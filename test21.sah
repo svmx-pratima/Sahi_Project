@@ -1,7 +1,0 @@
-_selectWindow("Work Order | Salesforce");
-_click(_button("NewField Sets"));
-_selectDomain("lightningdelivery--part2.cs64.my.salesforce.com");
-_selectWindow();
-_setValue(_textbox("MasterLabel"), "Test1");
-_setValue(_textarea("Description"), "test");
-_click(_submit(" Save [1]"));
