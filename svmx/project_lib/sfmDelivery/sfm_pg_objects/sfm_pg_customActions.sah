@@ -1,0 +1,63 @@
+/**
+* SFM  Custom Actions object repository 
+*/
+
+var $sfm_pg_customActions = new function sfm_pg_customActions() {
+	
+	this.sel_selectObject=_select(0, _near(_span("Manage Custom Actions for", _near(_select(0)))));
+	this.btn_backToSetupHome =_submit("Back To Setup Home");
+	this.btn_stdView=_submit("View");
+	this.btn_stdClone=_submit("Clone");
+	this.btn_customNew=_submit("New");
+	this.btn_customEdit=_submit("Edit");
+	this.btn_customClone=_submit("Clone[1]");
+	this.btn_customDelete=_button("Delete");
+	
+	//Type of CA 
+	this.sel_actionType=_select(0);
+	
+	//URL action type page objects
+	
+	this.btn_quickSaveCA=_button("Quick Save");
+	this.btn_saveCloseCA=_submit("Save & Close");
+	this.btn_cancelCA=_submit("Cancel");
+	
+	this.txt_actionTitle=_textbox("Action Title");
+	this.txt_actionId=_textbox(2);
+	this.txt_actionDescription=_textarea(0);
+	this.sel_openUrlIn=_select(2);
+	this.txt_urlToLaunch=_textbox("URL To Launch");
+	this.chk_fullWindow=_checkbox("Open As Full Window");
+	this.txt_windowHeight=_textbox("Window Height");
+	this.txt_windowWidth=_textbox("Window Width");
+	this.chk_showScrolbars=_checkbox("Show Scrollbars");
+	
+	this.btn_addParameter=_button("Add");
+	this.btn_deleteParameter=_button("Delete");
+	
+	//Objects to add parameters after clicking add button in URL based
+	
+	this.chk_selectParameter=_checkbox("1");
+	this.txt_parameterName=_textbox(6);
+	this.sel_parameterValueType=_select(3);
+	this.txt_parameterValue=_textbox(7);
+	this.sel_parameterFieldName=_select(4);
+	
+	//Web Service type page objects
+	
+	this.txt_nameSpacePrefix = _textbox("Namespace Prefix");
+	this.txt_className = _textbox("Class Name");
+	this.txt_methodName = _textbox("Method Name");
+	this.txt_processingMessage = _textbox("Processing Message");
+	
+	//Objects to add parameters after clicking add button in URL based
+	
+	this.chk_selectParameterWS =_checkbox("1");
+	this.txt_parameterNameWS = _textbox(7);
+	this.sel_parameterValueTypeWS =_select(2);
+	this.txt_parameterValueWS =_textbox(8);
+	this.sel_parameterFieldNameWS =_select(3);
+	
+	
+
+};

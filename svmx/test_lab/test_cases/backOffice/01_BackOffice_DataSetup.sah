@@ -1,0 +1,35 @@
+
+//author - Noor Salma Sharieff
+//var $PM_accName;
+
+var $RS_TestDataSetup = _testcase("This test case will setup data for the BAC feature test cases");
+$RS_TestDataSetup.start();
+//_setSpeed($g_stepSpeed);
+//Pre - Condition 
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+var $excel = _getExcel("C:\\auto\\sahi_pro\\userdata\\scripts\\Sahi_Project\\svmx\\test_lab\\test_cases\\backOffice\\bo_excleData\\BAC_TestData.xlsx","Sheet1");
+var $excelScripts = _getExcel("C:\\auto\\sahi_pro\\userdata\\scripts\\Sahi_Project\\svmx\\test_lab\\test_cases\\backOffice\\bo_excleData\\BAC_TestData.xlsx","Scripts");
+//column,row
+var $excelSetAccount = $excel.set(1,1,$bo_act_accounts.createAccount());
+var $excelSetProduct = $excel.set(2,1,$bo_act_products.createProduct("pro12", "--None--"));
+var $excelSetIBName = $excel.set(3,1,$bo_act_installedProduct.createInstalledProduct($excel.get(2,1),$excel.get(1,1),""));
+var $excelSetcontactName = $excel.set(4,1,$bo_act_contacts.createContact($excel.get(1,1)));
+var $excelSetslaterm = $excel.set(5,1,$bo_act_slaTerms.createSlaTerms("Default"));
+var $excelSetcaseNumber = $excel.set(6,1,$bo_act_Cases.createCase("New", "High", "Email"));
+var $excelSetsconName = $excel.set(7,1,$bo_act_serviceMaintenanceContracts.createServiceMaintenanceContract($excel.get(1,1), $excel.get(5,1),1,0));
+$bo_act_serviceMaintenanceContracts.AddCoveredProductToSCON($excel.get(7,1), $excel.get(3,1));
+var $Location = $excel.set(8,1,$bo_act_locations.createLocation("Depot", $excel.get(1,1), "MG Road", "India", "560001"));
+
+//$bo_act_navigation.navigateToSetUpAndSearch("Installed Packages");
+//_click(_link("Predix ServiceMax"));
+//var $namespace = $excel.set(9,1,_getText(_cell(0,_rightOf(_cell("Namespace Prefix")))));
+
+//Scripts
+//Time Based PM Scripts
+//$excelScripts.set(1,1,"SVMXC.PREV_Conditional_Engine_Batch batchable = new SVMXC.PREV_Conditional_Engine_Batch();String processId = '"+$PMProcessId+"';SVMXC__ServiceMax_Processes__c condtionprocess = [select id from SVMXC__ServiceMax_Processes__c where SVMXC__ProcessID__c =: processId limit 1];batchable.setProcessIds = new Set<String>{condtionprocess.Id};Database.executeBatch(batchable, 1);");
+//$excelScripts.set(2,1,"SVMXDEV.PREV_Conditional_Engine_Batch batchable = new SVMXDEV.PREV_Conditional_Engine_Batch();String processId = '"+$PMProcessId+"';SVMXDEV__ServiceMax_Processes__c condtionprocess = [select id from SVMXDEV__ServiceMax_Processes__c where SVMXDEV__ProcessID__c =: processId limit 1];batchable.setProcessIds = new Set<String>{condtionprocess.Id};Database.executeBatch(batchable, 1);");
+//$RS_TestDataSetup.end();
+
+
+
+

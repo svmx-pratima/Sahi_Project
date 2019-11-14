@@ -1,0 +1,157 @@
+// author = Lohitha
+
+var $swat_createproducts = _testcase("$swat_createproducts","create products");
+$swat_createproducts.start();
+_setSpeed($g_stepSpeed);
+
+var $user_credentials_xls = $excel.readFromCustomExcel("../swat/swat_excelData/swatdata.xlsx", "USer_Details","","");
+var $productdata_xls = $excel.readFromCustomExcel("../swat/swat_excelData/swatdata.xlsx", "Product","","");
+var $IBdata_xls = $excel.readFromCustomExcel("../swat/swat_excelData/swatdata.xlsx", "Installed Product","","");
+var $standardpricedata_xls = $excel.readFromCustomExcel("../swat/swat_excelData/swatdata.xlsx", "Standard Price","","");
+
+for(var $i=0; $i<$user_credentials_xls.length; $i++){
+	var $swat_un = $user_credentials_xls[$i][0];
+	var $swat_pwd = $user_credentials_xls[$i][1];
+	var $swat_url = $user_credentials_xls[$i][2];
+}
+
+for(var $i=0;$i<$productdata_xls.length;$i++)
+{
+	var $pro_id = $productdata_xls[$i][0];
+	var $pro_productname = $productdata_xls[$i][1];
+	var $pro_active = $productdata_xls[$i][2];
+	var $pro_stockable = $productdata_xls[$i][3];
+	var $pro_enablesearializedtrackingofstock = $productdata_xls[$i][4];
+	_log("$pro_productname = "+$pro_productname);
+}
+
+for(var $i=0;$i<$IBdata_xls.length;$i++)
+{
+	var $ib_id = $IBdata_xls[$i][0];
+	var $ib_product = $IBdata_xls[$i][1];
+	var $ib_slnum = $IBdata_xls[$i][2];
+	var $ib_status = $IBdata_xls[$i][3];
+	var $ib_account = $IBdata_xls[$i][4];
+	var $ib_contact = $IBdata_xls[$i][5];
+	var $ib_location = $IBdata_xls[$i][6];
+	var $ib_ibid = $IBdata_xls[$i][7];
+	_log("$ib_product = "+$ib_product);
+	_log("$ib_account = "+$ib_account);
+	_log("$ib_contact = "+$ib_contact);
+	_log("$ib_location ="+$ib_location);
+	_log("$ib_ibid ="+$ib_ibid);
+	_log("$ib_slnum ="+$ib_slnum);
+}
+
+for(var $i=0;$i<$standardpricedata_xls.length;$i++)
+{
+	var $stndprice_id = $standardpricedata_xls[$i][0];
+	var $stndprice_standradprice = $standardpricedata_xls[$i][1];
+	var $stndprice_active = $standardpricedata_xls[$i][2];
+	_log("$stndprice_standradprice = "+$stndprice_standradprice);
+}
+
+$bo_act_login.login($swat_url, $swat_un, $swat_pwd);
+//$bo_act_login.login("https://test.salesforce.com", "lohithaadmin@dcfull.com", "maxpl0re2");
+
+_set($login_result, _fetch(login($swat_un,$swat_pwd)));
+_log($login_result);
+
+_set($del_pro, _fetch(deletePro()));
+_log($del_pro);
+
+_set($pro_creation, _fetch(createPro($productdata_xls)));
+_log($pro_creation);
+
+if($pro_creation.length != null && $pro_creation != false && $pro_creation != null){
+	//updating product id in product excel
+	for(var $i=0; $i< $pro_creation.length; $i++){
+		_log("$pro_creation[i] ="+$pro_creation[$i]);
+		$excel.insertUnderColumn("../swat/swat_excelData/swatdata.xlsx", "Product", "Id", $pro_creation[$i],(1+$i));
+		//$excel.insertUnderColumn($filePath, $sheetName, $columnName, $dataToWrite, $rowIndex)
+	}
+	for(var $i=0; $i< $pro_creation.length; $i++){
+		_log("$pro_creation[i] ="+$pro_creation[$i]);
+		$excel.insertUnderColumn("../swat/swat_excelData/swatdata.xlsx", "Standard Price", "Product", $pro_creation[$i],(1+$i));
+		//$excel.insertUnderColumn($filePath, $sheetName, $columnName, $dataToWrite, $rowIndex)
+	}
+	//updating products in IB excel
+	$j=0;
+	for(var $i=0; $i< $IBdata_xls.length; $i++){
+		if($j == $pro_creation.length){
+			$j=0;
+		}
+		_log("$Product value  = "+$pro_creation[$j]);
+		$excel.insertUnderColumn("../swat/swat_excelData/swatdata.xlsx", "Installed Product", "Product", $pro_creation[$j],(1+$i));
+		$j++;
+	}
+}
+
+//<browser>
+
+function login($swat_un,$swat_pwd)
+{
+	var $login_result = sforce.connection.login($swat_un,$swat_pwd);
+	return $login_result;
+}
+
+//delete and create products
+function deletePro(){
+	var delete_pro = [];
+	//deleting the existing products
+	var proresult = _call(sforce.connection.query("SELECT Id,Name FROM Product2 WHERE Name LIKE '%Auto%'"));
+	var del_pro = proresult.getArray("records");
+	_log("del pro.length = "+del_pro.length);
+	if(del_pro.length > 0){
+		for(var $i=0;$i<del_pro.length;$i++){
+			var pro = del_pro[$i];
+			delete_pro.push(pro.Id);
+		}
+		var delResult = sforce.connection.deleteIds([delete_pro]);
+		_log("del result pro = "+delResult);
+		if(delResult.length < 0){
+			_log(delResult.length +" Existed products are deleted");
+		}
+	}
+	else{
+		_log("No Existed products to delete");
+	}
+}
+
+function createPro($productdata_xls){
+	var $isSuccess = false;
+	var createPro =[];
+	var pro_Id = [];
+	//creating products
+	for(var $i=0; $i<$productdata_xls.length; $i++){
+		var pro = new sforce.SObject("Product2");
+		_log("$products from excel "+$productdata_xls[$i][1]);
+		pro.Name = $productdata_xls[$i][1];
+		pro.IsActive = $productdata_xls[$i][2];
+		pro.SVMXC__Stockable__c = $productdata_xls[$i][3];
+		pro.SVMXC__Enable_Serialized_Tracking__c = $productdata_xls[$i][4];
+		createPro.push(pro);
+		_log("createPro "+createPro);
+	}
+	//fetch product data from products excel
+	
+	var $pro_result = _call(sforce.connection.create(createPro));
+	if($pro_result != 0 && $pro_result != null){
+		$isSuccess = true;
+		_log("$pro_result = "+$pro_result);
+		for(var $x=0; $x<$pro_result.length; $x++){
+			if($pro_result[$x].id === null){
+				$isSuccess = false;
+				return $isSuccess;
+			}
+			pro_Id.push($pro_result[$x].id);
+			_log("pro_Id.push = "+pro_Id);
+		}
+		_log("pro_Id = "+pro_Id);
+		return pro_Id;
+	}
+	return $isSuccess;
+}
+//</browser>
+
+

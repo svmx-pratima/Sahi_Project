@@ -1,0 +1,354 @@
+var $dc_sfApiDataCreation = new function dc_sfApiDataCreation() {
+      this.login = function($un,$pwd) {
+            var $login_result="";
+            _set($login_result,_fetch(login($un, $pwd)));
+            _wait(10000);
+            return $login_result;
+            // <browser>
+            function login($un, $pwd) {
+                  var $login_result = sforce.connection.login($un, $pwd);
+                  $sfdc_sessionId = $login_result.sessionId;
+                  _log("SFDC session Id " +  $sfdc_sessionId);
+                  _log("Returning Login Result" + $login_result);
+                  return $login_result;
+            } 
+            // </browser>
+      };
+      
+      //Creation of Account
+       this.createAccount = function() {
+             var $accountId;
+            _set($accountId,_fetch(createAccount()));
+            _wait(10000);           
+            return $accountId;
+            
+            //<browser>
+            function createAccount() {
+                 _log("Creating Account");
+                  var account = new sforce.SObject("Account");
+                  account.Name= "SMAX Account";
+  
+                  $result = _call(sforce.connection.create([ account ]));
+                  $accountId = $result[0].id;
+                  _log($accountId);
+                  return $accountId;
+              }//</browser>
+      };
+      
+    //Creation of Service Team
+    this.createServiceTeam = function() {
+        var $serviceTTeamId="";
+        _set($serviceTTeamId,_fetch(createServiceTeam()));
+        _log("Service Team Id In createST"+$serviceTTeamId);
+        _wait(10000);
+        return $serviceTTeamId;
+        
+        //<browser>
+        function createServiceTeam() {
+             _log("Creating Service Team");
+              var $serviceTeamId;
+              var serviceTeam = new sforce.SObject("SVMXC__Service_Group__c");
+              serviceTeam.Name = "SMAX Bangalore Team";
+              serviceTeam.SVMXC__Active__c = 'True';
+              serviceTeam.SVMXC__Street__c = "Banaswadi";
+              serviceTeam.SVMXC__City__c = "Bangalore";
+              serviceTeam.SVMXC__State__c = "Karnataka";
+              serviceTeam.SVMXC__Country__c = "India";
+              serviceTeam.SVMXC__Zip__c = "560001";
+       
+              $result = _call(sforce.connection.create([ serviceTeam ]));
+              _wait(10000);              
+              $serviceTeamId = $result[0].id;
+              _log($serviceTeamId);
+              return $serviceTeamId;
+
+        }//</browser>
+  } ;    
+  
+
+  //Creation of Technician
+  this.create_Technician = function($serviceTeamId,$userId) {
+	  
+      var $Technician="";
+      _set($Technician,_fetch(create_Technician($serviceTeamId,$userId)));
+      _wait(10000);
+      return $Technician;
+      
+      //<browser>
+      function create_Technician($serviceTeamId,$userId) {
+           _log("Creating Service Technician");
+            var serviceTechnician = new sforce.SObject("SVMXC__Service_Group_Members__c");
+            serviceTechnician.Name = "SMAX Tech Test1";
+            serviceTechnician.SVMXC__Service_Group__c=$serviceTeamId;
+            serviceTechnician.SVMXC__Enable_Scheduling__c = 'True';
+            serviceTechnician.SVMXC__Salesforce_User__c=$userId;
+            serviceTechnician.SVMXC__Active__c = 'True';
+            serviceTechnician.SVMXC__Street__c = "Banaswadi";
+            serviceTechnician.SVMXC__City__c = "Bangalore";
+            serviceTechnician.SVMXC__State__c = "Karnataka";
+            serviceTechnician.SVMXC__Country__c = "India";
+            serviceTechnician.SVMXC__Zip__c = "560001";
+            $result = _call(sforce.connection.create([ serviceTechnician ]));
+            $TechnicianId = $result[0].id;
+            _log($TechnicianId);
+            
+            var $TechnicianName = _call(sforce.connection
+                    .query("SELECT Name FROM SVMXC__Service_Group_Members__c WHERE Id = '"
+                                + $TechnicianId + "'"));
+            var $TechnicianArr = $TechnicianName.getArray("records");
+            _wait(2000);
+            var $TechnicianName = $TechnicianArr[0].Name;
+            _log($TechnicianName);  
+            return $TechnicianName;     
+                      
+       }//</browser>
+};
+
+
+this.verifySFUserExists = function($sfdcSessionId,$firstName,$lastName) {
+_log("Inside createSF User creation");
+var $sfUser="";
+_set($sfUser,_fetch(verifySFUserExists($sfdcSessionId,$firstName,$lastName)));
+_wait(10000);
+return $sfUser;
+
+  //Creation of Salesforce User to be associated with Technician
+//<browser>
+function verifySFUserExists($sfdcSessionId,$firstName,$lastName) {
+	_log("Fetching Technician User details");
+	_log($firstName);
+	_log($lastName);
+	   var $userResult=""; 
+		sforce.connection.sessionId = $sfdcSessionId;
+		_log("sforce.connection.sessionId = "+sforce.connection.sessionId);
+	   _log("Insider createSFUser functoin, before sforce connection");
+	    var $userId = _call(sforce.connection
+	            .query("SELECT Id FROM User WHERE FirstName = '"+$firstName+"'"+" AND LastName = '"+$lastName+"'"));
+	    _wait(10000);
+	    _log($userId);
+   	    var $records = $userId.getArray("records");
+	    _wait(10000);
+        _log("User Id to be associated with Technician is = "+$records[0].Id);	
+	    if($records.length==1)
+	    	{
+	    		$userResult='true';
+	    		_log("User Exists");
+	     	}
+	    else
+	    	{
+	    		$userResult='false';
+	    		_log("user does not exist");
+	       	}
+	    _log("User exists?" + $userResult);
+	    	for (var i=0; i< $records.length; i++) {
+	 	   var $record = $records[i];
+	 	   _log("record.FirstName = "+$record.name);
+	 	  _log("record.id = "+$record.id);
+ 	    }
+	    return $records[0].Id;
+ 	  }  //</browser>
+} ;
+
+	
+	this.fetchSFUserId = function($sfdcSessionId,$loggedInUserName) {
+		_log("Fetching Logged In User details");
+		var $sfUser="";
+		_set($sfUser,_fetch(fetchSFUserId($sfdcSessionId,$loggedInUserName)));
+		_wait(10000);
+		_log("log inside fetechUserId sfUser"+$sfUser);
+		return $sfUser;
+
+		  //Creation of Salesforce User to be associated with Technician
+		//<browser>
+		function fetchSFUserId($sfdcSessionId,$loggedInUserName) {
+
+			   var $userResult="";			   
+				sforce.connection.sessionId = $sfdcSessionId;
+				_log("sforce.connection.sessionId = "+sforce.connection.sessionId);
+			   _log("Insider createSFUser functoin, before sforce connection");
+			    var $userId = _call(sforce.connection
+			            .query("SELECT FirstName,LastName FROM User WHERE Username  = '"+$loggedInUserName+"'"));
+			    _log("After Select User Query"); 
+			    _wait(30000);
+			    _log($userId);
+	    
+			    var $records = $userId.getArray("records");
+			    _wait(10000);
+		        _log("Logged In User's First Name  = "+ $records[0].FirstName);
+		        _log("Logged In User's Last Name  = " + $records[0].LastName);
+	    
+			    if($records.length==1)
+			    	{
+			    		$userResult='true';
+			    		_log("user Exists");
+			     	}
+			    else
+			    	{
+			    		$userResult='false';
+			    		_log("user does nto exist");
+			       	}
+			    _log($userResult);
+
+			    var $fullName=$records[0].FirstName+" "+ $records[0].LastName;
+			    _log($fullName);
+			    return $fullName;
+	 	  }  //</browser>
+		} ;
+
+	
+	//Delete Account
+	this.deleteAccount = function($account_Id, $sfdc_sessionId) {
+		var $is_success = false;
+		_set($is_success, _fetch(deleteAccount($account_Id,$sfdc_sessionId)));
+		return $is_success;
+		// <browser>
+		function deleteAccount($account_Id,$sfdc_sessionId) {
+			sforce.connection.sessionId = $sfdc_sessionId;
+			var delete_Account = [];
+			var svmx_Job_result = _call(sforce.connection.query("Select Id From Account Where Id = '"+ $account_Id + "'"));
+			var records = svmx_Job_result.getArray("records");
+			_log("records.length = "+records.length);
+			if(records.length > 0){
+				for(var $x=0;$x<records.length;$x++){
+					var $record = records[$x];
+					delete_Account.push($record.Id);
+					_log("account ot be deleted" + $record.Id);
+				}
+				var delResult = sforce.connection.deleteIds([delete_Account]);
+				if(delResult.length < 0){
+					_log(delResult.length +" Accounts are deleted");
+					$is_success = true;
+				}
+			}
+			else{
+				_log("No Accounts to delete");
+				$is_success = false;
+			}
+			
+			return $is_success;
+		}
+		// </browser>		
+	};	
+	
+	
+	//Delete Work Order
+	this.delete_WorkOrder = function($WOId, $sfdc_sessionId) {
+		var $is_success = false;
+		_set($is_success, _fetch(delete_WorkOrder($WOId,$sfdc_sessionId)));
+		return $is_success;
+		// <browser>
+		function delete_WorkOrder($WOId,$sfdc_sessionId) {
+			sforce.connection.sessionId = $sfdc_sessionId;
+			var delete_WO = [];
+			var svmx_Job_result = _call(sforce.connection.query("Select Id, Name  From SVMXC__Service_Order__c Where Id = '"+ $WOId + "'"));
+			var records = svmx_Job_result.getArray("records");
+			_log("records.length = "+records.length);
+			if(records.length > 0){
+				for(var $x=0;$x<records.length;$x++){
+					var $record = records[$x];
+					delete_WO.push($record.Id);
+					_log("WO ot be deleted" + $record.Id);
+				}
+				var delResult = sforce.connection.deleteIds([delete_WO]);
+				if(delResult.length < 0){
+					_log(delResult.length +" Wo are deleted");
+					$is_success = true;
+				}
+			}
+			else{
+				_log("No WO's to delete");
+				$is_success = false;
+			}
+			
+			return $is_success;
+		}
+		// </browser>		
+	};	
+	
+	//Delete Work Order
+	this.delete_ServiceTeam = function($serviceTeamId, $sfdc_sessionId) {
+		var $is_success = false;
+		_set($is_success, _fetch(delete_ServiceTeam($serviceTeamId,$sfdc_sessionId)));
+		return $is_success;
+		// <browser>
+		function delete_ServiceTeam($serviceTeamId,$sfdc_sessionId) {
+			sforce.connection.sessionId = $sfdc_sessionId;
+			var delete_ServiceTeam = [];
+			var svmx_Job_result = _call(sforce.connection.query("Select Id, Name  From SVMXC__Service_Group__c Where Id = '"+ $serviceTeamId + "'"));
+			var records = svmx_Job_result.getArray("records");
+			_log("records.length = "+records.length);
+			if(records.length > 0){
+				for(var $x=0;$x<records.length;$x++){
+					var $record = records[$x];
+					delete_ServiceTeam.push($record.Id);
+					_log("WO ot be deleted" + $record.Id);
+				}
+				var delResult = sforce.connection.deleteIds([delete_ServiceTeam]);
+				if(delResult.length < 0){
+					_log(delResult.length +" Service Team are deleted");
+					$is_success = true;
+				}
+			}
+			else{
+				_log("No Service Team to delete");
+				$is_success = false;
+			}
+			
+			return $is_success;
+		}
+		// </browser>		
+	};	
+	
+	//Delete Work Order
+	this.$deleteServiceTechnician = function($serviceTechnicianId, $sfdc_sessionId) {
+		var $is_success = false;
+		_set($is_success, _fetch($deleteServiceTechnician($serviceTechnicianId,$sfdc_sessionId)));
+		return $is_success;
+		// <browser>
+		function $deleteServiceTechnician($serviceTechnicianId,$sfdc_sessionId) {
+			sforce.connection.sessionId = $sfdc_sessionId;
+			var delete_ServiceTechnician = [];
+			var svmx_Job_result = _call(sforce.connection.query("Select Id, Name  From SVMXC__Service_Group_Members__c Where Id = '"+ $serviceTechnicianId + "'"));
+			var records = svmx_Job_result.getArray("records");
+			_log("records.length = "+records.length);
+			if(records.length > 0){
+				for(var $x=0;$x<records.length;$x++){
+					var $record = records[$x];
+					delete_ServiceTechnician.push($record.Id);
+					_log("Technciain to be deleted" + $record.Id);
+				}
+				var delResult = sforce.connection.deleteIds([delete_ServiceTechnician]);
+				if(delResult.length < 0){
+					_log(delResult.length +" Technician are deleted");
+					$is_success = true;
+				}
+			}
+			else{
+				_log("No Techncian  to delete");
+				$is_success = false;
+			}
+			
+			return $is_success;
+		}
+		// </browser>		
+	};		
+
+    this.createWorkOrderUI = function($priority,$city,$orderStatus) {
+  	  
+		$bo_act_navigation.navigateToWorkOrdersTab();
+		_click($bo_pg_workOrders.btn_newWorkOrder);
+		_setSelected($bo_pg_workOrders.sel_priority, $priority);
+		_setSelected($bo_pg_workOrders.sel_orderStatus, $orderStatus);
+	     var $txt_city = _textbox(0,_rightOf(_label("/\\*City|^City/")));
+	    _setValue(_textbox($txt_city, $city));
+		_click($bo_pg_workOrders.btn_saveWorkOrder);
+		_assertNotVisible(_div("/Error: Invalid Data/"));
+		_wait(15000, _isVisible($bo_pg_workOrders.txt_workOrderDetails));
+		var $workOrderNumber =  _getText($bo_pg_workOrders.txt_getWONumber);
+		_logOutput($workOrderNumber+ " Work Order is created");
+		return $workOrderNumber;
+    };
+
+    
+    
+}; 

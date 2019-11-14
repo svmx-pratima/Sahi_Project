@@ -1,0 +1,96 @@
+/**
+ * Functions for the Service Pricebooks
+ */
+
+//Test Data for Functions
+var $unit = ["--None--","Per Hour","Flat Rate"];
+var $PriceBookName = "Standard Service Price Book";
+
+var $bo_act_servicePricebooks = new function bo_act_servicePricebooks() {
+	
+	this.addNewServicePricebooks = function($unit, $activityID, $activityProduct, $regularRate){
+		var $PriceBookName = $bo_act_common.generateRandomName("TestSPBook");
+		  $bo_act_navigation.navigateToServicePricebooks();
+		  _wait(2000);
+		 // _call(top.location.reload());
+		  _click($bo_pg_servicePricebooks.btn_addNewServicePricebook);
+		  _wait(2000);
+		  _wait(15000, _isVisible($bo_pg_servicePricebooks.link_createServicePriceBook));
+		  _setValue($bo_pg_servicePricebooks.txt_pricebookName, $PriceBookName);
+		  _click($bo_pg_servicePricebooks.btn_laborLine);
+		  _click($bo_pg_servicePricebooks.btn_deleteFirstLaborLine);
+		  _click($bo_pg_servicePricebooks.btn_saveServicePricebookDelivery);
+		  _wait(3000, _isVisible($bo_pg_servicePricebooks.btn_editServicePriceBook));
+		  _click($bo_pg_servicePricebooks.btn_editServicePriceBook);
+		  _click($bo_pg_servicePricebooks.chk_activateServicePriceBook);
+		  _click($bo_pg_servicePricebooks.btn_saveServicePricebookEntry);
+		  _wait(3000, _isVisible(_heading2("Service Pricebook Detail")));
+		 		 
+		 //Add New Service Price Book entry
+		 _click($bo_pg_servicePricebooks.btn_newServicePricebookEntry);
+		 _setStrictVisibilityCheck(true);
+	     _setSelected($bo_pg_servicePricebooks.sel_unit, $unit);
+	     _setValue($bo_pg_servicePricebooks.txt_activityID, $activityID);
+	     _setValue($bo_pg_servicePricebooks.txt_activityProduct, $activityProduct);
+	     _setValue($bo_pg_servicePricebooks.txt_regularRate, $regularRate);
+	     _click($bo_pg_servicePricebooks.btn_saveServicePricebookEntry);
+	     _setStrictVisibilityCheck();
+	     _assertNotVisible(_div("/Error: Invalid Data/"));
+	     ($bo_pg_servicePricebooks.navigateBackToCustomServicePriceBook($PriceBookName));
+	 	 _logOutput($PriceBookName+ " Service Pricebooks is created");
+	     return $PriceBookName;  
+	};
+	
+	this.editStandardServicePricebooks = function($PriceBookName,$unit,$activityID,$activityProduct,$regularRate){
+		 $bo_act_navigation.navigateToServicePricebooks();
+		 _wait(2000);
+		 _setStrictVisibilityCheck(true);
+		 $bo_pg_servicePricebooks.clickOnServicePriceBook($PriceBookName);
+		 _setStrictVisibilityCheck();
+	     _wait(15000, _isVisible($bo_pg_servicePricebooks.btn_newServicePricebookEntry));
+	     _click($bo_pg_servicePricebooks.btn_newServicePricebookEntry);
+	     _setSelected($bo_pg_servicePricebooks.sel_unit, $unit);
+	     _setValue($bo_pg_servicePricebooks.txt_activityID, $activityID);
+	     _setValue($bo_pg_servicePricebooks.txt_activityProduct, $activityProduct);
+	     _setValue($bo_pg_servicePricebooks.txt_regularRate, $regularRate);
+	     _click($bo_pg_servicePricebooks.btn_saveServicePricebookEntry);
+	     _assertNotVisible(_div("/Error: Invalid Data/"));
+	     var $ServicePricebooksEntryNumber = _getText(_heading2("pageDescription"));
+	     ($bo_pg_servicePricebooks.navigateBackToCustomServicePriceBook($PriceBookName));
+	 	_logOutput($ServicePricebooksEntryNumber+ " Service Pricebooks Entry is created");
+	    return $ServicePricebooksEntryNumber;
+	};
+
+	this.deleteStandardServicePricebooksEntry = function($PriceBookName, $ServicePricebooksEntryNumber){
+		 $bo_act_navigation.navigateToServicePricebooks();
+		 $bo_pg_servicePricebooks.clickOnServicePriceBook($PriceBookName);
+		 $bo_pg_servicePricebooks.clickOnServicePriceBookEntry($ServicePricebooksEntryNumber);
+		 _click($bo_pg_servicePricebooks.btn_deleteServicePricebookEntry);
+	};
+	
+	this.deleteCustomServicePricebooks = function($PriceBookName){
+		 $bo_act_navigation.navigateToServicePricebooks();
+		 $bo_pg_servicePricebooks.clickOnServicePriceBook($PriceBookName);
+		 _click($bo_pg_servicePricebooks.btn_deleteServicePricebookEntry);
+	};
+	
+	this.activateStandardPriceBook = function($PriceBookName){
+		$bo_act_navigation.navigateToStandardPriceBook();
+		  $bo_pg_servicePricebooks.clickOnServicePriceBook($PriceBookName);
+		if(_isVisible(_image("Not Checked",_rightOf(_cell("/Active/"))))){	
+			 _click($bo_pg_servicePricebooks.btn_editServicePriceBook);
+			 _click($bo_pg_servicePricebooks.chk_activateServicePriceBook);
+			 _click($bo_pg_servicePricebooks.btn_saveServicePricebookEntry);
+		_wait(10000, _isVisible($PriceBookName));
+		};
+		
+		if(_isVisible(_image("Checked",_rightOf(_cell("/Active/"))))){
+		_logOutput("Standard Price Book = " + $PriceBookName+ " is Activated");	
+		}
+		else{
+			_logOutput("Standard Price Book = " + $sconName+ " is Not Activated");	
+		};
+		
+		};
+	
+};

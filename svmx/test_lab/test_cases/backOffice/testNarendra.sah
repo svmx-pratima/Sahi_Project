@@ -1,0 +1,24 @@
+
+
+_navigateTo("https://test.salesforce.com");
+_setValue( _emailbox("username"),"narendra.sync@syncgate.org.full");
+_setValue(_password("pw"),"servicemax2");
+_click(_submit("Log In to Sandbox"));
+
+$bo_act_navigation.navigateToSvmxSetup();
+//$bo_act_navigation.navigateToSfmTransactionDesigner();
+
+$bo_act_navigation.navigateMobileAndOffline("TECHNICIAN GROUP", "Download Criteria","Work Order", "Account", "Case", "Contact", "Product");
+$bo_act_navigation.navigateSynchronizationSettings("TECHNICIAN GROUP","Synchronization Settings", "Other Settings", "Advanced Download Criteria", "Attachment");
+
+//_wait(10000,_isVisible(bo_pg_sfmTransactionAndDesigner.btn_newSFMTransaction));
+//_click($bo_pg_sfmTransactionAndDesigner.btn_newSFMTransaction);
+
+$bo_act_navigation.navigate_to_servicemaxSetup_buttons();
+
+
+
+
+
+   
+	

@@ -1,0 +1,33 @@
+var $dc_act_createSFUser = new function $dc_act_createSFUser() {
+	
+	this.createSFUser = function()
+	
+	{	_log("Inside createSF User creation");
+		   var $firstName="DC";
+		   var $LastName="Technician";
+		   _log("Insider of createSFUser");
+		  _navigateTo("http://test.salesforce.com");
+		  _setValue(_password("pw"), "servicemax2");
+		  _setValue(_emailbox("username"), "vansys@pqtpart1.com");
+		  _click(_submit("Log In to Sandbox"));
+		  _wait(50000);
+		   _click(_link("Setup"));
+		  _click(_image("Expand - Manage Users - Level 1"));
+		  _click(_div("Users"));
+		  _click(_link("Users"));
+		  _click(_button("New User"));
+		  _setValue(_textbox("name_firstName"), "DC");
+		  _setValue(_textbox("name_lastName"), "Technician");
+		  _setValue(_textbox("Email"), "vanditha.v@servicemax.com");
+		  _setValue(_textbox("Username"), $firstName+$LastName+"@smax.com");
+		  _setValue(_textbox("CommunityNickname"), "tech1");
+		  _setSelected(_select("user_license_id"), "Salesforce");
+		  _setSelected(_select("Profile"), "ServiceMax Service User");
+		  _click(_submit(" Save [1]"));
+		  _log("After Save");
+		  return $firstName;
+		    //_log($UserArr);	
+		
+	};	
+	
+};

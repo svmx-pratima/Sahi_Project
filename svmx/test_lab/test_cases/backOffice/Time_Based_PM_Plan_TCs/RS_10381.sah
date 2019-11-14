@@ -1,0 +1,91 @@
+
+//author - Noor Salma Sharieff
+
+var $RS_10381 = _testcase("RS_10381","Create a PM Plan from Service Contract with coverage type as Account");
+$RS_10381.start();
+_setSpeed($g_stepSpeed);
+
+var $Workbenchurl = "https://workbench.developerforce.com/login.php";
+//Pre - Condition 
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+var $accName = $bo_act_accounts.createAccount();
+var $proName = $bo_act_products.createProductSimple();
+var $installedProduct = $bo_act_installedProduct.createInstalledProduct($proName,$accName,"");
+var $slaterm = $bo_act_slaTerms.createSlaTerms("Default");
+var $sconName = $bo_act_serviceMaintenanceContracts.createServiceMaintenanceContract($accName, $slaterm,1,0);
+$bo_act_serviceMaintenanceContracts.AddCoveredProductToSCON($sconName, $installedProduct);
+//Create Task Template
+var $tasktemplateName = $bo_act_common.generateRandomName("task");
+$bo_act_navigation.navigateToTaskTemplatePage();
+$bo_act_taskTemplate.createTaskTemplate();
+$bo_act_taskTemplate.addTask(1, "Test", "dest", "High",$tasktemplateName);
+$bo_act_taskTemplate.addRequiredParts(1,$proName);
+
+//Test Steps
+var $PMPTempName = $bo_act_PMPlanTemplate.createTimeBasedPMPlanTemplate($proName, "Account (Visit Only)",$tasktemplateName,"Months");
+//$bo_act_workOrders.checkFieldAvailableInPageLayout($bo_pg_PMPlanTemplate.startDateDelay,$bo_pg_salesforcePageSetUp.btn_startDateDelay);
+//$bo_act_workOrders.checkFieldAvailableInPageLayout($bo_pg_PMPlanTemplate.startDateDelay,$bo_pg_salesforcePageSetUp.btn_startDateDelayUnit);
+_click($bo_pg_workOrders.btn_editWorkOrder);
+$bo_act_PMPlanTemplate.editTextField($bo_pg_PMPlanTemplate.txt_startDateDelay, 5);
+$bo_act_PMPlanTemplate.editDropDownFields($bo_pg_PMPlanTemplate.txt_startDateDelayUnit, "Days");
+_click($bo_pg_workOrders.btn_saveWorkOrder);
+
+var $PMPlan = $bo_act_PMPlan.createATimeBasedPMPlanFromScon($sconName, $PMPTempName,"Account (Visit Only)",1);
+
+
+var $startDate = _getText($bo_pg_PMPlan.div_startDate);
+_click($bo_pg_PMPlan.link_firstLinkInPMSchedule);
+var $lastRunDate = _getText($bo_pg_PMPlan.txt_lastRunDate);
+var $scheduleOnActual = _getText($bo_pg_PMPlan.txt_scheduledOnDate);
+
+_assertEqual($startDate,$lastRunDate, "Last Run Date is not equal to start date");
+_assert($lastRunDate != $scheduleOnActual,"Issue in Last Run Date and Scheduled On date");
+
+var $PMProcessId = $bo_act_PMProcess.createPMProcess("Time Based Preventive Maintenance",6, $PMPlan,"One Per Plan");
+
+$bo_act_navigation.navigateToSetUpAndSearch("Installed Packages");
+_click(_link("/ServiceMax/"));
+var $nameSpace = _getText(_cell(0,_rightOf(_cell("Namespace Prefix"))));
+if(_getText(_cell(0,_rightOf(_cell("Namespace Prefix"))))!="SVMXDEV")
+var $script = "String StrSVMXProcessID = '"+$PMProcessId+"';String StrSFPMProcessID = [Select Id From SVMXC__ServiceMax_Processes__c where SVMXC__ProcessID__c =: StrSVMXProcessID AND SVMXC__Active__c = true].Id;SVMXC.PREV_Engine_Batch EngObj = new SVMXC.PREV_Engine_Batch();EngObj.setProcessIds.add(StrSFPMProcessID);ID Batch = database.executebatch(EngObj, 1);";
+else
+$script = "String StrSVMXProcessID = '"+$PMProcessId+"';String StrSFPMProcessID = [Select Id From SVMXDEV__ServiceMax_Processes__c where SVMXDEV__ProcessID__c =: StrSVMXProcessID AND SVMXDEV__Active__c = true].Id;SVMXDEV.PREV_Engine_Batch EngObj = new SVMXDEV.PREV_Engine_Batch();EngObj.setProcessIds.add(StrSFPMProcessID);ID Batch = database.executebatch(EngObj, 1);";
+
+if($g_url.includes("login"))
+	var $environment = "Production";
+else
+	 $environment = "Sandbox";
+
+
+
+$bo_act_login.loginToWorkBench($Workbenchurl, $environment, $bac_un, $bac_pwd);
+$bo_act_login.runApexScriptinWB($script);
+
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+$bo_act_navigation.navigateToPreventiveMaintenancePlans();
+_click(_link($PMPlan));
+_call(top.location.reload());
+var $WONumber = _getText($bo_pg_PMPlan.link_firstLinkInWorkOrders);
+_assertNotNull($WONumber,"Work Order is not created");
+
+
+
+//Clean up function
+
+var $delscript =
+	"DELETE[SELECT id FROM "+$nameSpace+"__Service_Contract__c WHERE Name = '"+$sconName+"'];\n"+
+	"DELETE[SELECT id FROM "+$nameSpace+"__PM_Plan_Template__c WHERE Name = '"+$PMPTempName+"'];\n"+
+	"DELETE[SELECT id FROM "+$nameSpace+"__PM_Plan__c WHERE Name = '"+$PMPTempName+"'];\n"+
+	"DELETE[SELECT id FROM Account WHERE Name = '"+$accName+"'];\n"+
+	"DELETE[SELECT id FROM Product2 WHERE Name = '"+$proName+"'];\n"+
+	"DELETE[SELECT id FROM "+$nameSpace+"__Installed_Product__c WHERE Name = '"+$installedProduct+"'];\n"+
+	"DELETE[SELECT id FROM "+$nameSpace+"__Service_Order__c WHERE Name = '"+$WONumber+"'];\n"+
+	"DELETE[SELECT id FROM "+$nameSpace+"__Service_Level__c WHERE Name = '"+$slaterm+"'];\n";
+
+$bo_act_login.loginToWorkBench($Workbenchurl, $environment, $bac_un, $bac_pwd);
+$bo_act_login.runApexScriptinWB($delscript);
+
+$RS_10381.end();
+
+
+

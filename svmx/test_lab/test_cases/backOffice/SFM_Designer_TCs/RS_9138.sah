@@ -1,0 +1,110 @@
+/*Author Narendra Babu*/
+
+var RS_9138 = _testcase("RS_9138","MultiAdd and Save - Standalone purpose of editing existing record.");
+RS_9138.start();
+//Create WO1 for SFDC evennNGe
+var $sGenNum =$bo_act_common.generateRandomName("");
+var $objName= "";
+var $obJson = "";     
+var $columnName = "";
+var $filter="";
+var $workorderid= "";
+var $product1id="";
+var $product2id="";
+var $woURL="";
+var $searchTxt = "car";
+var $chkParts = [$bo_pg_manageWOLineUsageForSorting.chk_part1,$bo_pg_manageWOLineUsageForSorting.chk_part2];
+
+ 
+/*
+$objName= "Account";
+$obJson = "{\"Name\":\""+$restAccNamße+"\"}"; 
+$columnName = "Name";
+$filter="id";
+//create an account
+$account=$sfm_act_restApiMethods.postRestApi($appiumAdminUn,$appiumAdminPwd,$appiumclient_id,$appiumclient_secret,$appiumorginstance,$objName,$obJson,"POST");
+//get the caseNumber
+_log($account);*/
+ 
+//Create WORK ORDER
+
+$objName= "SVMXC__Service_Order__c";
+$obJson = "{\"SVMXC__Order_Status__c\":\"Open\",\"SVMXC__Order_Type__c\":\"Field Service\"}";     
+$columnName = "Name";
+$filter="id";
+ 
+$workorderid=$sfm_act_restApiMethods.postRestApi($bac_un,$bac_pwd,$bac_client_id,$bac_client_secret,$bac_orginstance,$objName,$obJson,"POST");
+_log($workorderid);
+//get the wo
+$WOname =$sfm_act_restApiMethods.getRestApi($bac_un,$bac_pwd,$bac_client_id,$bac_client_secret,$bac_orginstance,"GET", $objName, $columnName, $filter, $workorderid);
+_log($WOname);
+
+//Create Product one
+
+$objName= "Product2";
+$obJson = "{\"Name\":\""+$sGenNum+"Pro1"+"\",\"IsActive\":true}";     
+$product1id=$sfm_act_restApiMethods.postRestApi($bac_un,$bac_pwd,$bac_client_id,$bac_client_secret,$bac_orginstance,$objName,$obJson,"POST");
+_log($product1id);
+
+//Create Product two
+
+$objName= "Product2";
+$obJson = "{\"Name\":\""+$sGenNum+"Pro2"+"\",\"IsActive\":true}";     
+//$columnName = "Name";
+//$filter="id";
+ 
+$product2id=$sfm_act_restApiMethods.postRestApi($bac_un,$bac_pwd,$bac_client_id,$bac_client_secret,$bac_orginstance,$objName,$obJson,"POST");
+_log($product2id);
+
+
+//Test case scenario
+
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+$woURL=$bac_orgurl+"/"+$workorderid;
+_navigateTo($woURL);
+_wait(8000);
+_selectDomain("/svmxc/");
+_click($bo_pg_manageWOLineUsageForSorting.btn_editWO);
+_selectDomain();
+
+var $chkParts = [$bo_pg_manageWOLineUsageForSorting.chk_part1,$bo_pg_manageWOLineUsageForSorting.chk_part2];
+
+$bo_act_manageWOLineUsageForSorting.addmultiparts($sGenNum+"Pro", $chkParts);
+$bo_act_manageWOLineUsageForSorting.updateparts($bo_pg_manageWOLineUsageForSorting.img_extenedwindow1, "3", "33.5");
+$bo_act_manageWOLineUsageForSorting.updateparts($bo_pg_manageWOLineUsageForSorting.img_extenedwindow2, "5", "55.5");
+_click($bo_pg_manageWOLineUsageForSorting.btn_Save);
+
+
+
+
+
+/*
+
+_click($bo_pg_manageWOLineUsageForSorting.tab_parts);
+_click($bo_pg_manageWOLineUsageForSorting.btn_Multiaddparts);
+_setValue($bo_pg_manageWOLineUsageForSorting.txt_Search,"car");
+_click($bo_pg_manageWOLineUsageForSorting.icn_search);
+_wait(4000);
+_click($bo_pg_manageWOLineUsageForSorting.chk_Part1);
+_click($bo_pg_manageWOLineUsageForSorting.chk_Part2);
+_click($bo_pg_manageWOLineUsageForSorting.btn_select);
+_wait(8000);
+
+_click($bo_pg_manageWOLineUsageForSorting.img_extenedwindow1);
+_setValue($bo_pg_manageWOLineUsageForSorting.txt_lineqty, "3");
+_setValue($bo_pg_manageWOLineUsageForSorting.txt_linepriceunit,"33.5");
+_click($bo_pg_manageWOLineUsageForSorting.btn_update);
+_wait(3000);
+_click($bo_pg_manageWOLineUsageForSorting.img_extenedwindow2);
+_setValue($bo_pg_manageWOLineUsageForSorting.txt_lineqty, "5");
+_setValue($bo_pg_manageWOLineUsageForSorting.txt_linepriceunit,"55.5");
+_click($bo_pg_manageWOLineUsageForSorting.btn_update);
+_click($bo_pg_manageWOLineUsageForSorting.btn_Save);
+
+*/
+
+
+
+
+RS_9138.end();
+ 

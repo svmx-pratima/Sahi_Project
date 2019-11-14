@@ -1,0 +1,89 @@
+var $RS_7013 = _testcase("RS_7013","Verify current record literals in map");
+$RS_7013.start();
+//Variables used
+var $object_name = "Work Order";
+var $ctrlPicklist = "Order Status";
+var $processName = "RS_7013";
+var $process_to_clone = "Manage Work Order Lines - Usage";
+var $sfmTemplate = "SVMXSTD: Manage WO Usage Lines";
+var $isCustom = false;
+var $ctr = 0;
+var $i = 0;
+var $containerName = ["Order Status","Order Status","Order Status","Order Status","Order Status","Order Status"];
+var $fieldName=["City","Booked Appointment Slot","Previous Scheduled Date Time","Scheduled Date Time","Dispatch Priority","Estimated Duration"];
+var $currentWizardName = $sfmd_wizardName[4];
+var $success_message = "Work Order was saved.";
+var $stdMap = "SVMXSTD: Close Work Order";
+var $pickListLabels = [];
+var $pickListValues = [];
+var $textLabels = ["City","Scheduled Date Time","Estimated Duration"];
+var $textValues = ["SVMX.CURRENTRECORD."+$orgnamespace+"__City__c","SVMX.CURRENTRECORD."+$orgnamespace+"__SM_Estimated_Duration__c","SVMX.CURRENTRECORD."+$orgnamespace+"__Previous_Scheduled_Date_Time__c"];
+var $inputTextLabels = ["City","Estimated Duration"];
+var $inputTextValues = ["Bengaluru Sahi Pro","589"];
+var $inputDateTimeLabels = ["Previous Scheduled Date Time"];
+var $inputDateValues = ["04/11/2018"];
+var $inputTimeValues = ["1:30 PM"];
+var $mapTextValues = ["Booked Appointment Slot","Dispatch Priority","Scheduled Date Time"];
+var $mapType = "Value Map for Existing Records";
+//Appending current timestamp to process name to make it unique.
+var $timeStamp = $bo_act_navigation.getCurrentTimeStamp();
+$processName = $processName + "_" + $timeStamp;
+var $pageLayoutName = $processName + "pg";
+var $mapName = $processName + "mp";
+
+//**************************************************************************************
+//Login and switch to classic
+$bo_act_login.login($g_url,$sfmdUsn,$sfmdPwd);
+
+_wait(15000);
+
+//Navigate to servicemax setup and setup required process.
+//Clone standard process and add the dependent picklist in the screen designer
+_setSpeed(3000);
+$sfm_act_SFM.cloneTDM016($process_to_clone,$processName,$isCustom,$pageLayoutName, $sfmTemplate, $fieldName, $containerName);
+_click($bo_pg_sfmTransactionAndDesigner.btn_quickSave1);
+_click($bo_pg_sfmTransactionAndDesigner.btn_qualifyingCriteriaAndFieldMapping);
+
+//Set up the mapping with SVMX.CURRENTRECORD literals for Header
+$bo_act_mappings.createMapping("Work Order",$mapType,$pickListLabels,$pickListValues,$mapTextValues,$textValues,$mapName);
+
+_setSpeed(1000);
+//Add the custom process to SFM wizard.
+$sfm_act_wizards.addToWizard($object_name,$currentWizardName,"SFM",$processName);
+_selectDomain();
+_setSpeed(1000);
+//Create a work order
+var $wo_number = $sfm_act_common.createWoInClassic();
+$sfm_act_common.globalSearchOnce($wo_number);
+
+//Launch the process in SFM Delivery
+$sfm_act_common.launchSFMProcessInClassic($processName);
+_wait(10000);
+
+//Enter values for Booked Appointment Slot, Previous Scheduled Date Time and Dispatch Priority
+$sfm_act_SFM.fillHeaderTextValues($inputTextLabels,$inputTextValues);
+$sfm_act_SFM.fillDateTimeFields($inputDateTimeLabels,$inputDateValues,$inputTimeValues);
+$sfm_act_common.performQuickSave();
+_wait(4000);
+$sfm_act_common.clearSvmxCache();
+_wait(10000);
+//Combine text and date fields
+for($i=0;$i<$inputDateTimeLabels.length;$i++){
+	$inputTextLabels.push($inputDateTimeLabels[$i]);
+	$inputTextValues.push($inputDateValues[$i]);
+}
+//Verify values for the rest of the fields
+$inputDateTimeLabels = ["Scheduled Date Time"];
+var $verifyResult = $sfm_act_common.verifyValuesInDelivery($mapTextValues,$inputTextValues,$inputDateTimeLabels,$inputTimeValues,[],[],[],[],[],[]);
+_assertTrue($verifyResult);
+if($verifyResult){
+	_log("PASS: Current Record literals are verified in mapping");
+}
+else {
+	_log("FAIL:Current Record literals failed in mapping");
+}
+$sfm_act_common.saveClassicSfmProcess();
+_setStrictVisibilityCheck(false);
+$sfm_act_common.logoutInClassic();
+_setSpeed($g_stepSpeed);
+$RS_7013.end();

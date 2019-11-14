@@ -1,0 +1,192 @@
+//Tests are to be written here [Bhupendra Singh Chouhan]
+//==============
+
+var $RS_5467 = _testcase("$RS_5467","Interactive Entitlement-Case:- Covd Contract, Covd Loc, Covd Prod has Valid SLA but with Empty Dates and SLA");
+$RS_5467.start();
+_setSpeed($g_stepSpeed);
+
+/**
+* Login to the Sandbox Org
+*/
+
+$bo_act_login.login($PRT_url, $bac_PRTun, $bac_PRTpwd);
+
+//Pre - Condition Test Data
+var $recordType = ["Depot","Depot Child","Depot Parent","Standard Location"];
+var $productFamily = ["--None--","GeneralSolution","AdvSolution","Accessory", "Storage"];
+var $productCode = "";
+var $exchangeType = ["--None--","Advance Exchange","Return Exchange"];
+var $unitOfTimeForCoverage = ["--None--","Days","Weeks","Months","Years"];
+var $coverageEffectiveFrom = ["--None--","Date Installed","Date Ordered","Date Shipped","Last Activity Date","Last Date Shipped","Warranty Start Date","Warranty End Date"];
+var $materialPercentCovered = 10;
+var $laborPercentCovered = 20;
+var $expensesPercentCovered = 30;
+var $durationOfCoverage = 5;
+var $seperator = "/";
+
+/**
+ * Configure the Global Profile SET024 and SET025
+ */
+var $Module = "Entitlement Verification";
+var $SubModule = "Case Entitlement VF";
+var $Setting1 = "SET003";
+var $Setting2 = "SET006";
+var $value1 = "Product";
+var $value2 = "Product or Location line level";
+$bo_act_configurationProfiles.editGlobalProfileForPicklistSettings($Module, $SubModule, $Setting1, $value1);
+$bo_act_configurationProfiles.editGlobalProfileForPicklistSettings($Module, $SubModule, $Setting2, $value2);
+
+/**
+ * Create Account, Contact, Location, Product and Installed Product
+ */
+var $accountName = $bo_act_accounts.createAccount();
+var $contactName = $bo_act_contacts.createContact($accountName);
+var $locationName = $bo_act_locations.createLocation($recordType[3],$accountName,"#007","India","560001");
+var $productName = $bo_act_products.createProduct($productCode, $productFamily[0]);
+var $IBName = $bo_act_installedProduct.createInstalledProduct($productName, $accountName, $contactName);
+
+/**
+ * Create SLA Terms
+ */
+
+//Create 1st SLA Term SLA01 [SLA 09]
+var $slaName01 = $bo_act_slaTerms.createSlaTerms("Default");
+//$bo_act_slaTerms.addInitialResponseToSLA($slaName01,"Case","All","Medium","Created Date","5","10","SLA");
+//$bo_act_slaTerms.addOnsiteResponseToSLA($slaName01,"Case","All","Medium","Created Date","10","15","SLA");
+
+//validation of SLA creation
+_assertExists(_span($slaName01));
+
+//Create 2nd SLA Term SLA02 [SLA 10]
+var $slaName02 = $bo_act_slaTerms.createSlaTerms("Default");
+//$bo_act_slaTerms.addInitialResponseToSLA($slaName02,"Case","All","Medium","Created Date","5","10","SLA");
+//$bo_act_slaTerms.addOnsiteResponseToSLA($slaName02,"Case","All","Medium","Created Date","10","15","SLA");
+
+//validation of SLA creation
+_assertExists(_span($slaName02));
+
+//Create 3rd SLA Term SLA03 [SLA 11]
+var $slaName03 = $bo_act_slaTerms.createSlaTerms("Default");
+//$bo_act_slaTerms.addInitialResponseToSLA($slaName03,"Case","All","Medium","Created Date","5","10","SLA");
+//$bo_act_slaTerms.addOnsiteResponseToSLA($slaName03,"Case","All","Medium","Created Date","10","15","SLA");
+
+//validation of SLA creation
+_assertExists(_span($slaName03));
+
+/**
+ * Create Service Contract(With Child lines) and Activate it
+ */
+var $pastYear = 1;  // Start Date for Service Contract
+var $futureYear = 1;  // End Date for Service Contract
+
+// Creation of Service Contracts
+var $serviceConractName = $bo_act_serviceMaintenanceContracts.createServiceMaintenanceContract($accountName, $slaName01, $futureYear, $pastYear);
+
+//Activating Created Service Contract
+$bo_act_serviceMaintenanceContracts.activateServiceContract($serviceConractName);
+
+// Add Covered Product to Service Contract 
+
+$bo_act_serviceMaintenanceContracts.AddCoveredProducToSConWithoutStartEndDates($serviceConractName, $IBName, $slaName02);
+
+//Add Covered Location to Service Contract 
+
+var $pastYear1 = 2;  			// Start Date 'TODAY's' Date - 2 YEARS
+var $futureYear1 = 2;			//End Date 'TODAY's' Date + 2 YEARS
+
+$bo_act_serviceMaintenanceContracts.addCoveredLocationToServiceContract($serviceConractName, $locationName, $slaName03, $pastYear1, $futureYear1);
+//$bo_act_workOrders.checkFieldAvailableInPageLayout($bo_pg_workOrders.slaTerm,$bo_pg_salesforcePageSetUp.btn_slaTerm);
+//$bo_act_workOrders.checkFieldAvailableInPageLayout($bo_pg_serviceMaintenanceContracts.cell_startDate,$bo_pg_salesforcePageSetUp.btn_startDate);
+//$bo_act_workOrders.checkFieldAvailableInPageLayout($bo_pg_serviceMaintenanceContracts.cell_startDate,$bo_pg_salesforcePageSetUp.btn_endDate);
+
+/**
+ * Create Case record
+ */
+var $caseStatus = "New";
+var $casePriority = "Medium";
+var $caseOrigin = "Phone";
+var $caseNumber = $bo_act_Cases.createCase($caseStatus, $casePriority, $caseOrigin);
+
+//Edit the above case for Account, Contact and IB information
+$bo_act_Cases.editCase($caseNumber,$accountName,$contactName,$IBName,$locationName);
+
+/**
+* Create SFM Wizard for Case with 1 Steps as Check Entitlement.
+*/
+var $wizardTitleName = $bo_act_common.generateRandomName("SFWTitle");
+var $wizardIDName = $bo_act_common.generateRandomName("SFWId");
+var $fieldActnType = "Others";
+var $actnName = "Check Entitlement";
+
+$bo_act_navigation.navigateToSfmWizard();
+$bo_act_SFW.createWizardGeneralInfo("Case", $wizardTitleName, $wizardIDName);
+$bo_act_SFW.addCustomActionToWizard($fieldActnType, $actnName);
+$bo_act_SFW.quickSaveSFWizard();
+
+
+/**
+ * Perform Interactive Entitlement on Case
+ */
+$bo_act_interactiveEntitlement_Case.performInteractiveEntitlement_Case($caseNumber, $serviceConractName);
+
+/**
+ * Validation of "Covered By" on Interactive Entitlement Case Page
+ */
+var $CoveredByExpected = "Installed Product";
+var $CoveredByActual = _getText(_cell("/Ins/",_near(_div("Covered By"))));
+_assertEqual($CoveredByExpected,$CoveredByActual,"Actual and expected Covered By is not same");
+
+/**
+ * Perform Interactive Entitlement on Case when location is enabled
+ */
+$bo_act_interactiveEntitlement_Case.performInteractiveEntitlement_withOnLocation($caseNumber, $serviceConractName);
+
+/**
+ * Validation of "Covered By" on Interactive Entitlement Case Page
+ */
+var $CoveredByExpected1 = "Installed Product, Location";
+var $CoveredByActual1 = _getText(_cell("/Ins/",_near(_div("Covered By"))));
+_assertEqual($CoveredByExpected1,$CoveredByActual1,"Actual and expected Covered By is not same when location is enabled");
+
+var $StartDateExpected = $bo_act_common.getStartDateWithoutZeros($pastYear, $seperator);  // Start Date for Service Contract
+var $EndDateExpected = $bo_act_common.getEndDateWithoutZeros($futureYear, $seperator);  // End Date for Service Contract
+
+var $StartDateActual = _getText(_cell(0,_rightOf(_cell($serviceConractName))));
+var $EndDateActual = _getText(_cell(1,_rightOf(_cell($serviceConractName))));
+
+_assertEqual($StartDateExpected,$StartDateActual,"Actual and expected Covered By is not same when location is enabled");
+_assertEqual($EndDateExpected,$EndDateActual,"Actual and expected Covered By is not same when location is enabled");
+
+/**
+ * Save Interactive Entitlement page on Case when location is enabled
+ */
+$bo_act_interactiveEntitlement_Case.saveInteractiveEntitlement_CasePage();
+
+
+// validation of Entitlement Parameters On Case
+
+if(_isVisible(_image("Checked",_rightOf(_cell("/Is Entitlement Performed/"))))){
+	_logOutput("Entitlement is Performed Successfully = PASS");
+	}else{
+	_fail("Entitlement is Not Performed = Failed");
+	}
+
+var $actual_ServiceContract = _getText(_link(0,_rightOf(_cell("/Service\\/Maintenance Contract/",_near(_heading2("Case Detail"))))));
+var $actual_EntitlementType = _getText(_div(0,_rightOf(_cell("/Entitlement Type/"))));
+var $actual_BillingType = _getText(_div(0,_rightOf(_cell("/Billing Type/"))));
+var $actual_SLATerms = _getText(_link(0,_rightOf(_cell("/SLA Terms/",_near(_heading2("Case Detail"))))));
+
+_assertEqual($actual_ServiceContract,$serviceConractName,"Actual and expected Service Contract are not same");
+_assertEqual($actual_SLATerms,$slaName02,"Actual and expected SLA Terms are not same");
+_assertEqual($actual_EntitlementType,"INTERACTIVE","Actual and expected Entitlement Type are not same");
+_assertEqual($actual_BillingType,"Contract","Actual and expected Billing Type are not same");
+
+
+//Clean up function
+
+
+$bo_act_login.logOut(); 
+_closeWindow();
+
+$RS_5467.end();
+

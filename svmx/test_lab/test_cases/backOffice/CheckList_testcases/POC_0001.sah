@@ -1,0 +1,32 @@
+// Author Meghana Rao P
+
+var $POC_0001 = _testcase("POC_0001", "To create a new Checklist SFM Designer");
+$POC_0001.start();
+
+
+var $un = "meghana.rao@servicemax.com";
+var $pwd ="cloud_101";
+var $url ="https://test.salesforce.com";
+
+$bo_act_login.login($url, $un, $pwd);
+
+
+// To open up SFM transaction designer
+$bo_act_navigation.navigateToSfmTransactionDesigner();
+_wait(60000, _isVisible($bo_pg_sfmTransactionAndDesigner.btn_newSFM));
+_wait(1000);
+
+// to create a new Question "Give Feedback on the Product setup" with Tag as "Product"
+
+$bo_act_checklistdesigner.newChecklistTypeSFM("Meghana POC","to generate a Checklist/Survey type of Process", "Work Order");
+$bo_act_checklistdesigner.addQuestionToChecklist1("Question set 1", "");
+
+
+// TO Re-open the Same SFM Designer.
+$bo_pg_sfmTransactionAndDesigner.clickSFM("Meghana POC", true);
+
+// To create another Question under the Same tag and verify in 
+
+$bo_act_checklistdesigner.addQuestionToChecklist2("Question set 2", "");
+
+$POC_0001.end();

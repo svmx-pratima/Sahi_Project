@@ -1,0 +1,84 @@
+/**
+* SFM  Custom Actions Functions
+*/
+
+var $sfm_act_customActions = new function sfm_act_customActions() {
+	
+	this.newCustomAction =function($actionType,$actionId,$urlToLaunch){
+		_click($sfm_pg_customActions.btn_customNew);
+		
+		if($actionType=='URL'){
+			$sfm_act_customActions.urlCustomAction($actionType);
+			
+		}else if($actionType=='Web Service'){
+			
+		}else{
+			
+		}
+	};
+	
+	/**
+	*  Function to create URL based custom action
+	*/
+
+	this.urlCustomAction= function($customActionObject,$actionType,$actionId,$urlToLaunch,$paramName,$paramValueType,$paramValue){
+		
+		_setSelected($sfm_pg_customActions.sel_selectObject,$customActionObject);
+		
+		_wait(3000,$sfm_pg_customActions.btn_customNew);
+		_click($sfm_pg_customActions.btn_customNew);
+		_setSelected($sfm_pg_customActions.sel_actionType,$actionType);
+		_setValue($sfm_pg_customActions.txt_actionTitle,$actionId);
+		_setValue($sfm_pg_customActions.txt_actionId,$actionId);
+		_setValue($sfm_pg_customActions.txt_actionDescription,$actionId);
+		_setSelected($sfm_pg_customActions.sel_openUrlIn,"New Window");
+		_setValue($sfm_pg_customActions.txt_urlToLaunch,$urlToLaunch);
+		_click($sfm_pg_customActions.btn_addParameter);
+		_setValue($sfm_pg_customActions.txt_parameterName,$paramName);
+		_setSelected($sfm_pg_customActions.sel_parameterValueType,$paramValueType);
+		if($paramValueType=='Value'){
+			
+			_setValue($sfm_pg_customActions.txt_parameterValue,$paramValue);
+			
+		}else{
+			_setSelected($sfm_pg_customActions.sel_parameterFieldName,$paramValue);
+		}
+		_click($sfm_pg_customActions.btn_saveCloseCA);
+		_assertExists(_span($actionId));
+		
+		
+	};
+	
+	/**
+	*  Function to create Webservice based custom action
+	*/
+	this.webServiceCustomAction= function($customActionObject,$actionType,$actionId,$className,$methodName,$processingMessage,$paramName,$paramValueType,$paramValue){
+		_setSelected($sfm_pg_customActions.sel_actionType,$customActionObject);
+		
+		_wait(3000,$sfm_pg_customActions.btn_customNew);
+		_click($sfm_pg_customActions.btn_customNew);
+		_setSelected($sfm_pg_customActions.sel_actionType,$actionType);
+		_setValue($sfm_pg_customActions.txt_actionTitle,$actionId);
+		_setValue($sfm_pg_customActions.txt_actionId,$actionId);
+		_setValue($sfm_pg_customActions.txt_actionDescription,$actionId);
+		_setValue($sfm_pg_customActions.txt_className,$className);
+		_setValue($sfm_pg_customActions.txt_methodName,$methodName);
+		_setValue($sfm_pg_customActions.txt_processingMessage,$processingMessage);
+		
+		_click($sfm_pg_customActions.btn_addParameter);
+		_setValue($sfm_pg_customActions.txt_parameterNameWS,$paramName);
+		_setSelected($sfm_pg_customActions.sel_parameterValueTypeWS,$paramValueType);
+		if($paramValueType=='Value'){
+			
+			_setValue($sfm_pg_customActions.txt_parameterValueWS,$paramValue);
+			
+		}else{
+			_setSelected($sfm_pg_customActions.sel_parameterFieldNameWS,$paramValue);
+		}
+		_click($sfm_pg_customActions.btn_saveCloseCA);
+		_assertExists(_span($actionId));
+		
+		
+	};
+	
+};

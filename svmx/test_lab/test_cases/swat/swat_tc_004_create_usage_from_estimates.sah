@@ -1,0 +1,70 @@
+//Author	:- 	Shashikala Kamath
+//Modified By :- Ashwini Holagi
+
+var $swat_tc_004_create_usage_from_estimates = _testcase("swat_tc_004_create_usage_from_estimates","Verify the functionality of SFM type - as Standalone create");
+	
+	$swat_tc_004_create_usage_from_estimates.start();
+	
+	_setSpeed($g_stepSpeed);
+	
+	var $wizardObjectName = "Work Order";
+	var $wizardTitleName = $bo_act_common.generateRandomName("SFWTitle");
+	var $wizardIDName = $bo_act_common.generateRandomName("SFWId");
+	var $wizardStepType = "SFM";
+	var $wizardStepName = "Create Usage Lines from Estimates";
+	var $executionMode = "Interactive";
+	var $handOver = false;
+	
+	
+	//Login to App
+	$bo_act_login.login($swat_Url,$swat_un,$swat_pwd);
+	
+	
+	//Create Work Order, Product through API
+	var $Product = $swat_act_createDataUsingApi.createProduct($swat_un, $swat_pwd, $swat_ClientId, $swat_ConsumerSecret, $swat_OrgInstance);
+	var $workOrderNo = $swat_act_createDataUsingApi.createWorkOrder($swat_un, $swat_pwd, $swat_ClientId, $swat_ConsumerSecret, $swat_OrgInstance);
+	
+	//Steps to create SFM Wizard and Add Step of type SFM
+	$swat_act_sfmWizard.createSfmWizardWithStepSFM($wizardObjectName,$wizardTitleName, $wizardIDName,$wizardStepType,$wizardStepName, $executionMode, $handOver);
+	
+	global_clearBrowserCache();
+	
+	//Global Search WorkOrder
+	$sfm_act_common.globalSearch($workOrderNo);
+	_wait(10000);
+	
+	//Click 'Create Quote from Work Order' in SFM Wizard
+	$swat_act_sfmDelivery.launchSfmDelivery($wizardStepName,$wizardTitleName);
+	
+	var $lineQty=10;
+	var $searchValue=$Product;
+	
+	//Add a Parts Line
+	$bo_act_getPrice.addPartsLineToSFMDelivery($searchValue,$lineQty);
+	_wait(2000);	
+	
+	//Add a Labor Line
+	$bo_act_getPrice.addLaborLineToSFMDelivery($searchValue, "Service", "03", "05");
+	_wait(2000);
+	
+	//Add a Expense Line
+	$bo_act_getPrice.addExpensesLineToSFMDelivery("Phone", "03", "3000");
+	_wait(2000);
+		
+	//Add a Travel Line
+	$bo_act_getPrice.addTravelLineToSFMDeliveryUsingStartEndDate("01", "03");
+	_wait(2000);
+	
+	//Save SFM Delivery
+	$swat_act_sfmDelivery.saveSfmDeliveryWithoutGetPrice();
+	
+	//Verify Work Detail line of record type : Usage/Consumption is created for line types : Parts, Labor, Expenses, Travel
+	$swat_act_workOrders.verifyRecordTypeofLineItem("Usage/Consumption", "Parts");
+	$swat_act_workOrders.verifyRecordTypeofLineItem("Usage/Consumption", "Labor");
+	$swat_act_workOrders.verifyRecordTypeofLineItem("Usage/Consumption", "Expenses");
+	$swat_act_workOrders.verifyRecordTypeofLineItem("Usage/Consumption", "Travel");
+	
+	//Delete SFM Wizard 
+	$bo_act_SFW.deleteSFMWizard($wizardObjectName, $wizardIDName);
+	
+	$swat_tc_004_create_usage_from_estimates.end();

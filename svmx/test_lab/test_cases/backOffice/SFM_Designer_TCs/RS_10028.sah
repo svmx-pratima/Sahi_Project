@@ -1,0 +1,66 @@
+
+
+//Author:Mamata RS-5000
+	var $RS_10028 = _testcase("RS_10028", "Field level: On Change Webservice Child Field");
+	$RS_10028.start();
+	_setSpeed($g_stepSpeed);
+
+	var $sfmToBeCloned="Create Usage Lines from Estimates";
+	var $sfmName=$bo_act_common.generateRandomName("SFMRS10028")
+	//change  the name of $sfmTemplateSaveAsName before execution to avoid any duplication.
+	var $sfmTemplateSaveAsName=$bo_act_common.generateRandomName("Temp10028");
+
+	var $objName="Work Order";
+	var $wizardname=$bo_act_common.generateRandomName("WizardRS10028");
+	var $wizardID= $wizardname;
+	var $executionMode="Interactive";
+	var $fieldActnType="SFM";
+	var $actnName=$sfmName;
+	var $stndSFMName=$sfmName
+	var $wizardSelectObjectName=$objName;
+
+	var $subTypeWO="Order Status";
+	var $subTypePart="Date Received";
+	var $subTypeActivityType="Activity Type";
+	var $subTypeExpenses="Billable Qty";
+	var $subTypeTravel="Consumed From Location"
+	var $d_url="https://test.salesforce.com/";
+	var $d_unBase="noor.sharieff@Tools2.com";
+	var $d_pwdBase="welcome-03";
+	var $wizardButtonName=$sfmName;
+	var $enteredMinOC=30;
+	var $enteredOTOC="Depot Repair-Tr";
+	var $enteredZipOC=560064;
+
+// This Test case need to verified manually because need to create multiple custom fields and object 
+// and the Web Service also need to setup, hence marking as manually(Removing Automatable flag).
+		
+	//$bo_act_login.login($d_url, $d_unBase, $d_pwdBase);
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+
+//*****Navgate to SFm Designer and create clone of Manage WO Line Usage Services transaction********
+$bo_act_navigation.navigateToSfmTransactionDesigner();
+$bo_act_WebServices.createSFmForWebServices($sfmToBeCloned, $sfmName,$subTypePart,$subTypeActivityType,$subTypeExpenses,$subTypeTravel,$sfmTemplateSaveAsName);
+$bo_act_WebServices.enableOnChangeForChildLabelField();
+
+$bo_act_WebServices.saveAndClose();
+//*******Nagigate to SFM Wizard and Create Wizard and Add Above Transaction to it**********
+$bo_act_navigation.navigateToSfmWizard();
+$bo_act_SFW.createWizardGeneralInfo($objName,$wizardname,$wizardID);
+$bo_act_SFW.createWizardStep($fieldActnType,$actnName,$executionMode);
+
+//******Launch the SFM in delivery for WO object**************
+
+$bo_act_sfmVerifyWorkOrder.verifyWizardOnWOObj($stndSFMName);
+$bo_act_sfmVerifyWorkOrder.clkOnWizard($wizardButtonName);
+_wait(30000);
+$bo_act_WebServices.verifyOnChangeForChildField($enteredMinOC,$enteredOTOC,$enteredZipOC);
+
+//*****************Deleteing testdata************
+$bo_act_SFW.deleteWizards($objName,$wizardID);
+_wait(3000);
+$bo_act_navigation.navigateToSfmTransactionDesigner();
+$bo_act_SFM.deleteSFM($sfmName);
+
+
+$RS_10028.end();

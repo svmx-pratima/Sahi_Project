@@ -1,0 +1,85 @@
+//Append "bac_" for all variables
+
+
+// PLEASE DO NOT Use separate names for DEV and Base UN and PWD , instead just change the base/dev credentials in $bac_un & $bac_pwd, while committing to jenkins, also follow the same procedures.
+
+var $g_url = "https://test.salesforce.com"; 
+/*
+var $bac_un = "bhupen.win18tospr18@bacofc.com"; //pointing to Base
+var $bac_pwd = "automation@backoffice.com2";  
+
+var $bac_client_id = "3MVG9qbIpUScOGtZoxWRZ21R8iqmYG3wPibQ4j4E5jRngfjd2MYcwiCfX8_2YmEFtXfRH5SOdHfjAw2SScl8I";
+var $bac_client_secret = "1504290649766161433";
+var $bac_orginstance = "cs94";	
+
+var $nameSpace_Org = "SVMXC";
+var $workinghours_global = "01mi0000000ISUq";
+var $defaultBHours_Org = "01m1I0000001OIV";
+
+//var $bac_un = "svmxdev@automation.sandbox"; //pointing to Dev
+//var $bac_pwd = "salesforce@987"; 
+
+//var $bac_client_id = "3MVG90D5vR7Utjbq11Xruz7O6hQKxZR7XqU4qBTufscW715MqtB7Ej_dLuODdcNvcmAw.Hqlf4_VuxRs48LXA";
+//var $bac_client_secret = "65B712362A3A7FC16E05F8ED21E0A54BC5CFBEB25E239DA1820443210369562E";
+//var $bac_orginstance = "cs23";	
+
+*/
+// Start of PQT Org Credentials 1
+/* 
+var $bac_un ="pqtbo@pqt.com";
+var $bac_pwd ="servicemax0";
+var $bac_client_id = "3MVG9ahGHqp.k2_xHgnt1wGR61vi9UDMBIPiP8IN9_0GCRmvHP8u6PbNdRxid21yJeo.1FMTgxIIlqG8TWQjs";
+var $bac_client_secret = "66B79603174FCFB6E6C25881CC5C67C7592EA1348FEBA6730440AFF3F4CAE148";
+var $bac_orginstance = "cs17";	
+var $user_orgdetails = "005g0000006R6tVAAS";
+var $nameSpace_Org = "SVMXC";
+var $defaultBHours_Org = "01mg000000003Af";
+ */
+ 
+//Start of PQT Org Credentials 2
+var $bac_un ="vanditha.v@svmxdatafarm.com.boauto";
+var $bac_pwd ="servicemax2";
+var $bac_client_id = "3MVG98EE59.VIHmwrtj_mxPGP4t9CKhTBafgJfHvsPR84LsuozVZnYYszomRxLnem83xTmWuhWzZFxqLmSZ2R";
+var $bac_client_secret = "98A27A9F1376A26608C2A52C9C816E0343EEA99ACD27FFE66DA8A7E66DD56D8C";
+var $bac_orginstance = "cs41";	
+var $user_orgdetails = "0051I000002FzV5";
+var $nameSpace_Org = "SVMXC";
+var $defaultBHours_Org = "01m1I0000001OIV";
+
+//end of pqt org credentials */
+/*
+var $PRT_url = "https://test.salesforce.com";   // "https://test.salesforce.com/";
+var $bac_PRTun = "common-user@sf2.com.full2";//Fresh Installation: 
+var $bac_PRTpwd = "servicemax1";
+var $user_orgdetails = "005g0000006GHmn";
+/*
+var $PRT_url = "https://test.salesforce.com";   // "https://test.salesforce.com/";
+var $bac_PRTun = "common-user@sf2.com.full1";	//Upgrade scenario: 
+var $bac_PRTpwd = "servicemax1";
+//var $user_orgdetails = "005g0000006GHmn";
+
+var $workinghours_global = "01mi0000000ISUq";
+var $defaultBHours_Org = "01m1U000000tFx7";
+var $nameSpace_Org = "SVMXC";
+*/
+
+
+var $environment = "Sandbox"; // Production
+var $groupProfileName = "AutoBACGroup";
+
+//Copied from global file
+var $bac_g_url  = "https://test.salesforce.com/";
+var $bac_g_un = $bac_un;
+var $bac_g_pwd = $bac_pwd;
+var $bac_g_domain = "/svmx/";
+
+
+
+//Lightning Credentials
+var $bac_light_un = "noor.sharieff@Tools2.com";
+var $bac_light_pwd = "welcome-88";
+
+//Classic Community
+var $classic_community_url = "https://tools2-noorcommunity.cs14.force.com/Lots/login";
+var $classic_community_un ="noor.community@ge.com";
+var $classic_community_pwd ="welcome-01";

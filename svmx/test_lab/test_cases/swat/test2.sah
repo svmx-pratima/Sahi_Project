@@ -1,0 +1,138 @@
+/*
+///////////////////////////////////{
+//
+//Author	:- 	Shashikala Kamath
+//Reviewer	:- 	Anand Kakhandaki
+//Pre-Req	:-	
+//Steps		:-	
+//
+///////////////////////////////////
+* */
+
+var $BVT_TC_002_SFW_with_standard_Wiz_steps = _testcase("$BVT_TC_002_SFW_with_standard_Wiz_steps", 
+		"Configure the SFW to include standard SFMs and launch the same in delivery");
+$BVT_TC_002_SFW_with_standard_Wiz_steps.start();
+_setSpeed($g_stepSpeed);
+
+	//Pre - Condition 
+	$bo_act_login.login("https://test.salesforce.com","shashikala.svmx@ge.com", "maxpl0re");
+
+	var $wizardSelectObjectName = "Work Order";
+	var $wizardTitleName = $bo_act_common.generateRandomName("SFWTitle");
+	var $wizardIDName = $bo_act_common.generateRandomName("SFWId");
+	var $wizardTitleName1 = $bo_act_common.generateRandomName("Parts Order");
+	var $wizardIDName1 = $bo_act_common.generateRandomName("PartsOrderID");
+	var $wizardStep1Type = "SFM";
+	var $wizardStep1Name = "Create Quote from Work Order";
+	var $wizardStep2Type = "Output Document";
+	var $wizardStep2Name = "Manage Work Order Lines - Usage";
+	var $executionMode1 = "Interactive";
+	var $executionMode2 = "Background";
+	var $wizardStep3Name = "Create Usage Lines from Estimates";
+	var $wizardStep4Name = "Work Order Service Report";
+	var $wizardStep5Name = "Create New Shipment Order";
+	var $handOver1 = true;
+	var $handOver2 = false;
+	var $selectTemplateAtRunTime = false;
+	var $wizardSelectObjectName1 = "Parts Order";
+
+	/**
+	 * Creation of Case, Account, Contact, Product
+	 */
+	var $caseNumber = $bo_act_Cases.createCase("New", "High", "Email");
+	var $accountName = $bo_act_accounts.createAccount();
+	var $contactName = $bo_act_contacts.createContact($accountName);
+	var $productName =$bo_act_products.createProduct();
+	
+	
+	/**
+	 * Read data from swatdata.xlsx - Reading data which are created in testscript1 -BVT_TC_001_SFMSearch.sah
+	 */
+	/*var $runData = $excel.readFromCustomExcel("/Swat_excelData/swatdata.xlsx",  "runData", true, true);
+	var $caseNumber=$runData[1]["Case"];
+	var $accountName=$runData[1]["Account"];
+	var $contactName=$runData[1]["Contact"];
+	var $productName=$runData[1]["Product"];
+	_log("Case: "+$caseNumber);
+	_log("Account: "+$accountName);
+	_log("Contact: "+$contactName);
+	_log("Product: "+$productName);
+	*/
+	
+	
+	/**
+	 * Add Price To Standard Price for above created Product
+	 */ 
+	var $standardPriceValue = 120;
+	$bo_act_products.addStandardPriceForProduct($productName, $standardPriceValue);
+
+	var $IBName = $bo_act_installedProduct.createInstalledProduct($productName,$accountName,$contactName);
+
+	
+	// Steps to create SFM Wizard on WO Object
+	$bo_act_navigation.navigateToSfmWizard();
+	$bo_act_SFW.createWizardGeneralInfo($wizardSelectObjectName, $wizardTitleName, $wizardIDName);
+	$bo_act_SFW.createSFMWizardStepwithHandOver($wizardStep1Type, $wizardStep1Name, $executionMode1, $handOver2);
+	//$bo_act_SFW.createSFMWizardStepwithHandOver($wizardStep1Type, $wizardStep2Name, $executionMode1, $handOver1);
+	//$bo_act_SFW.createSFMWizardStepwithHandOver($wizardStep1Type, $wizardStep3Name, $executionMode1, $handOver1);
+	//$bo_act_SFW.createOutputDocumentWizardStepwithSelectTemplate($wizardStep2Type, $wizardStep4Name, $selectTemplateAtRunTime);
+	//var $fieldActnType = "Others";
+	//var $actnName = "Check Entitlement WO";
+	//$bo_act_SFW.addCustomActionToWizard($fieldActnType, $actnName);
+	$bo_act_SFW.quickSaveSFWizard();
+	$bo_act_SFW.saveAndClose();
+  
+	
+	
+	//Launch in delivery
+	$workOrderNo = $swat_act_workOrders.createWorkOrder($caseNumber, $accountName, $contactName, $IBName, "Open", "High", "Field Service");
+	//$woName = 
+ 
+	
+	
+	/**
+	 * Temp commenting below statement as global search is not working
+	 */
+	//$sfm_act_common.globalSearch($workOrderNo);
+	//_click(_link($workOrderNo));
+
+	
+	_selectDomain($g_domain);
+	_wait(15000,_isVisible(_cell($wizardTitleName)));
+
+	//create quote from WO Child Lines
+	$swat_act_childLinesAddition.createQuoteFromWOChildLines($wizardTitleName, $productName);
+	
+	//Create usage lines from estimate & Get Price Calculation for Part and Labor
+	$swat_act_childLinesAddition.createUsageLinesFromEstimates($productName);
+
+	//SFM - Create Usage from Estimate 
+	
+	// Add a Parts Line
+	$bo_act_getPrice.addPartsLineToSFMDelivery($searchValue,$lineQty);
+	
+	//Add a Labor Line
+	$bo_act_getPrice.addLaborLineToSFMDelivery($searchValue, "service", "03", "05");
+
+	//Add a Expense Line
+	$bo_act_getPrice.addExpensesLineToSFMDelivery("Phone", "03", "3000");
+	_wait(15000);
+	
+	//Add a Travel Line
+	$bo_act_getPrice.addTravelLineToSFMDeliveryUsingStartEndDate("01", "03");
+	
+	_wait(15000, _isVisible(_span("svmx-btn-icon svmx-sfmd-save-icon")));
+	_click($bo_pg_getPrice.btn_save);
+
+
+	// SFM - Output Document creation
+	_wait(30000, _isVisible(_button("Finalize")));
+	_click(_button("Finalize"));
+	_wait(30000, _isVisible(_link(0)));
+	_click(_link(0));
+	
+	
+	_wait(15000,_isVisible($bo_pg_workOrders.txt_workOrderDetails));
+	_assertVisible(_cell("Edit | View | Del", _near(_heading3("Notes & Attachments"))),"Service Report is attached to Work Order: ");
+
+$BVT_TC_002_SFW_with_standard_Wiz_steps.end();

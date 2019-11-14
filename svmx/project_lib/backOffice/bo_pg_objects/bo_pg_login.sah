@@ -1,0 +1,17 @@
+
+//var $bo_pg_login = new bo_pg_login();
+
+/**
+ * Login page object repository
+ */
+var $bo_pg_login = new function bo_pg_login(){
+this.txt_email = _emailbox("username");
+this.txt_password = _password("pw");
+
+this.btn_login = _submit("/Log/");
+
+
+}
+
+
+

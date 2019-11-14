@@ -1,0 +1,70 @@
+
+
+//author - Noor Salma Sharieff
+
+var $RS_5258 = _testcase("$RS_5258","Create a PM Plan from Service Contract with coverage type as Location");
+$RS_5258.start();
+_setSpeed($g_stepSpeed);
+
+//Pre - Condition 
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+var $accName = $bo_act_accounts.createAccount();
+var $proName = $bo_act_products.createProduct("pro12", "--None--");
+var $installedProduct = $bo_act_installedProduct.createInstalledProduct($proName,$accName,"");
+var $location = $bo_act_locations.createLocation("", $accName, "MG Road", "India", "560001");
+var $slaterm = $bo_act_slaTerms.createSlaTerms("Default");
+var $sconName = $bo_act_serviceMaintenanceContracts.createServiceMaintenanceContract($accName, $slaterm,1,0);
+$bo_act_serviceMaintenanceContracts.AddCoveredProductToSCON($sconName, $installedProduct);
+$bo_act_serviceMaintenanceContracts.addCoveredLocationToSCON($sconName, $location);
+
+//Test Steps
+var $PMPTempName = $bo_act_PMPlanTemplate.createTimeBasedPMPlanTemplate($proName, "Location (Must Have Location)","","Months");
+var $PMPlanName = $bo_act_PMPlan.createATimeBasedPMPlanFromScon($sconName, $PMPTempName,"Location (Must Have Location)",1);
+var $startDate = _getText(_div(0,_rightOf(_cell("Start Date"))));
+
+
+//Validations for Preventive Maintenance Coverage
+_click($bo_pg_PMPlan.link_firstLinkInPMcoverages);
+var $actuallocation = _getText($bo_pg_PMPlan.link_locationname);
+_assertEqual($location,$actuallocation);
+
+//Validation for PM Schedule
+_click(_link($PMPlanName));
+var $startDate = _getText($bo_pg_PMPlan.div_startDate);
+_click($bo_pg_PMPlan.link_firstLinkInPMSchedule);
+var $lastRunDate = _getText($bo_pg_PMPlan.txt_lastRunDate);
+
+$actualScheduledOn = _getText($bo_pg_PMPlan.txt_scheduledOnDate);
+_assertEqual($startDate,$lastRunDate,"Last Run Date is not equal to start date");
+_assert($lastRunDate != $actualScheduledOn,"Issue in Last Run Date and Scheduled On date");
+
+
+$bo_act_common.deleteAccount($bac_un, $bac_pwd, $accName);
+$bo_act_common.deleteIB($bac_un, $bac_pwd, $orgnamespace,$installedProduct);
+$bo_act_common.deleteProduct($bac_un, $bac_pwd,$proName);
+$bo_act_common.deleteSLA($bac_un, $bac_pwd, $orgnamespace, $slaterm);
+$bo_act_common.deleteSCON($bac_un, $bac_pwd, $orgnamespace, $sconName);
+$bo_act_common.deletePMPlantemplate($bac_un, $bac_pwd, $orgnamespace,$PMPTempName);
+$bo_act_common.deletePMPlan($bac_un, $bac_pwd, $orgnamespace,$PMPlanName);
+$bo_act_common.deleteLocation($bac_un, $bac_pwd, $orgnamespace,$location);
+
+//Clean up functions
+
+//var $datacreated = [$PMPlanName,$PMPTempName,$accName,$slaterm,$proName,$installedProduct,$location,$sconName];
+//for (var i = 0; i < $datacreated.length; i++) {
+//	$bo_act_common.cleanUpfunction($datacreated[i]);
+//}
+
+//$bo_act_accounts.deleteAccount($accName);
+//$bo_act_products.deleteProduct($proName);
+//$bo_act_installedProduct.deleteInstalledProduct($installedProduct);
+//$bo_act_slaTerms.deleteSLATerm($slaterm);
+//$bo_act_locations.deleteLocation($location);
+//$bo_act_serviceMaintenanceContracts.deleteServiceMaintenanceContract($sconName);
+//$bo_act_PMPlanTemplate.deletePMPlanTemplate($PMPTempName);
+//$bo_act_PMPlan.deletePMPlan($PMPlanName);
+
+$RS_5258.end();
+
+
+

@@ -1,0 +1,29 @@
+
+
+/**
+ * Home page object repository
+ */
+
+var $bo_pg_products = new function bo_pg_products(){
+	this.btn_new = _button(" New ");
+	this.txt_productName = _textbox("Name");
+	this.txt_productCode = _textbox("ProductCode");
+	this.sel_productFamily = _select("Family");
+	this.chk_active = _checkbox("IsActive");
+	this.chk_stockable = _checkbox("Stockable");
+	this.chk_serializedTracking = _checkbox("Enable Serialized Tracking of Stock");
+	this.btn_save = _submit(" Save ");
+	this.btn_delete = _button("Delete");
+	this.btn_editProduct = _button(" Edit ");
+	this.btn_saveProduct = _submit(" Save ");
+	this.txt_businessHoursEdit = _textbox(0,_rightOf(_label("Business Hours")));
+	
+	// Objects Related to Add Standard Price For Product Related list
+	this.btn_addStandardPrice = _button(" Add " ,_near(_heading3("Standard Price")));
+	this.txt_enterStandardPrice = _textbox(0,_under(_tableHeader("Standard Price")));
+	this.btn_saveStandardPrice = _submit(" Save ");
+	this.txt_productDetailPage = _heading2("Product Detail");
+	
+	this.stockable = _cell("/Stockable/");
+	this.enableSerializedTrackingOfStock = _cell("/Enable Serialized Tracking of Stock/");
+};

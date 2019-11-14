@@ -1,0 +1,72 @@
+var $RS_7504 = _testcase("RS_7504","CLONE - Verify adding a new coverage manually and saving the pm plan from Location.");
+$RS_7504.start();
+_setSpeed($g_stepSpeed);
+
+var $Workbenchurl = "https://workbench.developerforce.com/login.php";
+$bo_act_login.login($PRT_url, $bac_PRTun, $bac_PRTpwd);
+$bo_act_navigation.navigateToSetUpAndSearch("Installed Packages");
+_wait(60000,_isVisible(_heading1("Installed Packages")));
+_click(_link("Predix ServiceMax"));
+if(_getText(_cell(0,_rightOf(_cell("Namespace Prefix"))))!="SVMXDEV")
+var $nameSpace = "SVMXC";
+else
+$nameSpace = "SVMXDEV";
+
+
+//Test Data Creation
+var $accName = $bo_act_common.generateRandomName("Acc");
+var $proName= $bo_act_common.generateRandomName("Pro");
+var $location = $bo_act_common.generateRandomName("Loc");
+var $installedProduct = $bo_act_common.generateRandomName("IB_");
+var $slaterm = $bo_act_common.generateRandomName("sla_");
+var $sconName = $bo_act_common.generateRandomName("scon_");
+
+var $startDate = $bo_act_common.getPastDate(1,"/");
+var $endDate = $bo_act_common.getfutureDate(0, "/");
+
+var $script = 
+	"Account Acc = new Account (Name = '"+$accName+"', Type = 'Customer');insert Acc;\n" +
+	"Product2 pro = new Product2 (Name = '"+$proName+"',IsActive = true);insert pro;\n" +
+
+	"String accId = [Select id from Account where name = '"+$accName+"' ].Id;\n"+
+	"String proId  = [Select id from Product2 where name = '"+$proName+"'].Id; \n"+
+
+	$nameSpace+"__Site__c loc = new "+$nameSpace+"__Site__c (\n"+
+	"Name = '"+$location+"',\n"+
+	$nameSpace+"__Account__c = accId , \n"+
+	$nameSpace+"__Street__c = 'MG Road',\n"+
+	$nameSpace+"__Country__c = 'India' ,\n"+
+	$nameSpace+"__Zip__c = '560030' );\n"+
+	"insert loc;\n"+
+
+	"String locId = [Select id from "+$nameSpace+"__Site__c where name = '"+$location+"'].Id;\n"+
+
+	$nameSpace+"__Installed_Product__c ib01 = new "+$nameSpace+"__Installed_Product__c(\n"+
+	 "Name = '"+$installedProduct+"',\n"+
+	 $nameSpace+"__Site__c = locId,\n"+
+	 $nameSpace+"__Product__c = proId,\n"+
+	 $nameSpace+"__Company__c = accId,\n"+
+	 $nameSpace+"__Serial_Lot_Number__c = '"+$installedProduct+"',\n"+
+	 $nameSpace+"__Status__c = 'Shipped' );\n"+
+	"insert ib01;\n"+
+
+$nameSpace+"__Service_Level__c sla = new "+$nameSpace+"__Service_Level__c(\n"+
+"Name = '"+$slaterm+"',\n"+
+$nameSpace+"__Active__c = true);\n"+
+"insert sla;\n"+
+
+"String slaId = [Select id from "+$nameSpace+"__Service_Level__c where name = '"+$slaterm+"' ].Id;\n"+
+
+$nameSpace+"__Service_Contract__c scon = new "+$nameSpace+"__Service_Contract__c(\n"+
+"Name = '"+$sconName+"',\n"+
+$nameSpace+"__Active__c = true,\n"+
+$nameSpace+"__Company__c = accId,\n"+
+$nameSpace+"__Service_Level__c = slaId,\n"+
+$nameSpace+"__Start_Date__c = date.parse('"+$startDate+"'),\n"+
+$nameSpace+"__End_Date__c = date.parse('"+$endDate+"');\n"+
+"insert scon;\n";
+
+
+$bo_act_login.loginToWorkBench($Workbenchurl,"Sandbox", $bac_PRTun, $bac_PRTpwd);
+$bo_act_login.runApexScriptinWB($script);
+$RS_7504.end();

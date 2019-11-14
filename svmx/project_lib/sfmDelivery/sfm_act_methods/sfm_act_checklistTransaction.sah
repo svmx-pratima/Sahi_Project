@@ -1,0 +1,90 @@
+var $sfm_act_checklistTransaction = new function sfm_act_checklistTransaction() {
+	
+	 	this.createChecklistProcess = function($checklistProcessName,$questionTextArray) {
+	 		
+	 		var $filterName=$bo_act_common.generateRandomName("Filter");
+	 		 $bo_act_navigation.navigateToSvmxSetup();
+	 		 _click($bo_pg_servicemaxSetup.btn_serviceFlowManager);
+	 		 _click($bo_pg_servicemaxSetup.btn_sfmTransactionAndDocsDesigner);
+	 		 _wait(30000);
+	 		_click(($sfm_pg_checklistTransaction.btn_newSFMTransaction));
+		 		_wait(10000);
+	 		_setSelected($sfm_pg_checklistTransaction.sel_typeOfSFMTransaction,$sfm_pg_checklistTransaction.txt_checklistProcess);
+	 		_wait(10000);
+ 
+	 		_setValue($sfm_pg_checklistTransaction.sel_sourceObject,$sfm_pg_checklistTransaction.txt_selSourceObject);
+	 		_setSelected($sfm_pg_checklistTransaction.sel_sourceObjectValue,$sfm_pg_checklistTransaction.txt_selWorkOrderasSourceObject);
+	 		_click($sfm_pg_checklistTransaction.txt_OKMsg);
+	 		 _setValue($sfm_pg_checklistTransaction.txt_checklistProcessName, $checklistProcessName);
+	 		_setValue($sfm_pg_checklistTransaction.txt_checklistProcessId, $checklistProcessName);
+	 		 
+	 		 
+	 		_click($sfm_pg_checklistTransaction.txt_qualifyingCriteriaMapping);
+	 		_click($sfm_pg_checklistTransaction.btn_newCriteria);
+
+	 		_setSelected($sfm_pg_checklistTransaction.sel_fieldCriteria, "Order Status");
+	 		_setSelected($sfm_pg_checklistTransaction.sel_conditionCriteria, "Equals");
+	 		_setSelected($sfm_pg_checklistTransaction.sel_valueInCriteria, "Open");
+
+
+	 		_setValue($sfm_pg_checklistTransaction.txt_filter,$filterName);
+	 		_setValue($sfm_pg_checklistTransaction.txt_filterName, $filterName);
+	 		_click($sfm_pg_checklistTransaction.btn_removeFilterCondition);
+	 		_click($sfm_pg_checklistTransaction.btn_saveFilter);
+	 		_wait(4000);
+	 		_click($sfm_pg_checklistTransaction.txt_formDesigner);
+	 		 
+
+	 		for(var $i=0; $i<$questionTextArray.length; $i++) {
+
+	 		_setValue(_f("main").s_textinput("searchText[2]"), $questionTextArray[$i]);
+	 		_wait(3000);
+	 		_click($sfm_pg_checklistTransaction.lnk_addQuestiontoForm);
+
+	 	}
+	 	 
+	 	_click($sfm_pg_checklistTransaction.btn_quickSave);
+	 	_click($sfm_pg_checklistTransaction.btn_saveAndClose);	
+	 		
+	 		
+	 	     };
+
+this.deleteQuestions=function($questionTextArray)
+{
+	var $i;
+	_wait(3000,(_isVisible($sfm_pg_checklistQuestionLibrary.txt_checklistQuestionLibrary)));
+	_setValue($sfm_pg_checklistQuestionLibrary.txt_checklistQuestionSearch," ");
+
+	for(var $i=0; $i<$questionTextArray.length; $i++) {
+		_log("Question Text", $questionTextArray[$i]);
+		
+	_setValue($sfm_pg_checklistQuestionLibrary.txt_checklistQuestionSearch,$questionTextArray[$i]);
+	_wait(4000);
+ 
+	if(_isVisible(_div($questionTextArray[$i])))
+ 	{
+		_log("Created Question "+ $questionTextArray[$i]+ " exists");
+		_click($sfm_pg_checklistQuestionLibrary.selQuestion);
+		_click($sfm_pg_checklistQuestionLibrary.btnDelete);
+		_wait(3000,_isVisible($sfm_pg_checklistQuestionLibrary.txt_confirmDelete));
+		_click($sfm_pg_checklistQuestionLibrary.seldeletionConfirm);
+		_wait(3000,_isVisible($sfm_pg_checklistQuestionLibrary.txt_successHeaderMsg));
+		
+		if(_isVisible($sfm_pg_checklistQuestionLibrary.txt_deleteSucessMessage))
+		{
+			_click($sfm_pg_checklistQuestionLibrary.btn_okMessage);
+			_log("Questions deleted successfully");
+		}else
+		{		
+			_log("Error while deleting Questions");
+		}
+	}
+	else
+	{		
+		_log("Could not find the created question to delete: " + $questionTextArray[$i]);
+	}
+ 
+}
+	
+} ;
+} ;

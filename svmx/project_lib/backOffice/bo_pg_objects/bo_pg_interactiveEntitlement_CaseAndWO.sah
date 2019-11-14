@@ -1,0 +1,79 @@
+
+var $bo_pg_interactiveEntitlement_CaseAndWO = new function bo_pg_interactiveEntitlement_CaseAndWO(){
+	
+	/**
+	 * Work Order -> Object Related to Check INTERACTIVE Entitlement for PS Line Only
+	 */
+	this.txt_checkEntitlement_WOPage = _div("Check Entitlement: Work Order");
+	this.btn_checkEntitlement = _span("/Check Entitlement/");//_button("/Check Entitlement/");
+	this.btn_entitlementCheck = _button("Check Entitlement");
+	
+	// Click Installed Product on Check Entitlement PS line Page
+	this.clickOnInstalledProduct = function($IBName){
+		
+		_click(_div($IBName,_near(_span("Installed Product"))));
+	};
+	
+	this.txt_selectWarrantyOrContractPage = _span("Select Warranty/Contract");
+	
+    this.selectWarrantyOrContract = function($warrantyName){
+		
+    _click(_div("/svmx-grid-radioheader/",_near(_div($warrantyName,_near(_span("Select Warranty/Contract"))))));
+  
+	};
+	
+	this.btn_applySelection = _span("Apply Selection");
+	this.btn_saveEntitlementPSLine = _button("Save Entitlement");
+	this.btn_cancelEntitlementPSLinePage = _span("Cancel");
+	
+	/**
+	 * Case -> Object Related to Check INTERACTIVE Entitlement
+	 */
+	this.txt_checkEntitlement_CasePage = _heading3("Product Information");
+	this.btn_checkEntitlement_Case = _button("Check Entitlement");
+	this.btn_saveEntitlementCase = _button("Save Entitlement");
+	this.btn_EntitlementTabCase = _cell("Entitlement");
+	this.btn_warrantyOrSconTabCase = _cell("Warranties/Service Contracts");
+	
+	// Click Setting on INTERACTIVE Entitlement on Case Page
+	this.btn_settingEntitlementCase = _cell("Settings");
+	this.txt_settingEntitlement_CasePage = _heading2("Entitlement Verification");
+	this.chk_settingMatchLocation_CasePage = _checkbox(0,_rightOf(_span("Match Location")));
+	this.chk_settingMatchContact_CasePage = _checkbox(0,_rightOf(_span("Match Contact")));
+	this.chk_settingMatchAccounts_CasePage = _checkbox(0,_rightOf(_span("Match Accounts")));
+
+    this.selectWarrantyOrContractCasePage = function($SconName){
+		
+    _click(_checkbox("/EVER_CaseEntitlement/",_near(_link($SconName,_near(_heading3("Product Information"))))));
+  
+	};
+	
+	/**
+	 * WO -> Object Related to Check INTERACTIVE Entitlement On Work Order []
+	 */
+	this.chk_IncidentNotCovered = _div("/svmx-grid-radiocolumn-contentalign-undefined/",_near(_div("Not Covered")));
+	
+    this.selectSConOnCheckEntmPage = function($sconName){
+		
+    	if(_isVisible(_link($sconName,_near(_span("Contract Name/Number"))))){
+    		_click(_div("/svmx-grid-radioheader/",_near(_link($sconName,_near(_span("Contract Name/Number")))))); // Working as expected it is radio button
+        	//_click(_checkbox("/CaseEntitlement/",_near(_cell($sconName)))); //added by Shruthi Shanthappa  
+  			}else{
+  				_click(_button("Settings",_near(_button("Check Entitlement"))));
+  				_click(_button("Match Accounts"));
+  				_click(_button("Match Contact"));
+  				_click(_span("Apply"));
+  				_wait(2000);
+  				_click(_div("/svmx-grid-radioheader/",_near(_link($sconName,_near(_span("Contract Name/Number")))))); 
+  			}
+    	
+    	
+		};
+		
+	this.selectWarrantyOnCheckEntmPage = function($warrantyName){
+				
+		_click(_div("/svmx-grid-radioheader/",_near(_div($warrantyName,_near(_span("/Warranty Name/"))))));
+				  
+		};
+	
+};

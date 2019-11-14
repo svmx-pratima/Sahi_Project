@@ -1,0 +1,136 @@
+var $an_ftf_001= _testcase("ANA-000","When the user selects the Case and we add a custom fields in one of the criteria");
+$an_ftf_001.start();
+
+var $cred = _readExcelFile("../../../analytics/an_excleData/credentials.xlsx","Sheet1",true);
+var $un = $cred[2]["UserName"];
+var $pwd =$cred[2]["Password"];
+var $url =$cred[2]["url"];
+var $user =$cred[2]["User"];
+var $data = _readExcelFile("../../../analytics/Pre-Release/MTTC_fresh.xlsx","Sheet1",true);
+var $insert_case = $data[4]["InsertCase"];
+var $Account1 = $data[1]["Account"];
+var $Technician1 = $data[1]["Technician"];
+var $Product1 = $data[1]["Product"];
+var $OrderStatus1 = $data[1]["OrderStatus"];
+var $Closedon1 = $data[1]["ClosedOn"];
+var $Component = $data[1]["Component"];
+var $close=$data[1]["closedon"];
+var $Account2 = $data[4]["Account"];
+var $Technician2 = $data[4]["Technician"];
+var $Product2 = $data[4]["Product"];
+var $OrderStatus2 = $data[4]["OrderStatus"];
+var $Closedon2 = $data[4]["ClosedOn"];
+var $Site=$data[1]["Site"];
+var $ScheduledDate=$data[1]["ScheduledDate"];
+$bo_act_login.login($url, $un, $pwd);
+
+//create workorder
+var $insert_wo_first3 = "SVMXC__Service_Order__c  WO3 = new SVMXC__Service_Order__c (SVMXC__Company__c ='"+ $Account1 +"', SVMXC__Product__c = '"+$Product1+"', SVMXC__Group_Member__c = '"+$Technician1+"',SVMXC__Component__c = '"+$Component+"',SVMXC__Order_Status__c = '"+$OrderStatus1+"' , SVMXC__Closed_On__c = "+$Closedon1+",SVMXC__Country__c = 'United States',SVMXC__Sub_Status__c = 'Resolved', SVMXC__Priority__c = 'High',SVMXC__Site__c = '"+$Site+"',SVMXC__Scheduled_Date__c = Date.valueOf('"+$ScheduledDate+"'));insert WO3;";
+var $query_wo_first3 = "Select Name , Id  , SVMXC__Company__c , SVMXC__Closed_On__c from SVMXC__Service_Order__c where Createdby.Id = '"+$user+"'  Order by CreatedDate DESC Limit 1";
+var $fetchwoquery3 = $op_act_sForceApiCall.sForceQuery($un, $pwd, $insert_wo_first3 ,"create");
+var $WO3;
+var $store_first_wo3 = $op_act_sForceApiCall.sForceQuery($un, $pwd, $query_wo_first3,"query");
+_wait(1000);
+$store_first_wo3.forEach(function($ana_var4) {
+	$WO3 = $ana_var4.Id;
+});
+_log($WO3);
+
+var $StartDate = $data[1]['WDStartDate1'];
+var $EndDate =  $data[1]['WDEndDate1'];
+var $LineType = $data[1]['LineType'];
+var $RecordType = $data[1]['RecordType'];
+var $DeadTime = $data[1]['DeadTime'];
+var $ana_870_work_detail;
+var $ana_870_wd1 ;
+var $startdate ;
+var $enddate ;
+var $deadtime;
+var $var3;
+
+var $ana_870_insert_WD = "SVMXC__Service_Order_Line__c  WD = new SVMXC__Service_Order_Line__c ( SVMXC__Line_Type__c = '"+$LineType+"' , SVMXC__Start_Date_and_Time__c = DateTime.valueOf ('"+$StartDate+"'), SVMXC__End_Date_and_Time__c = DateTime.valueOf('"+$EndDate+"') ,custom_dead_time__c = "+$DeadTime+" ,SVMXC__Service_Order__c = '"+$WO3+"' );insert WD;";
+var $ana_870_query_wd = "Select Name , Id  , SVMXC__Start_Date_and_Time__c , SVMXC__End_Date_and_Time__c , SVMXC__Dead_Time__c from SVMXC__Service_Order_Line__c where Createdby.Id = '"+$user+"' Order by CreatedDate DESC Limit 1";
+var $ana_870_result = $op_act_sForceApiCall.sForceQuery($un, $pwd, $ana_870_insert_WD , "create");
+
+var $ana_870_fetch_wd = $op_act_sForceApiCall.sForceQuery($un, $pwd, $ana_870_query_wd,"query");
+
+$ana_870_fetch_wd.forEach(function($var3) {
+	
+	$ana_870_wd1 = $var3.Id ;
+	$startdate = $var3.SVMXC__Start_Date_and_Time__c;
+	$enddate = $var3.SVMXC__End_Date_and_Time__c;
+	$deadtime = $var3.custom_dead_time__c;
+		
+});
+
+// To calculate the time difference considering business hours is 24 hours
+
+var $stdate = new Date($startdate);
+var $edate = new Date($enddate);
+_log($stdate);
+_log($edate);
+var $datevalue = (($stdate.getTime() - $edate.getTime()) / 1000) / (-60) ; 
+//var $enddate = parseInt($enddate.getHours());
+_log($datevalue);
+
+$TopLevelWO.an_toplevelwo();
+//$an_act_MTTR.mttr_usa_calc("MTTR Calculation for USA");
+$an_act_MTTR.mttr_runEngine("vinaya.v@servicemax.com");
+
+
+var $i;
+var $ana_WO_Account1;
+var $Calculation_Method=null;
+var $Metric_Value;
+var $Value;
+
+_wait(10000);
+_click(_span("Account Summary"));
+_click(_span("tab-1213-btnInnerEl"));
+/*_click($an_pg_mttr.list_timezone);
+_click($an_pg_mttr.btn_ist_timezone);
+_click($an_pg_mttr.btn_period);
+_click($an_pg_mttr.btn_daily);
+_click($an_pg_mttr.list_time);
+_click($an_pg_mttr.btn_time);
+_setValue(_textbox("emailOnSuccess"), "vinaya.v@servicemax.com");*/
+_click(_span("Save[1]"));
+_click(_span("OK"));
+_click(_link("Run Now[1]"));
+_click(_span("OK"));
+
+
+var $ana_query_mttr = "Select SVMXC__Account__c, SVMXC__Calculation_Method__c ,SVMXC__Metric_Value__c,SVMXC__Value__c from SVMXC__SPM_Account_Summary__c where  SVMXC__Account__c='"+ $Account1 +"' and SVMXC__Calculation_Method__c='SPMMTTR: Sum of Labor Details' ";
+var $ana_result_mttr = $op_act_sForceApiCall.sForceQuery($un, $pwd, $ana_query_mttr,"query");
+_wait(2000);
+$ana_result_mttr.forEach(function($mttr) {
+	$ana_WO_Account1 = $mttr.SVMXC__Account__c;
+	$Calculation_Method = $mttr.SVMXC__Calculation_Method__c;
+	$Metric_Value = $mttr.SVMXC__Metric_Value__c;
+	$Value=$mttr.SVMXC__Value__c;
+	});
+
+
+_log($Calculation_Method);
+_log($Metric_Value);
+_assertEqual( $ana_WO_Account1, $Account1);
+_assertEqual($Calculation_Method ,'SPMMTTR: Sum of Labor Details' );
+_assertEqual( $Metric_Value, 150);
+_assertEqual( $Value, 150);
+
+$delete1 = "delete [Select Id from SVMXC__Service_Order__c];";
+var $delete_data = $op_act_sForceApiCall.sForceQuery($un, $pwd, $delete1 , "create");
+
+$delete3 = "delete [Select Id from SVMXC__SPM_Account_Summary__c];";
+var $delete_data = $op_act_sForceApiCall.sForceQuery($un, $pwd, $delete3 , "create");
+
+$delete4 = "delete [Select Id from SVMXC__Service_Order_Line__c];";
+var $delete_data = $op_act_sForceApiCall.sForceQuery($un, $pwd, $delete4 , "create");
+
+$delete5 = "delete [Select Id from SVMXC__SPM_Mean_Time_To_Repair__c];";
+var $delete_data = $op_act_sForceApiCall.sForceQuery($un, $pwd, $delete5 , "create");
+
+$an_ftf_001.end();
+
+
+

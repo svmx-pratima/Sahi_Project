@@ -1,0 +1,92 @@
+/* @author: Lakshmi BS
+ * testcase : $RS_3807
+ * testcase : $RS_3808
+ * testcase : $RS_3809
+ * testcase : $PRT_701
+ * Manual Setup: Create a immedtate dispatch process rule
+ * Manual Setup: Have the WorkOrder customize tab at the top menu bar
+ */
+
+//Pre-Requiste - SetUP
+$dc_act_salesforce.loadlogin($dc_url, $dc_un, $dc_pwd);
+$dc_act_servicemaxsetup.navigateServiceMaxSetup();
+$dc_act_servicemaxsetup.navigateTeamTechnicianMngmt();
+
+var $RS_3807 = _testcase("$RS_3807","Creating a Service Team from Service Org");
+	$RS_3807.start();
+	//Variables for Team
+	$team = "DC_BlrTeam"; $streetTeam = "DVG Road"; $cityTeam = "Bangalore"; $stateTeam = "Karnataka"; $zipTeam = "560004"; $countryTeam = "India";
+	try{
+		$dc_act_servicemaxsetup.createTeam($team, $streetTeam, $cityTeam, $stateTeam, $zipTeam, $countryTeam);
+	}catch($e){
+		_logExceptionAsFailure($e); 
+	}
+	$RS_3807.end();
+
+var $RS_3809 = _testcase("$RS_3809","Providing dispatcher access to a Service Team");
+	$RS_3809.start();
+	try{
+		$dc_act_servicemaxsetup.addDispatcher();
+	}catch($e){
+		_logExceptionAsFailure($e); 
+	}
+	$RS_3809.end();
+
+var $RS_3808 = _testcase("$RS_3808","Creating a Technician from Service Org");
+	$RS_3808.start();
+	//Variables for Tech
+	$tech= "DC_MGTech"; $streetTech = "MG Road"; $cityTech = "Bangalore"; $stateTech = "Karnataka"; $zipTech = "560001"; $countryTech = "India";
+	try{
+		$dc_act_servicemaxsetup.createTech($tech, $streetTech, $dc_pg_salesforce.city, $stateTech, $zipTech, $countryTech);
+	}catch($e){
+		_logExceptionAsFailure($e); 
+	}
+	$RS_3808.end();
+
+
+var $PRT_701 = _testcase("$PRT_701","Providing dispatcher access to a Service Team");
+$dc_pg_salesforce.navigateSFHome();  //Base State
+	$PRT_701.start();
+	try{
+		_set($dc_pg_salesforce.login_result, _fetch(sforce.connection.login($dc_un,
+				$dc_pwd)));
+		_setSpeed(10000);
+		_set($dc_pg_salesforce.workOrder, _fetch(createImmediateDispatchWO()));
+		_log($dc_pg_salesforce.workOrder);
+		_click($dc_pg_salesforce.link_WorkOrdersTab);
+		_setSpeed($g_stepSpeed);
+		_setValue(_textbox("sbstr"), $dc_act_salesforce.workOrder);
+		_click(_submit(" Go! "));
+		_wait(5000);
+		_click(_link($dc_act_salesforce.workOrder));
+		_assertExists($dc_pg_salesforce.link_Gauteng_Tech,
+		"Immediate Dispatch process is not verified successfully");
+		_log("Immediate Dispatch process is verified successfully");
+	}catch($e){
+		_logExceptionAsFailure($e); 
+	}
+	$PRT_701.end();
+
+//TeadDown
+//$dc_pg_salesforce.logOutDC();
+_log("Logout");
+
+
+/**
+ * Creates WO and abide to immediate dispatch rule
+ * @returns
+ */
+//<browser>
+function createImmediateDispatchWO() {
+	var $result = "";
+	var $workOrder = new sforce.SObject("SVMXC__Service_Order__c");
+	$workOrder.SVMXC__City__c = 'Johannesburg';
+	$workOrder.SVMXC__State__c = 'Gauteng';
+	$workOrder.SVMXC__Country__c = 'South Africa';
+	$workOrder.SVMXC__Zip__c = '1627';
+	$result = sforce.connection.create([ workOrder ]);
+	return result;
+
+}
+//</browser>
+

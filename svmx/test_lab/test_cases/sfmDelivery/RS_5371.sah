@@ -1,0 +1,97 @@
+var $RS_5371 = _testcase("RS_5371","Check for Date, DateTime fields at first level navigation in Displayed Under Search Result.");
+$RS_5371.start();
+
+function onScriptEnd(){
+	 _selectDomain();
+	 _focusWindow();
+	 _takeScreenShot();
+	 var $a=_scriptStatus();
+	 	 cleanUp();
+	 }
+	function cleanUp(){
+		_log("Performing clean up");
+		$sfm_act_search.deleteSfmSearch($searchName);
+		$sfm_act_common.logoutInClassic();
+	}
+
+//Variables used
+var $searchName = "RS_5371";
+var $displayFields = [];
+var $displayValues = [];
+var $dateTimeValue = "11/28/2018 6:03 AM";
+var $dateValue = "11/29/2018";
+var $missingStdDataTypes = ["Date","Date"];
+var $customFieldsNames = ["Automation Date2","Automation Date3"];
+var $i=0;
+var $actualValuesList = [];
+var $expectedList = [];
+var $objectName = "Work Order";
+//Appending current timestamp to process name to make it unique.
+var $timeStamp = $bo_act_navigation.getCurrentTimeStamp();
+$searchName = $searchName + "_" + $timeStamp;
+
+//Login and switch to classic
+//**************************************************************************************
+$bo_act_login.login($g_url,$sfmdUsn,$sfmdPwd);
+
+_wait(15000);
+//Look for missing fields
+//Create custom fields if needed
+$sfm_act_common.addCustomFields($objectName, $customFieldsNames, $missingStdDataTypes);
+//Setting up new custom search
+$bo_act_navigation.navigateToSfmSearchInDesigner();
+$sfm_act_search.createNewCustomSearch($searchName, $searchName);
+var $objectsArray = "Work Order";
+var $fieldNames = ["Actual Initial Response","Actual Onsite Response","Actual Resolution","Actual Restoration","Scheduled Date","Automation Date2","Automation Date3"];
+var $operatorList = ["Equals","Equals","Equals","Equals","Equals","Equals","Equals"];
+var $valueList = ["YESTERDAY","TODAY","NOW","TOMORROW","TODAY","TOMORROW","YESTERDAY"];
+var $advExpression ="";
+var $displayObjects = ["Work Order","Work Order","Work Order","Work Order","Work Order","Work Order","Work Order"];
+var $displayFields = ["Actual Initial Response","Actual Onsite Response","Actual Resolution","Actual Restoration","Scheduled Date","Automation Date2","Automation Date3"];
+var $sortingObjects =[];
+var $sortingFields = [];
+var $searchOrders = [];
+$sfm_act_search.configObjectInSearch($objectsArray, $fieldNames, $operatorList, $valueList, $advExpression, $displayObjects, $displayFields, $sortingObjects, $sortingFields, $searchOrders);
+$sfm_act_search.saveAndCloseSearch();
+$sfm_act_search.launchGivenSearch($searchName, "");
+
+//Work Order with the date literals as values
+
+//Set up date literals
+var $current = new Date();
+var $todayDate = new Date($sfm_act_common.addSubtractDates($current,0));
+$todayDate = $todayDate.getFullYear()+"-"+($todayDate.getMonth()+1)+"-"+$todayDate.getDate();
+var $yesterdayDate = new Date($sfm_act_common.addSubtractDates($current,-1));
+$yesterdayDate = $yesterdayDate.getFullYear()+"-"+($yesterdayDate.getMonth()+1)+"-"+$yesterdayDate.getDate();
+var $tomorrowDate = new Date($sfm_act_common.addSubtractDates($current,1));
+$tomorrowDate = $tomorrowDate.getFullYear()+"-"+($tomorrowDate.getMonth()+1)+"-"+$tomorrowDate.getDate();
+
+var $now = $sfm_act_common.calculateNow();
+_log("Value for now is "+$now);
+var $nowDateTime = $sfm_act_common.addSubtractDates($current,0)+" "+$now;
+_log("Now Date time "+$nowDateTime);
+var $restDateTime = $sfm_act_common.getDateTimeInRestFormat($nowDateTime);
+$objName= $orgnamespace+"__Service_Order__c";
+$obJson = "{\""+$orgnamespace+"__Order_Status__c\":\"Canceled\",\""+$orgnamespace+"__Scheduled_Date__c\":\""+$todayDate+"\",\"Automation_Date2__c\":\""+$tomorrowDate+"\",\"Automation_Date3__c\":\""+$yesterdayDate+"\",\""+$orgnamespace+"__Actual_Initial_Response__c\":\""+$yesterdayDate+"\",\""+$orgnamespace+"__Actual_Onsite_Response__c\":\""+$todayDate+"\",\""+$orgnamespace+"__Actual_Restoration__c\":\""+$tomorrowDate+"\",\""+$orgnamespace+"__Actual_Resolution__c\":\""+$restDateTime+"\"}";
+$columnName = "Name";
+$filter="id";
+var $filterValue =$sfm_act_restApiMethods.postRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,$objName,$obJson,"POST");
+$woName =$sfm_act_restApiMethods.getRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,"GET", $objName, $columnName, $filter, $filterValue);
+_log("Created Work order is" +$woName);
+$todayDate = $sfm_act_common.addSubtractDates($current,0);
+$yesterdayDate = $sfm_act_common.addSubtractDates($current,-1);
+$tomorrowDate = $sfm_act_common.addSubtractDates($current,1);
+var $yesterdayDateTime = $sfm_act_common.addSubtractDates($current,-1) +" 12:00 AM";
+var $todayDateTime = $sfm_act_common.addSubtractDates($current,0) +" 12:00 AM";
+var $tomorrowDateTime = $sfm_act_common.addSubtractDates($current,1) +" 12:00 AM";
+$expectedList = [$yesterdayDateTime,$todayDateTime,$nowDateTime,$tomorrowDateTime,$todayDate,$tomorrowDate,$yesterdayDate];
+//Verify the created work order
+_call(top.location.reload());
+_wait(3000);
+$res = $sfm_act_search.checkAndReturnSearchResults([$woName], "Work Order");
+_assertTrue($res,"Canceled Work Order is getting displayed");
+for($i=0;$i<$displayFields.length;$i++){
+	$actualValuesList.push($sfm_act_search.takeValueUnderColumn($displayFields[$i]));
+}
+_assertEqualArrays($expectedList,$actualValuesList,"Date Date/Time literals are verified for First Level Display in SFM Search");
+$RS_5371.end();

@@ -1,0 +1,157 @@
+var $RS_11196 = _testcase("RS_11196","CLONE - Verify an attachment when GBL037=False and verify attachment's location when GBL037=True");
+$RS_11196.start();
+
+//Variables used
+var $processName = "RS_11196";
+var $sfmd_Profile = "Cloned OrgProfile";
+var $sfmd_wizardType = "Checklist";
+var $chklistTitle = "Default title for Checklist";
+
+//Appending current timestamp to process name to make it unique.
+var $timeStamp = $sfm_act_common.getCurrentTimeStamp();
+$processName = $processName + "_" + $timeStamp;
+var $pageLayoutName = $processName + "pg";
+
+//Create Work order
+$objName= $orgnamespace+"__Service_Order__c";
+$obJson = "{\""+$orgnamespace+"__Order_Status__c\":\"Open\",\""+$orgnamespace+"__City__c\":\"Kashmir\"}";
+$columnName = "Name";
+$filter="id";
+var $filterValue =$sfm_act_restApiMethods.postRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,$objName,$obJson,"POST");
+$woName =$sfm_act_restApiMethods.getRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,"GET", $objName, $columnName, $filter, $filterValue);
+_log("Created Work order is" +$woName);
+
+//Login and switch to classic
+$bo_act_login.login($g_url,$sfmdUsn,$sfmdPwd);
+_wait(15000);
+
+
+//Set Global setting GBL 037 to True
+$sfm_act_common.editGlobalSettings($sfmd_Profile, "Common", "Global Settings", "GBL037", "True");
+
+//Create Checklist process and create multiple questions including attachment questions
+$sfm_act_common.createChecklistProcess($processName);
+$sfm_act_common.configChecklistSection([$processName]);
+
+//Create Attchment questions
+var $sectionName = $processName;
+var $questionText = $processName +" A1";
+var $responseType = "Attachment";
+var $requiredOrNot = false;
+var $preFillOption = false;
+var $preFillField = "";
+var $defaultAns = [""];
+var $tag = "";
+var $addToForm = true;
+var $helpUrl = "";
+var $responseSetName = "";
+var $responseSetValues = [];
+var $includeInOpdoc = true;
+var $descriptionReq = true;
+$sfm_act_common.createQuestion($sectionName, $questionText, $responseType, $requiredOrNot, $preFillOption, $preFillField, $defaultAns, $tag, $addToForm, $helpUrl, $responseSetName, $responseSetValues, $includeInOpdoc, $descriptionReq);
+$sectionName = $processName;
+$questionText = $processName +" A2";
+$responseType = "Attachment";
+$requiredOrNot = false;
+$preFillOption = false;
+$preFillField = "";
+$defaultAns = [""];
+$tag = "";
+$addToForm = true;
+$helpUrl = "";
+$responseSetName = "";
+$responseSetValues = [];
+$includeInOpdoc = true;
+$descriptionReq = true;
+$sfm_act_common.createQuestion($sectionName, $questionText, $responseType, $requiredOrNot, $preFillOption, $preFillField, $defaultAns, $tag, $addToForm, $helpUrl, $responseSetName, $responseSetValues, $includeInOpdoc, $descriptionReq);
+//Create one more sample question
+$sectionName = $processName;
+$questionText = $processName +" N1";
+$responseType = "Number";
+$requiredOrNot = false;
+$preFillOption = false;
+$preFillField = "";
+$defaultAns = ["3"];
+$tag = "";
+$addToForm = true;
+$helpUrl = "";
+$responseSetName = "";
+$responseSetValues = [];
+$includeInOpdoc = true;
+$descriptionReq = true;
+$sfm_act_common.createQuestion($sectionName, $questionText, $responseType, $requiredOrNot, $preFillOption, $preFillField, $defaultAns, $tag, $addToForm, $helpUrl, $responseSetName, $responseSetValues, $includeInOpdoc, $descriptionReq);
+//Add Checklist step to SFM wizard if not present
+$sfm_act_wizards.addChecklistProcessToWizard("Work Order", $sfmd_wizardName[1], "Checklist", $processName);
+//Perform global search of created work order and launch the checklist process.
+$sfm_act_common.globalSearchOnce($woName);
+$sfm_act_common.addRelatedListIfNotPresent("Files");
+$sfm_act_common.launchSFMProcessInClassic($chklistTitle);
+$sfm_act_common.launchChecklistFirstTime($processName);
+//Attaching 2 attachments.
+var $fileNameWithPath = "scripts/Sahi_Project/svmx/test_lab/test_cases/sfmDelivery/attachments/barbie2.jpg";
+$sfm_act_common.addAttachment(1, $fileNameWithPath,"Attachment Question 1");
+$fileNameWithPath = "scripts/Sahi_Project/svmx/test_lab/test_cases/sfmDelivery/attachments/just.txt";
+$sfm_act_common.addAttachment(2, $fileNameWithPath,"Attachment Question 2");
+//submitting the checklist
+$sfm_act_common.submitChecklist();
+$sfm_act_common.closeChecklists();
+
+//Composing the expected file name
+var $fileName = "";
+//Verifying the Salesforce files
+var $res = $sfm_act_common.verifyFiles($fileName);
+_assertTrue($res);
+if($res){
+	_log("PASS:RS_11196 - Salesforce Files are created (GBL 037 = True) from checklists as expected");
+}
+else{
+	_log("FAIL:RS_11196 - Salesforce Files are not created (GBL 037 = True) from checklists as expected");
+}
+//Double check that it is not created in Notes and Attachments
+$res = $sfm_act_common.verifyNotesAndAttachments($fileName);
+_assertFalse($res);
+if($res){
+	_log("PASS:RS_11196 - Notes and Attachments are not created when GBL 037 is true as expected");
+}
+else{
+	_log("FAIL:RS_11196 - Notes and Attachments are created when GBL 037 is true");
+}
+
+//Set Global setting GBL 037 to False
+$sfm_act_common.editGlobalSettings($sfmd_Profile, "Common", "Global Settings", "GBL037", "False");
+//Perform global search of created work order and launch the checklist process.
+$sfm_act_common.globalSearchOnce($woName);
+$sfm_act_common.addRelatedListIfNotPresent("Files");
+$sfm_act_common.launchSFMProcessInClassic($chklistTitle);
+$sfm_act_common.startNewChecklistSubmission($processName)
+//Attaching 2 attachments.
+var $fileNameWithPath = "scripts/Sahi_Project/svmx/test_lab/test_cases/sfmDelivery/attachments/barbie2.jpg";
+$sfm_act_common.addAttachment(1, $fileNameWithPath,"Attachment Question 3");
+$fileNameWithPath = "scripts/Sahi_Project/svmx/test_lab/test_cases/sfmDelivery/attachments/just.txt";
+$sfm_act_common.addAttachment(2, $fileNameWithPath,"Attachment Question 4");
+//submitting the checklist
+$sfm_act_common.submitChecklist();
+$sfm_act_common.closeChecklists();
+
+//Composing the actual file name
+var $fileName = "";
+//Verifying the Salesforce files
+var $res = $sfm_act_common.verifyFiles($fileName);
+_assertFalse($res);
+if($res){
+	_log("PASS:RS_11196 - Salesforce Files are not created (GBL 037 = False) from checklists as expected");
+}
+else{
+	_log("FAIL:RS_11196 - Salesforce Files are created (GBL 037 = False) from checklists as expected");
+}
+//Double check that it is not created in Notes and Attachments
+$res = $sfm_act_common.verifyNotesAndAttachments(fileName);
+_assertTrue($res);
+if($res){
+	_log("PASS:RS_11196 - Notes and Attachments are created when GBL 037 is false as expected");
+}
+else{
+	_log("FAIL:RS_11196 - Notes and Attachments are not created when GBL 037 is false");
+}
+
+$RS_11196.end();

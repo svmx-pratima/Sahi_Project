@@ -1,0 +1,35 @@
+var $RS_12424 = _testcase("$RS_12424","CLONE - For a From Source Object to create new header & child records SFM verify the Child line creation.");
+$RS_12424.start();
+
+var $sfmName=$bo_act_common.generateRandomName("RS_12424_SFM");
+
+//*****Navgate to SFm Designer and create clone of Add/Edit product Services transaction********
+$bo_act_navigation.navigateToSfmTransactionDesigner();
+$bo_act_SFM.clnStandardSFM("Create Follow-Up Work Order from Work Order",$sfmName,$sfmName);
+
+//*******Nagigate to SFM Wizard and Create Wizard and Add Above Transaction to it**********
+$bo_act_navigation.navigateToSfmWizard();
+$bo_act_SFW.createWizardGeneralInfo("Work Order",$sfmName,$sfmName);
+$bo_act_SFW.createWizardStep("SFM",$sfmName,"Interactive");
+
+
+//Create WO with Open Status
+$objName= "SVMXC__Service_Order__c";
+$obJson = "{\"SVMXC__Order_Status__c\":\"Open\",\"SVMXC__Order_Type__c\":\"Field Service\"}";     
+$columnName = "Name";
+$filter="id";
+
+$workorderid=$sfm_act_restApiMethods.postRestApi($bac_un,$bac_pwd,$bac_client_id,$bac_client_secret,$bac_orginstance,$objName,$obJson,"POST");
+_log($workorderid);
+//get the wo
+$WOname =$sfm_act_restApiMethods.getRestApi($bac_un,$bac_pwd,$bac_client_id,$bac_client_secret,$bac_orginstance,"GET", $objName, $columnName, $filter, $workorderid);
+_log($WOname);
+
+$RS_12424.end();
+
+
+//******Launch the Wizard in delivery for WO object**************
+
+$bo_act_navigation.navigateToWorkOrdersTab();
+_click(_link($WOname));
+$bo_act_sfmVerifyWorkOrder.clkOnWizard($sfmName);

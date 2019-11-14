@@ -1,0 +1,17 @@
+var $sfm_pg_sfdFormfill = new function sfm_pg_sfdFormfill(){
+	//Objects of SFD page
+	this.sfd_Account= _textbox(0,_rightOf(_label("Account:")));
+	this.sfd_BillingType=_textbox(0,_rightOf(_label("Billing Type:")));
+	this.sfd_City=_textbox(0,_rightOf(_label("City:")));
+	this.sfd_Component=_textbox(0,_rightOf(_label("Component:")));
+	this.sfd_Contact=_textbox(0,_rightOf(_label("Contact:")));
+	this.sfd_Priority=_textbox(0,_rightOf(_label("Priority:")));
+	this.sfd_Description=_textarea(0,_rightOf(_label("Problem Description:")));
+	this.sfd_Zip=_textbox(0,_rightOf(_label("Zip:")));
+	this.sfd_Case=_textbox(0,_rightOf(_label("Case:")));
+	this.sfd_DatTime=_textbox(0,_rightOf(_label("Canceled Date Time:")));
+	
+	this.sfd_workdesc=_textarea("sfm-textarea-1057-inputEl");
+	//Objects of SFM designer page
+	
+};

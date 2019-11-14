@@ -1,0 +1,189 @@
+//Tests are to be written here [Bhupendra Singh Chouhan]
+
+var $RS_12434 = _testcase("$RS_12434","Verify the auto Entitlement with 2 or more Warranties when new Entitlement setting (Do nothing) is NO");
+$RS_12434.start();
+_setSpeed($g_stepSpeed);
+/**
+* Login to the Sandbox Org
+*/
+
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+
+/**
+ * Create Account, Contact, Location, Product and Installed Product
+ */
+
+//Create Account with Rest API
+var $accountName = $bo_act_common.generateRandomName("Acc");
+$objName_A= "Account";
+$obJson_A = "{\"Name\":\""+ $accountName + "\"}";     
+ 
+$workorderid_A=$sfm_act_restApiMethods.postRestApi($bac_un,$bac_pwd,$bac_client_id,$bac_client_secret,$bac_orginstance,$objName_A,$obJson_A,"POST");
+_log($workorderid_A);
+
+
+//Create Contact with above Account
+var $contactName = $bo_act_common.generateRandomName("Con");
+$objName_C= "Contact";
+$obJson_C = "{\"LastName\":\""+ $contactName + "\",\"AccountId\":\""+$workorderid_A+"\"}";     
+ 
+$workorderid_C=$sfm_act_restApiMethods.postRestApi($bac_un,$bac_pwd,$bac_client_id,$bac_client_secret,$bac_orginstance,$objName_C,$obJson_C,"POST");
+_log($workorderid_C);
+
+//Create Product with Rest API
+
+var $productName = $bo_act_common.generateRandomName("Pro");
+$objName_P= "Product2";
+$obJson_P = "{\"Name\":\""+ $productName + "\",\"IsActive\":\"true\",\"ProductCode\":\"loc68\"}"; 
+ 
+$workorderid_P=$sfm_act_restApiMethods.postRestApi($bac_un,$bac_pwd,$bac_client_id,$bac_client_secret,$bac_orginstance,$objName_P,$obJson_P,"POST");
+_log($workorderid_P);
+
+//Create IB with above Product, account and contact
+
+var $IBName = $bo_act_common.generateRandomName("IB_");
+var $currentDate = $bo_act_common.currentDate_GMT("-");
+$objName_IB= $nameSpace_Org + "__Installed_Product__c";
+$obJson_IB = "{\"Name\":\""+ $IBName + "\",\""+$nameSpace_Org + "__Serial_Lot_Number__c\":\""+$IBName + "\",\""+$nameSpace_Org + "__Date_Installed__c\":\""+ $currentDate + "\",\""+$nameSpace_Org + "__Product__c\":\""+ $workorderid_P + "\",\""+$nameSpace_Org + "__Company__c\":\""+ $workorderid_A + "\",\""+$nameSpace_Org + "__Contact__c\":\""+ $workorderid_C + "\"}"; 
+ 
+$workorderid_IB=$sfm_act_restApiMethods.postRestApi($bac_un,$bac_pwd,$bac_client_id,$bac_client_secret,$bac_orginstance,$objName_IB,$obJson_IB,"POST");
+_log($workorderid_IB);
+
+//Create Warranty with Using Rest API
+// Warranty01
+var $warrantyName01 = $bo_act_common.generateRandomName("Warr1_");
+$objName_warranty= $nameSpace_Org + "__Service_Template__c";
+$obJson_warranty01 = "{\"Name\":\""+ $warrantyName01 + "\",\""+$nameSpace_Org + "__Template_Type__c\":\"Warranty\",\""+$nameSpace_Org + "__Material_Covered__c\":10,\""+$nameSpace_Org + "__Duration_of_Material_Coverage__c\":5,\""+$nameSpace_Org + "__Unit_of_Time_Material__c\":\"Years\",\""+$nameSpace_Org + "__Time_Covered__c\":20,\""+$nameSpace_Org + "__Duration_of_Time_Coverage__c\":5,\""+$nameSpace_Org + "__Unit_of_Time__c\":\"Years\",\""+$nameSpace_Org + "__Expenses_Covered__c\":30,\""+$nameSpace_Org + "__Duration_of_Expenses__c\":5,\""+$nameSpace_Org + "__Unit_of_Time_Expenses__c\":\"Years\",\""+$nameSpace_Org + "__Coverage_Effective_From2__c\":\""+$nameSpace_Org + "__Date_Installed__c\"}"; 
+ 
+$workorderid_warranty01 = $sfm_act_restApiMethods.postRestApi($bac_un,$bac_pwd,$bac_client_id,$bac_client_secret,$bac_orginstance,$objName_warranty,$obJson_warranty01,"POST");
+_log($workorderid_warranty01);
+
+//Create Product Warranty for IB with above Warranty
+var $startDate = $bo_act_common.currentDate_GMT("-");
+var $endDate = $bo_act_common.futureDate_GMT(5,"-");
+$objName_ProWarr= $nameSpace_Org + "__Warranty__c";
+$obJson_ProWarr01 = "{\""+$nameSpace_Org + "__Installed_Product__c\":\""+ $workorderid_IB + "\",\""+$nameSpace_Org + "__Service_Template__c\":\""+$workorderid_warranty01 + "\",\""+$nameSpace_Org + "__Start_Date__c\":\""+$startDate + "\",\""+$nameSpace_Org + "__End_Date__c\":\""+$endDate + "\"}"; 
+ 
+$workorderid_ProWarr01 = $sfm_act_restApiMethods.postRestApi($bac_un,$bac_pwd,$bac_client_id,$bac_client_secret,$bac_orginstance,$objName_ProWarr,$obJson_ProWarr01,"POST");
+_log($workorderid_ProWarr01);
+
+//Warranty02
+var $warrantyName02 = $bo_act_common.generateRandomName("Warr2_");
+$objName_warranty= $nameSpace_Org + "__Service_Template__c";
+$obJson_warranty02 = "{\"Name\":\""+ $warrantyName02 + "\",\""+$nameSpace_Org + "__Template_Type__c\":\"Warranty\",\""+$nameSpace_Org + "__Material_Covered__c\":10,\""+$nameSpace_Org + "__Duration_of_Material_Coverage__c\":5,\""+$nameSpace_Org + "__Unit_of_Time_Material__c\":\"Years\",\""+$nameSpace_Org + "__Time_Covered__c\":20,\""+$nameSpace_Org + "__Duration_of_Time_Coverage__c\":5,\""+$nameSpace_Org + "__Unit_of_Time__c\":\"Years\",\""+$nameSpace_Org + "__Expenses_Covered__c\":30,\""+$nameSpace_Org + "__Duration_of_Expenses__c\":5,\""+$nameSpace_Org + "__Unit_of_Time_Expenses__c\":\"Years\",\""+$nameSpace_Org + "__Coverage_Effective_From2__c\":\""+$nameSpace_Org + "__Date_Installed__c\"}"; 
+ 
+$workorderid_warranty02 = $sfm_act_restApiMethods.postRestApi($bac_un,$bac_pwd,$bac_client_id,$bac_client_secret,$bac_orginstance,$objName_warranty,$obJson_warranty02,"POST");
+_log($workorderid_warranty02);
+
+//Create Product Warranty for IB with above Warranty
+var $startDate = $bo_act_common.currentDate_GMT("-");
+var $endDate = $bo_act_common.futureDate_GMT(5,"-");
+$objName_ProWarr= $nameSpace_Org + "__Warranty__c";
+$obJson_ProWarr02 = "{\""+$nameSpace_Org + "__Installed_Product__c\":\""+ $workorderid_IB + "\",\""+$nameSpace_Org + "__Service_Template__c\":\""+$workorderid_warranty02 + "\",\""+$nameSpace_Org + "__Start_Date__c\":\""+$startDate + "\",\""+$nameSpace_Org + "__End_Date__c\":\""+$endDate + "\"}"; 
+ 
+$workorderid_ProWarr02 = $sfm_act_restApiMethods.postRestApi($bac_un,$bac_pwd,$bac_client_id,$bac_client_secret,$bac_orginstance,$objName_ProWarr,$obJson_ProWarr02,"POST");
+_log($workorderid_ProWarr02);
+
+
+//Create Case with above Product, account and contact
+
+$objName_case= "Case";
+$obJson_case = "{\"AccountId\":\""+ $workorderid_A + "\",\"Status\":\"Escalated\",\"Priority\":\"High\",\"Origin\":\"Email\"}"; 
+$columnName = "CaseNumber";
+$filter="id";
+
+$workorderid_case=$sfm_act_restApiMethods.postRestApi($bac_un,$bac_pwd,$bac_client_id,$bac_client_secret,$bac_orginstance,$objName_case,$obJson_case,"POST");
+_log($workorderid_case);
+
+//get the case number
+$caseNumber =$sfm_act_restApiMethods.getRestApi($bac_un,$bac_pwd,$bac_client_id,$bac_client_secret,$bac_orginstance,"GET", $objName_case, $columnName, $filter, $workorderid_case);
+_log($caseNumber);
+
+//Create WO with Open Status
+$objName= $nameSpace_Org + "__Service_Order__c";
+$obJson = "{\""+$nameSpace_Org + "__Order_Status__c\":\"Open\",\""+$nameSpace_Org + "__Order_Type__c\":\"Depot Repair\",\""+$nameSpace_Org + "__Component__c\":\""+$workorderid_IB+"\",\""+$nameSpace_Org + "__Company__c\":\""+$workorderid_A+"\",\""+$nameSpace_Org + "__Contact__c\":\""+$workorderid_C+"\",\""+$nameSpace_Org + "__Case__c\":\""+$workorderid_case+"\"}";     
+$columnName = "Name";
+$filter="id";
+ 
+$workorderid=$sfm_act_restApiMethods.postRestApi($bac_un,$bac_pwd,$bac_client_id,$bac_client_secret,$bac_orginstance,$objName,$obJson,"POST");
+_log($workorderid);
+//get the wo
+$WOname =$sfm_act_restApiMethods.getRestApi($bac_un,$bac_pwd,$bac_client_id,$bac_client_secret,$bac_orginstance,"GET", $objName, $columnName, $filter, $workorderid);
+_log($WOname);
+
+/**
+ * Create Auto Entitlement Rules for Work Order
+ */
+
+var $WOField = "Order Type";
+var $Operator = "Equals";
+var $Value = "Depot Repair";
+var $EntitSetting = "Product";
+var	$p1 = "No";		        	// $p1 = Yes/No for Select should Entitlement Be Performed On Products Serviced?
+var	$p2 = "No";			    	// $p2 = Yes/No for Select should Parent IB Of Component Be Included for Entitlement check?
+var	$p3 = "No";					// $p3 = Yes/No for Select should Top-Level IB Of Component Be Included for Entitlement check?
+var	$p4 = "Warranties";	// $p4 = Warranties/Scon/Both for Entitlement check?
+var	$p5 = "Validity dates";     // $p8 = Validity dates/Counters/Both
+var	$p6 = "No";				// $p10 = Yes/No Disable Auto Entitlement On Multiple Entitlements
+
+//Navigate to Auto Entitlement Rules - Work Order
+$autoEntitlementRuleName = $bo_act_autoEntitlementRule_WO.createAutoEntitlementRuleWithWarranty_WO($WOField, $Operator, $Value, $p1, $p2, $p3, $p4, $p5, $p6);
+_wait(3000);
+
+//Changing the Rule Sequence
+$bo_act_autoEntitlementRule_WO.changingAutoEntitlementRule_SequenceTop($autoEntitlementRuleName);
+
+/**
+ * Configure the Global Profile SET001
+ */
+// Global Setting SET001 - Enable Auto Entitlement For Work Order is set to True for Auto Entitlement process to trigger 
+//(This is a Global Setting and is available under Module "Entitlement Verification" and Submodule "Auto-Entitlement - Work Order") 
+
+var $Module = "Entitlement Verification";
+var $SubModule = "Auto-Entitlement-Work Order";
+var $Setting = "SET001";
+var $value = true;
+$bo_act_configurationProfiles.editGlobalProfileForBooleanSettings($Module, $SubModule, $Setting, $value);
+
+
+//Go to Work Order tab
+$bo_act_workOrders.navigateToWorkOrder($WOname);
+
+
+//Perform Auto Entitlement on Work Order
+$bo_act_autoEntitlementRule_WO.performAutoEntitlement_WO($WOname);
+
+
+//validation of Entitlement Parameters On Case
+
+if(_isVisible(_image("Checked",_rightOf(_cell("/Is Entitlement Performed/"))))){
+	_logOutput("Entitlement is Performed Successfully = PASS");
+	}else{
+	_fail("Entitlement is Not Performed = Failed");
+	}
+
+//var $actual_warranty = _getText(_link(0,_rightOf(_span("/Warranty/"))));
+var $actual_EntitlementType = _getText(_div(0,_rightOf(_cell("/Entitlement Type/"))));
+var $actual_BillingType = _getText(_div(0,_rightOf(_cell("/Billing Type/"))));
+var $actual_AutoEntStatus = _getText(_div(0,_rightOf(_cell("/Auto Entitlement Status/"))));
+var $actual_EntitlementNotes = _getText(_div(0,_rightOf(_cell("Entitlement Notes"))));
+
+if(_isVisible(_cell("Warranty"))){
+	var $actual_warranty = _getText(_link("/WN/", _rightOf(_cell("/Warranty/"))));
+	
+}else{
+	var $actual_warranty = _getText(_link("/WN/",_rightOf(_span("/Warranty/"))));
+}
+
+_assertNotNull($actual_warranty,"Warranty is Null on case record");
+_assertEqual($actual_AutoEntStatus,"Success","Actual and expected Auto Entitlement Status are not same");
+_assertEqual($actual_EntitlementType,"AUTO","Actual and expected Entitlement Type are not same");
+_assertEqual($actual_BillingType,"Warranty","Actual and expected Billing Type are not same");
+_assertNotNull($actual_EntitlementNotes, "Entitlement Notes is Null");
+
+// Delete the Auto Entitlemet Rule created on WO
+$bo_act_autoEntitlementRule_WO.deleteAutoEntitlementRule_WO($autoEntitlementRuleName);
+
+$bo_act_login.logOut(); 
+
+$RS_12434.end();

@@ -1,0 +1,68 @@
+var $user_credentials = $excel.readFromCustomExcel("../op_excleData/automation.xlsx", "User_Details","","");
+
+
+//var $nArr;
+//Calling the sforce API
+for(var $i=0;$i<$user_credentials.length;$i++)
+{
+var $g_un = $user_credentials[$i][0];
+var $g_pwd = $user_credentials[$i][1];
+var $g_url = $user_credentials[$i][2];
+}
+
+var $RS_6295 = _testcase("RS_6295", "Create New MTTS Rule");
+
+$RS_6295.start();
+
+/*var $g_url = "https://test.salesforce.com/";
+var $g_un = "govendhan@svmx-cct5.org.cct5part1";
+var $g_pwd = "maxpl0re2";*/
+
+$bo_act_login.login($g_url, $g_un, $g_pwd);
+		
+
+var $date = "" + new Date();
+var $MTTSName = "MTTSRule_" + $date;
+var $rowCount = 0;
+var $rowIndex = "1";
+
+_click(_link("ServiceMax Setup"));
+_wait(20000,_isVisible(_div("Dispatch Management")));
+_click(_div("Dispatch Management"));
+_wait(20000,_isVisible(_div("MTTS Rules")));
+_click(_div("MTTS Rules"));
+_set($rowCount, _table("MTTSRule:RuleForm:RuleBlock:MTTSRuleList").rows.length);
+$rowCount=$rowCount-1;
+_click(_button("New Rule"));
+_setValue(_textbox("MTTSRule:RuleForm:RuleBlock:MTTSRuleList:"+$rowCount+":j_id90"), $MTTSName);
+_setValue(_textarea("MTTSRule:RuleForm:RuleBlock:MTTSRuleList:"+$rowCount+":j_id94"), "MTTS Rule Automation");
+_setSelected(_select("MTTSRule:RuleForm:RuleBlock:j_id98:j_id99:table1:0:j_id104"), "Order Status");
+_setSelected(_select("MTTSRule:RuleForm:RuleBlock:j_id98:j_id99:table1:0:j_id109"), "Equals");
+_setValue(_textbox("MTTSRule:RuleForm:RuleBlock:j_id98:j_id99:table1:0:j_id113"), "Open");
+_setSelected(_select("MTTSRule:RuleForm:RuleBlock:j_id98:j_id99:table1:1:j_id104"), "Order Type");
+_setSelected(_select("MTTSRule:RuleForm:RuleBlock:j_id98:j_id99:table1:1:j_id109"), "Equals");
+_setValue(_textbox("MTTSRule:RuleForm:RuleBlock:j_id98:j_id99:table1:1:j_id113"), "Cleaning");
+_click(_imageSubmitButton("Add"));
+_setSelected(_select("MTTSRule:RuleForm:RuleBlock:j_id98:j_id99:table1:2:j_id104"), "Order Type");
+_setSelected(_select("MTTSRule:RuleForm:RuleBlock:j_id98:j_id99:table1:2:j_id109"), "Equals");
+_setValue(_textbox("MTTSRule:RuleForm:RuleBlock:j_id98:j_id99:table1:2:j_id113"), "Repair");
+_setValue(_textbox("MTTSRule:RuleForm:RuleBlock:j_id119:HdrAdvOption"), "1 AND (2 OR3)");;
+_setValue(_textbox("MTTSRule:RuleForm:RuleBlock:MTTS:Minutes"), "70");
+_click(_button("Save"));
+
+_log("$MTTSName = "+$MTTSName);
+
+if(_exists($MTTSName))
+	{
+	_log("MTTS Rule Created Successfully");
+	//$excel.writeToExcel("insertAtIndex", "../optimax/op_excleData/automation.xlsx", "MTTS", $MTTSName, $rowIndex);
+	$excel.insertUnderColumn("../op_excleData/automation.xlsx", "Rules", "MTTS", $MTTSName, $rowIndex);
+	}
+else
+	{
+	_fail("Error in Creating MTTS Rule");
+	}
+
+$bo_act_login.logOut();
+
+$RS_6295.end();

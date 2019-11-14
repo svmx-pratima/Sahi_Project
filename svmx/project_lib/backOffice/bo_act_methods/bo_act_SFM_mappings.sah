@@ -1,0 +1,137 @@
+/**
+ * Function to perform SFM MAppings workflows
+ * Author : Meghana Rao
+ */
+var $bo_act_SFM_mappings = new function bo_act_SFM_mappings() {
+	
+	/*
+	 * To create SFM Mappings from Source to Target with First condition
+	 */
+	this.createSFMMaps_AccounttoPMPlan = function($MapName,$MapId, $sourceobject, $targetobject , $valuecomparision){
+		
+		
+		$bo_act_navigation.navigatetoSFMMaps();
+		_wait(1000);
+		_setValue($bo_pg_sfmMappings.picklist_sourceobject, "");
+		_setValue($bo_pg_sfmMappings.picklist_sourceobject, $sourceobject);
+		_wait(1000);
+		_setSelected($bo_pg_sfmMappings.sourcecombobox, $sourceobject);
+		_wait(1000);
+		_setValue($bo_pg_sfmMappings.picklist_targetobject, "");
+		_setValue($bo_pg_sfmMappings.picklist_targetobject, $targetobject);
+		_wait(1000);
+		_setSelected($bo_pg_sfmMappings.targetcombobox,$targetobject);
+ 		_click($bo_pg_sfmMappings.btn_newmappings);
+		_wait(1000);
+		_setValue($bo_pg_sfmMappings.txt_mapname, $MapName);
+		_setValue($bo_pg_sfmMappings.txt_mapId, $MapId);
+		
+		_setValue($bo_pg_sfmMappings.txt_account_picklist, "");
+		_setValue($bo_pg_sfmMappings.txt_account_picklist, $valuecomparision);
+		_setSelected($bo_pg_sfmMappings.combo_account,$valuecomparision);
+		_click($bo_pg_sfmMappings.btn_save);
+		/*
+		 * To verify if the Map is saved successfully or not
+		 */
+		_assertEqual(true,_isVisible($bo_pg_sfmMappings.verify_mapsaved));
+
+	};
+
+	
+	this.createSFMMaps_IB_toPMPlan = function($MapName,$MapId, $sourceobject, $targetobject , $valuecomparision){
+		
+		
+		$bo_act_navigation.navigatetoSFMMaps();
+		_wait(1000);
+		_setValue($bo_pg_sfmMappings.picklist_sourceobject, "");
+		_setValue($bo_pg_sfmMappings.picklist_sourceobject, $sourceobject);
+		_wait(1000);
+		_setSelected($bo_pg_sfmMappings.sourcecombobox, $sourceobject);
+		_wait(1000);
+		_setValue($bo_pg_sfmMappings.picklist_targetobject, "");
+		_setValue($bo_pg_sfmMappings.picklist_targetobject, $targetobject);
+		_wait(1000);
+		_setSelected($bo_pg_sfmMappings.targetcombobox,$targetobject);
+ 		_click($bo_pg_sfmMappings.btn_newmappings);
+		_wait(1000);
+		_setValue($bo_pg_sfmMappings.txt_mapname, $MapName);
+		_setValue($bo_pg_sfmMappings.txt_mapId, $MapId);
+		
+		_setValue($bo_pg_sfmMappings.txt_account_picklist, "");
+		_setValue($bo_pg_sfmMappings.txt_account_picklist, $valuecomparision);
+		_setSelected($bo_pg_sfmMappings.combo_account,$valuecomparision);
+		_click($bo_pg_sfmMappings.btn_save);
+		/*
+		 * To verify if the Map is saved successfully or not
+		 */
+		_assertEqual(true,_isVisible($bo_pg_sfmMappings.verify_mapsaved));
+		
+		
+		
+	};
+	
+	this.deleteSFMMappings = function($MapName, $sourceobject, $targetobject)
+	{	
+			$bo_act_navigation.navigatetoSFMMaps();
+		_wait(1000);
+		_setValue($bo_pg_sfmMappings.picklist_sourceobject, "");
+		_setValue($bo_pg_sfmMappings.picklist_sourceobject, $sourceobject);
+		_wait(1000);
+		_setSelected($bo_pg_sfmMappings.sourcecombobox, $sourceobject);
+		_wait(1000);
+		_setValue($bo_pg_sfmMappings.picklist_targetobject, "");
+		_setValue($bo_pg_sfmMappings.picklist_targetobject, $targetobject);
+		_wait(1000);
+		_setSelected($bo_pg_sfmMappings.targetcombobox,$targetobject);
+		_wait(1000);
+		_setValue($bo_pg_sfmMappings.txt_map_search, $MapName);
+		_setSelected($bo_pg_sfmMappings.mapssearch,$MapName);
+		_wait(1000);
+		_click($bo_pg_sfmMappings.btn_delete);	
+		_wait(1000);
+		_click($bo_pg_sfmMappings.pop_yes);
+		_wait(10000);
+	};
+	
+	this.createMapping=function()
+	
+	{
+		_click(_f("main").s_button("New[2]"));
+		_wait(10000);
+		_setValue(_f("main").s_textinput("filterInput[1]"), "Activity Type");
+		_wait(6000);
+		_click(_f("main").s_textinput("/textip/").rightOf(_f("main").ftedatagriditemrenderer("Activity Type")));
+		_setValue(_f("main").s_textinput("/textip/").rightOf(_f("main").ftedatagriditemrenderer("Activity Type")),"No Activity");
+		
+		
+	}
+	
+	//Added by Srinivas for Geolocation literals checking in SFM Mapping
+	
+this.createSFMMaps_Geolocation = function($MapName,$MapId, $sourceobject, $targetobject){
+		
+		
+		$bo_act_navigation.navigatetoSFMMaps();
+		_wait(1000);
+		_setValue($bo_pg_sfmMappings.picklist_sourceobject, "");
+		_setValue($bo_pg_sfmMappings.picklist_sourceobject, $sourceobject);
+		_wait(1000);
+		_setSelected($bo_pg_sfmMappings.sourcecombobox, $sourceobject);
+		_wait(1000);
+		_setValue($bo_pg_sfmMappings.picklist_targetobject, "");
+		_setValue($bo_pg_sfmMappings.picklist_targetobject, $targetobject);
+		_wait(1000);
+		_setSelected($bo_pg_sfmMappings.targetcombobox,$targetobject);
+ 		_click($bo_pg_sfmMappings.btn_newmappings);
+		_wait(10000);
+		_setValue($bo_pg_sfmMappings.txt_mapname, $MapName);
+		_setValue($bo_pg_sfmMappings.txt_mapId, $MapId);
+		
+		
+		/*
+		 * To verify if the Map is saved successfully or not
+		 */
+		
+
+	};
+};

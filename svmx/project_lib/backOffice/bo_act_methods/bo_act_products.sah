@@ -1,0 +1,94 @@
+/**
+ * Functions for the Products object
+ */
+var $bo_act_products = new function bo_act_products() {
+
+	/**
+	 * Create a Product
+	 * var $productFamily = ["--None--","GeneralSolution","AdvSolution","Accessory", "Storage"];
+	 *	var $productCode = "";
+	 * @param $productName
+	 */
+	this.createProductSimple = function() {
+		var $productName = $bo_act_common.generateRandomName("pro");
+		$bo_act_navigation.navigateToProductsPage();
+		_click($bo_pg_products.btn_new);
+		_setValue($bo_pg_products.txt_productName, $productName);
+		_check($bo_pg_products.chk_active);
+		//_setValue($bo_pg_products.txt_productCode, $productCode);
+		_click($bo_pg_products.btn_save);
+		_assertNotVisible(_div("/Error: Invalid Data/"));
+		_logOutput($productName+ " product is created");
+		_wait(15000, _isVisible(_heading2($productName)));
+		return $productName;
+	};
+	
+	this.createProduct = function($productCode, $productFamily) {
+		var $productName = $bo_act_common.generateRandomName("pro");
+		$bo_act_navigation.navigateToProductsPage();
+		_click($bo_pg_products.btn_new);
+		_setValue($bo_pg_products.txt_productName, $productName);
+		_setValue($bo_pg_products.txt_productCode, $productCode);
+		_setSelected($bo_pg_products.sel_productFamily, $productFamily);
+		_check($bo_pg_products.chk_active);
+		_check($bo_pg_products.chk_stockable);
+		_check($bo_pg_products.chk_serializedTracking);
+		_click($bo_pg_products.btn_save);
+		_assertNotVisible(_div("/Error: Invalid Data/"));
+		_logOutput($productName+ " product is created");
+		_wait(15000, _isVisible(_heading2($productName)));
+		return $productName;
+	};
+	
+	this.createProductWithoutSerialized = function($productCode, $productFamily) {
+		var $productName = $bo_act_common.generateRandomName("pro");
+		$bo_act_navigation.navigateToProductsPage();
+		_click($bo_pg_products.btn_new);
+		_setValue($bo_pg_products.txt_productName, $productName);
+		_setValue($bo_pg_products.txt_productCode, $productCode);
+		_setSelected($bo_pg_products.sel_productFamily, $productFamily);
+		_check($bo_pg_products.chk_active);
+		_check($bo_pg_products.chk_stockable);
+		_click($bo_pg_products.btn_save);
+		_assertNotVisible(_div("/Error: Invalid Data/"));
+		_logOutput($productName+ " product is created");
+		_wait(15000, _isVisible($productName));
+		return $productName;
+		
+	};
+	
+	this.deleteProduct = function($proName){
+		$bo_act_navigation.navigateToProductsPage();
+		_click(_link($proName));
+		  _click($bo_pg_products.btn_delete);
+	};
+	
+	this.editProduct = function($proName){
+		$bo_act_navigation.navigateToProductsPage();
+		_click(_link($proName));
+		_click($bo_pg_products.btn_editProduct);
+	};
+	
+	this.updateTextBoxFields = function($object,$objectValue){
+		_setValue($object,$objectValue);
+		//return $callBack.returnResult([_isVisible($accountName), "Account not created",$accountName] );
+	};
+	
+	this.saveProduct = function(){
+		_click($bo_pg_products.btn_saveProduct);
+		_assertNotVisible(_div("/Error: Invalid Data/"));
+		//return $callBack.returnResult([_isVisible($accountName), "Account not created",$accountName] );
+	};
+
+	// Add Standard Price For Product
+	
+	this.addStandardPriceForProduct = function($productName, $standardPriceValue) {
+		$bo_act_navigation.navigateToProductsPage();
+		_click(_link($productName));
+		_click($bo_pg_products.btn_addStandardPrice);
+		_setValue($bo_pg_products.txt_enterStandardPrice, $standardPriceValue);
+		_click($bo_pg_products.btn_saveStandardPrice);
+		_wait(15000, _isVisible($bo_pg_products.txt_productDetailPage));
+	};
+
+};

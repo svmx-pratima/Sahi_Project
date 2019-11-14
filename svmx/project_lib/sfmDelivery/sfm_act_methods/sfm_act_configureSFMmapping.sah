@@ -1,0 +1,44 @@
+var $sfm_act_configureSFMmapping = new function sfm_act_configureSFMmapping(){
+	
+	this.navigateToSfmMappings = function($mappingName) {
+		 $bo_act_navigation.navigateToSvmxSetup();
+		 _click($bo_pg_servicemaxSetup.btn_serviceFlowManager);
+		 _click($sfm_pg_configureSfmMapping.btn_SfmMapping);
+		  _setSelected(_f("SFMExpressionBuilderSWF").s_combobox("sourceCombo"), "Product");
+		 _setSelected(_f("SFMExpressionBuilderSWF").s_combobox("targetCombo"), "Work Detail");
+		 _click(_f("SFMExpressionBuilderSWF").s_button("New"));
+		 _setSelected(_f("SFMExpressionBuilderSWF").s_combobox("valuesCombo[5]"), "Product Cost");//Billing Line Price(r)
+		 _setSelected(_f("SFMExpressionBuilderSWF").s_combobox("valuesCombo[9]"), "Created Date");//Canceled On(r)
+		 _setSelected(_f("SFMExpressionBuilderSWF").s_combobox("valuesCombo[27]"), "Stockable");//Is Billable(r)
+		 _setSelected(_f("SFMExpressionBuilderSWF").s_combobox("valuesCombo[67]"), "Product Description");//Work Description(r)
+		 _setValue(_f("SFMExpressionBuilderSWF").s_textinput("Save this map as"),$mappingName);
+		 _click(_f("SFMExpressionBuilderSWF").s_button("Save As"));
+		 _wait(3000);
+		 _click(_f("SFMExpressionBuilderSWF").s_button("Save"));
+		 _wait(5000);
+	};
+	
+	//function to create new product
+	this.createNewProduct = function($productCode, $productFamily,$productDesc,$productCost) {
+		var $productName = $bo_act_common.generateRandomName("RA_Pro");
+		//var $productDesc = $bo_act_common.generateRandomName("Product Description_Aumation");
+		$bo_act_navigation.navigateToProductsPage();
+		_click($bo_pg_products.btn_new);
+		_setValue($bo_pg_products.txt_productName, $productName);
+		_setValue($bo_pg_products.txt_productCode, $productCode);
+		_setSelected($bo_pg_products.sel_productFamily, $productFamily);
+		_setValue($sfm_pg_configureSfmMapping.txt_productDesc,$productDesc);
+		_wait(1000);
+		_setValue($sfm_pg_configureSfmMapping.txt_prodCost,$productCost);
+		_check($bo_pg_products.chk_active);
+		_check($bo_pg_products.chk_stockable);
+		_check($bo_pg_products.chk_serializedTracking);
+		_click($bo_pg_products.btn_save);
+		_assertNotVisible(_div("/Error: Invalid Data/"));
+		_logOutput($productName+ " product is created");
+		_wait(15000, _isVisible(_heading2($productName)));
+		return $productName;
+	};
+		 
+};
+	

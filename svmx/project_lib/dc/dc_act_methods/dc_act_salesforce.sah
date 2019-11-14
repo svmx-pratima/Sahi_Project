@@ -1,0 +1,87 @@
+//Page objects of Salesforce and reusable methods
+
+var $dc_act_salesforce = new function dc_act_salesforce() {
+
+	// Variables - Global for DC
+	this.login_result = "";
+	this.workOrder = "";
+	this.result = "";
+	this.longwait = 12000;
+	this.mediumwait = 8000;
+	this.shortwait = 3000;
+	this.street = "";
+	this.city = "";
+	this.state = "";
+	this.zip = "";
+	this.country = "";
+
+
+	
+	/**
+	 * Loads URL
+	 * 
+	 * @param $url
+	 */
+	this.navigateUrl = function($URL) {
+		_navigateTo($URL);
+		_wait($dc_pg_salesforce.mediumwait,
+				_isVisible($dc_pg_salesforce.txtfld_username));
+		// _assertTrue(_isVisible($dc_pg_salesforce.txtfld_username), "Failed to
+		// load the URL");
+		// _log("URL is loaded successfully", "SUCCESS");
+		return $callBack.returnResult(
+				_isVisible($dc_pg_salesforce.txtfld_username),
+				"URL is loaded successfully");
+
+	};
+
+	/**
+	 * Login to org
+	 * 
+	 * @param $dc_un
+	 * @param $dc_pwd
+	 */
+	this.loginDC = function($dc_un, $dc_pwd) {
+		_setValue($dc_pg_salesforce.txtfld_username, $dc_un);
+		_setValue($dc_pg_salesforce.txtfld_password, $dc_pwd);
+		_click($dc_pg_salesforce.btn_login);
+		_wait($dc_pg_salesforce.mediumwait,
+				_isVisible($dc_pg_salesforce.link_home));
+		return $callBack.returnResult(_isVisible($dc_pg_salesforce.link_home),
+				"User logged in successfully");
+	};
+
+	/**
+	 * Login and logins
+	 */
+	this.loadlogin = function() {
+		$dc_pg_salesforce.navigateUrl($dc_url);
+		$dc_pg_salesforce.loginDC($dc_un, $dc_pwd);
+	};
+
+	/**
+	 * Logout from salesforce
+	 */
+	this.logOutDC = function() {
+		$dc_pg_salesforce.navigateSFHome();
+		_click($dc_pg_salesforce.btn_userName);
+		_click($dc_pg_salesforce.link_logOut);
+		_wait(this.mediumwait, _isVisible($dc_pg_salesforce.txtfld_username));
+
+		return $callBack.returnResult(
+				_isVisible(_isVisible($dc_pg_salesforce.txtfld_username),
+				"User logged out successfully"));
+	};
+
+	/**
+	 * Navigates to Salesforce Home page
+	 */
+	this.navigateSFHome = function() {
+		_selectWindow();
+		_click($dc_pg_salesforce.link_home);
+		_wait(this.shortwait, _isVisible($dc_pg_salesforce.btn_userName));
+		return $callBack.returnResult($dc_pg_salesforce.btn_userName,
+				"Navigated to Home page successfully");
+	};
+
+};

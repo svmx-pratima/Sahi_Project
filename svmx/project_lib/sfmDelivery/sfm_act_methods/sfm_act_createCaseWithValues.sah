@@ -1,0 +1,89 @@
+//Function to select values from Lookup
+var $sfm_act_NewCaseCreation = new function sfm_act_NewCaseCreation(){
+	
+//Select Account Lookup
+this.selectAccountlookup = function(){
+_click(_image("Account Name Lookup (New Window)"));
+_wait(3000);
+_selectWindow("lookup");
+_wait(1000);
+_click(_submit(" Go! "));
+_wait(3000);
+$accName = _getText(_link(0,_under(_tableHeader("Account Name"))));
+_click(_link(0,_under(_tableHeader("Account Name"))));
+_selectWindow();
+return $accName;
+};
+
+//Select Contact Lookup
+this.selectContactlookup = function(){
+	_click(_image("Contact Name Lookup (New Window)"));
+	_wait(3000);
+	_selectWindow("lookup");
+	_wait(1000);
+	_click(_submit(" Go! "));
+	_wait(3000);
+	$contactNum = _getText(_link(0,_under(_tableHeader("Name"))));
+	_click(_link(0,_under(_tableHeader("Name"))));
+	_selectWindow();
+	return $contactNum;
+	};
+	
+	//Select Component Lookup
+	this.selectComponentlookup = function(){
+		_click(_image("Component SN Lookup (New Window)"));
+		_wait(3000);
+		_selectWindow("lookup");
+		_wait(1000);
+	_click(_submit(" Go! "));
+	_wait(3000);
+	var $Compname="";
+	if(_isVisible(_link(0,_under(_tableHeader("Installed Product Name"))))==true){
+		$Compname = _getText(_link(0,_under(_tableHeader("Installed Product Name"))));
+		_click(_link(0,_under(_tableHeader("Installed Product Name"))));
+	}
+	else{
+		$Compname = _getText(_link(0,_under(_tableHeader("Installed Product ID"))));
+		_click(_link(0,_under(_tableHeader("Installed Product ID"))));
+	}
+	
+		_selectWindow();
+		return $Compname;
+		};
+//Create new Case
+this.createCase = function($casePriority,$caseBillingType,$caseDescription,$caseOrigin ) {
+    $bo_act_navigation.navigateToCasesPage();
+	_click($bo_pg_Cases.btn_new);
+	//Adding values in fields
+	$componentname= this.selectComponentlookup();
+	_log($componentname);
+	_wait(1000);
+	_setSelected(_select(0,_rightOf(_label("/\\*Priority|^Priority/"))),$casePriority);
+	_setSelected($sfm_pg_caseCreationFields.caseBillingType1,$caseBillingType);
+	$contactName=this.selectContactlookup();
+	_log($contactName);
+	_wait(3000);
+	$accName = this.selectAccountlookup();
+	_log($accName);
+	_wait(5000);
+	_setValue($sfm_pg_caseCreationFields.case_Description,$caseDescription);
+	_setSelected($sfm_pg_caseCreationFields.case_Origin,$caseOrigin);
+	_click($bo_pg_Cases.btn_save);
+//	_assertNotVisible(_div("/Error: Invalid Data/"));
+//	_wait(15000, _isVisible(_heading2("Case Detail")));
+	var $caseNumber = "";
+	if(_isVisible($bo_pg_Cases.txt_caseNumber)){
+		$caseNumber = _getText($bo_pg_Cases.txt_caseNumber);	
+	}
+	else{
+		$caseNumber = _getText(_span("efhpCenterValue  "));
+	}
+	
+	_logOutput($caseNumber+ " Case is created");
+//return $caseNumber;
+return [$caseNumber,$contactName,$accName,$componentname];
+};
+
+
+};
+

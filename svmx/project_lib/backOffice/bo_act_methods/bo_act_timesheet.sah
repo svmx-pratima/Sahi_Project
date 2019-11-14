@@ -1,0 +1,44 @@
+/**
+ * Functions for the Accounts Object
+ */
+var $bo_act_timesheet = new function bo_act_timesheet() {
+
+	/**
+	 * Create an Account
+	 * 
+	 * @param $accountName
+	 */
+	
+var $btn_add = _span("Add");
+
+	this.createTimesheetConfig = function($timezone,$profile) {
+		var $timesheetName = $bo_act_common.generateRandomName("TM");
+		$bo_act_navigation.navigateToTimesheetPage();
+		_wait(60000,_isVisible($btn_add));
+		_click($btn_add);
+		_click(_button("/svmx-checkbox/", _near(_label("Active"))));
+		_setValue(_textbox("timesheetName"),$timesheetName);
+		_setValue(_textarea("description"),"Timesheet Entry for Weekly");
+		_setValue(_textbox("businessHoursName"),"IST_Timesheet");
+		_click(_listItem("IST_Timesheet"));
+		_setValue(_textbox("timezone"),$timezone);
+		_click(_listItem($timezone));
+
+		_setValue(_textbox("startingon"), $bo_act_common.currentDate("/"));
+		_setValue(_textbox("continuingthrough"), $bo_act_common.getfutureDate(1, "/"));
+		_click(_button("svmx-checkbox-1053-inputEl"));
+		_setValue(_textbox("startOfPeriodDate"),0);
+		_setValue(_textbox("endOfPeriodDate"),6);
+		_setValue(_textbox("emailOnSuccess"),"auto@mailinator.com");
+		_setValue(_textbox("emailOnError"),"auto@mailinator.com");
+		_click(_span("Assignment"));
+		_click(_span("Add[1]"));
+		_click(_div($profile));
+		_click(_span("Apply"));
+		_click(_span("Properties"));
+		_click(_link("Run Now"));
+		_click(_span("Save"));
+	};
+	
+
+};

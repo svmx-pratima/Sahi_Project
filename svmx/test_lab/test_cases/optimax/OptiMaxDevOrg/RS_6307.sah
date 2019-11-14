@@ -1,0 +1,116 @@
+var $user_credentials = $excel.readFromCustomExcel("../op_excleData/automation.xlsx", "User_Details","","");
+var $Dispatch_Process = $excel.readFromCustomExcel("../op_excleData/automation.xlsx", "Dispatch_Process","","");
+for(var $i=0;$i<$user_credentials.length;$i++)
+ {
+var $g_un = $user_credentials[$i][0];
+var $g_pwd = $user_credentials[$i][1];
+var $g_url = $user_credentials[$i][2];
+ }
+
+//for(var $i=0;$i<$Dispatch_Process.length;$i++)
+//{
+var $dp_Id = $Dispatch_Process[$i][1];
+var $dp_Terr_Id = $Dispatch_Process[$i][2];
+//}
+
+var $RS_6307 = _testcase("RS_6307", "Validating Preferred tech from Service Contract");
+
+$RS_6307.start();
+	
+$bo_act_login.login($g_url, $g_un, $g_pwd);
+
+_set($login_result, _fetch(login($g_un,$g_pwd)));
+_log($login_result);
+
+_set($create_ServiceContract, _fetch(create_ServiceContract($dp_Terr_Id)));
+_log($create_ServiceContract);
+
+//<browser>
+function login($g_un,$g_pwd){
+	
+	var $login_result = sforce.connection.login($g_un,$g_pwd);
+	return $login_result;
+                           }
+	
+function create_ServiceContract ($dp_Terr_Id){
+
+    // Creating Service team
+    
+       var Team = new sforce.SObject("SVMXDEV__Service_Group__c");
+       Team.RecordTypeId='0123B000000CnBXQA0';
+       Team.Name="Scont_Team";
+       Team.SVMXDEV__Active__c='True';
+       Team.SVMXDEV__Country__c="India";
+       var result_Team = sforce.connection.create([Team]);
+       _log(" result Team = "+result_Team[0].id);
+    
+    // Creating Technician with Service Team
+    
+        var Tech = new sforce.SObject("SVMXDEV__Service_Group_Members__c");
+        Tech.SVMXDEV__Service_Group__c=result_Team[0].id;
+        Tech.Name="Scont_Tech";
+        Tech.SVMXDEV__Active__c='True';
+        Tech.SVMXDEV__Street__c="MG road";
+        Tech.SVMXDEV__City__c="Bangalore";
+        Tech.SVMXDEV__Enable_Scheduling__c='True';
+        Tech.SVMXDEV__Zip__c='560034';
+        Tech.SVMXDEV__Country__c="India";
+        var result_Tech = sforce.connection.create([Tech]);
+       _log(" result Tech = "+result_Tech[0].id);   
+
+    //Creating Account With Preferred Technician 
+
+     var Acc = new sforce.SObject("Account");
+      Acc.Name = "Account";
+      var result_Acc = sforce.connection.create([Acc]);
+     _log(" result Account = "+result_Acc[0].id);
+
+    // Creating Service Contract with Preferred Technician
+
+     var Scont = new sforce.SObject("SVMXDEV__Service_Contract__c");
+     Scont.Name="Auto_ServiceContract";
+     Scont.SVMXDEV__Company__c=result_Acc[0].id;
+     Scont.SVMXDEV__Start_Date__c= "2017-11-18";
+     Scont.SVMXDEV__End_Date__c= "2017-11-23";
+     Scont.SVMXDEV__Service_Level__c="SLA on Case";
+     Scont.SVMXDEV__Active__c='True';
+     Scont.SVMXDEV__Primary_Technician__c=result_Tech[0].id;
+     var result_Scont = sforce.connection.create([Scont]);
+     _log(" result Service Contract = "+result_Scont[0].id);
+     
+    //Creating Work order with Service Contract
+
+var WO = new sforce.SObject("SVMXDEV__Service_Order__c");
+WO.SVMXDEV__Primary_Territory__c=$dp_Terr_Id;
+WO.SVMXDEV__Order_Type__c="Cleaning";
+WO.SVMXDEV__Order_Status__c='Open';	
+WO.SVMXDEV__Service_Contract__c=result_Scont[0].id;
+var result_WO = sforce.connection.create([WO]);
+_log(" result Work order = "+result_WO[0].id);
+
+   // Validating the Population 
+    var wo_result = sforce.connection.query("Select Id, SVMXDEV__Preferred_Technician__c from SVMXDEV__Service_Order__c Where Id = '"+result_WO[0].id+"'");
+    var records = wo_result.getArray("records");
+    _log("records = "+records);
+    for (var i=0; i< records.length; i++) 
+    {
+     var record = records[i];
+     _log("record.SVMXDEV__Preferred_Technician__c = "+record.SVMXDEV__Preferred_Technician__c+" ,result_Tech[0].id = "+result_Tech[0].id);
+       if(record.SVMXDEV__Preferred_Technician__c == result_Tech[0].id)
+       {
+         _log("Preferred Tech is populated");
+       }
+      else
+         {
+	     _log("Preferred Tech is not populated");
+         }
+}
+
+return result_WO;
+
+} 
+
+
+//</browser>
+
+$RS_6307.end();

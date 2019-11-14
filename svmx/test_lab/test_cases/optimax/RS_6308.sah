@@ -1,0 +1,82 @@
+var $user_credentials = $excel.readFromCustomExcel("../optimax/op_excleData/automation.xlsx", "User_Details","","");
+   
+for(var $i=0;$i<$user_credentials.length;$i++)
+ {
+var $g_un = $user_credentials[$i][0];
+var $g_pwd = $user_credentials[$i][1];
+var $g_url = $user_credentials[$i][2];
+ }
+
+
+var $RS_6308 = _testcase("RS_6308", "Creating ServiceTeam and Technicians");
+var $team = null;
+
+$RS_6308.start();
+	
+$bo_act_login.login($g_url, $g_un, $g_pwd);
+
+_set($login_result, _fetch(login($g_un,$g_pwd)));
+_log($login_result);
+
+
+_set($create_team, _fetch(create_Team()));
+_log($create_team);
+
+
+//<browser>
+function login($g_un,$g_pwd)
+     {
+	var $login_result = sforce.connection.login($g_un,$g_pwd);
+	return $login_result;
+     }
+
+
+function create_Team ()
+{
+	var result = _call(sforce.connection.query("SELECT Id,Name FROM RecordType WHERE Name = 'Technician'"));
+	var Id_result= result.getArray("records");
+	_log("Id_result = "+Id_result);
+	_log("Id = "+Id_result[0].Id);
+	   
+	//Creating ServiceTeam
+	
+	
+	var Team = new sforce.SObject("SVMXC__Service_Group__c");
+	Team.RecordTypeId=Id_result[0].Id;
+	Team.Name="TeamMandatoryAcc";
+	Team.SVMXC__Active__c='True';
+	Team.SVMXC__Country__c="India";
+	var result_Team = sforce.connection.create([Team]);
+
+	$team = result_Team[0].id;
+	_log(" Team = "+$team);
+
+
+	  //Creating Multiple Technician,associated to the Service Team
+	var CreateRecords=[];
+	var CreateResRecords=[];
+	for(var $i=1;$i<10;$i++)
+	 {
+	var Tech = new sforce.SObject("SVMXC__Service_Group_Members__c");
+	Tech.SVMXC__Service_Group__c=$team;
+
+	_log(" Team = "+$team);
+	Tech.Name="techMandatory"+$i;
+	Tech.SVMXC__Active__c='True';
+	Tech.SVMXC__Street__c="MG road";
+	Tech.SVMXC__City__c="Bangalore";
+	Tech.SVMXC__Enable_Scheduling__c='True';
+	Tech.SVMXC__Zip__c='560034';
+	Tech.SVMXC__Country__c="India";
+	CreateRecords.push(Tech);
+	 }
+	result = sforce.connection.create(CreateRecords);
+	return result; 
+		
+	
+}
+
+
+//</browser>
+
+$RS_6308.end();

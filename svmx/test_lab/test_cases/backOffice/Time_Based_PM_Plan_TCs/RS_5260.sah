@@ -1,0 +1,75 @@
+
+//author - Noor Salma Sharieff
+
+var $RS_5260 = _testcase("RS_5260","Create a PM Plan from Service Contract with coverage type as Account");
+$RS_5260.start();
+_setSpeed($g_stepSpeed);
+
+var $Workbenchurl = "https://workbench.developerforce.com/login.php";
+//Pre - Condition 
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+var $accName = $bo_act_accounts.createAccount();
+var $proName = $bo_act_products.createProduct("pro12", "--None--");
+var $installedProduct = $bo_act_installedProduct.createInstalledProduct($proName,$accName,"");
+var $slaterm = $bo_act_slaTerms.createSlaTerms("Default");
+var $sconName = $bo_act_serviceMaintenanceContracts.createServiceMaintenanceContract($accName, $slaterm,1,0);
+$bo_act_serviceMaintenanceContracts.AddCoveredProductToSCON($sconName, $installedProduct);
+
+//Test Steps
+var $PMPTempName = $bo_act_PMPlanTemplate.createTimeBasedPMPlanTemplate($proName, "Account (Visit Only)","","Months");
+var $PMPlan = $bo_act_PMPlan.createATimeBasedPMPlanFromScon($sconName, $PMPTempName,"Account (Visit Only)",1);
+
+//Validations
+_assertExists($bo_pg_PMPlan.noRecordsToDisplayUnderPreventiveMaintenanceCoverages);
+
+var $startDate = _getText($bo_pg_PMPlan.div_startDate);
+_click($bo_pg_PMPlan.link_firstLinkInPMSchedule);
+var $lastRunDate = _getText($bo_pg_PMPlan.txt_lastRunDate);
+var $scheduleOnActual = _getText($bo_pg_PMPlan.txt_scheduledOnDate);
+
+_assertEqual($startDate,$lastRunDate, "Last Run Date is not equal to start date");
+_assert($lastRunDate != $scheduleOnActual,"Issue in Last Run Date and Scheduled On date");
+
+var $PMProcessId = $bo_act_PMProcess.createPMProcess("Time Based Preventive Maintenance", 32, $PMPlan,"One Per Plan");
+
+$bo_act_navigation.navigateToSetUpAndSearch("Installed Packages");
+_click(_link("/ServiceMax/"));
+if(_getText(_cell(0,_rightOf(_cell("Namespace Prefix"))))!="SVMXDEV")
+var $script = "String StrSVMXProcessID = '"+$PMProcessId+"';String StrSFPMProcessID = [Select Id From SVMXC__ServiceMax_Processes__c where SVMXC__ProcessID__c =: StrSVMXProcessID AND SVMXC__Active__c = true].Id;SVMXC.PREV_Engine_Batch EngObj = new SVMXC.PREV_Engine_Batch();EngObj.setProcessIds.add(StrSFPMProcessID);ID Batch = database.executebatch(EngObj, 1);";
+else
+$script = "String StrSVMXProcessID = '"+$PMProcessId+"';String StrSFPMProcessID = [Select Id From SVMXDEV__ServiceMax_Processes__c where SVMXDEV__ProcessID__c =: StrSVMXProcessID AND SVMXDEV__Active__c = true].Id;SVMXDEV.PREV_Engine_Batch EngObj = new SVMXDEV.PREV_Engine_Batch();EngObj.setProcessIds.add(StrSFPMProcessID);ID Batch = database.executebatch(EngObj, 1);";
+
+
+$bo_act_login.loginToWorkBench($Workbenchurl, "Sandbox", $bac_un, $bac_pwd);
+$bo_act_login.runApexScriptinWB($script);
+
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+$bo_act_navigation.navigateToPreventiveMaintenancePlans();
+_click(_link($PMPlan));
+_call(top.location.reload());
+var $WONumber = _getText($bo_pg_PMPlan.link_firstLinkInWorkOrders);
+_assertNotNull($WONumber,"Work Order is not created");
+
+
+
+//Clean up function
+
+
+$bo_act_common.deleteAccount($bac_un, $bac_pwd, $accName);
+$bo_act_common.deleteIB($bac_un, $bac_pwd, $orgnamespace,$installedProduct);
+$bo_act_common.deleteProduct($bac_un, $bac_pwd,$proName);
+$bo_act_common.deleteWorkOrder($bac_un, $bac_pwd, $orgnamespace,$WONumber);
+$bo_act_common.deleteSLA($bac_un, $bac_pwd, $orgnamespace, $slaterm);
+$bo_act_common.deleteSCON($bac_un, $bac_pwd, $orgnamespace, $sconName);
+$bo_act_common.deletePMPlantemplate($bac_un, $bac_pwd, $orgnamespace,$PMPTempName);
+$bo_act_common.deletePMPlan($bac_un, $bac_pwd, $orgnamespace,$PMPlan);
+
+//var $datacreated = [$accName,$proName,$installedProduct,$sconName,$WONumber,$slaterm,$PMPTempName,$PMPlan];
+//for (var i = 0; i < $datacreated.length; i++) {
+//	$bo_act_common.cleanUpfunction($datacreated[i]);
+//}
+
+$RS_5260.end();
+
+
+

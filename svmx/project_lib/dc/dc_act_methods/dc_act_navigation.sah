@@ -1,0 +1,62 @@
+/**
+ * Function to perform common actions
+ */
+var $dc_act_navigation = new function dc_act_navigation() {
+
+	/**
+	 /**
+	 * Navigates to Home  page
+	 * @returns boolean
+	 */
+	
+	this.navigateToHome = function() {
+		_click($an_pg_home.link_home);
+		_wait(60000, _isVisible($an_pg_home.link_servicemaxSetup));
+
+		return $callBack.returnResult(
+				_exists($an_pg_home.link_servicemaxSetup), "navigateToHome");
+
+	};
+	
+	this.navigateToDispatchConsole= function() {
+		_click($dc_pg_home.link_DispatchConsole);
+		_wait(30000);
+	};
+	
+	//Vanditha
+	this.navigateToEventSubjectRule = function() {
+	    _click($dc_pg_eventSubjectRule.link_home);
+	    _click($dc_pg_eventSubjectRule.link_servicemaxSetup);
+		_wait(60000,_isVisible($dc_pg_eventSubjectRule.link_DispatchManagement));
+		_click($dc_pg_eventSubjectRule.link_DispatchManagement);		
+		_wait(60000,_isVisible($dc_pg_eventSubjectRule.link_EventSubjectRule));
+		_click($dc_pg_eventSubjectRule.link_EventSubjectRule);
+	   	_wait(60000, _isVisible($dc_pg_eventSubjectRule.btn_newRule));
+	};
+	
+	//Vanditha
+	this.navigateToDispatchConsoleFieldUpdates = function() {
+	    _click($dc_pg_consoleFieldUpdates.link_home);
+	    _click($dc_pg_consoleFieldUpdates.link_servicemaxSetup);
+		_wait(60000,_isVisible($dc_pg_consoleFieldUpdates.link_DispatchManagement));
+		_click($dc_pg_consoleFieldUpdates.link_DispatchManagement);
+		
+		_wait(60000,_isVisible($dc_pg_consoleFieldUpdates.link_DispatchConsoleFieldUpdates));
+		_click($dc_pg_consoleFieldUpdates.link_DispatchConsoleFieldUpdates);
+		
+	   	_wait(60000, _isVisible($dc_pg_consoleFieldUpdates.btn_Reset));
+	};
+	
+	//Vanditha
+ 
+	this.navigateToEventHoverRule = function() {
+	    _click($dc_pg_eventHoverRule.link_home);
+	    _click($dc_pg_eventHoverRule.link_servicemaxSetup);
+		_wait(60000,_isVisible($dc_pg_eventHoverRule.link_DispatchManagement));
+		_click($dc_pg_eventHoverRule.link_DispatchManagement);		
+		_wait(60000,_isVisible($dc_pg_eventHoverRule.link_EventHoverRule));
+		_click($dc_pg_eventHoverRule.link_EventHoverRule);
+	   	_wait(60000,_isVisible($dc_pg_eventHoverRule.btn_newRule));
+	};
+	
+};

@@ -1,0 +1,153 @@
+/**
+ * Functions to perform excel actions
+ */
+var $excel = new function excel() {
+
+	/**
+	 * Function to read a excel and return a array of values
+	 * 
+	 * @param $filePath
+	 * @param $sheetName
+	 * @param $includeHeader
+	 * @param $ignoreEmptyRows
+	 */
+	this.readFromCustomExcel = function($filePath, $sheetName, $includeHeader, $ignoreEmptyRows) {
+
+		_log("Reading from a excel file from " + $filePath + " from sheet " + $sheetName);
+		try {
+			var $dataRead = _readExcelFile($filePath, $sheetName, $includeHeader, $ignoreEmptyRows);
+			return $dataRead;
+		} catch ($e) {
+			_log("Exception caught : " + $e.toString());
+			return false;
+		}
+
+	};
+
+	/**
+	 * Function to write to a excel file
+	 * 
+	 * @param $excelMode read, write, insert
+	 * @param $filePath
+	 * @param $sheetName
+	 * @param $excelData
+	 * @param $rowIndex
+	 * 
+	 * Useage: var $filePath =
+	 * "/auto/sahi_pro/userdata/scripts/Sahi_Project/excelFile.xlsx" var
+	 * $sheetName = "Sheet1" var
+	 * $excelData=[["ajay","babu","cheeran"],["david","elango","frank"],
+	 * ["gokul","hari","irfan"],["jo","kumar","latha"],["mani","naraen","ojha"],
+	 * ["peter","queen","richard"],["shalini","thomas","umesh"]]; var
+	 * $insertRowData=["kathir","femina","jandir"]; var $excelMode =
+	 * "insertAtIndex"; var $rowIndex = "3";
+	 * 
+	 * writeToExcel($excelMode,$filePath,$sheetName,$excelData);
+	 */
+
+	this.writeToExcel = function($excelMode, $filePath, $sheetName, $excelData, $rowIndex) {
+		var $excelHandel = _getExcel($filePath, $sheetName, $excelData);
+
+		switch ($excelMode) {
+		case "write":
+
+			$excelHandel.setData([ [ $excelData ] ]);
+
+			break;
+
+		case "insert":
+			// Insert New Row at end
+
+			$excelHandel.insertRow([ [ $excelData ] ]);
+
+			break;
+
+		case "insertAtIndex":
+			// Insert New Row at given index
+
+			$excelHandel.insertRow([ [ $excelData ] ], $rowIndex); // will
+			// insert at
+			// index 2. Shifts
+			// other cells down
+			break;
+
+		default:
+			break;
+
+		}
+
+	};
+
+	/**
+	 * Function to insert under a column based on EOL or row index.
+	 * 
+	 * @param $columnName
+	 * @param $dataToWrite
+	 * @param $rowIndex
+	 *            (Optional, default row is considered as EOL)
+	 * 
+	 * Usage : insertUnderColumn("test.xlsx", "Sheet1","Name","Data");
+	 * insertUnderColumn("test.xlsx", "Sheet1","Name","Data2",2);
+	 * 
+	 */
+
+	this.insertUnderColumn = function($filePath, $sheetName, $columnName, $dataToWrite, $rowIndex) {
+
+		var $excelHandel = _getExcel($filePath, $sheetName);
+		var $dataRaw = $excelHandel.getData();
+		// Traverse through the Columns
+		//_log("$dataRaw.length = " + $dataRaw.length);
+		for (var $i = 0; $i < $dataRaw.length; $i++) {
+			// Traverse through the Rows
+			for (var $j = 0; $j < $dataRaw[$i].length; $j++) {
+				// If a column is a match then proceed in that that column row
+				// by row
+				if ($columnName == $excelHandel.get($i, $j)) {
+					try {
+						// Default EOL length for row
+						if ($rowIndex == null || $rowIndex == "") {
+							var $rowCount = 0;
+							for (var $k = 0; $k < $dataRaw.length; $k++) {
+								// Check if the rows under a column are not null
+								// or blank and count the rows to insert at the
+								// EOL of that column length.
+								// $k is the row and $j is the column
+								if ($excelHandel.get($k, $j) != null && $excelHandel.get($k, $j) != "") {
+									$rowCount++;
+								} else {
+									$rowCount;
+								}
+								// _log("$rowCount = " + $rowCount)
+							}
+							// Assign the row count to attain the EOL of the
+							// column
+							$rowNo = $rowCount;
+
+						} else {
+							// Custom row index
+							$rowNo = $rowIndex;
+							 //_log("$rowIndex = " + $rowIndex);
+						}
+						//Assign the column number from $j
+						$colNo = $j;
+
+						//_log("$rowNo " + $rowNo);
+						//_log("$colNo " + $colNo);
+
+						//Write the data to that row,column number
+						$excelHandel.set($rowNo, $colNo, [ [ $dataToWrite ] ]);
+
+						//_log("Data After Write  " + $excelHandel.get($rowNo, $colNo));
+
+						break;
+					} catch ($e) {
+						_log("Exception In Excel " + $e);
+
+					}
+				}
+			}
+
+		}
+	};
+
+};

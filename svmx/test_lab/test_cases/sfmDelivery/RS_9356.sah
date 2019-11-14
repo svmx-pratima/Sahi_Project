@@ -1,0 +1,131 @@
+//Author: Anand Kakhandaki
+var $RS_9356=_testcase("$RS_9356","Verify that the checklist is included as a part of smart doc when there are more than one values of the same question configured as a part of OPDOC process.");
+$RS_9356.start();
+
+		
+		//pre-Req:
+		//create Work orders
+		$objName= $orgnamespace+"__Service_Order__c";
+		$obJson = "{\""+$orgnamespace+"__Order_Status__c\":\"Open\",\""+$orgnamespace+"__Order_Type__c\":\"Field Service\"}";
+		$columnName = "Name";
+		$filter="id";
+		$filterValue=$sfm_act_restApiMethods.postRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,$objName,$obJson,"POST");
+		$WONumber =$sfm_act_restApiMethods.getRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,"GET", $objName, $columnName, $filter, $filterValue);
+		_log("WO number: "+$WONumber);
+
+		
+		//Login to app
+		$bo_act_login.login($g_url,$sfmdUsn,$sfmdPwd);
+//		$bo_act_configurationProfiles.editGlobalProfileForBooleanSettings("Common", "Global Settings", "GBL037", false);
+
+		//Checklsit Process (SFM) creation
+		var $chkListsfmName=$bo_act_common.generateRandomName("RS9356_cklist_");
+		var $sfmType="to generate a Checklist/Survey type of Process";
+		var $object="Work Order";
+		$sfm_act_Transactions.sfmPropertiesPage($chkListsfmName, $chkListsfmName, $chkListsfmName, $sfmType, "", [], $object, []);
+
+		var $Today=$bo_act_common.getfutureDate(0, "/", 0);
+		//Section1: Default section
+		var $sectionName="Checklist Section Title";
+
+		//Adding Question to default section
+		var $Que=$bo_act_common.generateRandomName("que_");
+		var $queType="Number";
+		var $queCommonDetails=[$queType,$Que,"","",true];
+		var $QueDetails=[false,1];
+		$sfm_act_formDesigner.createCheckListQuestion($sectionName, $queCommonDetails, $QueDetails);
+		
+		//map WO to Checklist
+		$sfm_act_Transactions.sfmQualifyingCriteriaieldMappings($object, [], [], "", "SVMXSTD: Map Work Order to Checklist");
+		
+		_setStrictVisibilityCheck(true);
+		_click($bo_pg_sfmTransactionAndDesigner.btn_quickSave1);
+		_wait(10000);
+		_click($bo_pg_sfmTransactionAndDesigner.btn_saveAndclose);
+		_setStrictVisibilityCheck(false);
+		
+		//opDoc SFM creation
+		var $sfmName=$bo_act_common.generateRandomName("rs_9356_");
+		var $sfmType="to generate an Output Document for a header record with/without its child records";
+		$sfm_act_Transactions.sfmPropertiesPage($sfmName, $sfmName, $sfmName, $sfmType, "", [], "Work Order",["Checklist (Work Order)"]);		
+		var $filePath="../../../../checklistOPDocFormat.txt";
+		$sfm_act_Transactions.saveOPDOCTempDesigner("",$sfmName, $sfmName, $filePath);
+		$sfm_act_Transactions.AdvancedOptionsChecklist(false, true, [$chkListsfmName], ["All Versions"]);
+		
+
+		var $evalVal=["Equals","Equals"];
+		var $opType=["Value","Value"];
+		var $opValue=["1","2"];
+		var $ansList=[$evalVal,$opType,$opValue];
+		$sfm_act_Transactions.opDocCheckListInclusion($chkListsfmName, $Que, $ansList);
+
+		_setStrictVisibilityCheck(true);
+		_click($bo_pg_sfmTransactionAndDesigner.btn_quickSave1);
+		_wait(10000);
+		_click($bo_pg_sfmTransactionAndDesigner.btn_saveAndclose);
+		_setStrictVisibilityCheck(false);
+		
+		//add sfm to wizard
+		var $wizardObject="Work Order";
+		var $sfmd_wizardName1 =$sfmd_wizardName[7];
+		var $sfmd_wizardType="Checklist";
+		var $profile="";
+		var $handOver=false;
+		$sfm_act_wizards.addToWizard($wizardObject, $sfmd_wizardName1, $sfmd_wizardType, "", $handOver, $profile); 
+		
+		
+		//add sfm to wizard
+		var $sfmd_wizardName1 =$sfmd_wizardName[7];
+		var $sfmd_wizardType="Output Document";
+		var $profile="";
+		var $handOver=false;
+		$sfm_act_wizards.addToWizard($wizardObject, $sfmd_wizardName1, $sfmd_wizardType,$sfmName , $handOver, $profile);
+		
+	
+		$sfm_act_common.globalSearchOnce($WONumber);
+		_wait(10000);
+		_setStrictVisibilityCheck(true);
+		$sfm_act_createCustomWizard.clickWizardBtn("Default title for Checklist");
+		_wait(30000,_isVisible(_link("/Checklists/")));
+		
+		//Assertion on checklist default values and dvr's
+		_click(_div("/"+$chkListsfmName+"/"));
+		_wait(10000,_isVisible(_link($chkListsfmName)));
+		_click($bo_pg_sfmTransactionAndDesigner.btn_submitCheckList);
+		
+		
+		_wait(5000,_isVisible(_link("/Checklists/")));
+		_click(_label("Start New",_near(_label($chkListsfmName))));
+		//_click(_div("/"+$chkListsfmName+"/"));
+		
+		_wait(10000,_isVisible(_label("Checklist Section Title")));
+		_setValue(_textbox(0,_near(_label($Que+":"))),2);
+		_click($bo_pg_sfmTransactionAndDesigner.btn_submitCheckList);
+		
+		_wait(5000,_isVisible(_link("/Checklists/")));
+		_click(_label("Start New",_near(_label($chkListsfmName))));
+		
+		_wait(10000,_isVisible(_label("Checklist Section Title")));
+		_setValue(_textbox(0,_near(_label($Que+":"))),5);
+		_click($bo_pg_sfmTransactionAndDesigner.btn_submitCheckList);
+		
+		
+		//validation on opdoc
+		$sfm_act_common.globalSearchOnce($WONumber);
+		_wait(10000);
+		_setStrictVisibilityCheck(true);
+		$sfm_act_createCustomWizard.clickWizardBtn($sfmName);
+		_wait(5000,_isVisible($bo_pg_sfmTransactionAndDesigner.btn_finalize));
+		
+		
+		_assertContainsText("1",_cell(0,_rightOf(_cell($Que))));
+		_assertContainsText("2",_cell(0,_rightOf(_cell($Que+"[1]"))));
+		_assertNotExists(_cell("5",_rightOf(_cell($Que+"[2]"))));
+		
+		_click($bo_pg_sfmTransactionAndDesigner.btn_finalize);
+		_wait(15000);
+		_click(_link($WONumber));
+		_wait(10000,_isVisible($sfm_pg_sfmDesigner.btn_edit));
+		_assertExists(_link("/"+$sfmName+".*pdf/",_near(_heading3("Notes & Attachments"))));
+
+$RS_9356.end();

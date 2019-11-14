@@ -1,0 +1,133 @@
+/**
+ * Function to perform login work flows
+ */
+var $bo_act_login = new function bo_act_login() {
+
+	/**
+	 * Function to login to salesforce
+	 * 
+	 * @param $url
+	 * @param $un
+	 * @param $pwd
+	 */
+	this.login = function($url, $un, $pwd) {
+		// Setting default values
+		/*
+		 * $url = $url || $g_url; $un = $un || $g_un; $pwd = $pwd || $g_pwd;
+		 */
+		global_clearBrowserCache();
+		_navigateTo($url);
+		if(_isVisible($bo_pg_home.link_home)){
+			this.logOut();
+			}
+		global_clearBrowserCache();
+		_wait(5000, _isVisible($bo_pg_login.txt_email));
+		_setValue($bo_pg_login.txt_email, $un);
+		_setValue($bo_pg_login.txt_password, $pwd);
+		_click($bo_pg_login.btn_login);
+		//_wait(30000);
+		_wait(30000, _isVisible($bo_pg_home.link_home));
+		//_call(top.location.reload(true));
+		//Switch to Classic if not.
+		_selectDomain();
+		var $url;
+		_set($url, window.location.href);
+		_log($url);
+		if($url.includes("lightning.force.com")){
+			_click($sfm_pg_commonSfdc.link_userProfileInLightning);
+			_wait(3000);
+			_click($sfm_pg_commonSfdc.link_switchToClassic);
+			_wait(4000);			
+		}
+		// Need to return
+	};
+	
+
+	/**
+	 * Function to log out of salesforce
+	 * 
+	 */
+	this.logOut = function() {
+		$bo_act_navigation.navigateToHome();
+		_wait(6000, _isVisible($bo_pg_home.btn_userName));
+		_click($bo_pg_home.btn_userName);
+		_click($bo_pg_home.link_logOut);
+		_wait(30000, _isVisible($bo_pg_login.txt_email));
+		_call(top.location.reload(true));
+
+		return $callBack.returnResult(!_exists($bo_pg_home.link_home), "log out");
+
+		// Need to return
+	};
+	
+this.loginToWorkBench = function($url, $environment,$un, $pwd){
+	_navigateTo($url);
+	_setSelected($bo_pg_home.sel_WBEnvironment,$environment);
+	_check(_checkbox("termsAccepted"));
+	_click($bo_pg_home.btn_loginWithSalesForce);
+	if(_isVisible(_submit(" Allow "))){
+			_click(_submit(" Allow "));
+	};
+	if(_condition($bo_pg_login.txt_email!=null))
+	{
+		//_click(_link("Use Custom Domain"));			// added by Bhupendra to run in Gcloud Org
+		//_setValue(_textbox("mydomain"), "gcloud-svmx-trial.my.salesforce.com"); // added by Bhupendra to run in Gcloud Org
+		//_click(_submit("Continue"));		// added by Bhupendra to run in Gcloud Org
+		_setValue($bo_pg_login.txt_email, $un);
+		_setValue($bo_pg_login.txt_password, $pwd);
+		_click($bo_pg_login.btn_login);
+	}else
+		_logOutput("Logged into Work bench");
+	
+};
+
+this.runApexScriptinWB = function($script){
+	_click(_span("utilities"));
+	_click(_link("Apex Execute"));
+	_setValue(_textarea("scriptInput"),$script);
+	_click(_submit("Execute"));
+	_wait(60000,_isVisible(_div("mainBlock")));
+	_wait(6000);
+	_assertNotVisible(_div("/COMPILE ERROR:/"));	
+	_wait(6000);
+};
+// Added by Bhupendra Singh For APM ServiceMax Integration testing
+this.runRESTExplorerInWB_ForPOST = function($script,$requestBody){
+	_click(_span("utilities"));
+	_click(_link("REST Explorer"));
+	_click(_radio("POST"));
+	_setValue(_textbox("urlInput"),$script);
+	_setValue(_textarea("requestBody"),$requestBody);
+	_click(_submit("Execute"));
+	_wait(60000,_isVisible(_strong("Raw Response")));
+	_wait(3000);
+	_assertVisible(_paragraph("codeViewPort"));	
+	_wait(3000);
+};
+this.runRESTExplorerInWB_ForGet = function($script){
+	_click(_span("utilities"));
+	_click(_link("REST Explorer"));
+	_click(_radio("GET"));
+	_setValue(_textbox("urlInput"),$script);
+	_click(_submit("Execute"));
+	_wait(60000,_isVisible(_strong("Raw Response")));
+	_wait(3000);
+	_assertVisible(_paragraph("codeViewPort"));	
+	_wait(3000);
+	_click(_submit("Execute"));
+	_wait(3000);
+};
+
+//Login to classic community
+this.classic_community_login = function($url, $un, $pwd) {
+	
+	global_clearBrowserCache();
+	_navigateTo($url);
+	global_clearBrowserCache();
+	_wait(5000, _isVisible($bo_pg_login.txt_email));
+	_setValue($bo_pg_login.txt_email, $un);
+	_setValue($bo_pg_login.txt_password, $pwd);
+	_click($bo_pg_login.btn_login);
+	_wait(10000,_isVisible(_link("Chatter")));
+};
+};

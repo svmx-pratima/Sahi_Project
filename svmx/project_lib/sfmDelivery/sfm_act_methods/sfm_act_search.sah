@@ -1,0 +1,408 @@
+var $sfm_act_search = new function sfm_search() {
+	this.managePermissionSearch = function($standardSearch,$button,$profile){
+		$sfm_pg_search.selectStandardSearch($standardSearch);
+		_wait(3000);
+	 	$sfm_pg_search.clickMenuOptn($button);
+	 	_wait(4000);
+		_setSelected($sfm_pg_search.sel_profile,$profile);
+		_wait(3000);
+		var $availableSearches=_getText($sfm_pg_search.availableSearches);
+		_log($availableSearches);
+		_log($availableSearches.length);
+		for(var $i=0;$i<$availableSearches.length;$i++){
+			if($availableSearches[$i]==$standardSearch){
+				_setSelected($sfm_pg_search.availableSearches,$standardSearch);
+				_click($sfm_pg_search.add_image);
+			}
+		}
+		var $selectedSearches=_getText($sfm_pg_search.selectedSearches);
+		_log($selectedSearches.length);
+		for(var $i=0;$i<$selectedSearches.length;$i++){
+			if($selectedSearches[$i]==$standardSearch){
+				break;
+			}
+		}
+		_click($sfm_pg_search.btn_save);
+	};
+
+	this.searchSfmSearches =  function ($standardSearch) {
+ 		_selectDomain($g_domain);
+ 		_setSelected($sfm_pg_search.sel_search,$standardSearch);
+		_click($sfm_pg_search.btn_go);
+		_selectDomain();
+ 	};
+
+	this.verifyWorkOrder = function($standardSearch){
+		_click(_span($standardSearch));
+		if(_isVisible($sfm_pg_search.tab_allWo)){
+			_click($sfm_pg_search.tab_allWo);
+			_setStrictVisibilityCheck(true);
+			var $woNumber = _getText($sfm_pg_search.link_wo);
+			_log($woNumber);
+//			_log($woNumber.search);
+			if($woNumber.search("WO-")!=-1){
+				_log("Pass");
+			}
+			else{
+				_log("Fail");
+			}
+		}
+	};
+
+	this.cloneSearch = function($standardSearch,$searchTitle,$searchId){
+		 //This functions clones the given standard search
+		 //Sample usage: RS_5362.sah
+		//Author: Janaki
+		 _check(_checkbox(0,_leftOf(_span($standardSearch))));
+		 _click($sfm_pg_search.btn_cloneSfmSearch);
+		 _setValue($sfm_pg_search.txt_searchName,$searchTitle);
+		 _setValue($sfm_pg_search.txt_searchID,$searchId);
+		 _click($sfm_pg_search.btn_saveAndClose);
+		 _wait(15000,_isVisible(_span($standardSearch)));
+		 
+	};
+	this.openEditModeForGivenSearch = function($sfmSearchName){
+		//This function opens the edit mode for a given SFM search
+		_check(_checkbox(0,_leftOf(_span($sfmSearchName))));
+		_click($sfm_pg_search.btn_searchEdit);
+		_wait(3000);
+	};
+	this.launchGivenSearch = function($sfmSearchName,$searchText){
+		//This function launches a given SFM Search
+		//Author : Janaki
+		_click($sfm_pg_commonSfdc.link_home);
+		_selectDomain($g_domain);
+		_setSelected($sfm_pg_search.lst_searchHomePage,$sfmSearchName);
+		_setValue($sfm_pg_search.txt_sfmSearchTextBox,$searchText);
+		_click($sfm_pg_search.btn_goSfmSearch);
+		_selectDomain();
+		_wait(10000,_isVisible(_span("/"+$sfmSearchName+"/")));
+	};
+	
+	this.changeObjectDisplaySequence = function($resultSectionTitle,$direction){
+		//This function is used for changing the object display sequence in SFM search
+		//Author: Janaki
+		//Parameters: $resultSectionTitle - Object whose sequence needs to change
+		//$direction - "Up" ,"Down" ,"Top", or "Bottom"..Any of these values
+		//"Up" - moves one level up
+		//"Down" - moves one level down
+		//"Top" - moves to top
+		//"Bottom" - moves to bottom
+		
+		var $i = 0;
+		_click($sfm_pg_search.tab_searchConfig);
+		_click($sfm_pg_search.btn_objectSequence);
+		_setStrictVisibilityCheck(true);
+		 for($i=0;$i<$resultSectionTitle.length;$i++){
+			 _setSelected(_select(0,_in(_div("editPage"))),$resultSectionTitle[$i]);
+			_click(_imageSubmitButton($direction[$i])); 
+			_wait(9000);
+		 }
+		 _click($sfm_pg_search.btn_objectSave);
+		 _wait(9000);
+	};
+	
+	this.changeFieldDisplaySequence = function($fieldName,$direction){
+		//This function is used for change the field display sequence for the selected object
+		//Author: Janaki
+		//Parameters: $fieldName - Field whose sequence needs to change
+		//$direction - "Up" ,"Down" ,"Top", or "Bottom"..Any of these values
+		//"Up" - moves one level up
+		//"Down" - moves one level down
+		//"Top" - moves to top
+		//"Bottom" - moves to bottom
+		_setStrictVisibilityCheck(true);
+		 for($i=0;$i<$fieldName.length;$i++){
+			 _setSelected($sfm_pg_search.lst_fieldDisplaySequence,$fieldName[$i]);
+			_click(_imageSubmitButton($direction[$i])); 
+			 _wait(9000);
+		 }
+		 _click($sfm_pg_search.btn_objectSave);
+		 _wait(4000);
+	};
+	
+	this.saveAndCloseSearch = function(){
+		//This function saves and closes the changes in SFM Search
+		//Author: Janaki
+		_click($sfm_pg_search.btn_saveAndClose);
+		_wait(8000,_isVisible($sfm_pg_search.txt_stdSearch));
+	};
+	this.createNewCustomSearch = function($searchName,$searchId){
+		var $searchID = $searchName.toLowerCase();
+		var $i=0;
+		_click($sfm_pg_search.btn_customNew);
+		_setValue($sfm_pg_search.txt_searchTitle,$searchName);
+		_setValue($sfm_pg_search.txt_searchID,$searchId);
+		_click($sfm_pg_search.tab_searchConfig);
+		
+	};
+	this.configObjectInSearch = function($objectName,$fieldNames,$operatorList,$valueList,$advExpression,$displayObjects,$displayFields,$appliedObjects,$appliedFields,$sortingObjects,$sortingFields,$searchOrders){
+		//This function configures objects along with criteria,fields display and objects applied
+		//Author: Janaki
+		
+	    //Sample usage: RS_5358.sah
+		var $i=0;
+		_click($sfm_pg_search.btn_new);
+		_wait(2000);
+		var $x = _count("_checkbox","/.*/");
+		_setSelected(_select(0,_rightOf(_cell($x.toString(),_near(_div("Search Object"))))),$objectName);
+		_setValue(_textbox(0,_rightOf(_cell($x.toString(),_near(_label("Result Section Title"))))),$objectName);
+		//Setting filter criteria along with advanced expressions
+		 var $i=0; var $j;
+		 for($i=0;$i<$fieldNames.length;$i++){
+			            $j = $i+1;
+						_setSelected(_select(0,_rightOf(_cell($j.toString(),_near(_span("Optional: Using the expression builder below, define a filter criteria to always apply on this object's records"))))),$fieldNames[$i]);
+						_setSelected(_select(1,_rightOf(_cell($j.toString(),_near(_span("Optional: Using the expression builder below, define a filter criteria to always apply on this object's records"))))),$operatorList[$i]);
+					    _setValue(_textbox(0,_rightOf(_cell($j.toString(),_near(_span("Optional: Using the expression builder below, define a filter criteria to always apply on this object's records"))))),$valueList[$i]);
+							if($j != ($fieldNames.length)){
+					  			_click($sfm_pg_search.btn_addRowFilterCriteria);
+					 			_wait(3000);
+							}
+				}
+		 _setValue($sfm_pg_search.txt_advExprFilterCriteria,$advExpression);
+		 
+		 //Setting display fields for each object in the search
+		 if($displayObjects.length > 0) {
+				 for($i=0;$i<$displayObjects.length;$i++){
+						$j=$i+2;
+						_click($sfm_pg_search.btn_addRowDisplayField);
+						_wait(7000);
+					    _setSelected(_select(0,_rightOf(_cell($j.toString(),_in(_cell("/Col last/",_near(_tableHeader("Search Object",_near(_span("Choose one or more fields to be displayed in the search result"))))))))),$displayObjects[$i]);
+					   _wait(3000);
+					   _setSelected(_select(1,_rightOf(_cell($j.toString(),_in(_cell("/Col last/",_near(_tableHeader("Search Object",_near(_span("Choose one or more fields to be displayed in the search result"))))))))),$displayFields[$i]);
+					}
+			}
+		 
+		 //Setting up objects to be applied.
+		 if($appliedObjects.length > 0){
+			 for($i=0;$i<$displayObjects.length;$i++){
+				 $j=$i+2;
+				 _click($sfm_pg_search.btn_addRowForAppliedSearch);
+				 _wait(7000);
+				 _setSelected(_select(0,_rightOf(_cell($j.toString(),_near(_tableHeader("Search Object[2]"))))),$appliedObjects[$i]);
+				 _wait(3000);
+				 _setSelected(_select(1,_rightOf(_cell($j.toString(),_near(_tableHeader("Search Object[2]"))))),$appliedFields[$i]);
+				 //Not able to uniquely identify as all identifiers are same in the page.
+			 }
+		 }
+		 //Setting up the required sorting
+		 if($sortingObjects.length > 0){
+			 for($i=0;$i<$sortingObjects.length;$i++){
+				 $j=$i+1;
+				 _click($sfm_pg_search.btn_addRowSorting);
+				 _wait(7000);
+				 _setSelected(_select(0,_rightOf(_cell($j.toString(),_near(_tableHeader("Search Object[3]"))))),$sortingObjects[$i]);
+				 _wait(3000);
+				 _setSelected(_select(1,_rightOf(_cell($j.toString(),_near(_tableHeader("Search Object[3]"))))),$sortingFields[$i]);
+				 _wait(3000);
+				 _setSelected(_select(2,_rightOf(_cell($j.toString(),_near(_tableHeader("Search Object[3]"))))),$searchOrders[$i]);
+				 _wait(3000);
+				 //Not able to uniquely identify as all identifiers are same in the page.
+			 }
+		 }
+		 
+		 //Save all the changes
+		 _click($sfm_pg_search.btn_objectSave);
+		 _wait(4000);
+		 _assertVisible($sfm_pg_search.msg_searchSaveSuccess);
+		 
+};
+
+
+
+	this.customManagePermission = function($standardSearch){
+		$sfm_pg_search.selectStandardSearch($standardSearch);
+		_click($sfm_pg_search.btn_customManagePermission);
+	};
+	this.selectObjectWithinSearch = function($resultSectionTitle){
+		//This function selects an object of the basis of the given result section title in the
+		//Search configuration page
+		//Author: Janaki
+		var $x = _collect("_textbox","/RsltTitle/");
+		var $i=0;var $temp;
+		for($i =0;$i<$x.length;$i++){
+				$temp = _getText($x[$i]);
+				if($temp === $resultSectionTitle){
+					_check(_checkbox(0,_leftOf($x[$i])));
+					_wait(5000);
+				}
+				else{
+					_uncheck(_checkbox(0,_leftOf($x[$i])));
+					_wait(3000);
+				}
+		}
+
+	};
+
+	this.selectMultipleObject = function($objArr){
+		_setSelected($sfm_pg_search.sel_objects,$objArr, true);
+		_click($sfm_pg_search.btn_bottom);
+		_wait(5000);
+		_click($sfm_pg_search.btn_objectSave);
+	
+	};
+
+	this.selectFieldOrder = function($value,$fieldArr){
+		_click(_checkbox(0,_leftOf(_textbox({value:$value}))));
+		_click($sfm_pg_search.btn_fldDisplaySeq);
+		_setSelected($sfm_pg_search.sel_objects,$fieldArr, true);
+		_click($sfm_pg_search.btn_bottom);
+		_click($sfm_pg_search.btn_objectSave);
+	};
+
+	this.newCustomSearch = function($searchName,$searchObject){
+		var $searchID = $searchName.toLowerCase();
+		_click($sfm_pg_search.btn_customNew);
+		_setValue($sfm_pg_search.txt_searchTitle,$searchName);
+		_setValue($sfm_pg_search.txt_searchID,$searchID);
+		_click($sfm_pg_search.tab_searchConfig);
+		this.addNewSearchConfig($searchObject);
+	};
+
+	this.addNewSearchConfig = function($searchObject){
+		_click($sfm_pg_search.btn_new);
+		_setSelected($sfm_pg_search.sel_searchObject,$searchObject);
+	};
+
+	this.buildExpression = function($clicks,$exprsnVal,$sheetName){
+		$selectData = $excel.readFromCustomExcel("../sfmDelivery/sfmDelivery_excelData/data.xlsx",$sheetName,"","");
+		_log($selectData);
+		for(var $i=0;$i<$clicks;$i++){
+			_click($sfm_pg_search.btn_addRow);
+			_wait(2000);
+		}
+		var $rowLength = _table("list[1]").rows.length;
+		var $rowCount;
+		_set($rowCount,$rowLength);	
+		for(var $j=1;$j<$rowCount;$j++){
+			var $cellLength = _table("list[1]").rows[$i].cells.length;
+			var $cellCount;
+			_set($cellCount,$cellLength);	
+			for(var $k=1;$k<$cellCount-1;$k++){
+				var $row = $j-1;
+				var $col = $k-1;
+				if($k==3){
+					_setValue(_textbox(0,_in(_table("list[1]").rows[$j].cells[$k])),$selectData[$row][$col]);	
+				}
+				else{
+					_setSelected(_select(0,_in(_table("list[1]").rows[$j].cells[$k])),$selectData[$row][$col]);
+				}
+			}
+		}
+		_setValue($sfm_pg_search.txt_advancedExprsn, $exprsnVal);
+	};
+
+	this.addResultsToDisplay = function($clicks,$sheetName){
+		$selectData = $excel.readFromCustomExcel("../sfmDelivery/sfmDelivery_excelData/data.xlsx", $sheetName,"","");
+//		_log($selectData);
+		for(var $i=0;$i<$clicks;$i++){
+			_click($sfm_pg_search.btn_addRowResult);
+			_wait(2000);
+		}
+		var $rowLength = _table("list[2]").rows.length;
+		var $rowCount;
+		_set($rowCount,$rowLength);	
+//		_log($rowCount);
+		for(var $j=2;$j<$rowCount;$j++){
+			var $cellLength = _table("list[2]").rows[$j].cells.length;
+//			_log($cellLength);
+			var $cellCount1;
+			_set($cellCount1,$cellLength);
+//			_log($cellCount1);
+			for(var $k=1;$k<$cellCount1-1;$k++){
+				var $row = $j-2;
+//				_log($row);
+				var $col = $k-1;
+//				_log($col);
+				_setSelected(_select(0,_in(_table("list[2]").rows[$j].cells[$k])),$selectData[$row][$col]);
+			}
+			
+		}
+		_click($sfm_pg_search.btn_objectSave);	
+	};
+	
+	//Author: Vanditha
+	//This function is used to verify the availability of records based on Search Parameter passed in SFM Search delivery
+	// Parameters:
+	// $tabName: Array containing individual tab names available in a particular SFM Search
+	// $searchParameter: Within each tab, parameter to be passed based on which Search is performed in SFM Search
+	
+	this.verifySearchResults = function($tabName,$searchParameter){
+		//Verify for the availability of records in each tab based on Search paramater
+ 		if(_isVisible($tabName)){
+ 			_click($tabName);
+			_wait(10000);
+			_setStrictVisibilityCheck(true);
+			_setValue(_textbox(1,_near(_span("Go"))),$searchParameter);
+			_click(_span("Go"));			
+			_assertVisible(_link($searchParameter),"Record does not exist Message in"+$tabName+"");
+	 }
+};
+
+this.checkAndReturnSearchResults = function($searchParameter,$tabName){
+	//This function checks and returns true or false based on search results
+	//Returns : Result as Boolean
+	//Author:Janaki
+	//Sample usage: RS_5358.sah
+	
+	var $res = true;
+	var $i=0;
+	for($i=0;$i<$searchParameter.length;$i++){
+		_setStrictVisibilityCheck(true);
+		if(_isVisible(_span("/"+$tabName+"/"))){
+	 		_click(_span("/"+$tabName+"/"));
+	 		_wait(3000);
+			_setValue($sfm_pg_search.txt_searchQuickFind,$searchParameter[$i]);
+			_click(_span("Go"));
+			_wait(3000);
+			if(_isVisible(_link($searchParameter[$i],_in(_div("/sfmsearch-resultviewpanel/"))))){
+				$res = Boolean($res && true);
+				_log($searchParameter[$i]+" is visible in Search Results");
+			}
+			else {
+					$res = Boolean($res && false);
+					_log($searchParameter[$i]+ "is not visible in the Search Results");
+			}
+			}
+		_setStrictVisibilityCheck(false);
+	}
+
+return $res;
+};
+
+this.takeValueUnderColumn = function($columnName){
+	//This function returns the value under the given column name in search delivery after it is found through
+	//quick find ie, there is only one search result displayed
+	//Returns: Value found
+	//Author: Janaki
+	//Sample usage: RS_6344.sah
+	_setStrictVisibilityCheck(true);
+	var $a = [];
+	var $b = [];
+	var $x = _collect("_span","/svmx-column-header/");
+	var $i;
+	for($i=0;$i<$x.length;$i++){
+		 var $z = _getText($x[$i]);
+		$a.push($z);
+	}
+	
+	$x = _collect("_div","/svmx-grid-cell-inner/");
+	for($i=0;$i<$x.length;$i++){
+		 var $z = _getText($x[$i]);
+		$b.push($z);
+	}
+
+	var $index = $a.indexOf($columnName);
+	var $temp = $b[$index];
+	_log("Value for "+$columnName+" is "+$temp);
+	return $temp;
+};
+
+this.deleteSfmSearch = function($sfmSearchName){
+	//This function deletes the given SFM Search
+	//Author:Janaki
+	$bo_act_navigation.navigateToSfmSearchInDesigner();
+	_check(_checkbox(0,_leftOf(_span($sfmSearchName))));
+	_click($sfm_pg_search.btn_deleteSfmSearch);
+};
+};

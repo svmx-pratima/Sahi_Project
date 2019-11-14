@@ -1,0 +1,59 @@
+var $user_credentials = $excel.readFromCustomExcel("../optimax/op_excleData/automation.xlsx", "User_Details","","");
+var $MTTSData = $excel.readFromCustomExcel("../optimax/op_excleData/automation.xlsx", "Rules","","");
+
+
+//var $nArr;
+//Calling the sforce API
+for(var $i=0;$i<$user_credentials.length;$i++)
+{
+var $g_un = $user_credentials[$i][0];
+var $g_pwd = $user_credentials[$i][1];
+var $g_url = $user_credentials[$i][2];
+}
+
+var $RS_6296 = _testcase("RS_6298", "Edit a MTTS Rule");
+
+$RS_6296.start();
+
+var $MTTSName = $MTTSData[0][0];
+
+$bo_act_login.login($g_url, $g_un, $g_pwd);
+
+_click(_link("ServiceMax Setup"));
+_wait(20000, _isVisible(_div("Dispatch Management")));
+_click(_div("Dispatch Management"));
+_wait(20000, _isVisible(_div("MTTS Rules")));
+_click(_div("MTTS Rules"));
+
+var $rowCount = $op_utility.search_MTTS_Rule($MTTSName);
+
+_log("Row Count : " + $rowCount);
+
+_click(_button("Edit Rule"));
+_click(_imageSubmitButton("Add"));
+_setSelected(_select("MTTSRule:RuleForm:RuleBlock:j_id98:j_id99:table1:3:j_id104"), "Billing Type");
+_setSelected(_select("MTTSRule:RuleForm:RuleBlock:j_id98:j_id99:table1:3:j_id109"), "Equals");
+_setValue(_textbox("MTTSRule:RuleForm:RuleBlock:j_id98:j_id99:table1:3:j_id113"), "Paid");
+_setValue(_textbox("MTTSRule:RuleForm:RuleBlock:j_id119:HdrAdvOption"), "1 AND (2 OR 3 OR 4)");
+_click(_button("Save"));
+
+$rowCount = $op_utility.search_MTTS_Rule($MTTSName);
+
+_log("Row Count : " + $rowCount);
+
+_click(_button("Edit Rule"));
+
+var $temp = _getText(_textbox("MTTSRule:RuleForm:RuleBlock:j_id119:HdrAdvOption"));
+
+if (_areEqual("1 AND (2 OR 3 OR 4)", $temp)) 
+{
+_log("MTTS Rule Updated successfully");
+}
+else
+{
+_fail("Error in Updating MTTS Rule");
+}
+
+$bo_act_login.logOut();
+
+$RS_6296.end();

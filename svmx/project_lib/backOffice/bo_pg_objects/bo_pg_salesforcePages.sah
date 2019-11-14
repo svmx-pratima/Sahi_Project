@@ -1,0 +1,21 @@
+
+
+/**
+ * Home page object repository
+ */
+
+var $bo_pg_salesforcePages = new function bo_pg_salesforcePages(){
+	this.btn_new = _button(" New ");
+	this.btn_edit = _button(" Edit ");
+	this.txt_accountName = _textbox("acc2");
+	this.btn_save = _submit(" Save ");
+	this.btn_delete = _button("Delete");
+	this.btn_next = _submit(" Next ");
+	this.btn_saveAndNew = _submit("Save & New");
+	this.link_dashboardHomePageDefault = _link("Dashboard Home Page Default");
+	this.chk_ServiceMaxSFMSearch = _checkbox(0, _rightOf(_label("ServiceMax SFM Search")))
+	
+};
+
+
+

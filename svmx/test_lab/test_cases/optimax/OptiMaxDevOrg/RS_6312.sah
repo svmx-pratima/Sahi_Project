@@ -1,0 +1,36 @@
+var $user_credentials = $excel.readFromCustomExcel("../op_excleData/automation.xlsx", "User_Details","","");
+for(var $i=0;$i<$user_credentials.length;$i++)
+{
+var $g_un = $user_credentials[$i][0];
+var $g_pwd = $user_credentials[$i][1];
+var $g_url = $user_credentials[$i][2];
+}
+
+var $RS_6312= _testcase("RS_6312", "Add Home Base for technician");
+
+$RS_6312.start();
+
+
+$bo_act_login.login($g_url, $g_un, $g_pwd);
+
+_click(_link("ServiceMax Setup"));
+_wait(20000,_isVisible(_div("Service Organization")));
+_click(_div("Service Organization"));
+_wait(20000,_isVisible(_div("Service Org")));
+_click(_div("Service Org"));
+_click(_image("radio_chk0.gif[1]"));
+_wait(20000,_isVisible(_div("Home Base")));
+_click(_cell("Home Base"));
+_wait(10000,_isVisible(_div("Add Home Base")));
+_click(_button("Add Home Base"));
+_setValue(_textbox("TrackTechTeam:selected_ID:SVMXPageBlock:PbHomeBase:HomeBaseList:0:TStreet"), "MG road");
+_setValue(_textbox("TrackTechTeam:selected_ID:SVMXPageBlock:PbHomeBase:HomeBaseList:0:TCity"), "Bangalore");
+_setValue(_textbox("TrackTechTeam:selected_ID:SVMXPageBlock:PbHomeBase:HomeBaseList:0:TState"), "Karnataka");
+_setSelected(_select("TrackTechTeam:selected_ID:SVMXPageBlock:PbHomeBase:HomeBaseList:0:TCntry"), "India");
+_setValue(_textbox("TrackTechTeam:selected_ID:SVMXPageBlock:PbHomeBase:HomeBaseList:0:TZip"), "560001");
+_click(_button("Save"));
+_wait(30000,_isVisible(_div("Success:")));
+_click(_heading4("Success:"));
+
+
+$RS_6312.end();

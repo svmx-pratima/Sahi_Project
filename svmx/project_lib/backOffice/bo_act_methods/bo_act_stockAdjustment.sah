@@ -1,0 +1,24 @@
+/**
+ * Functions for the StockAdjustment Object
+ */
+var $bo_act_stockAdjustment = new function bo_act_stockAdjustment() {
+
+	/**
+	 * Create an StockAdjustment
+	  */
+	this.createStockAdjustment = function($stockingLocation,$stockingProduct,$newQty,$adjustmentType) {
+		 $bo_act_navigation.navigateToStockAdjustment();
+		_click($bo_pg_stockAdjustment.btn_new);
+		_setValue($bo_pg_stockAdjustment.txt_stockingLocation,$stockingLocation);
+		_setValue($bo_pg_stockAdjustment.txt_stockingProduct,$stockingProduct);
+		_setValue($bo_pg_stockAdjustment.txt_newQty,$newQty);
+		_setSelected($bo_pg_stockAdjustment.sel_adjustmentType,$adjustmentType);
+	    _click($bo_pg_stockAdjustment.btn_save);
+	    var $StockadjustmentName = _getText(_heading2("pageDescription"));
+		_assertNotVisible(_div("/Error: Invalid Data/"));
+		_wait(15000, _isVisible($StockadjustmentName));
+		_logOutput($StockadjustmentName+ " Stock Adjustment is created");
+    return $StockadjustmentName;
+		
+	};
+};

@@ -1,0 +1,88 @@
+var $an_ana_9816 = _testcase("ANA-9816","SCON within Coverage of Covered Product with Work Order");
+$an_ana_9816.start();
+var $cred = _readExcelFile("../../analytics/an_excleData/credentials.xlsx","Sheet1",true);
+var $un =$bac_un ;
+var $pwd =$bac_pwd;
+var $url =$cred[1]["url"];
+var $user =$cred[1]["User"];
+var $data = _readExcelFile("../../analytics/an_excleData/MTTC_data.xlsx","Sheet1",true);
+var $Account = $data[1]["Account"];
+var $Technician = $data[1]["Technician"];
+var $Product = $data[1]["Product"];
+var $OrderStatus = $data[1]["OrderStatus"];
+var $Component = $data[1]["Component"];
+var $PreferredStartDate = $data[5]["PreferredStartDate"];
+var $PreferredEndDate = $data[5]["PreferredEndDate"];
+$bo_act_login.login($url, $un, $pwd);
+
+$delete1 = "delete [Select Id from SVMXC__Service_Order__c ];";
+var $delete_data = $op_act_sForceApiCall.sForceQuery($un, $pwd, $delete1 , "create");
+$delete2 = "delete [Select Id from SVMXC__SPM_Mean_Time_Between_Failure__c ];";
+var $delete_data1 = $op_act_sForceApiCall.sForceQuery($un, $pwd, $delete2 , "create");
+
+// Create Work Order
+
+	var $ana_9816_create_WO = "SVMXC__Service_Order__c WO1 = new SVMXC__Service_Order__c(SVMXC__Company__c='"+$Account+"',SVMXC__Component__c = '"+$Component+"', SVMXC__Preferred_Start_Time__c = DateTime.valueOf("+$PreferredStartDate+"+0.025), SVMXC__Preferred_End_Time__c = DateTime.valueOf("+$PreferredEndDate+"+0.085), SVMXC__Order_Status__c = 'Closed' ); insert WO1;";
+	var $ana_9816_result_WO = $op_act_sForceApiCall.sForceQuery($un, $pwd, $ana_9816_create_WO , "create");
+	var $ana_9816_get_WO = "Select Id, Name from SVMXC__Service_Order__c where Createdby.Id = '"+$user+"' Order by CreatedDate DESC Limit 1";
+	var $ana_9816_fetch_WO = $op_act_sForceApiCall.sForceQuery($un, $pwd, $ana_9816_get_WO,"query");
+	var $ana_9816_WO_ID ;
+
+$ana_9816_WO_ID = $ana_9816_fetch_WO[0].Id;
+_log($ana_9816_WO_ID);	
+_wait(30000);
+
+
+
+
+//$an_act_MTBF.mtbf_closed_wo_calc();
+_click($an_pg_rv.link_home);
+_click($an_pg_rv.link_servicemaxSetup);
+_click($an_pg_rv.btn_serviceperformancemetrics);
+_click($an_pg_rv.btn_serviceperformancemetricsetup);
+$an_act_MTBF.MTBF_runEngine("vinaya.v@ge.com");
+	
+
+
+
+var $ana_9816_IB ;
+var $ana_9816_Expected_uptime;
+var $ana_9816_downtime;
+var $ana_9816_wo_count;
+var $ana_9816_Actual_uptime;
+var $ana_9816_MTBF;
+var $runon;
+
+var $ana_9816_query= "Select SVMXC__Installed_Product__c,SVMXC__Actual_Uptime__c, SVMXC__Downtime__c,SVMXC__Expected_Uptime__c,SVMXC__MTBF__c,SVMXC__Product__c,SVMXC__Run_On__c,SVMXC__Workorder_Count__c from SVMXC__SPM_Mean_Time_Between_Failure__c where SVMXC__Installed_Product__c = '"+$Component+"'";
+var $ana_9816_result = $op_act_sForceApiCall.sForceQuery($un, $pwd, $ana_9816_query,"query");
+
+$ana_9816_result.forEach(function($var) {
+	
+	$ana_9816_IB = $var.SVMXC__Installed_Product__c;
+	$ana_9816_Expected_uptime = $var.SVMXC__Expected_Uptime__c;
+	$ana_9816_downtime = $var.SVMXC__Downtime__c;
+	$ana_9816_wo_count = $var.SVMXC__Workorder_Count__c;
+	$ana_9816_Actual_uptime=$var.SVMXC__Actual_Uptime__c;
+    $ana_9816_MTBF=$var.SVMXC__MTBF__c;
+    $runon=$var.SVMXC__Run_On__c;
+});
+
+
+_log($ana_9816_IB);
+_log($ana_9816_Expected_uptime);
+_log($ana_9816_downtime); 
+_log($ana_9816_wo_count);
+_assertNotNull($ana_9816_IB);
+_assertNotNull($runon);
+_assertNotNull($ana_9816_Expected_uptime);
+_assertNotNull($ana_9816_downtime);
+_assertNotNull($ana_9816_wo_count);
+_assertNotNull($ana_9816_Actual_uptime);
+_assertNotNull($ana_9816_MTBF);
+
+$an_ana_9816.end();
+
+
+
+
+

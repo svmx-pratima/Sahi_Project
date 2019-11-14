@@ -1,0 +1,98 @@
+/**
+ * Function to perform sForce API Calls actions
+ */
+var $op_act_sForceApiCall = new function op_act_sForceApiCall() {
+
+	/**
+	 * Used to query from sForce api calls and will return a array of results
+	 * 
+	 * @param $un
+	 * @param $pwd
+	 * @param $queryComplex
+	 * @returns $nArr (Query response data array)
+	 */
+
+	this.sForceQuery = function($un, $pwd, $queryComplex, $queryType) {
+    	_call(top.location.reload(true));
+
+		var $nArr = null;
+		var $queryString = String($queryComplex);
+
+		if ($queryType == "query") {
+			_set($nArr, _fetch(sForceApiCall($un, $pwd, $queryString, $queryType)));
+
+			for (var $i = 0; $i < 10; $i++) {
+
+				_wait(10000, $nArr != null && JSON.stringify($nArr).indexOf("[]") == -1 && JSON.stringify($nArr).indexOf("{\"column\":\"-1\"") == -1);
+				if ($nArr != null && JSON.stringify($nArr).indexOf("[]") == -1 && JSON.stringify($nArr).indexOf("{\"column\":\"-1\"") == -1) {
+					break;
+				} else {
+					_set($nArr, _fetch(sForceApiCall($un, $pwd, $queryString, $queryType)));
+				}
+			}
+
+		} else if ($queryType == "create") {
+			_set($nArr, _fetch(sForceApiCall($un, $pwd, $queryString, $queryType)));
+			var $i = 0;
+			var $retry = 10;
+			for ($i = 0; $i <= $retry; $i++) {
+				if ($nArr != "exception") {
+					break;
+
+				} else {
+					_set($nArr, _fetch(sForceApiCall($un, $pwd, $queryString, $queryType)));
+				}
+				if ($i >= $retry) {
+					_logExceptionAsFailure("Exception In Apex Call");
+				}
+			}
+		}
+		return $nArr;
+
+		// <browser>
+		var g_loggedIn = false;
+		var sessionId;
+		function sForceApiCall($un, $pwd, $queryString, $queryType) {
+			var records = null;
+			var arr = null;
+
+			if (g_loggedIn == false) {
+				sforce.connection.sessionId = null;
+				// sforce.connection.debuggingHeader = null;
+				sessionId = sforce.connection.login($un, $pwd);
+				_log("Session ID =" + sessionId);
+				g_loggedIn = true;
+			} else {
+				_log("Already loggedin via API Sid :");
+			}
+
+			switch ($queryType) {
+			case 'query':
+				records = _call(sforce.connection.query($queryString));
+				_log("Records = " + records);
+
+				arr = records.getArray('records');
+				return arr;
+
+			case 'create':
+				try {
+					records = _call(sforce.apex.executeAnonymous($queryString));
+					_log("Records = " + records);
+					break;
+				} catch ($e) {
+					_log("Exception in Apex -- Reincluding Apex Src and Retrying ::" + $e);
+					return "exception";
+				}
+				return records;
+
+			default:
+				arr = [];
+			return arr;
+
+			}
+		}
+		// </browser>
+
+	};
+
+};

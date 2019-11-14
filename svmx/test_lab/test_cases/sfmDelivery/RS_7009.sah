@@ -1,0 +1,46 @@
+var $rs_7009 = _testcase("RS_7009","Verify standard and custom Multisource SFM process.");
+$rs_7009.start();
+var $processName = "Create Service Contract From Account";
+var $sfmName = $bo_act_common.generateRandomName("SFM_Auto_");
+var $sfmPgLayoutName = $bo_act_common.generateRandomName("SFM_Auto_Page");
+var $wizTitle = $bo_act_common.generateRandomName("SFM Wiz");
+//var $sfmPwd = "maxplore2";
+$bo_act_login.login($g_url,$sfmdUsn, $sfmdPwd);
+$accToAdd = ["Account1150"];
+
+//Clone the Standard Multi-source SFM Process - Create Service Contract from Account
+$bo_act_navigation.navigateToSfmTransactionDesigner();
+$sfm_act_Transactions.cloneAndSaveProcess($processName,$sfmName,$sfmPgLayoutName);
+
+
+//Add the process to SFM Wizard in Account
+$bo_act_navigation.navigateToSfmWizard();
+$sfm_act_createCustomWizard.chooseObject("Account");
+$sfm_act_createCustomWizard.addManageWizSteps($wizTitle,"SFM",$sfmName);
+
+
+//Create a New Account
+$sfm_act_addDeleteMeth.createAccount($accToAdd);
+_click(_link("Accounts"));
+_click(_link("/"+$accToAdd[0]+"/"));
+_selectDomain($g_domain);
+$sfm_act_createCustomWizard.clickWizardBtn($sfmName);
+_selectDomain();
+
+//Launch the Process in Delivery and fill the Mandatory details
+_click(_div(3,_rightOf(_label("End Date:"))));
+_click(_span("/lookup_icon/",_rightOf(_label("Service Plan:"))));
+_click(_span("/search-icon/"));
+_doubleClick(_div("Test SP Name"));
+_setValue(_textbox(0,_rightOf(_label("Contract Name/Number:"))), "1133");
+_click($sfm_pg_sfmDesigner.btn_deliverySave);
+
+
+//To validate if the SFM process is saved successfully
+if(_exists(_span("Saved Successfully"))){
+	_log("Pass ::: Service/Maintenance Contract created successfully");
+	}else{
+	_fail("Fail ::: SFM Process failed");
+	};
+
+$rs_7009.end();

@@ -1,0 +1,96 @@
+//Author:Rubi Agrawal
+var $RS_12450 = _testcase("$RS_12450","Verify that custom snippet configured on header displays time overlap with new & existing lines both");
+$RS_12450.start();
+
+var $sfmNameToBeCloned = "Manage Work Order Lines - Usage";
+var $sfmName=$bo_act_common.generateRandomName("RS_12450_");
+var $isCustom = false;
+var $sfmTemplate = "SVMXSTD: Manage WO Usage Lines";
+var $sfmTemplateSaveAsName = $sfmName;
+var $containerName = ["Order Status","Order Status","Parts","Parts"];
+var $fieldName=["Scheduled Date Time","Previous Scheduled Date Time","Start Date and Time","End Date and Time"];
+var $webServiceObject = "Work Order";
+var $event = "On Change";
+var $eventType = "JavaScript";
+var $methodName = "TestCodeSnippet: TestCodeSnippet";
+var $wizardObject ="Work Order";
+
+//Create WO through REST API
+var $woNumber = $sfm_act_createCustomWizard.createBlankWoFromRest($sfmdUsn, $sfmdPwd, $sfmClientId, $sfmConsumerSecret, $sfmOrgInstance);
+
+//Login and switch to classic
+$bo_act_login.login($g_url,$sfmdUsn,$sfmdPwd);
+_wait(15000);
+
+//clone Source to Target Child Process
+$sfm_act_SFM.cloneTDM016($sfmNameToBeCloned,$sfmName,$isCustom, $sfmTemplateSaveAsName,$sfmTemplate,$fieldName, $containerName);
+//To add custom code snippet in Scheduled Date Time Field
+_click(_f("main").s_richeditabletext("/textDisplay/").inside(_f("main").fieldrenderer("Scheduled Date Time")));
+_setSelected(_f("main").s_combobox("/ComboBox/").under(_f("main").uiftetextfield($event)), $eventType);
+_wait(2000);
+_setSelected(_f("main").s_combobox("/cmb/").rightOf(_f("main").uiftetextfield("Method")),$methodName);
+_wait(2000);
+_click($bo_pg_sfmTransactionAndDesigner.btn_pageLayoutSave);
+_wait(3000, _isVisible($bo_pg_sfmTransactionAndDesigner.lbl_pageLayoutSaved));
+$sfm_act_SFM.partsNotMandatory();
+_click($sfm_pg_sfmDesigner.btn_saveSFM); 
+
+//add the process to wizard
+$sfm_act_wizards.addToWizard($wizardObject, $sfmd_wizardName[6], $sfmd_wizardType[1], $sfmName);  
+
+//Navigate to the WO for validation
+$bo_act_navigation.navigateToCreatedRecordUsingGlobalSearch($woNumber);
+$sfm_act_createCustomWizard.clickWizardBtn($sfmName);
+_wait(5000);
+var $startHrs="2";
+var $endHrs="11";
+//To add 1st line
+_click($sfm_pg_sfmDesigner.btn_deliveryPartsTab);
+_click($sfm_pg_sfmDesigner.btn_deliveryAddRowParts);
+_click($sfm_pg_sfmDesigner.btn_deliveryExtendedEdit);
+_click($bo_pg_getPrice.btn_startDateAndTime);
+_click($bo_pg_getPrice.btn_endDateAndTime);
+// Configure the hours for Start Date Time
+_click($bo_pg_getPrice.btn_HrsPickListNextToStartDateAndTime);
+_click(_listItem($startHrs));
+// Configure the hours for End Date Time
+_click($bo_pg_getPrice.btn_HrsPickListNextToEndDateAndTime);
+_click(_listItem($endHrs));
+_click($sfm_pg_sfmDesigner.btn_eeUpdate);
+_click($sfm_pg_sfmDesigner.btn_deliveryQuickSave);
+
+//To add 2nd line
+var $startHrs1="3";
+var $endHrs1="10";
+_click($sfm_pg_sfmDesigner.btn_deliveryPartsTab);
+_click($sfm_pg_sfmDesigner.btn_deliveryAddRowParts);
+_click($sfm_pg_sfmDesigner.btn_deliveryExtendedEdit);
+_click($bo_pg_getPrice.btn_startDateAndTime);
+_click($bo_pg_getPrice.btn_endDateAndTime);
+// Configure the hours for Start Date Time
+_click($bo_pg_getPrice.btn_HrsPickListNextToStartDateAndTime);
+_click(_listItem($startHrs1));
+// Configure the hours for End Date Time
+_click($bo_pg_getPrice.btn_HrsPickListNextToEndDateAndTime);
+_click(_listItem($endHrs1));
+_click($sfm_pg_sfmDesigner.btn_eeUpdate);
+_click($sfm_pg_sfmDesigner.btn_deliveryQuickSave);
+
+//To add date and time in Header
+var $scheduleDateTime = _span("svmx-btn-icon svmx-sfmd-current-datetime-icon",_near($sfm_pg_sfmDesigner.txt_scheduledDateTime));
+var $previousDateTime=_span("/svmx-btn-icon svmx-sfmd-current-datetime-icon/",_near($sfm_pg_sfmDesigner.txt_previousDateTime));
+var $HrsSceduledDateTime=_textbox("/svmx-trigger-noedit/",_rightOf($sfm_pg_sfmDesigner.txt_scheduledDateTime));
+var $HrsPreviousDateTime=_textbox("/svmx-trigger-noedit/",_rightOf($sfm_pg_sfmDesigner.txt_previousDateTime));
+var $startHrs1="5";
+var $endHrs1="9";
+_click($previousDateTime);
+_click($HrsPreviousDateTime);
+_click(_listItem($endHrs1));
+
+_click($scheduleDateTime);
+_click($HrsSceduledDateTime);
+_click(_listItem($startHrs1));
+$RS_12450.end();
+
+	 
+	 

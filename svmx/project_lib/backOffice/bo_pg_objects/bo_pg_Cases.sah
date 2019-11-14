@@ -1,0 +1,50 @@
+/**
+ * Home page object repository
+ */
+
+var $bo_pg_Cases = new function bo_pg_Cases(){
+	this.btn_new = _button(" New ");
+	this.txt_caseDetail = _heading2("Case Detail");
+	this.txt_contactName = _textbox("Contact Name");
+	this.txt_accountName = _textbox("Account Name");
+	this.txt_siteName = _textbox("Site");
+	this.txt_componentSN_Name = _textbox("Component SN");
+	this.txt_subjectName = _textbox("Subject");
+	this.sel_selectCaseStatus = _select(0,_rightOf(_cell("/\\*Status|^Status/")));
+	this.sel_selectCasePriority = _select(0,_rightOf(_cell("/\\*Priority|^Priority/")));
+	this.sel_selectCaseType = _select(0,_rightOf(_cell("/\\*Type|^Type/")));
+	this.sel_selectCaseOrigin = _select(0,_rightOf(_cell("/\\*Case Origin|^Case Origin/")));
+	this.sel_checkentitlement = _checkbox(0,_rightOf(_label("Perform Auto Entitlement")));
+	this.sel_casereason =_select(0,_rightOf(_label("/\\*Case Reason|^Case Reason/")));
+	this.btn_save = _submit(" Save ");
+	this.txt_caseNumber = _heading2("pageDescription");
+	this.btn_editCase = _button(" Edit "); 
+	this.btn_SFWCheckEntitlementOnCase = _button("Check Entitlement");
+	this.btn_cloneCase = _button(" Clone ");
+	this.btn_deleteCase = _button("Delete");
+	this.txt_TimeToRestore = _div(0,_rightOf(_cell("/Time to Restore/")));
+	this.txt_TimeToResolve = _div(0,_rightOf(_cell("/Time to Resolve/")));
+	this.txt_TimeToInitialResponse = _div(0,_rightOf(_cell("/Time to Initial Response/")));
+	this.txt_SLAClock = _table("/timer/");
+	this.txt_ResolutionInternalBy = _div(0,_rightOf(_cell("/Resolution Internal By/")));
+	this.txt_ResolutionCustomerBy = _div(0,_rightOf(_cell("/Resolution Customer By/")));
+	
+	// added by Bhupendra Singh
+	this.btn_caseLines = _span("Case Lines");
+	this.txt_lineQuantity = _textbox("/Quantity/",_rightOf(_label("/Quantity/")));
+	
+this.txt_InitialResponseInternalBy = _div(0,_rightOf(_cell("/Initial Response Internal By/")));
+	this.txt_InitialResponseCustomerBy = _div(0,_rightOf(_cell("/Initial Response Customer By/")));
+	
+	//Edit Case Page
+	this.txt_slaTermOnEdit = _textbox(0,_rightOf(_label("SLA Terms")));
+	this.sel_TypeOnEdit = _select(0,_rightOf(_label("Type")));
+	this.txt_actualRestorationOnEdit = _link(0,_rightOf(_label("Actual Restoration")));
+	this.txt_actualResolutionOnEdit = _link(0,_rightOf(_label("Actual Resolution")));
+this.txt_actualInitialResponseOnEdit = _link(0,_rightOf(_label("Actual Initial Response")));
+
+this.componentSN = _cell("Component SN");
+};
+
+
+

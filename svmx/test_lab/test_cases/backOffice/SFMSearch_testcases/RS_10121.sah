@@ -1,0 +1,29 @@
+// Author Meghana Rao P
+/*
+ * To verify the Scope of search being 1 Object and then checking it in delivery - For Account object
+ */
+var $RS_10121 = _testcase("RS_10121", "Creating a SFM Search with only 1 object");
+$RS_10121.start();
+
+
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+
+var $randomnumber = $bo_act_common.generateRandomName("");
+
+
+//Create Account for the Org
+var $accountcreation = "Account acc1 = New Account(Name ='Acc"+$randomnumber+"', Type = 'Analyst');insert acc1;";
+var $rs_10121_account = $op_act_sForceApiCall.sForceQuery($bac_un, $bac_pwd, $accountcreation ,"create");
+var $rs_10121_query_acc = "Select Id, Name from Account where Name ='Acc"+$randomnumber+"'";
+var $rs_10121_fetch2 = $op_act_sForceApiCall.sForceQuery($bac_un, $bac_pwd, $rs_10121_query_acc ,"query");
+var $AccountID = $rs_10121_fetch2[0].Id;
+var $rs_10121_AccName = $rs_10121_fetch2[0].Name;
+
+$number1 = Math.floor(Math.random() * 10);
+$bo_act_navigation.navigateToSvmxSetup();
+var $searchTitle = $bo_act_common.generateRandomName("Search");
+var $searchId = $bo_act_common.generateRandomName("SearchId");
+// Creating a new Custom SFM Search
+$bo_act_sfmsearch.createsfmsearch($searchId,$searchTitle, "Account", "Type", "Analyst", "Equals", "10121");
+$bo_act_sfmsearchdelivery.sfmsearch($searchTitle,$rs_10121_AccName , false);
+$RS_10121.end();

@@ -1,0 +1,8 @@
+var $data = _readExcelFile("../../analytics/an_excleData/an_Datasheet1.xlsx","Sheet1",true);
+var $un =$bac_un ;
+var $pwd =$bac_pwd;
+var $url = "https://test.salesforce.com";
+$bo_act_login.login($url, $un, $pwd);
+$an_act_Repeat_Visit_SR.rv_usa_calc("Repeat Visit Calc USA");
+$an_act_Repeat_Visit_SR.rv_uk_calc("Repeat Visit Calc UK");
+$an_act_Repeat_Visit_SR.rv_usa_custom("Custom Field Account");

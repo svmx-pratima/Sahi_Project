@@ -1,0 +1,107 @@
+//Author:Rubi Agrawal
+var $RS_11975 = _testcase("$RS_11975","Verify bubble info in Header for user with no field permission");
+$RS_11975.start();
+
+var $restAccName = "Acc_"+$sfmName;
+//variables for rest call
+//$orgInstance = "cs19";
+$objName= "Account";
+$obJson = "{\"Name\":\""+$restAccName+"\"}"; 
+$columnName = "Name";
+$filter="id";
+
+//create an account
+$account=$sfm_act_restApiMethods.postRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,$objName,$obJson,"POST");
+$accountName =$sfm_act_restApiMethods.getRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,"GET", $objName, $columnName, $filter, $account);
+
+//get the caseNumber
+$objName1= "Case";
+$obJson1 = "{\"AccountId\":\""+$account+"\",\""+$orgnamespace+"__Billing_Type__c\":\"Loan\",\"Priority\":\"High\",\"Description\":\"CaseCreatedfromRest\"}";
+$columnName1 = "CaseNumber";
+$filter1="id";
+//create a case
+$filterValue=$sfm_act_restApiMethods.postRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,$objName1,$obJson1,"POST");
+//get the caseNumber
+$caseNumber =$sfm_act_restApiMethods.getRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,"GET", $objName1, $columnName1, $filter1, $filterValue);
+
+//create Work orders
+$objName= $orgnamespace+"__Service_Order__c";
+$obJson = "{\""+$orgnamespace+"__Order_Status__c\":\"Open\",\""+$orgnamespace+"__Order_Type__c\":\"Field Service\"}";
+$columnName = "Name";
+$filter="id";
+$filterValue=$sfm_act_restApiMethods.postRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,$objName,$obJson,"POST");
+$WONumber =$sfm_act_restApiMethods.getRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,"GET", $objName, $columnName, $filter, $filterValue);
+_log("WO number: "+$WONumber);
+
+// Login to App
+$bo_act_login.login($g_url,$sfmdUsn,$sfmdPwd);
+/*$objectName="Case Line";
+$FieldToEdit=["Priority","Case"];
+$permissionToprovide=["Billing Type","Problem Description"];
+//Field permission for technician profile;
+$sfm_act_common.RemoveFieldPermissionClassic($objectName,$FieldToEdit,$tech_Profile);
+$sfm_act_common.ProvideFieldPermissionClassic($objectName,$permissionToprovide,$tech_Profile);*/
+		
+//clone standard SFM
+var $sfmNameToBeCloned="Manage Work Order Lines - Usage";
+var $sfmName=$bo_act_common.generateRandomName("RS11975_");
+var $sfmTemplateSaveAsName=$bo_act_common.generateRandomName("SFM_Page_");
+var $sfmTemplate="SVMXSTD: Manage WO Usage Lines";
+var $fieldName=["Case"];
+var $containerName=["Order Status"];
+$sfm_act_SFM.cloneTDM016($sfmNameToBeCloned, $sfmName, false, $sfmTemplateSaveAsName, $sfmTemplate, $fieldName, $containerName);
+			
+//create lookup for part object in Child
+var $object="Case";
+var $lookupTempName="SVMXSTD: Case Lookup";
+var $fieldNameList=["Account ID","Billing Type","Case Number","Description","Priority"];
+var $addToSearchList=[true,false];
+var $addToDisplayList=[true,true,false,true,false];
+var $addToBubbleList=[true,true,false,true,false];
+var $lookupFieldsToAdd=[$fieldNameList,$addToSearchList,$addToDisplayList,$addToBubbleList];
+var $noOfRecords=50;
+var $lookUpName=$bo_act_common.generateRandomName("RS11975_lookup_");
+$sfm_act_Transactions.createLookUp($object, $lookupTempName, $lookupFieldsToAdd, "", $lookUpName,"",$noOfRecords);
+		
+//Save SFM after adding lookup configuration
+_wait(2000);
+_click($bo_pg_sfmTransactionAndDesigner.btn_quickSave);
+_click($bo_pg_sfmTransactionAndDesigner.btn_saveAndclose);
+_wait(10000);
+		
+//add SFM to wizard
+var $wizardObject="Work Order";
+//add the process to wizard
+$sfm_act_wizards.addToWizard($wizardObject, $sfmd_wizardName[1], $sfmd_wizardType[1], $sfmName); 
+
+//Logout from admin and login as Technician
+$bo_act_login.logOut();
+//var $sfmtUsn= "tech@sfmdlight.com";
+//var $sfmtPwd="svmx12345";
+$bo_act_login.login($g_url, $sfmtUsn,$sfmtPwd); 
+
+//Search WO and launch SFM
+$bo_act_navigation.navigateToCreatedRecordUsingGlobalSearch($WONumber);
+$sfm_act_createCustomWizard.clickWizardBtn($sfmName);
+
+//select a case and click on bubble info
+_setValue($sfm_pg_sfmDesigner.txt_caseInHeader,$caseNumber);
+_click($sfm_pg_sfmDesigner.btn_caseLookUpInWO);
+_wait(10000,_isVisible(_span("Case search")));
+_click(_cell($caseNumber));
+_click($sfm_pg_sfmDesigner.btn_select);
+_wait(3000);
+_click($sfm_pg_sfmDesigner.btn_casebubble);
+_wait(3000,_isVisible($sfm_pg_sfmDesigner.btn_bubbleDiv));
+if((_assertExists(_row("Case Number"+":"+$caseNumber))==true)&&
+(_assertExists(_row("Piority"+":"+"High"))==true)&&
+(_assertExists(_row("Billing Type"+":"+"Loan"))==true))
+{
+	_log("PASS:::Test case passed");
+}
+else
+	{
+	_log("FAIL:::Test case failed");
+	}
+
+$RS_11975.end();

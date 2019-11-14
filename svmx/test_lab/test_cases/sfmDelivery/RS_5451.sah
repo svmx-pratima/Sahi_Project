@@ -1,0 +1,351 @@
+var $rs_5451 = _testcase("RS_5451","Verify Editing of Advanced expression in Header and child. Also verify deleting of Advanced Expression.");
+$rs_5451.start();
+
+		//Pre_Requesite
+		//Create Account
+		var $AccountName=$bo_act_common.generateRandomName("RS5451_Account_");
+		var $objName= "Account";
+		var $obJson = "{\"Name\":\""+$AccountName+"\"}";
+		$AccountID=$sfm_act_restApiMethods.postRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,$objName,$obJson,"POST");
+		_log("Account: "+$AccountName);
+
+		//Create Product
+		var $objName= "Product2";
+		var $WDpartName=new Array;
+		var $ProductID=new Array;
+		for (var $i = 0; $i < 2; $i++) {
+			$WDpartName[$i]=$bo_act_common.generateRandomName("RS5451_Prod_");
+			var $obJson = "{\"Name\":\""+$WDpartName[$i]+"\",\"ProductCode\":\""+$WDpartName[$i]+"\",\""+$orgnamespace+"__Product_Line__c\":\"Storage\",\""+$orgnamespace+"__Product_Type__c\":\"Consumable\"}";
+			$ProductID[$i]=$sfm_act_restApiMethods.postRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,$objName,$obJson,"POST");
+			_log("Product Name: "+$WDpartName[$i]);	
+		}
+		
+		//Create IB
+		var $IBSerialNo=$bo_act_common.generateRandomName("RS_5451_IB_");
+		var $objName= $orgnamespace+"__Installed_Product__c";
+		var $obJson = "{\"Name\":\""+$IBSerialNo+"\",\""+$orgnamespace+"__Company__c\":\""+$AccountID+"\",\""+$orgnamespace+"__Product__c\":\""+$ProductID[1]+"\",\""+$orgnamespace+"__Serial_Lot_Number__c\":\""+$IBSerialNo+"\"}";
+		$IBfilterValue=$sfm_act_restApiMethods.postRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,$objName,$obJson,"POST");
+		_log("IB: "+$IBSerialNo);
+
+
+		//Work Order Creation
+		var $woStatus="Open";
+		var $WONumber=new Array;
+		var $WOID=new Array;
+		$objName= $orgnamespace+"__Service_Order__c";
+		var $today=getDBDate(0,"-",0);
+		for (var $i = 0; $i < 3; $i++) {
+			if ($i==0) {
+				$obJson = "{\""+$orgnamespace+"__Order_Status__c\":\"Open\",\""+$orgnamespace+"__Order_Type__c\":\"Field Service\",\""+$orgnamespace+"__Company__c\":\""+$AccountID+"\"}";
+			}else if ($i==1) {
+				$obJson = "{\""+$orgnamespace+"__Order_Status__c\":\"Open\",\""+$orgnamespace+"__Order_Type__c\":\"Field Service\",\""+$orgnamespace+"__Company__c\":\""+$AccountID+"\",\""+$orgnamespace+"__Billing_Type__c\":\"Warranty\",\""+$orgnamespace+"__Scheduled_Date__c\":\""+$today+"\"}";
+			}else {
+				$obJson = "{\""+$orgnamespace+"__Order_Status__c\":\"Closed\",\""+$orgnamespace+"__Order_Type__c\":\"Field Service\"}";
+			}
+			_log($obJson);
+			$columnName = "Name";
+			$filter="id";
+			$filterValue=$sfm_act_restApiMethods.postRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,$objName,$obJson,"POST");
+			$WO =$sfm_act_restApiMethods.getRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,"GET", $objName, $columnName, $filter, $filterValue);
+			_log("WO number: "+$WO);
+			$WOID[$i]=$filterValue;
+			$WONumber[$i]=$WO;
+		}
+		
+		$objName="RecordType";
+		$filter=["DeveloperName","SobjectType"];
+		$filterValue=["UsageConsumption",$orgnamespace+"__Service_Order_Line__c"];
+		$columnName = "id";
+		$recTypeID =$sfm_act_restApiMethods.getRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,"GET", $objName, $columnName, $filter, $filterValue);
+		_log("Record Type ID: "+$recTypeID);
+		
+		//Create WD(parts) under Open WO
+		for (var $i = 0; $i < 2; $i++) {
+			$objName= $orgnamespace+"__Service_Order_Line__c";
+			if ($i==0) {
+				$obJson = "{\""+$orgnamespace+"__Line_Type__c\":\"Parts\",\"RecordTypeId\":\""+$recTypeID+"\",\""+$orgnamespace+"__Product__c\":\""+$ProductID[$i]+"\",\""+$orgnamespace+"__Activity_Type__c\":\"Installation\",\""+$orgnamespace+"__Requested_City__c\":\"Mysore\",\"Account__c\":\""+$AccountID+"\",\""+$orgnamespace+"__Service_Order__c\":\""+$WOID[0]+"\"}";
+			}else {
+				$obJson = "{\""+$orgnamespace+"__Line_Type__c\":\"Parts\",\"RecordTypeId\":\""+$recTypeID+"\",\""+$orgnamespace+"__Product__c\":\""+$ProductID[$i]+"\",\""+$orgnamespace+"__Activity_Type__c\":\"Installation\",\""+$orgnamespace+"__Requested_City__c\":\"Bangalore\",\""+$orgnamespace+"__Billable_Quantity__c\":\"3\",\""+$orgnamespace+"__Date_Requested__c\":\""+$today+"\",\"Account__c\":\""+$AccountID+"\",\""+$orgnamespace+"__Serial_Number__c\":\""+$IBfilterValue+"\",\""+$orgnamespace+"__Service_Order__c\":\""+$WOID[0]+"\"}";
+			}
+
+			$columnName = "Name";
+			$filter="id";
+			$filterValue=$sfm_act_restApiMethods.postRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,$objName,$obJson,"POST");
+			$WDNumber =$sfm_act_restApiMethods.getRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,"GET", $objName, $columnName, $filter, $filterValue);
+			_log("WD number: "+$WDNumber);
+		}
+
+		
+		//Login to App
+		$bo_act_login.login($g_url,$sfmdUsn,$sfmdPwd);
+		
+		//clone standard SFM
+		var $sfmNameToBeCloned="Create Usage Lines from Estimates";
+		var $sfmName=$bo_act_common.generateRandomName("rs_5451_");
+		var $sfmTemplateSaveAsName=$bo_act_common.generateRandomName("SFM_Page_");
+		var $sfmTemplate="SVMXSTD: Manage WO Usage Lines";
+		var $fieldName="";
+		var $containerName="";
+		$sfm_act_SFM.cloneTDM016($sfmNameToBeCloned, $sfmName, false, $sfmTemplateSaveAsName, $sfmTemplate, $fieldName, $containerName);
+		
+		//adding qualifying criteria for parent object
+		var $comboField=["Order Status","Order Type"];
+		var $comboConditions=["Equals","Equals"];
+		var $toggleButton=["",""];
+		var $comboInput=["Open","Field Service"];
+		var $advExpr="1 AND 2";
+		var $errMsg="This record does not qualify as the Order Status is NOT Open and Order Type is NOT Field Service.";
+		var $exprsnName = $bo_act_common.generateRandomName("RS_5451_expr_");
+		var $ExprFieldsDetails=[$comboField,$comboConditions,$toggleButton,$comboInput,$advExpr,$errMsg,$exprsnName];
+		$sfm_act_Transactions.sfmQualifyingCriteriaieldMappings("Work Order", $ExprFieldsDetails, "", "","");
+			
+		//adding qualifying criteria for child object - part
+		var $childcomboField=["Activity Type","Requested City"];
+		var $childcomboConditions=["Equals","Equals"];
+		var $childtoggleButton=["",""];
+		var $childcomboInput=["Installation","Mysore"];
+		var $childadvExpr="1 AND 2";
+		var $childerrMsg="";
+		var $childexprsnName = $bo_act_common.generateRandomName("RS_5451_exprPart_");
+		var $childExprFieldsDetails=[$childcomboField,$childcomboConditions,$childtoggleButton,$childcomboInput,$childadvExpr,$childerrMsg,$childexprsnName];
+		$sfm_act_Transactions.sfmQualifyingCriteriaieldMappings("Parts", $childExprFieldsDetails, "", "","");
+		
+		_click($bo_pg_sfmTransactionAndDesigner.btn_saveAndclose);
+		
+		//add SFM to expression Wizard
+		var $wizardObject="Work Order";
+		var $sfmd_wizardName1 =$sfmd_wizardName[6];
+		var $sfmd_wizardType="SFM";
+		var $profile="";
+		var $handOver=false;
+		_log($sfmd_wizardName1);
+		$sfm_act_wizards.addToWizard($wizardObject, $sfmd_wizardName1, $sfmd_wizardType, $sfmName, $handOver, $profile);  
+		
+		
+		//Assert SFM transaction is launched and childline display
+		$sfm_act_common.globalSearchOnce($WONumber[0]);
+		_wait(10000);
+		_setStrictVisibilityCheck(true);
+		$sfm_act_createCustomWizard.clickWizardBtn($sfmName);
+		_assertExists(_div("/"+$sfmName+"/"));
+		_click($sfm_pg_screenDesigner.btn_Parts);
+		_assertExists(_cell($WDpartName[0]));
+		_setStrictVisibilityCheck(false);
+		
+		//Logout and login: this is code is added due to limitation of sahi.
+		//Limitation: we cann't perform action on transaction page twice in single login
+		$bo_act_login.logOut();
+		_wait(10000,_isVisible($bo_pg_login.txt_email));
+		$bo_act_login.login($g_url,$sfmdUsn,$sfmdPwd);
+		
+		//Update the SFM Transaction
+		_selectDomain();
+		$bo_act_navigation.navigateToSfmTransactionDesigner();
+		_wait(10000);
+		$sfm_act_SFM.selectSFM($sfmName, true);
+		_wait(5000,_isVisible());
+		_click(_f("main").s_label($sfmName));
+		_wait(10000,_isVisible($sfm_pg_screenDesigner.btn_qualifyingCriteriaAndFieldMapping));
+		
+		_click($sfm_pg_screenDesigner.btn_qualifyingCriteriaAndFieldMapping);
+		_wait(10000,_isVisible($sfm_pg_screenDesigner.lbl_qualifyingCriteriaMapping));
+		_click(_f("main").s_label("Work Order").near($sfm_pg_screenDesigner.lbl_qualifyingCriteriaMapping));
+		_wait(10000,_isVisible($sfm_pg_screenDesigner.lbl_headerQualificationLabel));
+		
+		//adding qualification criteria for parent object
+		var $comboField=["Account","Billing Type","Scheduled Date"];
+		var $comboConditions=["Is Not Null","Equals","Equals"];
+		var $toggleButton=["","",""];
+		var $comboInput=["","Warranty","Today"];
+		var $advExpr="(((1 and 2) or 3) and (4 or 5))";
+		var $errMsg="This record does not qualify as the Order Status is NOT Open and Order Type is NOT Field Service.";
+		$sfm_act_Transactions.sfmUpdateExpression($comboField, $comboConditions, $toggleButton, $comboInput, $advExpr, $errMsg);
+		$sfm_act_Transactions.sfmSvaeExpression($exprsnName, $exprsnName, "Save");
+		
+		_click($sfm_pg_screenDesigner.btn_qualifyingCriteriaAndFieldMapping);
+		_wait(10000,_isVisible($sfm_pg_screenDesigner.lbl_qualifyingCriteriaMapping));
+		_click(_f("main").s_label("Parts").near($sfm_pg_screenDesigner.lbl_qualifyingCriteriaMapping));
+		_wait(10000,_isVisible($sfm_pg_screenDesigner.lbl_headerQualificationLabel));
+		
+		//adding qualifying criteria for child object - part
+		var $childcomboField=["Billable Qty","Date Required","IB Serial Number"];
+		var $childcomboConditions=["Equals","Equals","Contains"];
+		var $childtoggleButton=["","",""];
+		var $childcomboInput=["1","Tomorrow","RS_5451_IB"];
+		var $childadvExpr="(((1 and 2) or 3) and (4 or 5))";
+		var $childerrMsg="";
+		$sfm_act_Transactions.sfmUpdateExpression($childcomboField, $childcomboConditions, $childtoggleButton, $childcomboInput, $childadvExpr, $childerrMsg);
+		
+		$sfm_act_Transactions.sfmSvaeExpression($childexprsnName, $childexprsnName, "Save");
+		_click($bo_pg_sfmTransactionAndDesigner.btn_saveAndclose);
+		
+		
+		$sfm_act_common.globalSearchOnce($WONumber[1]);
+		_wait(10000);
+		_setStrictVisibilityCheck(true);
+		$sfm_act_createCustomWizard.clickWizardBtn($sfmName);
+		_assertExists(_link("/"+$sfmName+"/"));
+		_click($sfm_pg_screenDesigner.btn_Parts);
+		_assertNotExists(_cell($WDpartName[0]));
+		_setStrictVisibilityCheck(false);
+		
+	
+		$sfm_act_common.globalSearchOnce($WONumber[2]);
+		_wait(10000);
+		_setStrictVisibilityCheck(true);
+		$sfm_act_createCustomWizard.clickWizardBtn($sfmName);
+		_wait(10000,_isVisible(_div($errMsg)));
+		_assertExists(_div($errMsg));
+		_setStrictVisibilityCheck(false);
+		
+		//Logout and login: this is code is added due to limitation of sahi.
+		//Limitation: we cann't perform action on transaction page twice in single login
+		$bo_act_login.logOut();
+		_wait(10000,_isVisible($bo_pg_login.txt_email));
+		$bo_act_login.login($g_url,$sfmdUsn,$sfmdPwd);
+		
+		//Remove Advance criteria
+		$sfm_act_SFM.editCustomProcess($sfmName);
+		_wait(10000,_isVisible($sfm_pg_screenDesigner.btn_qualifyingCriteriaAndFieldMapping));
+		_click($sfm_pg_screenDesigner.btn_qualifyingCriteriaAndFieldMapping);
+		_wait(10000,_isVisible($sfm_pg_screenDesigner.lbl_qualifyingCriteriaMapping));
+		_click(_f("main").s_label("Work Order").near($sfm_pg_screenDesigner.lbl_qualifyingCriteriaMapping));
+		_wait(10000,_isVisible($sfm_pg_screenDesigner.lbl_headerQualificationLabel));
+		
+		//adding qualifying criteria for parent object
+		var $comboField=[];
+		var $comboConditions=[];
+		var $toggleButton=[];
+		var $comboInput=[];
+		var $advExpr="";
+		var $errMsg="This record does not qualify as the Order Status is NOT Open and Order Type is NOT Field Service.";
+		$sfm_act_Transactions.sfmUpdateExpression($comboField, $comboConditions, $toggleButton, $comboInput, $advExpr, $errMsg);
+		$sfm_act_Transactions.sfmSvaeExpression($exprsnName, $exprsnName, "Save");
+		_click($bo_pg_sfmTransactionAndDesigner.btn_saveAndclose);
+		
+		$sfm_act_common.globalSearchOnce($WONumber[2]);
+		_wait(10000);
+		_setStrictVisibilityCheck(true);
+		$sfm_act_createCustomWizard.clickWizardBtn($sfmName);
+		_wait(10000,_isVisible(_div($errMsg)));
+		_assertExists(_div($errMsg));
+		_setStrictVisibilityCheck(false);
+		
+//** function to create Work**'
+
+function getDBDate($futureYear, $seperator,$futureDay){
+		var $retDate=$bo_act_common.getfutureDate($futureYear, $seperator, $futureDay);
+		var $dateDetails=$retDate.split("-");
+		var $retDate=$dateDetails[2]+$seperator+$dateDetails[0]+$seperator+$dateDetails[1];
+		//_log("Formated Date: "+$retDate);
+		return $retDate;
+}		
+		
+function createWO_RS5451($orderStatus,$orderType,$AccountName, $billingType,$ScheduledDate){
+		var $wo= $bo_act_workOrders.createWorkOrder("", $AccountName, "", $IBSerialNo,$orderStatus, "High", "Field Service");
+		_click($bo_pg_workOrders.btn_editWorkOrder);
+		addWOfieldValue("","","", $billingType,$ScheduledDate);
+		_click($bo_pg_workOrders.btn_saveWorkOrder);
+		_wait(10000,_isVisible($bo_pg_workOrders.txt_workOrderDetails));
+		return $wo;
+
+};
+
+function addWOfieldValue($orderStatus,$orderType,$AccountName, $billingType,$ScheduledDate){
+		_setStrictVisibilityCheck(true);
+		if ($orderStatus!="") {
+			_setSelected($bo_pg_workOrders.sel_orderStatus, $orderStatus);
+		}
+		if ($orderType!="") {
+			_setSelected($bo_pg_workOrders.sel_orderType, $orderType);
+		}
+		if ($AccountName!="" && $AccountName!==null && $AccountName!=="Delete") {
+			_setValue($bo_pg_workOrders.txt_account, $accountName);	
+		}else if ($AccountName=="Delete") {
+			_click(_link("Press Delete to Remove",_near($sfm_pg_wo.lbl_Account)));
+		}
+		if ($billingType!="" && $billingType!=null) {
+			_setSelected($bo_pg_workOrders.sel_billingType,$billingType);
+		}
+		if ($ScheduledDate!="" && $ScheduledDate!=null) {
+			_setSelected($bo_pg_workOrders.txt_scheduleDate,$ScheduledDate);
+		}
+		_setStrictVisibilityCheck(false);
+}
+	
+	
+
+function addWorkDetailLine($recordType,$lineType,$activityType,$requesteCity,$billableQty,$dateRequired,$WDpartName,$AccountName,$IBSerialNo){
+	_click($bo_pg_workOrders.btn_newWD);
+	_wait(10000,_isVisible($bo_pg_workDetails.sel_workDetailsRecordType));
+	_setSelected($bo_pg_workDetails.sel_workDetailsRecordType,$recordType);
+	_click($bo_pg_workDetails.btn_WDcontinue);
+	_wait(10000,isVisible($bo_pg_workDetails.sel_WDLineType));
+	_setStrictVisibilityCheck(true);	
+	addWDfiledValues($lineType,$activityType,$requesteCity,$billableQty,$dateRequired,$WDpartName,$AccountName,$IBSerialNo);
+	_click($bo_pg_workDetails.btn_saveWorkDetails);
+	_wait(15000,_isVisible($bo_pg_workDetails.btn_editWD));
+	var $WorkDetailName=_getText(_heading2("/WL-.*/"));
+	_setStrictVisibilityCheck(false);
+	return $WorkDetailName;
+
+}
+
+function addWDfiledValues($lineType,$activityType,$requesteCity,$billableQty,$dateRequired,$WDpartName,$AccountName,$IBSerialNo){
+	_setStrictVisibilityCheck(true);
+	if ($lineType!="") {
+		_setSelected($bo_pg_workDetails.sel_WDLineType,$lineType);
+	}
+	if ($activityType!="") {
+		_setSelected($bo_pg_workDetails.sel_WDActivityType,$activityType);
+	}
+	if ($requesteCity!="") {
+		_setValue($bo_pg_workDetails.txt_requestedCity,$requesteCity);
+	}
+	if ($billableQty!="") {
+		_setValue($bo_pg_workDetails.txt_billableQTY,$billableQty);
+	}
+	if ($dateRequired!="" && $dateRequired!=null) {
+		_setValue($sfm_pg_wo.txt_dateRequired,$dateRequired);
+	}	
+
+	if ($WDpartName!="" && $WDpartName!==null) {
+			_setValue($bo_pg_workDetails.txt_part,$WDpartName);
+			_click($bo_pg_workDetails.link_partSearchIcon);
+			_wait(10000);
+			_selectWindow("/Search/");
+			_click(_link($WDpartName));
+			_selectWindow();
+			_wait(5000,_isVisible($bo_pg_workDetails.txt_part));		
+	}
+	if ($IBSerialNo!="" && $IBSerialNo!==null) {
+		_setValue($bo_pg_workDetails.txt_IBSerialNumber,$IBSerialNo);
+		_click($bo_pg_workDetails.link_IBSearchIcon);
+		_wait(10000);
+		_selectWindow("/Search/");
+		_click(_link($IBSerialNo));
+		_selectWindow();
+		_wait(5000,_isVisible($bo_pg_workDetails.txt_part));		
+	}	
+	_setStrictVisibilityCheck(false);
+}
+
+function editWorkDetailLine($WorkDetail,$lineType,$activityType,$requesteCity,$billableQty,$dateRequired,$WDpartName,$AccountName,$IBSerialNo){
+	_setStrictVisibilityCheck(true);
+	_click($sfm_pg_sfmDesigner.link_related);
+	//_click(_link($WorkDetail));
+	_wait(10000,_isVisible(_link($WorkDetail)));
+	_click(_link("/Show/", _near(_link($WorkDetail))));
+	_wait(5000,_isVisible($sfm_pg_sfmDesigner.link_editWD));
+	_click($sfm_pg_sfmDesigner.link_editWD);
+	_wait(10000,_isVisible(_heading2("Edit Work Detail")));
+	//addWDfiledValues($lineType, $lineQTY,$WDcancelFD,$WDcloseFD,"");
+	addWDfiledValues($lineType, $activityType, $requesteCity, $billableQty, $dateRequired, $WDpartName, $AccountName, $IBSerialNo);
+	_click($sfm_pg_sfmDesigner.btn_saveWorkDetail);
+	_setStrictVisibilityCheck(false);
+}
+
+
+
+
+$rs_5451.end();

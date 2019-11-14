@@ -1,0 +1,7 @@
+var $bo_pg_stockTransfer = new function bo_pg_stockTransfer(){
+	this.txt_sourceLocation = _textbox("/\\*Source Location|^Source Location/");
+	this.txt_destinationLocation = _textbox("/\\*Destination Location|^Destination Location/");
+	this.btn_save = _submit(" Save ");
+	this.btn_new =  _button(" New ");
+	
+};

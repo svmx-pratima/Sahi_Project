@@ -1,0 +1,346 @@
+/**
+ * Functions for the Search Configurations
+ */
+var $bo_act_sfmsearch = new function bo_act_sfmsearch() {
+
+	
+this.createsfmsearch = function($searchId1, $searchTitle1,$objectName,$fieldName1,$value1,$operator, $testcase){
+	
+
+        $bo_act_navigation.navigateToSfmSearchInDesigner();
+		_click($swat_pg_sfmSearch.btn_new);
+		
+		//General Info		
+		_setValue($swat_pg_sfmSearch.txt_searchTitle,$searchTitle1);
+		_setValue($swat_pg_sfmSearch.txt_searchId,$searchId1);
+		
+		//Search Configuration
+		_click($swat_pg_sfmSearch.tab_searchConfiguration);
+		_click($swat_pg_sfmSearch.btn_sub_new);
+		
+		//Include one or more objects to be included in the scope of this search
+		_setSelected($swat_pg_sfmSearch.picklist_searchObject,$objectName);
+		
+		/* Using the expression builder below, define a filter criteria to 
+		   always apply on this object's records */
+		_setSelected($swat_pg_sfmSearch.picklist_fieldName,$fieldName1);
+		_setSelected($swat_pg_sfmSearch.picklist_operator,$operator);
+		_setValue($swat_pg_sfmSearch.txt_value,$value1);
+		
+		
+		if($testcase == "10126")
+			{
+		//Click on Save button
+		_click($swat_pg_sfmSearch.btn_save);
+		_click($swat_pg_sfmSearch.btn_quicksave);
+		
+			}
+		else 
+		{
+		//Click on save and close
+		_click($swat_pg_sfmSearch.btn_save);
+		_click($swat_pg_sfmSearch.btn_save_and_close);
+		}	
+		
+};
+
+this.sfmsearch_displayfields = function($searchTitle ,$sectiontitle, $object , $field1 , $field2)
+
+{
+	
+	
+	 $bo_act_navigation.navigateToSfmSearchInDesigner();
+	 _click(_checkbox(0,_near(_span($searchTitle))));
+	 _click($swat_pg_sfmSearch.btn_edit_values);
+
+	 _click($swat_pg_sfmSearch.tab_searchConfiguration);
+
+	 _click(_checkbox(0,_near($swat_pg_sfmSearch.btn_firstcheckbox)));
+	 _click($swat_pg_sfmSearch.btn_edit_sfm_config);
+	 _click($swat_pg_sfmSearch.btn_add2);
+	 _setSelected($swat_pg_sfmSearch.picklist_searchObject2, $object);
+	 _setSelected($swat_pg_sfmSearch.picklist_fieldName2, $field1);
+	 _click($swat_pg_sfmSearch.btn_add2);
+	 _setSelected($swat_pg_sfmSearch.picklist_searchObject3, $object);
+	 _setSelected($swat_pg_sfmSearch.picklist_fieldName3, $field2);
+	 _click($swat_pg_sfmSearch.btn_save);
+	 _click($swat_pg_sfmSearch.btn_save_and_close);	
+
+};
+
+
+this.sfmsearch_advancedexpression = function($searchId1, $searchTitle1,$objectName,$fieldName1,$value1,$operator, $fieldname2,$value2, $testcase){
+	
+
+    $bo_act_navigation.navigateToSfmSearchInDesigner();
+	_click($swat_pg_sfmSearch.btn_new);
+	
+	//General Info		
+	_setValue($swat_pg_sfmSearch.txt_searchTitle,$searchTitle1);
+	_setValue($swat_pg_sfmSearch.txt_searchId,$searchId1);
+	
+	//Search Configuration
+	_click($swat_pg_sfmSearch.tab_searchConfiguration);
+	_click($swat_pg_sfmSearch.btn_sub_new);
+	
+	//Include one or more objects to be included in the scope of this search
+	_setSelected($swat_pg_sfmSearch.picklist_searchObject,$objectName);
+	
+	/* Using the expression builder below, define a filter criteria to 
+	   always apply on this object's records */
+	_setSelected($swat_pg_sfmSearch.picklist_fieldName,$fieldName1);
+	_setSelected($swat_pg_sfmSearch.picklist_operator,$operator);
+	_setValue($swat_pg_sfmSearch.txt_value,$value1);
+	
+	_click($swat_pg_sfmSearch.btn_add);
+	_setSelected($swat_pg_sfmSearch.picklist_fieldName1,$fieldname2);
+	_setSelected($swat_pg_sfmSearch.picklist_operator1,$operator);
+	_setValue($swat_pg_sfmSearch.txt_value1,$value2);
+	
+	//Advanced Expression
+	_setValue($swat_pg_sfmSearch.txt_advanced_expression,"1 AND 2");
+	
+	if($testcase == "10126")
+		{
+	//Click on Save button
+	_click($swat_pg_sfmSearch.btn_save);
+	_click($swat_pg_sfmSearch.btn_quicksave);
+	
+		}
+
+	else 
+	{
+	//Click on save and close
+	_click($swat_pg_sfmSearch.btn_save);
+	_click($swat_pg_sfmSearch.btn_save_and_close);
+	}
+
+	
+};
+
+// Creating SFM Search for Multiple Objects in Scope of Search
+
+this.sfmsearch_multipleobjects = function($searchId1, $searchTitle1,$objectName1,$fieldName1,$value1,$operator, $fieldname2,$value2,$objectName2,$fieldName2 ,$value3 , $operator2)
+{
+	
+	 $bo_act_navigation.navigateToSfmSearchInDesigner();
+		_click($swat_pg_sfmSearch.btn_new);
+		
+		//General Info		
+		_setValue($swat_pg_sfmSearch.txt_searchTitle,$searchTitle1);
+		_setValue($swat_pg_sfmSearch.txt_searchId,$searchId1);
+		
+		//Search Configuration
+		_click($swat_pg_sfmSearch.tab_searchConfiguration);
+		_click($swat_pg_sfmSearch.btn_sub_new);
+		_wait(1000);
+		//Include one or more objects to be included in the scope of this search
+		_setSelected($swat_pg_sfmSearch.picklist_searchObject,$objectName1);
+		
+		/* Using the expression builder below, define a filter criteria to 
+		   always apply on this object's records */
+		_setSelected($swat_pg_sfmSearch.picklist_fieldName,$fieldName1);
+		_setSelected($swat_pg_sfmSearch.picklist_operator,$operator);
+		_setValue($swat_pg_sfmSearch.txt_value,$value1);
+		
+		_click($swat_pg_sfmSearch.btn_add);
+		_setSelected($swat_pg_sfmSearch.picklist_fieldName1,$fieldname2);
+		_setSelected($swat_pg_sfmSearch.picklist_operator1,$operator);
+		_setValue($swat_pg_sfmSearch.txt_value1,$value2);
+		
+		
+		//Advanced Expression
+		_setValue($swat_pg_sfmSearch.txt_advanced_expression,"1 OR 2");
+		_click($swat_pg_sfmSearch.btn_save);
+		
+		_click($swat_pg_sfmSearch.btn_sub_new);
+		// Adding another Object to the Search Scope
+		_setSelected($swat_pg_sfmSearch.picklist_secondobject,$objectName2);
+		
+		/* Using the expression builder below, define a filter criteria to 
+		   always apply on this object's records */
+		_setSelected($swat_pg_sfmSearch.picklist_fieldName,$fieldName2);
+		_setSelected($swat_pg_sfmSearch.picklist_operator,$operator2);
+		_setValue($swat_pg_sfmSearch.txt_value,$value3);
+
+		
+		//Click on save and close
+		_click($swat_pg_sfmSearch.btn_save);
+		_click($swat_pg_sfmSearch.btn_save_and_close);
+		
+
+};
+
+
+
+// Cloning an SFM Search and making changes to it - Both Standard and Custom
+
+this.clonesfmsearch = function($searchTitle,$searchTitle2, $searchId2,$objectName,$value, $sectiontitle, $isstandardtrue)
+{
+	
+	 
+	 // cloning a Standard SFM Search
+	 if($isstandardtrue == true && $sectiontitle == "Open Work Orders")
+	 {
+		 $bo_act_navigation.navigateToSfmSearchInDesigner();
+		 _click(_checkbox(0,_near(_span($searchTitle))));
+		 _click($swat_pg_sfmSearch.btn_clone_stdsearch);
+		 _setValue($swat_pg_sfmSearch.txt_searchTitle,$searchTitle2);
+		 _setValue($swat_pg_sfmSearch.txt_searchId,$searchId2);
+		 _click($swat_pg_sfmSearch.tab_searchConfiguration);
+		 _click(_checkbox(0,_near($swat_pg_sfmSearch.txt_object_standard2)));
+		 _click($swat_pg_sfmSearch.btn_edit_sfm_config);
+		 _setValue($swat_pg_sfmSearch.txt_value,$value);
+
+	 }
+
+	 // cloning a custom SFM Search
+	 if($isstandardtrue == false && $sectiontitle == "Work Orders")
+		 
+	{
+		 $bo_act_navigation.navigateToSfmSearchInDesigner();
+		 _click(_checkbox(0,_near(_span($searchTitle))));
+		 _click($swat_pg_sfmSearch.btn_clone_customsearch);
+		 _setValue($swat_pg_sfmSearch.txt_searchTitle,$searchTitle2);
+		 _setValue($swat_pg_sfmSearch.txt_searchId,$searchId2);
+		 _click($swat_pg_sfmSearch.tab_searchConfiguration);
+		 
+		 _click(_checkbox(0,_near($swat_pg_sfmSearch.txt_object_custom1)));
+		 _click($swat_pg_sfmSearch.btn_edit_sfm_config);
+		 _setValue($swat_pg_sfmSearch.txt_value1,$value);
+		 
+	}
+	 
+	 _click($swat_pg_sfmSearch.btn_save);
+	 _click($swat_pg_sfmSearch.btn_quicksave);	
+	 _click($swat_pg_sfmSearch.btn_save_and_close);
+		
+};
+
+
+this.clonesfmsearch_objectdisplay = function ($searchTitle,$searchTitle2, $searchId2,$objectName,$value, $sectiontitle, $isstandardtrue)
+
+{
+	 
+	 // cloning a Standard SFM Search
+	 if($isstandardtrue == true && $sectiontitle == "Open Work Orders")
+	 {
+		 $bo_act_navigation.navigateToSfmSearchInDesigner();
+		 _click(_checkbox(0,_near(_span($searchTitle))));
+		 _click($swat_pg_sfmSearch.btn_clone_stdsearch);
+		 _setValue($swat_pg_sfmSearch.txt_searchTitle,$searchTitle2);
+		 _setValue($swat_pg_sfmSearch.txt_searchId,$searchId2);
+		 _click($swat_pg_sfmSearch.tab_searchConfiguration);
+		 _click(_checkbox(0,_near($swat_pg_sfmSearch.txt_object_standard2)));
+		 _click($swat_pg_sfmSearch.btn_edit_sfm_config);
+		 _setValue($swat_pg_sfmSearch.txt_value,$value);
+		 _click($swat_pg_sfmSearch.btn_save);
+		 _wait(3000);
+		 _click($swat_pg_sfmSearch.btn_quicksave);
+		 _wait(3000);
+	 }
+	 _click($swat_pg_sfmSearch.btn_objectdisplaysequence);
+	_setSelected($swat_pg_sfmSearch.pop_up_value, "Open "+$objectName);    // Added By Bhupendra Singh
+	 _click($swat_pg_sfmSearch.btn_top_popup);
+	 _wait(6000);
+	 _click($swat_pg_sfmSearch.btn_popup_save);
+	 _wait(6000);
+	/* _click($swat_pg_sfmSearch.btn_save);
+	 _wait(3000);*/
+	 _click($swat_pg_sfmSearch.btn_quicksave);
+	 _wait(3000);
+	 _click($swat_pg_sfmSearch.btn_save_and_close);
+	 _wait(3000);
+};
+
+// Cloning an SFM search and making no changes to it - Both Standard and custom
+this.clonesfmsearch_nochanges = function($searchTitle,$searchTitle2, $searchId2,$isstandardtrue)
+
+{
+	 
+	 // cloning a Standard SFM Search
+	 if($isstandardtrue == true)
+	 {
+		 $bo_act_navigation.navigateToSfmSearchInDesigner();
+		 _click(_checkbox(0,_near(_span($searchTitle))));
+		 _click($swat_pg_sfmSearch.btn_clone_stdsearch);
+		 _setValue($swat_pg_sfmSearch.txt_searchTitle,$searchTitle2);
+		 _setValue($swat_pg_sfmSearch.txt_searchId,$searchId2);
+		
+
+	 }
+
+	 // cloning a custom SFM Search
+	 if($isstandardtrue == false)
+		 
+	{
+		 $bo_act_navigation.navigateToSfmSearchInDesigner();
+		 _click(_checkbox(0,_near(_span($searchTitle))));
+		 _click($swat_pg_sfmSearch.btn_clone_customsearch);
+		 _setValue($swat_pg_sfmSearch.txt_searchTitle,$searchTitle2);
+		 _setValue($swat_pg_sfmSearch.txt_searchId,$searchId2);
+	
+		 
+	}
+	 
+	 _click($swat_pg_sfmSearch.btn_quicksave);	
+	 _click($swat_pg_sfmSearch.btn_save_and_close);
+		
+
+
+
+};
+this.editsfmsearch = function($searchTitle ,$objectName,$value2, $sectiontitle)
+{
+	 $bo_act_navigation.navigateToSfmSearchInDesigner();
+	 _click(_checkbox(0,_near(_span($searchTitle))));
+	 _click($swat_pg_sfmSearch.btn_edit_values);
+
+	 _click($swat_pg_sfmSearch.tab_searchConfiguration);
+	 if(_getValue($swat_pg_sfmSearch.txt_object_standard1) == $sectiontitle)
+		 {
+	 _click(_checkbox(0,_near($swat_pg_sfmSearch.txt_object_standard1)));
+	 _click($swat_pg_sfmSearch.btn_edit_sfm_config);
+	
+		 }
+
+	 _setValue($swat_pg_sfmSearch.txt_value1,$value2);
+	 _click($swat_pg_sfmSearch.btn_save);
+	_click($swat_pg_sfmSearch.btn_quicksave);
+	_click($swat_pg_sfmSearch.btn_save_and_close);
+
+
+};
+
+//Adding this function for editing a search using _check instead of _click for Case object in Cln - Std Account Search for 9159 test case
+this.editCaseSearch = function($searchTitle ,$objectName,$value2)
+{
+	 $bo_act_navigation.navigateToSfmSearchInDesigner();
+	 _click(_checkbox(0,_near(_span($searchTitle))));
+	 _click($swat_pg_sfmSearch.btn_edit_values);
+	 _click($swat_pg_sfmSearch.tab_searchConfiguration);
+	 _click(_checkbox("/block1:j_id161:table1:1:ObjSel/"));
+	_click($swat_pg_sfmSearch.btn_edit_sfm_config);
+	_click($swat_pg_sfmSearch.btn_add4);
+	_setSelected($swat_pg_sfmSearch.picklist_searchObject7,$objectName);
+	_setSelected($swat_pg_sfmSearch.picklist_fieldName7,"Case Number");
+	_setSelected($swat_pg_sfmSearch.picklist_searchOrder,"Ascending");
+	_click($swat_pg_sfmSearch.btn_save);
+	_click($swat_pg_sfmSearch.btn_quicksave);
+	_click($swat_pg_sfmSearch.btn_save_and_close);
+
+};
+//View the SFM Search created
+this.viewCaseSearch = function($searchTitle ,$objectName,$value2)
+{
+	// $bo_act_navigation.navigateToSfmSearchInDesigner();
+	 _click(_checkbox(0,_near(_span($searchTitle))));
+	 _click($swat_pg_sfmSearch.btn_edit_values);
+	 _click($swat_pg_sfmSearch.tab_searchConfiguration);
+	 _click(_checkbox("/block1:j_id161:table1:1:ObjSel/"));
+	_click($swat_pg_sfmSearch.btn_edit_sfm_config);
+
+};
+
+
+};

@@ -1,0 +1,38 @@
+var $an_act_timesheetmanager = new function an_act_timesheetmanager (){
+	
+	
+	this.an_timesheetmanager_creation = function($TimeSheetName , $Description , $StartingOn , $EndingOn, $StartDate , $EndDate , $SuccessEmail) 
+	
+	{
+		
+		_click($an_pg_rv.link_home);
+		_click($an_pg_rv.link_servicemaxSetup);
+		_click($an_pg_techutilization.btn_service_organization);
+		_click($an_pg_techutilization.btn_timesheet);
+		_wait(_isVisible($an_pg_techutilization.btn_timesheet_add));
+		_click($an_pg_techutilization.btn_timesheet_add);
+		_click($an_pg_techutilization.btn_timesheet_active);
+		_setValue($an_pg_techutilization.txt_timesheet_name ,$TimeSheetName);
+		_setValue($an_pg_techutilization.txt_timesheet_description, $Description);
+		_click($an_pg_techutilization.list_timesheet_frequency);
+		_click($an_pg_techutilization.btn_weekly);
+		_click($an_pg_techutilization.list_week_on);
+		_click($an_pg_techutilization.btn_Monday);
+		_click($an_pg_techutilization.list_timesheet_time_at);
+		_click($an_pg_techutilization.btn_timesheet_time);
+		_click($an_pg_techutilization.list_timesheet_timezone);
+		_click($an_pg_techutilization.btn_timesheet_ist);
+		_setValue($an_pg_techutilization.btn_starting_on, $StartingOn);
+		_setValue($an_pg_techutilization.btn_ending_on, $EndingOn);
+		_setValue($an_pg_techutilization.btn_startdate_set, $StartDate);
+		_setValue($an_pg_techutilization.btn_enddate_set,$EndDate);
+		_setValue($an_pg_techutilization.btn_timesheet_emailOnsuccess,$SuccessEmail);
+		
+		
+		
+	};
+	
+	
+	
+	
+};

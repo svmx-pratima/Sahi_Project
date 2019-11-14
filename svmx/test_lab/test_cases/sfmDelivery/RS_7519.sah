@@ -1,0 +1,181 @@
+var $RS_7519=_testcase("$RS_7519","Verify the case where exit criteria of a section is met and the entry criteria is not met.");
+$RS_7519.start();
+
+		//pre_Req: Create Work orders
+		var $objName= $orgnamespace+"__Service_Order__c";
+		var $obJson = "{\""+$orgnamespace+"__Order_Status__c\":\"Open\",\""+$orgnamespace+"__NoOfTimesAssigned__c\":\"1\",\""+$orgnamespace+"__SM_Estimated_Duration__c\":\"1\",\""+$orgnamespace+"__Order_Type__c\":\"Field Service\"}";
+		var $columnName = "Name";
+		var $filter="id";
+		var $filterValue=$sfm_act_restApiMethods.postRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,$objName,$obJson,"POST");
+		var $WONumber =$sfm_act_restApiMethods.getRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,"GET", $objName, $columnName, $filter, $filterValue);
+		_log("WO number: "+$WONumber);
+
+		
+		//Login to app
+		$bo_act_login.login($g_url,$sfmdUsn,$sfmdPwd);
+//		$bo_act_configurationProfiles.editGlobalProfileForBooleanSettings("Common", "Global Settings", "GBL037", false);
+		
+		//Checklsit Process (SFM) creation
+		var $chkListsfmName=$bo_act_common.generateRandomName("RS7519_cklist_");
+		var $sfmType="to generate a Checklist/Survey type of Process";
+		var $object="Work Order";
+		$sfm_act_Transactions.sfmPropertiesPage($chkListsfmName, $chkListsfmName, $chkListsfmName, $sfmType, "", [], $object, []);
+			
+		//Section1: Section-1
+		//Rename: Default section to Section-1
+		var $sectionName="Checklist Section Title";
+		var $numSeaction1="Section-1";
+		var $description="' a`~!@#$% ^&&] ~!@#$%^&*()_+{}|:\"<>?,./;'[]\=-` специалист ©Š n: ñ *$+ = - ` ^#:) (€)(£)(¥) (#$^&*?, ±, 8, µ, a, ß, p, ~)[`-=[]\';,./~!@#$%^&*()_+{}|:\"<>?] ÂÃÄÀÁÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿ";
+		var $numSectionURL="http://google.com";
+		_click($sfm_pg_formDesigner.tab_formDesigner);
+		$sfm_act_formDesigner.editAndSaveSectionDetails($sectionName, $numSeaction1, $description, $numSectionURL);
+		
+		//Adding Attachment Questions
+		var $numQueNameList=new Array();
+		for (var $i = 0; $i < 2; $i++) {
+				var $queType="Number";
+				var $num_Que=$bo_act_common.generateRandomName("numb_");
+				var $queCommonDetails=[$queType,$num_Que,"","",true];
+				var $preFillFromWO=false;
+				var $defaultVal=10;
+				var $numberQueDetails=[$preFillFromWO,$defaultVal];
+				$sfm_act_formDesigner.createCheckListQuestion($numSeaction1, $queCommonDetails, $numberQueDetails);
+			$numQueNameList[$i]=$num_Que;
+		}
+	
+		//Section 2: Section-2 
+		//Rename: Default section to Section-2
+		$sfm_act_formDesigner.createNewSection();
+		var $numSeaction2="Section-2";
+		$sfm_act_formDesigner.editAndSaveSectionDetails($sectionName, $numSeaction2, $numSeaction2, $numSectionURL);
+		
+		//Create num question
+		var $queType="Number";
+		var $numb_Que1=$bo_act_common.generateRandomName("numb_");
+		var $queCommonDetails=[$queType,$numb_Que1,"","",true];
+		var $preFillFromWO=true;
+		var $defaultVal="Estimated Duration";
+		var $numberQueDetails=[$preFillFromWO,$defaultVal];
+		$sfm_act_formDesigner.createCheckListQuestion($numSeaction2, $queCommonDetails, $numberQueDetails);
+		
+		//Section 3: Section-3 
+		//Rename: Default section to Section-3
+		$sfm_act_formDesigner.createNewSection();
+		var $numSeaction3="Section-3";
+		$sfm_act_formDesigner.editAndSaveSectionDetails($sectionName, $numSeaction3, $numSeaction3, $numSectionURL);
+
+		//Create num question
+		var $queType="Number";
+		var $numb_Que2=$bo_act_common.generateRandomName("numb_");
+		var $queCommonDetails=[$queType,$numb_Que2,"","",true];
+		var $preFillFromWO=true;
+		var $defaultVal="No Of Times Assigned";
+		var $numberQueDetails=[$preFillFromWO,$defaultVal];
+		$sfm_act_formDesigner.createCheckListQuestion($numSeaction3, $queCommonDetails, $numberQueDetails);
+		
+		//adding Exist Criteria on section-1
+		$sfm_act_formDesigner.editSection($numSeaction1);
+		_click($sfm_pg_formDesigner.tab_exitCriteria);
+		var $comboField=["Equals"];
+		var $operandType=["Value"];
+		var $answer=["10"];
+		var $skipTo1=["2-"+$numSeaction2];
+		var $skipTo2=["3-"+$numSeaction3];
+		var $criteriaDetail1=[$comboField,$operandType,$answer,$skipTo1];
+		var $criteriaDetail2=[$comboField,$operandType,$answer,$skipTo2];
+		var $criteriaDetailList=[$criteriaDetail1,$criteriaDetail2];
+		$sfm_act_formDesigner.addQuesToExistCriteriaTab([$numQueNameList[0],$numQueNameList[1]],["Number","Number"],$criteriaDetailList);
+
+		//Entry criteria to Section 2
+		$sfm_act_formDesigner.editSection($numSeaction2);
+		var $comboField=["Estimated Duration"];
+		var $comboConditions=["Not Equal"]; 
+		var $toggleButton=[""];
+		var $comboInput=["1"];
+		var $advExpr="";
+		var $criteriaName=$numb_Que1;
+		var $criteriaDetails=[$comboField,$comboConditions,$toggleButton,$comboInput,$advExpr,$criteriaName];
+		$sfm_act_formDesigner.createEntryCriteria("", $criteriaDetails);
+		_click($bo_pg_sfmTransactionAndDesigner.btn_closeSectionEdit);
+		
+		//Entry criteria to Section 3
+		$sfm_act_formDesigner.editSection($numSeaction3);
+		var $comboField=["No Of Times Assigned"];
+		var $comboConditions=["Equals"]; 
+		var $toggleButton=[""];
+		var $comboInput=["1"];
+		var $advExpr="";
+		var $criteriaName=$numb_Que2;
+		var $criteriaDetails=[$comboField,$comboConditions,$toggleButton,$comboInput,$advExpr,$criteriaName];
+		$sfm_act_formDesigner.createEntryCriteria("", $criteriaDetails);
+		_click($bo_pg_sfmTransactionAndDesigner.btn_closeSectionEdit);
+
+		//SOU
+		$sfm_pg_sourceObjectUpdate.createSOU("Work Order", ["City"], ["Set"], ["Value"], ["Mysore"], "Checklist");
+
+		//map WO to Checklist
+		$sfm_act_Transactions.sfmQualifyingCriteriaieldMappings($object, [], [], "", "SVMXSTD: Map Work Order to Checklist");
+		
+		_setStrictVisibilityCheck(true);
+		_click($bo_pg_sfmTransactionAndDesigner.btn_quickSave1);
+		_wait(10000);
+		_click($bo_pg_sfmTransactionAndDesigner.btn_saveAndclose);
+		_setStrictVisibilityCheck(false);
+
+		//add sfm to wizard
+		var $wizardObject="Work Order";
+		var $sfmd_wizardName1 =$sfmd_wizardName[7];
+		var $sfmd_wizardType="Checklist";
+		var $profile="";
+		var $handOver=false;
+		$sfm_act_wizards.addToWizard($wizardObject, $sfmd_wizardName1, $sfmd_wizardType, "", $handOver, $profile,"",false);
+
+		$sfm_act_common.globalSearchOnce($WONumber);
+		_wait(10000);
+		_setStrictVisibilityCheck(true);
+		$sfm_act_createCustomWizard.clickWizardBtn("Default title for Checklist");
+		_wait(30000,_isVisible(_link("/Checklists/")));
+		
+		_click(_div("/"+$chkListsfmName+"/"));
+		_wait(10000,_isVisible(_link()));
+		
+		_assertEqual ($description,_getText(_textarea(0,_near(_label("/Section-1/")) )));
+		_assertExists(_span("/helpUrl/",_near(_div("/"+$numSeaction1+"/"))));
+		
+		_click($bo_pg_sfmTransactionAndDesigner.btn_next);
+		_wait(8000,_isVisible(_label("/"+$numSeaction3+"/")));
+		
+		_click($sfm_pg_wizardWindow.btn_cancel);
+		_wait(5000,_isVisible($bo_pg_sfmTransactionAndDesigner.btn_proceed));
+		
+		_click($bo_pg_sfmTransactionAndDesigner.btn_proceed);
+		_wait(30000,_isVisible(_link("/Checklists/")));
+		
+		_click($sfm_pg_wizardWindow.btn_cancel);
+		_wait(5000,_isVisible($bo_pg_workOrders.btn_editWorkOrder));
+		
+		_assertVisible(_row("/dataRow/",_in(_div("/ChecklistsChecklists Help Action/"))));
+
+		_setStrictVisibilityCheck(true);
+		$sfm_act_createCustomWizard.clickWizardBtn("Default title for Checklist");
+		_wait(30000,_isVisible(_link("/Checklists/")));
+		
+		_click(_div("/"+$chkListsfmName+"/"));
+		_wait(10000,_isVisible(_link()));
+			
+		
+		_click($bo_pg_sfmTransactionAndDesigner.btn_next);
+		_wait(8000,_isVisible(_label("/"+$numSeaction3+"/")));
+		_assertExists(_label(_label("/"+$numSeaction3+"/")));
+		
+		_click($bo_pg_sfmTransactionAndDesigner.btn_submitCheckList);
+		_wait(5000,_isVisible(_link("/Checklists/")));
+		
+		
+		$sfm_act_common.globalSearchOnce($WONumber);
+		_wait(10000);
+		
+		_assertContainsText("Mysore",_div(0,_near(_cell("/City/"))));
+		
+			
+$RS_7519.end();

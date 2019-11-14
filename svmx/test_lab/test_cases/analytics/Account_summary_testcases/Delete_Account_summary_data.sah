@@ -1,0 +1,21 @@
+var $un =$bac_un ;
+var $pwd =$bac_pwd;
+var $url = "https://test.salesforce.com";
+$bo_act_login.login($url, $un, $pwd);
+$delete1 = "delete [Select Id from SVMXC__Service_Order__c];";
+var $delete_data = $op_act_sForceApiCall.sForceQuery($un, $pwd, $delete1 , "create");
+
+$delete2 = "delete [Select Id from SVMXC__SPM_First_Time_Fix__c];";
+var $delete_data = $op_act_sForceApiCall.sForceQuery($un, $pwd, $delete2 , "create");
+
+$delete3 = "delete [Select Id from SVMXC__SPM_Account_Summary__c];";
+var $delete_data = $op_act_sForceApiCall.sForceQuery($un, $pwd, $delete3 , "create");
+
+$delete4 = "delete [Select Id from SVMXC__Service_Order_Line__c];";
+var $delete_data = $op_act_sForceApiCall.sForceQuery($un, $pwd, $delete4 , "create");
+
+$delete5 = "delete [Select Id from SVMXC__SPM_Mean_Time_To_Repair__c];";
+var $delete_data = $op_act_sForceApiCall.sForceQuery($un, $pwd, $delete5 , "create");
+
+$delete6 = "delete [Select Id from SVMXC__SPM_Repeat_Visit__c];";
+var $delete_data = $op_act_sForceApiCall.sForceQuery($un, $pwd, $delete6 , "create");

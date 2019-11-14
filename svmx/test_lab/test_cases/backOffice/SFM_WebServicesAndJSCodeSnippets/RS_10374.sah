@@ -1,0 +1,130 @@
+
+//Author - Noor Salma Sharieff
+
+var $RS_10374 = _testcase("Verify standard SFM Web Services.");
+$RS_10374.start();
+_setSpeed($g_stepSpeed);
+
+var $Workbenchurl = "https://workbench.developerforce.com/login.php";
+
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+
+var $startDate = $bo_act_common.currentDate("/");
+var $endDate = $bo_act_common.getfutureDate(2, "/");
+
+var $accName = $bo_act_accounts.createAccount();
+var $proName = $bo_act_products.createProduct("pro12", "--None--");
+var $slaterm = $bo_act_slaTerms.createSlaTerms("Default");
+var $sconName = $bo_act_serviceMaintenanceContracts.createServiceMaintenanceContract($accName, $slaterm,1,0);
+
+	//Verify Cancel Contract SFM
+	_selectDomain($g_domain);
+	_click($bo_pg_serviceMaintenanceContracts.btn_cancelContractSFM);
+	_selectDomain();
+	_wait(1500,_isVisible($bo_pg_serviceMaintenanceContracts.btn_cancelContract));
+	_click($bo_pg_serviceMaintenanceContracts.btn_cancelContract);
+	_wait(15000, _isVisible($bo_pg_serviceMaintenanceContracts.head_serviceContract));
+	_assertExists(_image("Not Checked"),_rightOf(_cell("Active")));
+
+	
+	//Verify Activate Contract
+	_selectDomain($g_domain);
+	_click($bo_pg_serviceMaintenanceContracts.btn_activateContractSFM);
+	_selectDomain();
+	_wait(1500,_isVisible($bo_pg_serviceMaintenanceContracts.btn_activateContract));
+	_click($bo_pg_serviceMaintenanceContracts.btn_activateContract);
+	_wait(15000, _isVisible($bo_pg_serviceMaintenanceContracts.head_serviceContract));
+	_assertExists(_image("Checked"),_rightOf(_cell("Active")));
+	//var $PMPlan = $bo_act_PMPlan.createATimeBasedPMPlanFromScon($sconName, " ","Account (Visit Only)",1);
+
+
+	//Renew Service Contract
+	_selectDomain($g_domain);
+	_click($bo_pg_serviceMaintenanceContracts.btn_renewContractSFM);
+	_selectDomain();
+	_wait(15000,_isVisible($bo_pg_serviceMaintenanceContracts.btn_renewContract));
+	_setValue(_textbox(0,_rightOf(_label("Start Date:"))),$startDate);
+	_setValue(_textbox(0,_rightOf(_label("End Date:"))),$endDate);
+	_click($bo_pg_serviceMaintenanceContracts.btn_renewContract);
+	_wait(15000, _isVisible($bo_pg_serviceMaintenanceContracts.head_serviceContract));
+	$bo_act_serviceMaintenanceContracts.editServiceContract();
+	_assertNotNull(_getText(_textbox(0,_rightOf(_label("/Start Date/")))));
+	_assertNotNull(_getText(_textbox(0,_rightOf(_label("/End Date/")))));
+	_click(_submit("Cancel"));
+	_wait(15000, _isVisible($bo_pg_serviceMaintenanceContracts.head_serviceContract));
+
+
+//	PM Plan SFM Verification
+	var $PMPTempName = $bo_act_PMPlanTemplate.createTimeBasedPMPlanTemplate($proName, "Account (Visit Only)","","Months");
+	var $PMPlan = $bo_act_PMPlan.createATimeBasedPMPlanFromScon($sconName, $PMPTempName,"Account (Visit Only)",1);
+
+	var $accName = $bo_act_accounts.createAccount();
+	var $slaterm = $bo_act_slaTerms.createSlaTerms("Default");
+	var $sconName = $bo_act_serviceMaintenanceContracts.createServiceMaintenanceContract($accName, $slaterm,1,0);
+	$bo_act_serviceMaintenanceContracts.editServiceContract();
+	$bo_act_serviceMaintenanceContracts.updateCheckbox($bo_pg_serviceMaintenanceContracts.chkActiveEdit, false);
+	$bo_act_serviceMaintenanceContracts.saveServiceContract();
+	_selectDomain($g_domain);
+	_click($bo_pg_serviceMaintenanceContracts.btn_activateContractSFM);
+	_selectDomain();
+	_wait(1500,_isVisible($bo_pg_serviceMaintenanceContracts.btn_activateContract));
+	_click($bo_pg_serviceMaintenanceContracts.btn_activateContract);
+
+	//Verify Cancel PM Plan
+	$bo_act_navigation.navigateToPreventiveMaintenancePlans();
+	_click(_link($PMPlan));
+	_call(top.location.reload());
+	_selectDomain($g_domain);
+	_click($bo_pg_PMPlan.btn_cancelPMPlanSFM);
+	_selectDomain();
+	_wait(15000,_isVisible($bo_pg_PMPlan.btn_cancelPMPlan));
+	_click($bo_pg_PMPlan.btn_cancelPMPlan);
+	_wait(15000, _isVisible($bo_pg_PMPlan.head_PMPlan));
+	_assertExists(_div("Canceled"),_rightOf(_cell("Status")));
+
+//Verify Activate PM Plan
+	_selectDomain($g_domain);
+	_click($bo_pg_PMPlan.btn_activatePMPlanSFM);
+	_selectDomain();
+	_wait(15000,_isVisible($bo_pg_PMPlan.btn_activatePMPlan));
+	_click($bo_pg_PMPlan.btn_activatePMPlan);
+	_wait(15000, _isVisible($bo_pg_PMPlan.head_PMPlan));
+	_assertExists(_div("Active"),_rightOf(_cell("Status")));
+	
+//Clean up function
+	
+$bo_act_navigation.navigateToSetUpAndSearch("Installed Packages");
+_wait(60000,_isVisible(_heading1("Installed Packages")));
+_click(_link("/ServiceMax/"));
+_wait(10000,_isVisible(_cell("Namespace Prefix")));
+if(_getText(_cell(0,_rightOf(_cell("Namespace Prefix"))))!="SVMXDEV")
+var $nameSpace = "SVMXC";
+	else
+$nameSpace = "SVMXDEV";
+
+var $delscript =
+	"DELETE[SELECT id FROM Account WHERE Name = '"+$accName+"'];\n"+
+	"DELETE[SELECT id FROM Product2 WHERE Name = '"+$proName+"'];\n"+
+	"DELETE[SELECT id FROM "+$nameSpace+"__Service_Level__c WHERE Name = '"+$slaterm+"'];\n"+
+	"DELETE[SELECT id FROM "+$nameSpace+"__Service_Contract__c WHERE Name = '"+$sconName+"'];\n"+
+	"DELETE[SELECT id FROM "+$nameSpace+"__PM_Plan_Template__c WHERE Name = '"+$PMPTempName+"'];\n"+
+	"DELETE[SELECT id FROM "+$nameSpace+"__PM_Plan__c WHERE Name = '"+$PMPlan+"'];\n";
+
+$bo_act_login.loginToWorkBench($Workbenchurl,"Sandbox", $bac_un, $bac_pwd);
+$bo_act_login.runApexScriptinWB($delscript);
+
+
+//_click(_button("Delete"));
+//	$bo_act_accounts.deleteAccount($accName);
+//	$bo_act_slaTerms.deleteSLATerm($slaterm);
+
+
+//Clean up function
+	
+
+$RS_10374.end();
+
+
+
+
+

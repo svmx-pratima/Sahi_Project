@@ -1,0 +1,153 @@
+var $rs_10314 = _testcase("RS_10314","Verify Lookup auto resolve with override context in Child line");
+$rs_10314.start();
+
+		//Pre_Requesite
+		$objName= "Product2";
+		$productName=$bo_act_common.generateRandomName("Pro_10314_");
+		$obJson = "{\"Name\":\""+$productName+"\"}";
+		$filterValue=$sfm_act_restApiMethods.postRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,$objName,$obJson,"POST");
+
+		var $Account=$bo_act_common.generateRandomName("AccountRS_10314_");
+		$objName= "Account";
+		$obJson = "{\"Name\":\""+$Account+"\"}";
+		$filterValue=$sfm_act_restApiMethods.postRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,$objName,$obJson,"POST");
+		_log("Account: "+$Account);
+
+		//create Work orders
+		$objName= ""+$orgnamespace+"__Service_Order__c";
+		$obJson = "{\""+$orgnamespace+"__Order_Status__c\":\"Open\",\""+$orgnamespace+"__Is_Entitlement_Performed__c\":\"true\",\""+$orgnamespace+"__Order_Type__c\":\"Field Service\"}";
+		$columnName = "Name";
+		$filter="id";
+		$filterValue=$sfm_act_restApiMethods.postRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,$objName,$obJson,"POST");
+		$WONumber =$sfm_act_restApiMethods.getRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,"GET", $objName, $columnName, $filter, $filterValue);
+		_log("WO number: "+$WONumber);
+
+		// Login to App
+		$bo_act_login.login($g_url,$sfmdUsn, $sfmdPwd);
+		$bo_act_configurationProfiles.editGlobalProfileForBooleanSettings("SFM Transaction Manager", "SFM Transaction Delivery Engine", "SET001", false);
+		
+		//clone standard SFM
+		var $sfmNameToBeCloned="Manage Work Order Lines - Usage";
+		var $sfmName=$bo_act_common.generateRandomName("rs_10314_");
+		var $sfmTemplateSaveAsName=$bo_act_common.generateRandomName("SFM_Page_");
+		var $sfmTemplate="SVMXSTD: Manage WO Usage Lines";
+		var $fieldName=["Account","Account"];
+		var $containerName=["Order Status","Parts"];
+		$sfm_act_SFM.cloneTDM016($sfmNameToBeCloned, $sfmName, false, $sfmTemplateSaveAsName, $sfmTemplate, $fieldName, $containerName);
+		
+		//Remove multi-add for part childline
+		$sfm_act_SFM.partsMultiAdd("--None--");
+		
+		//Context lookup setting up on Work Order Header object
+		_click(_f("main").s_textinput("/.*/").near(_f("main").uiftetextfield("Account")));
+		
+		//Context lookup setting up on Parts childline
+		_click(_f("main").s_richtext($fieldName[1]).near(_f("main").s_richtext("Parts")));
+		
+		
+		//create lookup for account object in header
+		$object="Account";
+		var $lookupTempName="SVMXSTD: Account Lookup";
+		var $lookUpName=$bo_act_common.generateRandomName("rs_10314_lookup_");
+		$sfm_act_Transactions.createLookUp($object, $lookupTempName, "", "", $lookUpName,"Order Status","");
+		
+		//create lookup for account object in child
+		$object="Account";
+		var $lookupTempName="SVMXSTD: Account Lookup";
+		var $lookUpName=$bo_act_common.generateRandomName("rs_10314_lookup_");
+		$sfm_act_Transactions.createLookUp($object, $lookupTempName, "", "", $lookUpName,"Parts","");
+
+		//Save SFM after adding context lookup
+		_setStrictVisibilityCheck(true);
+		_click($bo_pg_sfmTransactionAndDesigner.btn_pageLayoutSave);
+		_wait(5000,_isVisible($bo_pg_sfmTransactionAndDesigner.btn_sfmpageSaveConfirmMsg));
+		_click($bo_pg_sfmTransactionAndDesigner.btn_saveAndclose);
+		_setStrictVisibilityCheck(false);
+		
+		//add sfm to wizard
+		var $wizardObject="Work Order";
+		var $sfmd_wizardName1 =$sfmd_wizardName[3];
+		var $sfmd_wizardType="SFM";
+		var $profile="";
+		var $handOver=false;
+		_log("Wizard Name: "+$sfmd_wizardName1);
+		$sfm_act_wizards.addToWizard($wizardObject, $sfmd_wizardName1, $sfmd_wizardType, $sfmName, $handOver, $profile); 
+
+		$sfm_act_common.globalSearchOnce($WONumber);
+		_wait(10000);
+		_setStrictVisibilityCheck(true);
+		$sfm_act_createCustomWizard.clickWizardBtn($sfmName);
+		_wait(5000,_isVisible(_div("/"+$sfmName+"/")));
+		
+		_wait(10000,_isVisible($sfm_pg_sfmDesigner.txt_headerAccount));
+		_setValue($sfm_pg_sfmDesigner.txt_headerAccount,"xyzqw2we3w");
+		_click($sfm_pg_sfmDesigner.link_quickSave);
+		
+		_wait(5000,_isVisible(_div("Account: No matching record(s) found for this keyword: xyzqw2we3w")));
+		_assertExists(_div("/xyzqw2we3w/"));
+		_click($sfm_pg_sfmDesigner.btn_hideMsg);
+		
+		_wait(3000,_isVisible($sfm_pg_sfmDesigner.txt_headerAccount));
+		_setValue($sfm_pg_sfmDesigner.txt_headerAccount,$Account);
+		_keyPress($sfm_pg_sfmDesigner.txt_headerAccount, 13);
+		_wait(5000,_isVisible($sfm_pg_sfmDesigner.btn_searchTextBox));
+		_assertContainsText($Account,$sfm_pg_sfmDesigner.btn_searchTextBox);
+		_assertExists(_div($Account));
+		_click($sfm_pg_search.btn_cancel);
+		
+		$sfm_act_sfmDesigner.addChildLine("Parts");
+		_wait(10000,_isVisible($sfm_pg_sfmDesigner.txt_accountTextbox));
+		
+
+		_click($sfm_pg_sfmDesigner.searchPartIcon);
+		_wait(5000,_isVisible($sfm_pg_sfmDesigner.lbl_recentItemProducts));
+		_setValue($sfm_pg_sfmDesigner.btn_searchTextBox,$productName);
+		_click($sfm_pg_sfmDesigner.link_searchLink);
+		_click(_div($productName));
+		_click($sfm_pg_sfmDesigner.btn_select);
+		_setValue($sfm_pg_sfmDesigner.txt_accountTextbox,"xyzqw2we3w");
+		_click($sfm_pg_sfmDesigner.button_updatePartsSearch);
+		_wait(5000);
+		_click($sfm_pg_sfmDesigner.link_quickSave);
+		_wait(5000,_isVisible(_div("/No matching record/")));
+		_assertExists(_div("/xyzqw2we3w/"));
+		_click($sfm_pg_sfmDesigner.btn_hideMsg);
+		
+		_setStrictVisibilityCheck(true);
+		_click($sfm_pg_sfmDesigner.btn_deliveryExtendedEdit);
+		_setStrictVisibilityCheck(false);
+		_setValue($sfm_pg_sfmDesigner.txt_accountTextbox,$Account);
+		_keyPress($sfm_pg_sfmDesigner.txt_headerAccount, 13);
+		_assertContainsText($Account,$sfm_pg_wizards.txt_searchObj);
+		_assertExists(_div($Account));
+		_click(_div($Account));
+		_click($sfm_pg_sfmDesigner.btn_select);
+		_click($sfm_pg_sfmDesigner.button_updatePartsSearch);
+		_wait(5000);
+		_click($sfm_pg_sfmDesigner.link_quickSave);
+		
+		
+		
+		$bo_act_configurationProfiles.editGlobalProfileForBooleanSettings("SFM Transaction Manager", "SFM Transaction Delivery Engine", "SET001", true);
+		
+		$sfm_act_common.globalSearchOnce($WONumber);
+		_wait(10000);
+		_setStrictVisibilityCheck(true);
+		$sfm_act_createCustomWizard.clickWizardBtn($sfmName);
+		_wait(5000,_isVisible(_div("/"+$sfmName+"/")));
+		
+		_wait(3000,_isVisible($sfm_pg_sfmDesigner.txt_headerAccount));
+		_setValue($sfm_pg_sfmDesigner.txt_headerAccount,$Account);
+		_keyPress($sfm_pg_sfmDesigner.txt_headerAccount, 13);
+		_wait(5000,_isVisible($sfm_pg_sfmDesigner.btn_searchTextBox));
+		_assertNotExists($sfm_pg_sfmDesigner.btn_searchTextBox);
+		
+		_click($sfm_pg_sfmDesigner.btn_deliveryExtendedEdit);
+		_wait(10000,_isVisible($sfm_pg_sfmDesigner.txt_accountTextbox));
+		_setValue($sfm_pg_sfmDesigner.txt_accountTextbox,$Account);
+		_keyPress($sfm_pg_sfmDesigner.txt_headerAccount, 13);
+		_assertNotExists($sfm_pg_wizards.txt_searchObj);
+
+		$bo_act_configurationProfiles.editGlobalProfileForBooleanSettings("SFM Transaction Manager", "SFM Transaction Delivery Engine", "SET001", false);
+
+$rs_10314.end();

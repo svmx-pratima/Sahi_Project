@@ -1,0 +1,34 @@
+var $sfm_act_sfmDesigner = new function sfm_act_sfmDesigner() {
+	
+	this.navToExtendedEdit = function(){
+		_wait(5000);
+		_setStrictVisibilityCheck(true);
+		_click($sfm_pg_sfmDesigner.btn_deliveryExtendedEdit);
+		_setStrictVisibilityCheck(false);
+	};
+	
+	this.addChildLine = function($childName){
+		if($childName == 'Parts'){
+			_click($sfm_pg_sfmDesigner.btn_deliveryPartsTab);
+			_wait(5000,_isVisible($sfm_pg_sfmDesigner.btn_deliveryAddRowParts));
+			_click($sfm_pg_sfmDesigner.btn_deliveryAddRowParts);
+		}else if($childName == 'Labor'){
+			_click($sfm_pg_sfmDesigner.btn_deliveryLaborTab);
+			_wait(3000,_isVisible($sfm_pg_sfmDesigner.btn_deliveryAddRowLabor));
+			_click($sfm_pg_sfmDesigner.btn_deliveryAddRowLabor);			
+		}else if($childName == 'Expenses'){
+			_click($sfm_pg_sfmDesigner.btn_deliveryExpenseTab);
+			_wait(3000,_isVisible($sfm_pg_sfmDesigner.btn_deliveryAddRowExpenses));
+			_click($sfm_pg_sfmDesigner.btn_deliveryAddRowExpenses);			
+		}else{
+			_click($sfm_pg_sfmDesigner.btn_deliveryTravelTab);
+			_wait(3000,_isVisible($sfm_pg_sfmDesigner.btn_deliveryAddRowTravel));
+			_click($sfm_pg_sfmDesigner.btn_deliveryAddRowTravel);
+		}
+		_wait(10000);
+		_setStrictVisibilityCheck(true);
+		_click($sfm_pg_sfmDesigner.btn_deliveryExtendedEdit);
+		_setStrictVisibilityCheck(false);	
+	};
+	
+};

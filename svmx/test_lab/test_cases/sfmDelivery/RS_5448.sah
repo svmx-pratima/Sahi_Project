@@ -1,0 +1,62 @@
+var $rs_5448 = _testcase("RS_5448","Verify the functionality of Standalone Expressions.");
+$rs_5448.start();
+
+
+		//Login to App
+		$bo_act_login.login($g_url,$sfmdUsn,$sfmdPwd);
+		$sfm_act_expressions.navigateToExpression();
+		
+		//Create Custom expression
+		var $object="Work Order";
+		var $comboField=["Account","Actual Initial Response","Order Status","Order Type"];
+		var $comboConditions=["Contains","Equals","Not Equal","Equals"];
+		var $comboInput=["Online","Today","Canceled","Field Service"];
+		var $toggleButton=["","Yes","",""];
+		var $advExpr="";
+		var $errMsg="";
+		var $exprsnName = $bo_act_common.generateRandomName("RS_5448_expr_");
+		$sfm_act_expressions.createCustomExpression($object, $comboField, $comboConditions, $toggleButton, $comboInput, $advExpr, $errMsg, $exprsnName);
+		
+		//Clone TDM016
+		var $sfmNameToBeCloned="Manage Work Order Lines - Usage";
+		var $sfmName = $bo_act_common.generateRandomName("RS_5448_");
+		var $isCustom=false;
+		var $sfmTemplateSaveAsName=$bo_act_common.generateRandomName("SFM_Page_");
+		var $sfmTemplate="SVMXSTD: Manage WO Usage Lines";
+		var $fieldName="";
+		var $containerName="";
+		$sfm_act_SFM.cloneTDM016($sfmNameToBeCloned, $sfmName, $isCustom, $sfmTemplateSaveAsName, $sfmTemplate, $fieldName, $containerName);
+		
+		//Add expression created to SFM
+		$sfm_act_Transactions.sfmQualifyingCriteriaieldMappings($object, "", "", $exprsnName,"");
+		
+		//Update expression with more fields
+		var $addcomboField=["Driving Time (in Minutes)","Country"];
+		var $addcomboConditions=["Greater Than","Is Null"];
+		var $addcomboInput=["60",""];
+		var $addtoggleButton=["",""];
+		$sfm_act_Transactions.sfmUpdateExpression($addcomboField, $addcomboConditions, $addtoggleButton, $addcomboInput, "", "");
+		$sfm_act_Transactions.sfmSvaeExpression($exprsnName, $exprsnName, "Save");
+		_click($bo_pg_sfmTransactionAndDesigner.btn_saveAndclose);
+		
+		//concat two inputs
+		var $finalcomboField=$comboField.concat($addcomboField);
+		var $finalcomboConditions=$comboConditions.concat($addcomboConditions);
+		var $finalcomboInput=$comboInput.concat($addcomboInput);
+		
+		
+		$sfm_act_expressions.navigateToExpression();
+		var $getExprDetails=$sfm_act_Transactions.getExpressionValues($object, $exprsnName);
+		var $retcomboField=$getExprDetails[0];
+		var $retcomboConditions=$getExprDetails[1];
+		var $retcomboInput=$getExprDetails[2];
+		
+		for (var $i = 0; $i < $retcomboField.length; $i++) {
+			_assertEqual($retcomboField[$i],$finalcomboField[$i]);
+			_assertEqual($retcomboConditions[$i],$finalcomboConditions[$i]);
+			_assertEqual($retcomboInput[$i],$finalcomboInput[$i]);
+		}
+		
+
+
+$rs_5448.end();

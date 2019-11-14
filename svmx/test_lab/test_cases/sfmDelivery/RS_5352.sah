@@ -1,0 +1,55 @@
+var $rs_5352 = _testcase("RS_5352","Verify Data Validation Error type on Header when simple expressions is configured - Source to Target");
+$rs_5352.start();
+$sfmName = $bo_act_common.generateRandomName("RS_5352_");
+var $sfmNameToBeCloned = "Create Usage Lines from Estimates";
+var $isCustom = false;
+var $sfmTemplate = "SVMXSTD: Manage WO Usage Lines";
+var $containerName = ["Order Status"];
+var $fieldName = ["Problem Description"];
+
+var $targetObject="Work Order";
+var $rulename =$sfmName;
+var $ruleDescription ="Billing Type should not be Empowerment";
+var $fieldArray = ["Billing Type"];
+var $conditionArray = ["Equals"];
+var $operandArray =["Value"];
+var $valueArray =["Empowerment"];
+var $advExpr= "";
+var $messageType = "Error";
+var $wizardObject ="Work Order";
+
+//Create WO through REST API
+var $woNumber = $sfm_act_createCustomWizard.createBlankWoFromRest($sfmdUsn, $sfmdPwd, $sfmClientId, $sfmConsumerSecret, $sfmOrgInstance);
+
+//login
+$bo_act_login.login($g_url,$sfmdUsn, $sfmdPwd);
+
+//clone the process
+$sfm_act_SFM.cloneTDM016($sfmNameToBeCloned,$sfmName,$isCustom, $sfmName,$sfmTemplate, $fieldName, $containerName);
+
+//add dvr to the process
+$sfm_pg_dvr.newRule($targetObject, $rulename, $ruleDescription, $fieldArray, $conditionArray, $operandArray, $valueArray, $advExpr, $messageType);
+_click($sfm_pg_sfmDesigner.btn_saveSFM); 
+
+$sfm_act_wizards.addToWizard($wizardObject, $sfmd_wizardName[0], $sfmd_wizardType[1], $sfmName);  
+
+//Navigate to the WO for validation
+$bo_act_navigation.navigateToCreatedRecordUsingGlobalSearch($woNumber);
+
+$sfm_act_createCustomWizard.clickWizardBtn($sfmName);
+
+_selectDomain();
+//Validate DVR when condition is met
+_setValue($sfm_pg_sfmDesigner.txt_billingType, "Empowerment");  
+_click($sfm_pg_sfmDesigner.btn_deliverySave);
+_assertExists(_div($ruleDescription),"DVR on header is not working");
+
+//Validate DVR when condition is not met
+_setValue($sfm_pg_sfmDesigner.txt_billingType, "Contract");  
+_click($sfm_pg_sfmDesigner.btn_deliverySave);
+_assertNotExists(_div($ruleDescription),"DVR is thrown when not supposed to be");
+if(_exists($sfm_pg_sfmDesigner.txt_priceAlert)){
+	_click($sfm_pg_sfmDesigner.btn_priceAlertOk);
+}
+
+$rs_5352.end();

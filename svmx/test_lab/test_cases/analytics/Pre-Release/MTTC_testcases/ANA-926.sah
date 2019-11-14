@@ -1,0 +1,79 @@
+var $an_mttc_926 = _testcase("ANA-926","To verify the Custom Expressions at WO level - Work Order and ANA-919");
+$an_mttc_926.start();
+var $cred = _readExcelFile("../../analytics/an_excleData/credentials.xlsx","Sheet1",true);
+var $un = $cred[2]["UserName"];
+var $pwd =$cred[2]["Password"];
+var $url =$cred[2]["url"];
+var $user =$cred[2]["User"];
+var $data = _readExcelFile("../../analytics/an_excleData/MTTC_data.xlsx","Sheet1",true);
+var $Account = $data[4]["Account"];
+var $Technician = $data[4]["Technician"];
+var $Product = $data[4]["Product"];
+var $OrderStatus = $data[4]["OrderStatus"];
+var $Closedon = $data[4]["ClosedOn"];
+$bo_act_login.login($url, $un, $pwd);
+
+var $WO;
+var $created_by;
+var $closed_on;
+var $Customer_Down;
+var $insert_wo_first = "SVMXC__Service_Order__c  WO = new SVMXC__Service_Order__c (SVMXC__Company__c ='"+ $Account +"', SVMXC__Product__c = '"+$Product+"', SVMXC__Group_Member__c = '"+$Technician+"', SVMXC__Closed_On__c = DateTime.valueOf ("+$Closedon+"), SVMXC__Priority__c = 'High',SVMXC__Customer_Down__c=True);insert WO;";
+var $query_wo_first = "Select Name , Id  , SVMXC__Closed_On__c ,CreatedDate,SVMXC__Customer_Down__c   from SVMXC__Service_Order__c where Createdby.Id = '"+$user+"'  Order by CreatedDate DESC Limit 1";
+var $fetchwoquery = $op_act_sForceApiCall.sForceQuery($un, $pwd, $insert_wo_first ,"create");
+
+var $store_first_wo = $op_act_sForceApiCall.sForceQuery($un, $pwd, $query_wo_first,"query");
+
+
+$store_first_wo.forEach(function($ana_var) {
+	$WO = $ana_var.Id;
+	 $created_by=$ana_var.CreatedDate;
+	 $closed_on=$ana_var.SVMXC__Closed_On__c;
+	 $Customer_Down=$ana_var.SVMXC__Customer_Down__c;
+});
+_log($WO);
+
+var $stdate = new Date($created_by);
+var $edate = new Date($closed_on);
+_log($stdate);
+_log($edate);
+var $datevalue = Math.round((($stdate.getTime() - $edate.getTime()) / 1000) / (-60)); 
+_log($datevalue);
+
+$an_act_MTTC.MTTC_custom_Expression("MTTC_custom_Expression");
+$an_act_MTTC.MTTC_runEngine("vinaya.v@servicemax.com");
+
+var $i;
+var $ana_WO =null;
+var $ana_WO_Account;
+var $ana_Completion_Time;
+var $Service_Delivered_on;
+var $ana_configuration_Name;
+var $ana_product;
+var $custum_checkbox;
+var $ana_technician;
+
+	
+var $ana_query_mttc = "Select SVMXC__Work_Order__c , SVMXC__Account__c, SVMXC__Configuration_Name__c ,SVMXC__Product__c,SVMXC__Technician__c,SVMXC__Service_Delivered_On__c,SVMXC__Completion_Time__c,Custom_checkbox__c from SVMXC__SPM_Mean_Time_To_Complete__c where SVMXC__Work_Order__c ='"+ $WO +"'";
+var $ana_result_mttc = $op_act_sForceApiCall.sForceQuery($un, $pwd, $ana_query_mttc,"query");
+_wait(2000);
+$ana_result_mttc.forEach(function($varmttc) {
+	$ana_WO=$varmttc.SVMXC__Work_Order__c;
+	$ana_WO_Account = $varmttc.SVMXC__Account__c;
+	$custum_checkbox=$varmttc.Custom_checkbox__c;
+	$ana_Completion_Time = $varmttc.SVMXC__Completion_Time__c;
+	$Service_Delivered_on = $varmttc.SVMXC__Service_Delivered_On__c;
+	$ana_product=$varmttc.SVMXC__Product__c;
+	$ana_technician=$varmttc.SVMXC__Technician__c;
+	});
+
+
+_assertEqual($ana_WO, $WO);
+_assertEqual($Account , $ana_WO_Account);
+_assertEqual($custum_checkbox, $Customer_Down);
+_assertEqual( $Technician, $ana_technician);
+_assertEqual($Product , $ana_product);
+_assertEqual($datevalue,1440);
+
+
+$an_mttc_926.end();
+

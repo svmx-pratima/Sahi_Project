@@ -1,0 +1,54 @@
+	var $RS_4997 = _testcase("RS_4997", "Verify Web Service call After Save/Insert.");
+	$RS_4997.start();
+	var $sfmNameToBeCloned = "Manage Work Order Lines - Usage";
+	var $sfmName=$bo_act_common.generateRandomName("RS_4997_");
+	var $isCustom = false;
+	var $sfmTemplate = "SVMXSTD: Manage WO Usage Lines";
+	var $sfmTemplateSaveAsName = $sfmName;
+	var $containerName = ["Order Status","Order Status","Order Status","Order Status"];
+	var $fieldName=["Order Type","Zip","Is Entitlement Performed","Driving Time (in Minutes)"];
+	var $webServiceObject = "Work Order";
+	var $event = "After Save/Update";
+	var $eventType = "Webservice";
+	var $methodName = "objWebService.afterSaveOrUpdate";
+	var $wizardObject ="Work Order";
+
+	//Create WO through REST API
+	var $woNumber = $sfm_act_createCustomWizard.createBlankWoFromRest($sfmdUsn, $sfmdPwd, $sfmClientId, $sfmConsumerSecret, $sfmOrgInstance);
+
+	//login
+	_setSpeed($g_stepSpeed);
+	$bo_act_login.login($g_url, $sfmdUsn, $sfmdPwd); 
+
+	//clone Source to Target Child Process
+	$sfm_act_SFM.cloneTDM016($sfmNameToBeCloned,$sfmName,$isCustom, $sfmTemplateSaveAsName,$sfmTemplate,$fieldName, $containerName);
+	$sfm_act_SFM.setWebservice($webServiceObject, $event, $eventType, $methodName);
+	_click($sfm_pg_sfmDesigner.btn_saveSFM); 
+
+	//add the process to wizard
+	$sfm_act_wizards.addToWizard($wizardObject, $sfmd_wizardName[1], $sfmd_wizardType[1], $sfmName);  
+
+	//Navigate to the WO for validation
+	$bo_act_navigation.navigateToCreatedRecordUsingGlobalSearch($woNumber);
+
+	$sfm_act_createCustomWizard.clickWizardBtn($sfmName);
+
+	// Validate in delivery after clicking quick save
+	_setValue($sfm_pg_sfmDesigner.txt_orderType,"Depot Repair");
+	_click($sfm_pg_sfmDesigner.chk_deliveryIsEntitlePerformed);
+	_click($sfm_pg_sfmDesigner.btn_deliveryQuickSave);
+	_wait(5000);
+	if(_isVisible($sfm_pg_sfmDesigner.txt_priceAlert)){
+		_click($sfm_pg_sfmDesigner.btn_priceAlertOk);
+	}
+	_wait(15000);
+	_assertEqual("Field Service", _getText($sfm_pg_sfmDesigner.txt_orderType), "Order type is not updated");
+	_assertEqual("560061",_getText($sfm_pg_sfmDesigner.txt_zip),"Zip is not updated");
+	_assertEqual("40",_getText($sfm_pg_sfmDesigner.txt_drivingTime),"Driving time is not updated");
+	//_assertEqual(false,$sfm_act_common. verifyCheckBoxValues(["Is Entitlement Performed:"],[false]),"Is Entitlement Performed is checked");
+	if($sfm_act_common. verifyCheckBoxValues(["Is Entitlement Performed:"],[false])){
+		_log("Pass ::: Is Entitlement Performed is not checked");
+	}else{
+		_log("Is Entitlement Performed is checked","FAILURE");
+	}
+	$RS_4997.end();

@@ -1,0 +1,34 @@
+// Author Meghana Rao P
+/*
+ * This test case verifies the quick save of SFM search and checking the SFM Search Delivery
+ */
+var $RS_10133 = _testcase("RS_10133", "quick save and checking the delivery");
+$RS_10133.start();
+
+// To generate Random names for SearchTitle and Search ID
+var $searchTitle = $bo_act_common.generateRandomName("Search");
+var $searchId = $bo_act_common.generateRandomName("SearchId");
+
+var $data = _readExcelFile("../../backOffice/bo_excleData/BORegressionDatasheet.xlsx",$orgtype,true);
+var $createwoquery = $data[1]["CreateWorkOrderOpen"];
+var $fetchwo = $data[1]["fetchwo"];
+
+// create a Work Order
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+
+var $rs_10133_result = $op_act_sForceApiCall.sForceQuery($bac_un, $bac_pwd, $createwoquery ,"create");
+var $rs_10133_query_wo = $fetchwo;
+var $rs_10133_fetch = $op_act_sForceApiCall.sForceQuery($bac_un, $bac_pwd, $rs_10133_query_wo ,"query");
+
+var $rs_10133_WO1 = $rs_10133_fetch[0].Name;
+var $rs_10133_actual_initial = $rs_10133_fetch[0].SVMXC__Actual_Initial_Response__c;
+var $rs_10133_actual_onsite = $rs_10133_fetch[0].SVMXC__Actual_Onsite_Response__c;
+
+
+// To create a Custom SFM Search value
+// createsfmsearch = For Single Expression
+$bo_act_sfmsearch.sfmsearch_advancedexpression($searchId, $searchTitle, "Work Order", "Actual Initial Response", "TODAY", "Equals", "Actual Onsite Response", "YESTERDAY", "10133");
+
+$bo_act_sfmsearch.sfmsearch_displayfields($searchTitle, "Work Orders", "Work Order", "Actual Initial Response", "Actual Onsite Response");
+$bo_act_sfmsearchdelivery.verifyfieldspresent_withrecord($searchTitle,$rs_10133_WO1, "Actual Initial Response", $rs_10133_actual_initial, "/");
+$RS_10133.end();

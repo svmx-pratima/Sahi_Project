@@ -1,0 +1,2 @@
+_click(_link("Site"));
+_click(_link("100"));

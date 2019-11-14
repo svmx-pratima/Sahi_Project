@@ -1,0 +1,66 @@
+var $user_credentials = $excel.readFromCustomExcel("../op_excleData/automation.xlsx", "User_Details","","");
+
+//var $nArr;
+//Calling the sforce API
+for(var $i=0;$i<$user_credentials.length;$i++)
+{
+var $g_un = $user_credentials[$i][0];
+var $g_pwd = $user_credentials[$i][1];
+var $g_url = $user_credentials[$i][2];
+}
+
+var $RS_6324 = _testcase("RS_6324", "Validate error message is being displayed when we no work order attribute is mapped");
+
+$RS_6324.start();
+
+/*var $g_url = "https://test.salesforce.com/";
+var $g_un = "govendhan@svmx-cct5.org.cct5part1";
+var $g_pwd = "maxpl0re2";*/
+
+$bo_act_login.login($g_url, $g_un, $g_pwd);
+		
+
+var $date = "" + new Date();
+var $TerrName = "TerritoryRule_" + $date;
+var $rowCount = 0;
+
+_click(_link("ServiceMax Setup"));
+_wait(20000,_isVisible(_div("Dispatch Management")));
+_click(_div("Dispatch Management"));
+_wait(20000,_isVisible(_div("Territory Match Rules")));
+_click(_div("Territory Match Rules"));
+_set($rowCount, _table("TRTRYRule:RuleForm:RuleBlock:TrtryRuleList").rows.length);
+$rowCount=$rowCount-1;
+_click(_button("New Rule"));
+_setValue(_textbox("TRTRYRule:RuleForm:RuleBlock:TrtryRuleList:"+$rowCount+":j_id91"), $TerrName);
+_setValue(_textarea("TRTRYRule:RuleForm:RuleBlock:TrtryRuleList:"+$rowCount+":j_id95"), "Territory Match Rule Automation");
+_setSelected(_select("TRTRYRule:RuleForm:RuleBlock:j_id99:j_id100:table1:0:j_id105"), "Order Status");
+_setSelected(_select("TRTRYRule:RuleForm:RuleBlock:j_id99:j_id100:table1:0:j_id110"), "Equals");
+_setValue(_textbox("TRTRYRule:RuleForm:RuleBlock:j_id99:j_id100:table1:0:j_id114"), "Open");
+_setSelected(_select("TRTRYRule:RuleForm:RuleBlock:j_id99:j_id100:table1:1:j_id105"), "Order Status");
+_setSelected(_select("TRTRYRule:RuleForm:RuleBlock:j_id99:j_id100:table1:1:j_id105"), "Order Type");
+_setSelected(_select("TRTRYRule:RuleForm:RuleBlock:j_id99:j_id100:table1:1:j_id110"), "Equals");
+_setValue(_textbox("TRTRYRule:RuleForm:RuleBlock:j_id99:j_id100:table1:1:j_id114"), "Cleaning");
+_click(_imageSubmitButton("Add"));
+_setSelected(_select("TRTRYRule:RuleForm:RuleBlock:j_id99:j_id100:table1:2:j_id105"), "Order Type");
+_setSelected(_select("TRTRYRule:RuleForm:RuleBlock:j_id99:j_id100:table1:2:j_id110"), "Equals");
+_setValue(_textbox("TRTRYRule:RuleForm:RuleBlock:j_id99:j_id100:table1:2:j_id114"), "Repair");
+_setValue(_textbox("TRTRYRule:RuleForm:RuleBlock:j_id120:HdrAdvOption"), "1 AND (2 OR 3)");
+_click(_button("Save"));
+
+var $exists = _exists("Error:Please map at least one attribute to a Work Order field");
+
+
+
+if($exists)
+	{
+	_log("Error Message is being displayed");
+	}
+else
+	{
+	_fail("Error message is not being displayed");
+	}
+
+$bo_act_login.logOut();
+
+$RS_6324.end();

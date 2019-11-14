@@ -1,0 +1,105 @@
+
+
+/**
+ * Home page object repository
+ */
+
+var $swat_pg_sfmSearch = new function swat_pg_sfmSearch(){
+	//this.btn_new = _button(" New ");
+	//this.txt_accountName = _textbox("acc2");
+	//this.btn_save = _submit(" Save ");
+	//this.btn_delete = _button("Delete");
+	
+	// Buttons to Clone a SFM Search with Object Work Order : owner : Meghana Rao
+	this.btn_clone_stdsearch = _submit("Clone");
+	this.btn_clone_customsearch = _submit("Clone[1]");
+	this.btn_edit_values = _submit("Edit");
+	this.txt_object_custom1 = _textbox(1);
+	this.txt_object_standard1 = _textbox(3);
+	this.txt_object_standard2 =  _textbox(5);
+	this.txt_object_standard3 =  _textbox(7);
+	this.btn_firstcheckbox = _checkbox("1");
+	this.btn_objectdisplaysequence = _button("Object Display Sequence");
+	this.btn_top_popup = _imageSubmitButton("Top");
+	this.btn_popup_save = _button("Save");
+	this.link_span1 = _span("svmx-tab-inner");
+	this.link_span2 = _span("svmx-tab-inner[1]");
+	this.link_span3 = _span("svmx-tab-inner[2]");
+	this.link_span4 = _span("svmx-tab-inner[3]");
+	this.pop_up_value = _select("/Sequenceblock/");
+	this.newtab = "/MaxConsole/";
+	this.savebutton = _span("/svmx-sfmd-save-icon/");
+	this.checklist_closebutton = _span("/sfm-button-/");
+	
+	
+	
+	
+	this.btn_edit_sfm_config = _button("Edit");
+	
+	this.btn_new = _submit("New");
+	this.txt_searchTitle = _textbox(0,_rightOf(_cell("Search Title")));		//_span is changed to _cell
+	this.txt_searchId = _textbox(0,_rightOf(_cell("Search ID")));			//_span is changed to _cell
+	this.tab_searchConfiguration = _cell("Search Configuration");
+	this.btn_sub_new = _button("New");
+	
+	this.picklist_searchObject = _select(0,_near(_div("Search Object")));
+	this.picklist_secondobject = _select(1);
+	this.picklist_fieldName = _select(0,_near(_div("Field Name")));
+	this.picklist_operator = _select(1,_near(_div("Operator")));
+	this.txt_value = _textbox(0,_near(_div("Value")));
+	this.btn_add = _imageSubmitButton("table2AddRow");
+	this.picklist_fieldName1 = _select(2,_near(_div("Field Name")));
+	this.picklist_operator1 = _select(3,_near(_div("Operator")));
+	this.txt_value1 = _textbox(1,_near(_div("Value")));
+	this.txt_advanced_expression = _textbox(0,_near(_span("Advanced Expression")));
+	
+	this.btn_add2 = _imageSubmitButton("table3AddRow");
+	this.picklist_searchObject2 = _select(2,_near(_div("Search Object[1]")));
+	this.picklist_fieldName2 = _select(3,_near(_div("Field Name[1]")));
+	this.picklist_searchObject3 = _select(4,_near(_div("Search Object[1]")));
+	this.picklist_fieldName3 = _select(5,_near(_div("Field Name[1]")));
+	this.picklist_searchObject4 = _select(6,_near(_div("Search Object[1]")));
+	this.picklist_fieldName4 = _select(7,_near(_div("Field Name[1]")));
+	
+	
+	this.btn_add3 = _imageSubmitButton("table4AddRow");
+	this.picklist_searchObject5  = _select(2,_near(_div("Search Object[2]")));
+	this.picklist_fieldName5 = _select(3,_near(_div("Field Name[2]")));
+	this.picklist_searchObject6  = _select(4,_near(_div("Search Object[2]")));
+	this.picklist_fieldName6 = _select(5,_near(_div("Field Name[2]")));
+	
+	
+	this.btn_add4 = _imageSubmitButton("table5AddRow");
+	this.picklist_searchObject7  = _select(0,_near(_div("Search Object[3]")));
+	this.picklist_fieldName7 = _select(1,_near(_div("Field Name[3]")));
+	this.btn_delete4 = _imageSubmitButton("table5DeleteRow")
+	this.picklist_searchOrder = _select(2,_near( _div("Search Order")));
+	
+	this.btn_quicksave = _button("Quick Save"); // Owner Meghana Rao
+	this.btn_save =  _button("Save");
+	this.btn_save_and_close = _button("Save & Close");
+	
+	//_heading2("ServiceMax SFM Search")
+	//Choose Search
+	this.sfmPickListHome = _select("SearchId:SFMSearchFrm1:j_id2");
+	this.picklist_searchItem = _select("selectBox");
+	
+	// Click on Go button
+		this.link_go =  _link("Go");
+		this.txt_search = _textbox(1); // Owner Meghana Rao
+		this.workorder_search = _span("/Open Work Orders/"); // Owner Meghana Rao
+		
+	// Once the SFM Search is launched, click on "Go" button
+	   this.btn_go = _span("Go");
+	   
+	 // Search for a WO by typing its number and then click on Go. Select the radio button prefixed to it.
+	   
+	   this.txt_SearchArea = _textbox(1,_near(_span("Go")));
+	  this.radio_button = _div("svmx-grid-radioheader svmx-grid-radioheader-unselected svmx-grid-radiocolumn-contentalign-undefined");
+	  
+	  
+	 
+};
+
+
+

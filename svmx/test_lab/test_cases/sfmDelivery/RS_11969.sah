@@ -1,0 +1,111 @@
+//Author:Rubi Agrawal
+var $RS_11969 = _testcase("$RS_11969","Verify SFM with get price where get price fields are NOT in page layout but present in fieldset");
+$RS_11969.start();
+_setSpeed($g_stepSpeed);
+
+//Create WO
+var $objName= $orgnamespace+"__Service_Order__c";
+var $obJson = "{\""+$orgnamespace+"__Order_Status__c\":\"Open\",\""+$orgnamespace+"__Is_Entitlement_Performed__c\":\"true\",\""+$orgnamespace+"__Order_Type__c\":\"Field Service\"}";
+var $columnName = "Name";
+var $filter="id";
+var $filterValue=$sfm_act_restApiMethods.postRestApi($sfmdUsn, $sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,$objName,$obJson,"POST");
+var $woNumber =$sfm_act_restApiMethods.getRestApi($sfmdUsn, $sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,"GET", $objName, $columnName, $filter, $filterValue);
+_log("WO number: "+$woNumber);
+var $recordToBeSearch=$woNumber;
+
+//Create Product
+var $objName= "Product2";
+var $WDpartName=new Array;
+var $ProductID=new Array;
+for (var $i = 0; $i < 1; $i++) {
+	$WDpartName[$i]=$bo_act_common.generateRandomName("Prod_11968");
+	var $obJson = "{\"Name\":\""+$WDpartName[$i]+"\",\"ProductCode\":\""+$WDpartName[$i]+"\",\""+$orgnamespace+"__Product_Line__c\":\"Storage\",\""+$orgnamespace+"__Product_Type__c\":\"Consumable\"}";
+	$ProductID[$i]=$sfm_act_restApiMethods.postRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,$objName,$obJson,"POST");
+	_log("Product Name: "+$WDpartName[$i]);	
+}
+//Login and switch to classic
+$bo_act_login.login($g_url,$sfmdUsn,$sfmdPwd);
+_wait(15000);
+
+//Create field set
+var $object_name="Work Order";
+var $fieldsInFieldset=["Proforma Invoice Amount"];
+var $fieldsetName=$bo_act_common.generateRandomName("Fieldset_");
+$sfm_act_sfSetup.addfieldsetToWoClassic($object_name,$fieldsetName,$fieldsInFieldset);
+
+//Set GBL036=True
+var $Module="Common";
+var $SubModule="Global Settings";
+var $Setting="GBL036";
+var $value="True";
+$bo_act_configurationProfiles.editGlobalProfileForBooleanSettings($Module, $SubModule, $Setting, $value);
+
+
+//Search for product created and add standard price
+var $productToBeSearch=$WDpartName[0];
+var $productPrice='900';
+$bo_act_products.addStandardPriceForProduct($productToBeSearch, $productPrice);
+_click(_button(" Edit "));
+_check(_checkbox("IsActive"));
+_click(_submit(" Save "));
+
+//Clone SFM Process
+var $process_to_clone="Manage Work Order Lines - Usage";
+var $processName=$bo_act_common.generateRandomName("RS_11969_");
+var $isCustom=false;
+var $pageLayoutName=$bo_act_common.generateRandomName("RS_11969");
+var $sfmTemplate="SVMXSTD: Manage WO Usage Lines";
+var $fieldName=[];
+var $containerName=[];
+$sfm_act_SFM.cloneTDM016($process_to_clone,$processName,$isCustom,$pageLayoutName, $sfmTemplate, $fieldName, $containerName);
+
+//Add Field sets to SFM process
+_click($bo_pg_sfmTransactionAndDesigner.tab_advancedOptions);
+_click(_f("main").tab("Field Sets"));
+_click(_f("main").s_label("Work Order[3]"));
+_click(_f("main").s_label($fieldsetName));
+_click(_f("main").s_button(">"));
+_click($sfm_pg_sfmDesigner.btn_saveSFM); 
+
+//add the process to wizard
+$sfm_act_wizards.addToWizard($object_name, $sfmd_wizardName[5], $sfmd_wizardType[1], $processName); 
+
+//Launch SFM process
+$bo_act_navigation.navigateToWorkOrdersTab();
+_click(_link($woNumber));
+_selectDomain($g_domain);
+//$sfm_act_common.globalSearchOnce($woNumber);
+$sfm_act_createCustomWizard.clickWizardBtn($processName);
+
+//Add child line 
+var $productName = $WDpartName[0];
+var $lineQty="3";
+//$sfm_act_createCustomWizard.addParts($productName);
+$bo_act_getPrice.addPartsLineToSFMDelivery($productName,$lineQty);
+
+
+//Click Get price
+$bo_act_getPrice.calculateGetPrice();
+//_click($sfm_pg_sfmDesigner.btn_deliveryGetPrice);
+_wait(3000);
+
+//Save the SFM process
+_click($sfm_pg_sfmDesigner.btn_deliverySave);
+_wait(10000,_isVisible(_heading2($woNumber)));
+if(_exists($sfm_pg_sfmDesigner.txt_priceAlert)){
+	_click($sfm_pg_sfmDesigner.btn_priceAlertOk);
+	_wait(10000,_isVisible(_heading2($WONumber)));
+}
+
+//Validate Proforma Invoice Amount has been updated or not
+var $BillableLinePriceExpected = $lineQty*$productPrice;
+_click($sfm_pg_commonSfdc.btn_editWo);
+if(_assertEqual($BillableLinePriceExpected,_getText(_textbox(0,_rightOf(_span("/Proforma Invoice Amount/"))))))
+	{_log("PASS:When field is not present in page layout after getprice value is getting populated in Proforma Invoice Amount")
+	}
+else
+	{
+	_log("FAIL:Test Case failed");
+	}
+
+$RS_11969.end();

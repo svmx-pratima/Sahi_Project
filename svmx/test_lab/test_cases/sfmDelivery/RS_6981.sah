@@ -1,0 +1,151 @@
+var $rs_6981 = _testcase("RS_6981","Verify formula on different data types");
+$rs_6981.start();
+var $sfmNameToBeCloned = "Manage Work Order Lines - Usage";
+var $sfmName = $bo_act_common.generateRandomName("RS_6981_");
+var $isCustom = false;
+var $sfmTemplate = "SVMXSTD: Manage WO Usage Lines";
+var $sfmTemplateSaveAsName = $sfmName;
+var $containerNameArray = ["Order Status","Order Status","Order Status","Order Status","Order Status"];
+var $fieldNameArray = ["Customer Down","Problem Description","Is Entitlement Performed","Actual Onsite Response","Scheduled Date"];
+var $wizardObject ="Work Order";
+
+var $formulaTargetObjectArray = ["Work Order","Work Order","Work Order","Work Order","Labor","Labor"];
+var $formulaTargetFieldArray = ["Billing Type","Is Entitlement Performed","Actual Onsite Response","Scheduled Date", "Billable Qty", "Billable Line Price"];
+var $formulaNameArray = [$sfmName+"BillingType",$sfmName+"IsEntlPerf",$sfmName+"ActualOnsiteRespEqNow",$sfmName+"ScheduledDateUpdate", $sfmName+"MonthFormula", $sfmName+"YearFormula"];
+var $formulaDescriptionArray = ["If customerDown is true then Billing type=Paid else as is",
+                                "If Billing type is Courtesy then check Is Entitlement performed else as is",
+                                "Actual Onsite Response Equals Now",
+                                "Scheduled Date should be set to 1st day of the created month in next year",
+                                "Month of StartDate and Time",
+                                "Year of StartDate and Time"
+                                ];
+
+if($orgtype=="Base"){
+	var $formulaArray =["$F.IF($F.EQUAL($D.Work_Order.SVMXC__Customer_Down__c,'true'),'Paid',$D.Work_Order.SVMXC__Billing_Type__c)",
+	                    "$F.IF($F.EQUAL($D.Work_Order.SVMXC__Billing_Type__c,'Courtesy'),'true',$D.Work_Order.SVMXC__Is_Entitlement_Performed__c)",
+	                    "$F.NOW()",
+	                    "$F.DATE($F.YEAR($D.Work_Order.CreatedDate)+1, $F.MONTH($D.Work_Order.CreatedDate), 1)",
+	                    "$F.MONTH($D.Labor.SVMXC__Start_Date_and_Time__c)",
+	                    "$F.YEAR($D.Labor.SVMXC__Start_Date_and_Time__c)"
+	                    ];
+}
+
+else{
+	var $formulaArray =["$F.IF($F.EQUAL($D.Work_Order.SVMXDEV__Customer_Down__c,'true'),'Paid',$D.Work_Order.SVMXDEV__Billing_Type__c)",
+	                    "$F.IF($F.EQUAL($D.Work_Order.SVMXDEV__Billing_Type__c,'Courtesy'),'true',$D.Work_Order.SVMXDEV__Is_Entitlement_Performed__c)",
+	                    "$F.NOW()",
+	                    "$F.DATE($F.YEAR($D.Work_Order.CreatedDate)+1, $F.MONTH($D.Work_Order.CreatedDate), 1)",
+	                    "$F.MONTH($D.Labor.SVMXDEV__Start_Date_and_Time__c)",
+	                    "$F.YEAR($D.Labor.SVMXDEV__Start_Date_and_Time__c)"
+	                    ];
+}
+
+//Create WO through REST API
+var $woNumber = $sfm_act_createCustomWizard.createBlankWoFromRest($sfmdUsn, $sfmdPwd, $sfmClientId, $sfmConsumerSecret, $sfmOrgInstance);
+
+_setSpeed($g_stepSpeed);
+$bo_act_login.login($g_url, $sfmdUsn, $sfmdPwd); 
+
+$sfm_act_SFM.cloneTDM016($sfmNameToBeCloned,$sfmName,$isCustom, $sfmTemplateSaveAsName,$sfmTemplate, $fieldNameArray, $containerNameArray);
+$sfm_pg_formula.createFormula($formulaTargetObjectArray, $formulaTargetFieldArray, $formulaNameArray, $formulaDescriptionArray, $formulaArray);
+_click($sfm_pg_sfmDesigner.btn_quickSaveSFM);
+_wait(2000);
+_click($sfm_pg_sfmDesigner.btn_saveSFM); 
+_wait(3000,_isVisible($sfm_pg_sfmDesigner.lnk_home)); 
+
+//add the process to wizard
+$sfm_act_wizards.addToWizard($wizardObject,$sfmd_wizardName[5], $sfmd_wizardType[1], $sfmName);
+_wait(3000,_isVisible($sfm_pg_sfmDesigner.lnk_home));    
+
+//Navigate to the WO for validation
+$bo_act_navigation.navigateToCreatedRecordUsingGlobalSearch($woNumber);
+$sfm_act_createCustomWizard.clickWizardBtn($sfmName);
+
+//Validate If customerDown is true then Billing type=Paid else as is
+
+if(_style(_button("Customer Down:"),"background-position")=="0% 0%"){
+	_click(_button("Customer Down:",_rightOf(_label("Customer Down:"))));	
+}
+_click($sfm_pg_sfmDesigner.btn_deliveryQuickSave);
+if(_exists($sfm_pg_sfmDesigner.txt_priceAlert)){
+	_click($sfm_pg_sfmDesigner.btn_priceAlertOk);
+	_wait(8000);
+}
+if(_getText(_textbox("Billing Type:",_rightOf(_label("Billing Type:"))))=="Paid"){
+	_log("Pass :::CustomerDown is true and so Billing type=Paid ");
+}else{
+	_log("Fail ::: When CustomerDown is true, Billing type != Paid","FAILURE");
+}
+
+//Validate If Billing type is Courtesy then check Is Entitlement performed else as is
+_wait(3000);
+if(_style(_button("Customer Down:"),"background-position")!="0% 0%"){
+	_click(_button("Customer Down:",_rightOf(_label("Customer Down:"))));	
+}
+_setValue(_textbox("Billing Type:",_rightOf(_label("Billing Type:"))),"Courtesy");
+_click($sfm_pg_sfmDesigner.btn_deliveryQuickSave);
+if(_exists($sfm_pg_sfmDesigner.txt_priceAlert)){
+	_click($sfm_pg_sfmDesigner.btn_priceAlertOk);
+	_wait(8000);
+}
+if(_style(_button("Is Entitlement Performed:"),"background-position")=="0% 0%"){
+	_log("Fail ::: When BillingType= Courtesy, Is Entitlement Performed is not checked","FAILURE");
+}
+else{
+	_log("Pass ::: When BillingType= Courtesy, Is Entitlement Performed is checked");
+}
+
+//Validate Scheduled Date should be set to 1st day of the created month in next year
+_wait(3000);
+var $curDate= new Date();
+var $curYear = $curDate.getFullYear()+1;
+var $curMonth=$curDate.getMonth()+1;
+var $curDay= $curDate.getDay();
+var $schDate=$curMonth+"/01/"+$curYear;
+if($schDate.length==9){
+	$schDate="0"+$schDate;
+}
+/*var $val =0;
+_set($val,_getText($sfm_pg_sfmDesigner.txt_scheduledDate));
+//_log($val);
+//_log($schDate.indexOf($val));
+*/if($schDate==(_getText($sfm_pg_sfmDesigner.txt_scheduledDate))){
+	_log("Pass ::: Scheduled Date is set to 1st day of the created month in next year");
+}
+else{
+	_log("Fail ::: Scheduled Date is not set to 1st day of the created month in next year","FAILURE");
+}
+
+//Validate Actual onsite response= Today
+
+if(_getText(_textbox("/svmx-date-/",_rightOf(_label("Actual Onsite Response:"))))==$bo_act_common.currentDate("/")){
+	_log("Pass :::  Actual onsite response= Today ");
+	}
+else{
+	_log("Fail :::  Actual onsite response != Today","FAILURE");
+}
+
+//Validate Billable Qty = Month of StartDate and Time and Billable Line price = Year of StartDate and Time
+_wait(3000);
+_click($sfm_pg_sfmDesigner.btn_deliveryLaborTab);
+_click($sfm_pg_sfmDesigner.btn_deliveryAddRowLabor);
+_click($sfm_pg_sfmDesigner.btn_deliveryExtendedEdit);
+_setValue($sfm_pg_sfmDesigner.txt_eeStartDateTime,$bo_act_common.currentDate("/"));
+_click($sfm_pg_sfmDesigner.btn_eeUpdate);
+_wait(3000);
+_click($sfm_pg_sfmDesigner.btn_deliveryQuickSave);
+if(_exists($sfm_pg_sfmDesigner.txt_priceAlert)){
+	_click($sfm_pg_sfmDesigner.btn_priceAlertOk);
+	_wait(10000);
+}
+
+_wait(5000);
+_click($sfm_pg_sfmDesigner.btn_deliveryLaborTab);
+_click($sfm_pg_sfmDesigner.btn_deliveryExtendedEdit);
+
+if((_getText($sfm_pg_sfmDesigner.txt_billingQty)==$curMonth) && 
+		(_getText($sfm_pg_sfmDesigner.txt_billingLinePrice)==$curDate.getFullYear())	){
+	_log("Pass ::: Billable Qty = Month of StartDate and Time and Billable Line price = Year of StartDate and Time");
+}
+_click($sfm_pg_sfmDesigner.btn_eeCancel);
+$rs_6981.end();

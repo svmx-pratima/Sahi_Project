@@ -1,0 +1,24 @@
+//_includeOnce("../../../references/references.js");
+
+//author - Mamata Rout
+
+
+var $RS_5431 = _testcase("RS_5431", "Verify SFM App Permission page when an object doesn't have any Wizards/SFMs/CA.");
+$RS_5431.start();
+_setSpeed($g_stepSpeed);
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+
+//***********Create Custom Object which does not have any Wizard,SFM or CA*********
+ $bo_act_createCustomObject.createNewcustomObj();
+_log("Custom Ovject creation is successfull");
+//**************Navigate to SFM Permission, Verify Search for the custom action created********
+$bo_act_navigation.navigateToSfmAppPermission();
+$bo_act_SFMAppPermission.srchCutomObject();
+
+//**********Delete Custom Object***********
+ $bo_act_createCustomObject.deleteCustomObj();
+_setSpeed($g_stepSpeed);
+
+$RS_5431.end();
+
+

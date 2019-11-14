@@ -1,0 +1,51 @@
+
+var $an_pg_mttr = new function an_pg_mttr() {
+
+	this.btn_meantime_to_repair = _span("Mean Time To Repair");
+	this.btn_addmttr = _span("Add[1]");
+	this.btn_activecheckbox = _button("svmx-form-field svmx-form-checkbox");
+	this.txt_mttr_description = _textarea("appliesTo");
+	this.list_deadtime_select = _label("Select the source for Dead Time field:");
+	this.list_deadtime = _listItem("Dead Time (In Minutes)");
+	this.list_mttr_technician = _textbox("Select the source for Technician field");
+	this.list_mttr_product = _textbox("Select the source for Product field");
+	this.btn_technician = _listItem("Technician");
+	this.btn_product = _listItem("Product");
+	this.list_scheduled_date = _textbox("Select the source for Schedule Date field");
+	this.btn_scheduled_date = _listItem("Scheduled Date");
+	this.list_account_selection = _textbox("Select the source for Account field");
+	this.btn_account = _listItem("Account");
+	this.btn_settings = _span("Settings");
+	this.btn_criteria = _span("Criteria");
+	this.list_choose_qualification_wo = _textbox("tabPanel_1_editprocesspanel_expression_WorkOrderCriteriafieldset_id-inputEl");
+	this.btn_usa_closed_wo = _listItem("Closed United States WO") ;
+	this.btn_uk_closed_wo = _listItem("Closed UK WO");
+	this.list_workdetail_qualification = _textbox("tabPanel_1_editprocesspanel_expression_QualificationCriteriafieldset_id-inputEl");
+	this.btn_labor_line_only = _listItem("SVMXSTD: Labor Lines Only");
+	this.btn_parts_line_only = _listItem("SVMXSTD: Parts Lines Only");
+	this.btn_save = _span("Save");
+	this.btn_ok = _div("OK");
+	
+	
+	// For Schedule and Notifications
+	this.btn_schedule_notification = _span("Schedule & Notifications[1]");
+	this.list_timezone = _textbox("timezone");
+	this.btn_ist_timezone = _listItem("(GMT+05:30) India Standard Time (Asia/Kolkata)");
+	this.btn_period = _textbox("period");
+	this.btn_daily = _listItem("Daily");
+	this.list_time = _textbox("timeAt");
+	this.btn_time = _listItem("9:00 AM");
+	this.txt_emailonsuccess = _textbox("emailOnSuccess");
+	this.btn_save_sn = _span("Save");
+	this.btn_click_run = _link("Run Now");
+	this.btn_ok_sn = _div("OK");	
+	
+	// For custom expression
+	
+	this.btn_custom_wo_expr = _listItem("Custom WO Expr");
+	this.btn_custom_wd_expr = _listItem("Custom WD Expression");
+	this.btn_custom_deadtime =  _listItem("custom dead time");
+	this.list_custom_maps = _label("Select an object mapping to store additional data for this metric:");
+	this.btn_map_choose = _listItem("custom MTTR Maps");
+};
+

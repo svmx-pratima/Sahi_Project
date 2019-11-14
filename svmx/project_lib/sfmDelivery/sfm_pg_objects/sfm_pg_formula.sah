@@ -1,0 +1,63 @@
+/**
+* SFM  transaction & designer Formula page object repository and function to create formula
+*/
+
+var $sfm_pg_formula = new function sfm_pg_formula() {
+
+	this.btn_formulaTab =_f("main").tab("Formulas");
+	this.txt_quickFind =_f("main").s_textinput("searchText");
+	this.btn_newFormula = _f("main").s_button("New[4]");
+	this.txt_targetObject = _f("main").s_combobox("objCombo");
+	this.txt_targetField= _f("main").s_combobox("fieldCombo[1]");
+	this.txt_formulaName = _f("main").s_textinput("formulaName");
+	this.txt_formulaId = _f("main").s_textinput("formulaID");
+	this.txt_formulaDescription = _f("main").s_textarea("description");
+	this.txt_formula = _f("main").s_textarea("formula");
+	this.btn_saveFormula = _f("main").s_button("Save");
+	this.btn_addToProcess =	_f("main").s_button("Add To Process") ;
+	this.btn_cancelFormula = _f("main").s_button("Cancel");
+	this.formulaAlert =_f("main").label("The Data Validation/Formula ID you have entered already exists. Please enter a unique ID.");
+	this.formulaSaved= _f("main").label("Data Validation/Formula saved");
+	
+	
+	/**
+	 * Function to create formula 
+	 *
+	 */
+	this.createFormula = function($formulaTargetObject,$formulaTargetField,$formulaName,$formulaDescription,$formula){
+		_click($sfm_pg_formula.btn_formulaTab);
+		for(var $i=0; $i<$formulaTargetObject.length; $i++){
+			_click($sfm_pg_formula.btn_newFormula);
+			
+			_setSelected($sfm_pg_formula.txt_targetObject,$formulaTargetObject[$i]);
+			_setSelected($sfm_pg_formula.txt_targetField,$formulaTargetField[$i]);
+			_setValue($sfm_pg_formula.txt_formulaName,$formulaName[$i]);
+			_setValue($sfm_pg_formula.txt_formulaId,"");
+			_setValue($sfm_pg_formula.txt_formulaId,$formulaName[$i]);
+			_setValue($sfm_pg_formula.txt_formulaDescription,$formulaDescription[$i]);
+			_setValue($sfm_pg_formula.txt_formula,$formula[$i]);
+			_click($sfm_pg_formula.btn_saveFormula);
+			if (_exists($sfm_pg_formula.formulaAlert)) {
+				_focusWindow();
+				_takeScreenShot();
+				_logExceptionAsFailure("Formula not saved, refer screenshot for error");	
+			}
+			else{		 
+				 _wait(2000, _isVisible($sfm_pg_formula.formulaSaved));
+				 _click($sfm_pg_formula.btn_addToProcess);	
+				 _wait(2000);
+			}
+		}
+		/*_setSelected($sfm_pg_formula.txt_targetObject,$formulaTargetObject);
+		_setSelected($sfm_pg_formula.txt_targetField,$formulaTargetField);
+		_setValue($sfm_pg_formula.txt_formulaName,$formulaName);
+		_setValue($sfm_pg_formula.txt_formulaId,"");
+		_setValue($sfm_pg_formula.txt_formulaId,$formulaName);
+		_setValue($sfm_pg_formula.txt_formulaDescription,$formulaDescription);
+		_setValue($sfm_pg_formula.txt_formula,$formula);
+		_wait(2000, _isVisible(_f("main").label("Data Validation/Formula saved")));*/
+		
+				
+	};
+	
+};

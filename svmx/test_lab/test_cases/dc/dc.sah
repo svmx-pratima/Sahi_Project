@@ -1,0 +1,55 @@
+
+//var $url = "http://test.salesforce.com";
+//var $un = "dc_admin@dcmap1.com.cfg3";
+//var $pwd = "svmx1234";
+
+var $url = "https://test.salesforce.com";
+var $un = "commonuser@svmxpqt.com";
+var $pwd = "servicemax2";
+
+//$bo_act_login.login($url, $un, $pwd);
+
+_navigateTo($url);
+_wait(5000, _isVisible($bo_pg_login.txt_email));
+_setValue($bo_pg_login.txt_email, $un);
+_setValue($bo_pg_login.txt_password, $pwd);
+_click($bo_pg_login.btn_login);
+_wait(30000, _isVisible($bo_pg_home.link_home));
+
+_click(_link("Dispatch Console"));
+
+//
+_setSpeed(3000);
+_setStrictVisibilityCheck(true, _f("DispatchConsole"));
+
+$wNo = "WO-00001911";
+_selectWindow("Dispatch Console");
+_focusWindow();
+
+_setValue(_f("DispatchConsole").textinput("searchText"),$wNo);
+_click(_f("DispatchConsole").checkbox("New"));
+_click(_f("DispatchConsole").checkbox("New"));
+_wait(1000);
+_call(Sahi.DRAG_DROP_SPEED=50);
+_click(_f("DispatchConsole").label("/Expand all/"));
+_click(_f("DispatchConsole").uitextfield("/Van Tech/"));
+var $pos = _position(_f("DispatchConsole").uitextfield("/Van Tech/"));
+var $xPos = parseInt($pos[0])+350;
+var $yPos = parseInt($pos[1]);
+
+_dragDrop(_f("DispatchConsole").uitextfield($wNo), _xy(_f("DispatchConsole").timescale("timeScale"), $xPos, $yPos));
+_wait(3000);
+//_setValue(_f("DispatchConsole").datefield("startDate"), "2017-08-24");
+_click(_f("DispatchConsole").button("Save"));
+_wait(3000);
+
+_click(_f("DispatchConsole").ganttchartholder_inlinecomponent1(0));
+var $color = _fetch(_f("DispatchConsole").ganttchartholder_inlinecomponent1(0).executeFn("getStyle", "bgColor"));
+
+//_click(_f("DispatchConsole").button("Yes"));
+//_selectWindow("Dispatch Console");
+//_click(_f("DispatchConsole").button("Yes"));
+//
+//_mouseOverNative(_xy(_f("DispatchConsole").uitextfield("MG Road Tech"),600,0));
+
+_setSpeed($g_stepSpeed);

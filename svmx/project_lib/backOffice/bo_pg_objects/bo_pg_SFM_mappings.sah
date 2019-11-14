@@ -1,0 +1,29 @@
+
+/**
+ * SFM Mappings - To create new SFM Maps
+ */
+var $bo_pg_sfmMappings = new function bo_pg_sfmMappings() {
+	
+	
+	/**
+	Added by Meghana Rao
+	 */
+	
+	 this.btn_sfmmappings = _div("SFM Mappings");
+	 this.picklist_sourceobject = _f("SFMExpressionBuilderSWF").s_textinput("textInput");
+	 this.picklist_targetobject = _f("SFMExpressionBuilderSWF").s_textinput("textInput[1]");
+	 this.btn_newmappings = _f("SFMExpressionBuilderSWF").s_button("New");
+	 this.txt_mapname = _f("SFMExpressionBuilderSWF").s_textinput("Save this map as");
+	 this.txt_mapId = _f("SFMExpressionBuilderSWF").s_textinput("Input ID Here");
+	 this.txt_account_picklist = _f("SFMExpressionBuilderSWF").s_textinput("textInput[4]");
+	 this.btn_save = _f("SFMExpressionBuilderSWF").s_button("Save");
+	 this.targetcombobox = _f("SFMExpressionBuilderSWF").s_combobox("targetCombo");
+	 this.sourcecombobox = _f("SFMExpressionBuilderSWF").s_combobox("sourceCombo");
+	 this.combo_account = _f("SFMExpressionBuilderSWF").s_combobox("valuesCombo[1]");
+	 this.verify_mapsaved = _f("SFMExpressionBuilderSWF").label("Map saved");
+	 this.txt_map_search = _f("SFMExpressionBuilderSWF").s_textinput("textInput[2]");
+	 this.mapssearch = _f("SFMExpressionBuilderSWF").s_combobox("searchCombo");
+	this.btn_delete = _f("SFMExpressionBuilderSWF").s_button("Delete");
+	this.pop_yes = _f("SFMExpressionBuilderSWF").button("Yes");
+	this.map_deleted_verificqtion = _f("SFMExpressionBuilderSWF").label("Map deleted");
+};

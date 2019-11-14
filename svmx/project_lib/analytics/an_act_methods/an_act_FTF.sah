@@ -1,0 +1,260 @@
+/**
+ * Function to create a First time to Fix Calculation method for First time to Fix
+ */
+var $an_act_FTF = new function an_act_FTF() {
+	
+	this.ftf_closed_wo_calc = function($Calculationmethodname) {
+
+		// To setup the values
+		$TopLevelWO.an_toplevelwo();
+		_click($an_pg_ftf.metrics);
+		_click($an_pg_ftf.btn_first_time_to_fix);
+		_click($an_pg_ftf.btn_addftf);
+		_wait(200);
+		_click($an_pg_ftf.btn_activecheckboxftf);
+		_setValue($an_pg_ftf.txt_ftf_description, $Calculationmethodname);
+		_wait(200);
+		_click($an_pg_ftf.btn_settings);
+		_click($an_pg_ftf.txt_source_ftf_computation);
+		_click($an_pg_ftf.list_item_wo);
+		_click($an_pg_ftf.txt_reference_to_PWO);
+		_click($an_pg_ftf.list_item_yes);
+		_click($an_pg_ftf.txt_Account);
+		_click($an_pg_ftf.Account);
+		_click($an_pg_ftf.txt_tech);
+		_click($an_pg_ftf.Tech);
+		_click($an_pg_ftf.txt_product);
+		_click($an_pg_ftf.txt_fixed_on_date);
+		_wait(200);
+		_click($an_pg_ftf.btn_criteria);
+		_click($an_pg_ftf.list_qualification_wo);
+		_click($an_pg_ftf.btn_closed_wo);
+		_click($an_pg_ftf.list_fixed_on_first_visit);
+		_click($an_pg_ftf.btn_resolved_wo);
+		_click($an_pg_ftf.btn_save);
+		_click($an_pg_ftf.btn_ok);		
+		
+	};	
+	
+	this.ftf_custom_exp = function($Calculationmethodname) {
+
+		// To setup the values
+		$TopLevelCase.an_toplevelcase_custom();
+		_click($an_pg_ftf.metrics);
+		_click($an_pg_ftf.btn_first_time_to_fix);
+		_click($an_pg_ftf.btn_addftf);
+		_click($an_pg_ftf.btn_activecheckboxftf);
+		_setValue($an_pg_ftf.txt_ftf_description, $Calculationmethodname);
+		_wait(200);
+		_click($an_pg_ftf.btn_settings);
+		_click($an_pg_ftf.txt_source_ftf_computation);
+		_click($an_pg_ftf.list_item_wo);
+		_click($an_pg_ftf.txt_reference_to_PWO);
+		_click($an_pg_ftf.list_item_yes);
+		_click($an_pg_ftf.txt_Account);
+		_click($an_pg_ftf.custom_acc);
+		_click($an_pg_ftf.txt_tech);
+       _click($an_pg_ftf.custom_tech);
+		_click($an_pg_ftf.txt_product);
+		_click($an_pg_ftf.txt_fixed_on_date);
+		_wait(200);
+		_click($an_pg_ftf.btn_criteria);
+		_click($an_pg_ftf.list_qualification_wo);
+		_click(_listItem("Custom WO Expr"));
+		_click($an_pg_ftf.list_fixed_on_first_visit);
+		_click(_listItem("Custom WO Expr[1]"));
+		_click($an_pg_ftf.btn_save);
+		_click($an_pg_ftf.btn_ok);		
+		
+	};	
+	
+	
+	this.ftf_runEngine = function($emailId)
+	{
+		_click($an_pg_ftf.metrics);
+		_click($an_pg_ftf.btn_first_time_to_fix);
+		_click($an_pg_ftf.btn_click_Schedule_Notifications);
+		_click($an_pg_mttr.list_timezone);
+	    _click($an_pg_mttr.btn_ist_timezone);
+	    _click($an_pg_mttr.btn_period);
+	    _click($an_pg_mttr.btn_daily);
+	    _click($an_pg_mttr.list_time);
+	    _click($an_pg_mttr.btn_time);
+		_click($an_pg_ftf.txt_Email_onSuccess);
+		_setValue($an_pg_ftf.txt_Email_onSuccess, $emailId);
+		_click($an_pg_ftf.btn_save);
+		_click($an_pg_ftf.btn_ok);
+		_wait(300);
+		_click($an_pg_ftf.btn_click_run);
+		_click($an_pg_ftf.btn_ok);
+		_wait(1000);
+		
+	};
+	
+	this.convertToSfdcId=function($value)
+		{
+	var $x,$i,$j;
+	var $y = $value.split('\r').join('').split('\n');
+	var $z = new Array();
+	for ($x=0; $x < $y.length; $x++) {
+	if ($y[$x].length == 15) {
+	var $s = '';
+	for ($i = 0; $i < 3; $i++) {
+	var $f = 0;
+	for ($j = 0;$j < 5; $j++) {
+	var $c = $y[$x].charAt($i * 5 + $j);
+	if ($c >= 'A' && $c <= 'Z') $f += 1 << $j;
+	}
+	$s += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ012345'.charAt($f);
+	}
+	$z.push($y[$x] + $s);
+	};
+	}
+	$value = $z.join('\r\n');
+	return $value;
+	};
+	
+	this.ftf_closed_wo_calc_case = function() {
+
+		// To setup the values
+		$TopLevelCase.an_toplevelcase();		
+		_click($an_pg_ftf.metrics);
+		_click($an_pg_ftf.btn_first_time_to_fix);	
+		
+	};	
+	
+	this.ftf_closed_wo_calc_sr = function() {
+// To setup the values
+		$TopLevelSR.an_topLevelSR();		
+		_click($an_pg_ftf.metrics);
+		_click($an_pg_ftf.btn_first_time_to_fix);
+	};	
+
+this.ftf_wd = function($Calculationmethodname) {
+// To setup the values
+	$TopLevelCase.an_toplevelcase();	
+		_click($an_pg_ftf.metrics);
+		_click($an_pg_ftf.btn_first_time_to_fix);
+	_click($an_pg_ftf.btn_addftf);
+		_wait(200);
+		_click($an_pg_ftf.btn_activecheckboxftf);
+		_setValue($an_pg_ftf.txt_ftf_description, $Calculationmethodname);
+		_wait(200);
+		_click($an_pg_ftf.btn_settings);
+		_click($an_pg_ftf.txt_source_ftf_computation);
+         _click($an_pg_ftf.list_item_wd);
+	    _click($an_pg_ftf.txt_reference_to_PWD);
+		_click($an_pg_ftf.list_item_WD2);
+	    _click($an_pg_ftf.txt_Account);
+		_click($an_pg_ftf.txt_tech);
+		_click($an_pg_ftf.txt_product);
+		_click($an_pg_ftf.txt_fixed_on_date);
+		_wait(200);
+		_click($an_pg_ftf.btn_criteria);
+	   _click($an_pg_ftf.list_qualification_wo);
+		_click($an_pg_ftf.btn_depot_repair_wo);
+		_click($an_pg_ftf.list_fixed_on_first_visit_wd);
+	    _click($an_pg_ftf.wd_qc);
+		_click($an_pg_ftf.btn_save);
+		_click($an_pg_ftf.btn_ok);	
+	
+	};	
+	
+	this.ftf_UI = function($Calculationmethodname) {
+// To setup the values
+	$TopLevelCase.an_toplevelcase();			
+		_click($an_pg_ftf.metrics);
+		_click($an_pg_ftf.btn_first_time_to_fix);
+	_click($an_pg_ftf.btn_addftf);
+		_wait(200);
+		_click($an_pg_ftf.btn_activecheckboxftf);
+		_setValue($an_pg_ftf.txt_ftf_description, $Calculationmethodname);
+		_wait(200);
+		_click($an_pg_ftf.btn_settings);
+		_click($an_pg_ftf.txt_source_ftf_computation);
+		_click($an_pg_ftf.list_item_wo);
+		_click($an_pg_ftf.txt_reference_to_PWO);
+		_click($an_pg_ftf.list_item_yes);
+		_click($an_pg_ftf.txt_source_ftf_computation);
+        _click($an_pg_ftf.list_item_wd);
+		_click($an_pg_ftf.txt_reference_to_PWD);
+		_click($an_pg_ftf.list_item_WD1);
+	    _click($an_pg_ftf.txt_reference_to_PWD);
+		_click($an_pg_ftf.list_item_WD2);
+	    _click($an_pg_ftf.txt_Account);
+		_click($an_pg_ftf.txt_tech);
+		_click($an_pg_ftf.txt_product);
+		_click($an_pg_ftf.txt_fixed_on_date);
+		_wait(200);
+		_click($an_pg_ftf.btn_criteria);
+		_click($an_pg_ftf.list_qualification_wo);
+		_click($an_pg_ftf.btn_closed_wo);
+		_click($an_pg_ftf.list_fixed_on_first_visit);
+		_click($an_pg_ftf.btn_resolved_wo);
+		_click($an_pg_ftf.btn_save);
+		_click($an_pg_ftf.btn_ok);	
+	
+	};	
+	
+	this.ftf_wd_custom= function($Calculationmethodname) {
+// To setup the values
+	$TopLevelCase.an_toplevelcase();	
+		_click($an_pg_ftf.metrics);
+		_click($an_pg_ftf.btn_first_time_to_fix);
+	_click($an_pg_ftf.btn_addftf);
+		_wait(200);
+		_click($an_pg_ftf.btn_activecheckboxftf);
+		_setValue($an_pg_ftf.txt_ftf_description, $Calculationmethodname);
+		_wait(200);
+		_click($an_pg_ftf.btn_settings);
+		_click($an_pg_ftf.txt_source_ftf_computation);
+         _click($an_pg_ftf.list_item_wd);
+	    _click($an_pg_ftf.txt_reference_to_PWD);
+		_click($an_pg_ftf.list_item_WD1);
+	    _click($an_pg_ftf.txt_Account);
+		_click($an_pg_ftf.txt_tech);
+		_click($an_pg_ftf.txt_product);
+		_click($an_pg_ftf.txt_fixed_on_date);
+		_wait(200);
+		_click($an_pg_ftf.btn_criteria);
+	   _click($an_pg_ftf.list_qualification_wo);
+		_click(_listItem("SVMXSTD: Work Order With Valid Component"));
+		_click($an_pg_ftf.list_fixed_on_first_visit_wd);
+	    _click(_listItem("Custom WD Expression"));
+		_click($an_pg_ftf.btn_save);
+		_click($an_pg_ftf.btn_ok);	
+
+	};
+	
+	this.ftf_wd_sr= function($Calculationmethodname) {
+		// To setup the values
+		$TopLevelSR.an_topLevelSR();
+				_click($an_pg_ftf.metrics);
+				_click($an_pg_ftf.btn_first_time_to_fix);
+			_click($an_pg_ftf.btn_addftf);
+				_wait(200);
+				_click($an_pg_ftf.btn_activecheckboxftf);
+				_setValue($an_pg_ftf.txt_ftf_description, $Calculationmethodname);
+				_wait(200);
+				_click($an_pg_ftf.btn_settings);
+				_click($an_pg_ftf.txt_source_ftf_computation);
+		         _click($an_pg_ftf.list_item_wd);
+			    _click($an_pg_ftf.txt_reference_to_PWD);
+				_click($an_pg_ftf.list_item_WD2);
+			    _click($an_pg_ftf.txt_Account);
+				_click($an_pg_ftf.txt_tech);
+				_click($an_pg_ftf.txt_product);
+				_click($an_pg_ftf.txt_fixed_on_date);
+				_wait(200);
+				_click($an_pg_ftf.btn_criteria);
+			   _click($an_pg_ftf.list_qualification_wo);
+				_click($an_pg_ftf.btn_depot_repair_wo);
+				_click($an_pg_ftf.list_fixed_on_first_visit_wd);
+			    _click($an_pg_ftf.wd_qc);
+				_click($an_pg_ftf.btn_save);
+				_click($an_pg_ftf.btn_ok);	
+			
+			};	
+	
+	
+};

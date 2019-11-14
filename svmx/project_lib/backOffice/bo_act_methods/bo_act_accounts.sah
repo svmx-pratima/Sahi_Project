@@ -1,0 +1,88 @@
+/**
+ * Functions for the Accounts Object
+ */
+var $bo_act_accounts = new function bo_act_accounts() {
+
+	/**
+	 * Create an Account
+	 * 
+	 * @param $accountName
+	 */
+	this.createAccount = function() {
+		var $accountName = $bo_act_common.generateRandomName("Acc");
+        $bo_act_navigation.navigateToAccountsPage();
+		_click($bo_pg_accounts.btn_new);
+		_setValue($bo_pg_accounts.txt_accountName, $accountName);
+		_click($bo_pg_accounts.btn_save);
+		_assertNotVisible(_div("/Error: Invalid Data/"));
+		_wait(15000, _isVisible(_heading2($accountName)));
+		_logOutput($accountName+ " account is created");
+		return $accountName;
+	};
+	// Added By Bhupendra Singh for APM Integration Testing
+	this.createAccountWithExternalRecordID = function($Prefix,$description,$externalRecordID) {
+		var $accountName = $bo_act_common.generateRandomName($Prefix);
+		$bo_act_navigation.navigateToAccountsPage();
+		_click($bo_pg_accounts.btn_new);
+		_setValue($bo_pg_accounts.txt_accountName, $accountName);
+		_setValue($bo_pg_accounts.txt_ExternalRecordID, $externalRecordID);
+		_setValue($bo_pg_accounts.txt_description, $description);
+		_setSelected(_select("/acc/",_rightOf(_label("Industry"))), "Healthcare");
+		_click($bo_pg_accounts.btn_save);
+		_assertNotVisible(_div("/Error: Invalid Data/"));
+		_wait(15000, _isVisible(_heading2($accountName)));
+		_logOutput($accountName+ " account is created");
+		return $accountName;
+	};
+	
+	/**
+	 * Create an Account with PArent Account field filled
+	 * Author : Meghana Rao
+	 */
+	
+	this.createAccount_parentaccount = function($parentaccount){
+		var $accountName = $bo_act_common.generateRandomName("Acc");
+		  $bo_act_navigation.navigateToAccountsPage();
+			_click($bo_pg_accounts.btn_new);
+			_setValue($bo_pg_accounts.txt_accountName, $accountName);
+			_setValue($bo_pg_accounts.txt_parentaccount, $parentaccount);
+			_click($bo_pg_accounts.btn_save);
+			_assertNotVisible(_div("/Error: Invalid Data/"));
+			_wait(15000, _isVisible(_heading2($accountName)));
+			_logOutput($accountName+ " account is created");
+			return $accountName;		
+	};
+	this.deleteAccount = function($accName){
+		  $bo_act_navigation.navigateToAccountsPage();
+		  _click(_link($accName));
+		  _click($bo_pg_accounts.btn_delete);
+	};
+	
+	// Owner Meghana Rao
+	
+	this.addIBtoAccounts = function($productName,$accountName,$contactName) {
+		
+		
+		var $serialNum = $bo_act_common.generateRandomName("Ser");
+		var $IBName = $bo_act_common.generateRandomName("IB_");
+		
+		 //$bo_act_navigation.navigateToLocations();
+		 //_click($locationName);
+		 _click($bo_pg_accounts.newInstalledProduct);
+		_setValue($bo_pg_installedProducts.txt_productName,$productName);
+		_setValue($bo_pg_installedProducts.txt_serialNumber, $serialNum);
+		_setValue($bo_pg_installedProducts.txt_accountName, $accountName);
+		_setValue($bo_pg_installedProducts.txt_contactName, $contactName);
+		_setValue($bo_pg_installedProducts.txt_installedProductName, $IBName);
+		_setValue($bo_pg_installedProducts.txt_installedDate);
+		_click($bo_pg_installedProducts.btn_save);
+		_assertNotVisible(_div("/Error: Invalid Data/"));
+		_logOutput($IBName+ " IB is created");
+		_wait(15000, _isVisible(_heading2($IBName)));
+		return $IBName;
+	
+		
+	};
+	
+	
+};

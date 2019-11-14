@@ -1,0 +1,204 @@
+//Tests are to be written here [Bhupendra Singh Chouhan]
+//==============
+
+//Pre - Condition Test Data
+var $recordType = ["Depot","Depot Child","Depot Parent","Standard Location"];
+var $productFamily = ["--None--","GeneralSolution","AdvSolution","Accessory", "Storage"];
+var $productCode = "";
+
+var $RS_11872 = _testcase("$RS_11872","AI-Verify the Reconcile API handling multiple records/data update on the both IB and Site objects.");
+$RS_11872.start();
+_setSpeed($g_stepSpeed);
+/**
+* Login to the Sandbox Org
+*/
+
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+
+//Added by Bhupendra Singh For APM Servicemax Integretion Testing
+var $extRecID_Act1 = $bo_act_common.generateRandomName("Ext_A");
+var $Account1 = $bo_act_accounts.createAccountWithExternalRecordID("APM_act_","APM Servicemax Integretion Testing Account 01",$extRecID_Act1);
+var $extRecID_Act2 = $bo_act_common.generateRandomName("Ext_A");
+var $Account2 = $bo_act_accounts.createAccountWithExternalRecordID("APM_act_","APM Servicemax Integretion Testing Account 02",$extRecID_Act2);
+var $extRecID_Act3 = $bo_act_common.generateRandomName("Ext_A");
+var $Account3 = $bo_act_accounts.createAccountWithExternalRecordID("APM_act_","APM Servicemax Integretion Testing Account 03",$extRecID_Act3);
+var $extRecID_Act4 = $bo_act_common.generateRandomName("Ext_A");
+var $Account4 = $bo_act_accounts.createAccountWithExternalRecordID("APM_act_","APM Servicemax Integretion Testing Account 04",$extRecID_Act4);
+var $extRecID_Act5 = $bo_act_common.generateRandomName("Ext_A");
+var $Account5 = $bo_act_accounts.createAccountWithExternalRecordID("APM_act_","APM Servicemax Integretion Testing Account 05",$extRecID_Act5);
+
+//For location records
+var $recordType = ["Depot","Depot Child","Depot Parent","Standard Location"];
+var $extRecID_Loc1 = $bo_act_common.generateRandomName("Ext_L");
+var $Location1 = $bo_act_locations.createLocationWithExternalRecordID("APM_loc_",$recordType[3],"","#07","India","Pune","560008",$extRecID_Loc1,$extRecID_Act1);
+var $extRecID_Loc2 = $bo_act_common.generateRandomName("Ext_L");
+var $Location2 = $bo_act_locations.createLocationWithExternalRecordID("APM_loc_",$recordType[3],"","#07","India","Pune","560009",$extRecID_Loc2,$extRecID_Act2);
+var $extRecID_Loc3 = $bo_act_common.generateRandomName("Ext_L");
+var $Location3 = $bo_act_locations.createLocationWithExternalRecordID("APM_loc_",$recordType[3],"","#07","India","Pune","560010",$extRecID_Loc3,$extRecID_Act3);
+var $extRecID_Loc4 = $bo_act_common.generateRandomName("Ext_L");
+var $Location4 = $bo_act_locations.createLocationWithExternalRecordID("APM_loc_",$recordType[3],"","#07","India","Pune","560011",$extRecID_Loc4,$extRecID_Act4);
+var $extRecID_Loc5 = $bo_act_common.generateRandomName("Ext_L");
+var $Location5 = $bo_act_locations.createLocationWithExternalRecordID("APM_loc_",$recordType[3],"","#07","India","Pune","560012",$extRecID_Loc5,$extRecID_Act5);
+
+//For Products records
+var $productName = $bo_act_products.createProduct($productCode, $productFamily[0]);
+
+//For Installed Products records
+var $extRecID_IB1 = $bo_act_common.generateRandomName("Ext_IB");
+var $IBName1 = $bo_act_installedProduct.createIBWithExternalRecordID("APM_IB_", $productName, $extRecID_IB1, $extRecID_Act1, $extRecID_Loc1, "", "", "Jaipur");
+var $extRecID_IB2 = $bo_act_common.generateRandomName("Ext_IB");
+var $IBName2 = $bo_act_installedProduct.createIBWithExternalRecordID("APM_IB_", $productName, $extRecID_IB2, $extRecID_Act2, $extRecID_Loc2, "", "", "Jaipur");
+var $extRecID_IB3 = $bo_act_common.generateRandomName("Ext_IB");
+var $IBName3 = $bo_act_installedProduct.createIBWithExternalRecordID("APM_IB_", $productName, $extRecID_IB3, $extRecID_Act3, $extRecID_Loc3, "", "", "Jaipur");
+var $extRecID_IB4 = $bo_act_common.generateRandomName("Ext_IB");
+var $IBName4 = $bo_act_installedProduct.createIBWithExternalRecordID("APM_IB_", $productName, $extRecID_IB4, $extRecID_Act4, $extRecID_Loc4, "", "", "Jaipur");
+var $extRecID_IB5 = $bo_act_common.generateRandomName("Ext_IB");
+var $IBName5 = $bo_act_installedProduct.createIBWithExternalRecordID("APM_IB_", $productName, $extRecID_IB5, $extRecID_Act5, $extRecID_Loc5, $extRecID_IB1, $extRecID_IB2, "Jaipur");
+
+// For POST Request 
+var d = new Date(),
+month = '' + (d.getMonth() + 1),
+day = '' + (d.getDate()),
+year = d.getFullYear();
+
+if (month.length < 2) month = '0' + month;
+if (day.length < 2) day = '0' + day;
+
+var $new_dateworkorder =  [year, month, day].join('-');
+_logOutput($new_dateworkorder);
+
+var $CurrentDateTime = $new_dateworkorder+"T00:00:00Z";
+var $POSTscript = "/services/apexrest/SVMXC/svmx/rest/IG/1.0/reconcile/";
+var $requestBody = "{ "+"\""+"ReconcileDate"+"\""+": "+ "\""+$CurrentDateTime+"\"" +" } ";
+
+var $Workbenchurl = "https://workbench.developerforce.com/login.php";
+
+$bo_act_login.loginToWorkBench($Workbenchurl,"Sandbox", $bac_un, $bac_pwd);
+$bo_act_login.runRESTExplorerInWB_ForPOST($POSTscript, $requestBody);
+var $rawResponse = _getText(_paragraph("codeViewPort"));
+_logOutput($rawResponse);
+var $number =$rawResponse.split("\"JobId\":");
+_logOutput($number[1]);
+var $job_id = $number[1].split("\"");
+_logOutput($job_id[1]);
+
+// Verify the Status of the Job submitted
+var $numb =$rawResponse.split("\"Status\":");
+_logOutput($numb[1]);
+var $job_Status = $numb[1].split("\"");
+_logOutput($job_Status[1]);
+_assertEqual("In-Progress",$job_Status[1],"Actual and Expected Job Status are not same" );
+
+
+//For GET Request 
+var $GETScript = "/services/apexrest/SVMXC/svmx/rest/IG/1.0/reconcile/getStatus/"+$job_id[1]+"/";
+_logOutput($GETScript);
+$bo_act_login.runRESTExplorerInWB_ForGet($GETScript);
+
+var $rawResponseGet = _getText(_paragraph("codeViewPort"));
+_logOutput($rawResponseGet);
+
+//Job status for Installed Product Objects
+var $getData = $rawResponseGet.split("\"Status\":");
+_logOutput($getData[3]);
+var $jobStatus_IB = $getData[3].split("\"");
+_logOutput($jobStatus_IB[1]);
+_assertEqual("Completed",$jobStatus_IB[1],"Actual and Expected Job Status for IB are not same" );
+
+//Job status for Site Objects
+_logOutput($getData[2]);
+var $jobStatus_Site = $getData[2].split("\"");
+_logOutput($jobStatus_Site[1]);
+_assertEqual("Completed",$jobStatus_Site[1],"Actual and Expected Job Status for Site are not same" );
+
+// Over All Job status for Reconciled Objects
+_logOutput($getData[1]);
+var $jobStatus_ReconciledObjects = $getData[1].split("\"");
+_logOutput($jobStatus_ReconciledObjects[1]);
+_assertEqual("Completed",$jobStatus_ReconciledObjects[1],"Actual and Expected Job Status for overall job are not same" );
+
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+
+//Verify the Each Location records are updated with the Account values based on the external record ID mapping
+$bo_act_installedProduct.openInstalledProductRecord($IBName5);
+var $Actual_acct5 = _getText(_link("/APM_act_/",_rightOf(_cell("/Account/"))));
+var $Actual_loc5 = _getText(_link("/APM_loc/",_rightOf(_cell("/Location/"))));
+var $Actual_ParentIB = _getText(_link("/APM_IB/",_rightOf(_cell("/Parent/"))));
+var $Actual_TopLevelIB = _getText(_link("/APM_IB/",_rightOf(_cell("/Top-Level/"))));
+
+_assertEqual($Account5,$Actual_acct5,"Actual and Expected Account On IB record are not same");
+_assertEqual($Location5,$Actual_loc5,"Actual and Expected Location On IB record are not same");
+_assertEqual($IBName1,$Actual_ParentIB,"Actual and Expected Parent IB On IB record are not same");
+_assertEqual($IBName2,$Actual_TopLevelIB,"Actual and Expected Top-Level IB On IB record are not same");
+_click($bo_pg_installedProducts.btn_delete);
+_wait(3000);
+
+$bo_act_installedProduct.openInstalledProductRecord($IBName4);
+var $Actual_acct4 = _getText(_link("/APM_act_/",_rightOf(_cell("/Account/"))));
+var $Actual_loc4 = _getText(_link("/APM_loc/",_rightOf(_cell("/Location/"))));
+_assertEqual($Account4,$Actual_acct4,"Actual and Expected Account On IB record are not same");
+_assertEqual($Location4,$Actual_loc4,"Actual and Expected Location On IB record are not same");
+_click($bo_pg_installedProducts.btn_delete);
+_wait(3000);
+
+$bo_act_installedProduct.openInstalledProductRecord($IBName3);
+var $Actual_acct3 = _getText(_link("/APM_act_/",_rightOf(_cell("/Account/"))));
+var $Actual_loc3 = _getText(_link("/APM_loc/",_rightOf(_cell("/Location/"))));
+_assertEqual($Account3,$Actual_acct3,"Actual and Expected Account On IB record are not same");
+_assertEqual($Location3,$Actual_loc3,"Actual and Expected Location On IB record are not same");
+_click($bo_pg_installedProducts.btn_delete);
+_wait(3000);
+
+$bo_act_installedProduct.openInstalledProductRecord($IBName2);
+var $Actual_acct2 = _getText(_link("/APM_act_/",_rightOf(_cell("/Account/"))));
+var $Actual_loc2 = _getText(_link("/APM_loc/",_rightOf(_cell("/Location/"))));
+_assertEqual($Account2,$Actual_acct2,"Actual and Expected Account On IB record are not same");
+_assertEqual($Location2,$Actual_loc2,"Actual and Expected Location On IB record are not same");
+_click($bo_pg_installedProducts.btn_delete);
+_wait(3000);
+
+$bo_act_installedProduct.openInstalledProductRecord($IBName1);
+var $Actual_acct1 = _getText(_link("/APM_act_/",_rightOf(_cell("/Account/"))));
+var $Actual_loc1 = _getText(_link("/APM_loc/",_rightOf(_cell("/Location/"))));
+_assertEqual($Account1,$Actual_acct1,"Actual and Expected Account On IB record are not same");
+_assertEqual($Location1,$Actual_loc1,"Actual and Expected Location On IB record are not same");
+_click($bo_pg_installedProducts.btn_delete);
+_wait(3000);
+
+
+//Verify the Each Location records are updated with the Account values based on the external record ID mapping
+$bo_act_locations.openLocationRecord($Location1);
+_assertEqual($Account1,_getText(_link("/APM_act_/",_rightOf(_cell("/Account/")))),"Actual and Expected Account On location record are not same");
+_click($bo_pg_locations.btn_delete);
+_wait(3000);
+
+$bo_act_locations.openLocationRecord($Location2);
+_assertEqual($Account2,_getText(_link("/APM_act_/",_rightOf(_cell("/Account/")))),"Actual and Expected Account On location record are not same");
+_click($bo_pg_locations.btn_delete);
+_wait(3000);
+
+$bo_act_locations.openLocationRecord($Location3);
+_assertEqual($Account3,_getText(_link("/APM_act_/",_rightOf(_cell("/Account/")))),"Actual and Expected Account On location record are not same");
+_click($bo_pg_locations.btn_delete);
+_wait(3000);
+
+$bo_act_locations.openLocationRecord($Location4);
+_assertEqual($Account4,_getText(_link("/APM_act_/",_rightOf(_cell("/Account/")))),"Actual and Expected Account On location record are not same");
+_click($bo_pg_locations.btn_delete);
+_wait(3000);
+
+$bo_act_locations.openLocationRecord($Location5);
+_assertEqual($Account5,_getText(_link("/APM_act_/",_rightOf(_cell("/Account/")))),"Actual and Expected Account On location record are not same");
+_click($bo_pg_locations.btn_delete);
+_wait(3000);
+
+//Clean up function for Account
+$bo_act_accounts.deleteAccount($Account1);
+$bo_act_accounts.deleteAccount($Account2);
+$bo_act_accounts.deleteAccount($Account3);
+$bo_act_accounts.deleteAccount($Account4);
+$bo_act_accounts.deleteAccount($Account5);
+
+$bo_act_login.logOut(); 
+
+$RS_11872.end();

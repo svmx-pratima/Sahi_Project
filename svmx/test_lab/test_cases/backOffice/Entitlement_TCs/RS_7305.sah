@@ -1,0 +1,124 @@
+//Tests are to be written here [Bhupendra Singh Chouhan]
+//==============
+
+//Pre - Condition Test Data
+
+var $RS_7305 = _testcase("$RS_7305","Auto Entitlement-Case:- Warranty - Entitlement based on Validity Dates");
+$RS_7305.start();
+_setSpeed($g_stepSpeed);
+/**
+* Login to the Sandbox Org
+*/
+
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+
+
+/**
+ * Configure the Global Profile SET001
+ * Global Setting SET001 - Enable Auto Entitlement For Work Order is set to True for Auto Entitlement process to trigger 
+ * (This is a Global Setting and is available under Module "Entitlement Verification" and Submodule "Auto-Entitlement - Work Order") 
+ */
+var $Module = "Entitlement Verification";
+var $SubModule = "Auto-Entitlement-Case";
+var $Setting = "SET001";
+var $value = true;
+$bo_act_configurationProfiles.editGlobalProfileForBooleanSettings($Module, $SubModule, $Setting, $value);
+
+/**
+ * Create Auto Entitlement Rules for Work Order
+ */
+
+var $CaseField1 = "Case Origin";
+var $Operator = "Equals";
+var $Value1 = "Web";
+var $CaseField2 = "Priority";
+var $Value2 = "Low";
+var	$p1 = "Warranties";		// $p4 = Warranties/Scon/Both for Entitlement check?
+var	$p2 = "Validity dates";     				// $p8 = Validity dates/Counters/Both
+
+//Navigate to Auto Entitlement Rules - Case Rule1
+$autoEntRuleName = $bo_act_autoEntitlementRule_Case.createAutoEntitlementRule_Case($CaseField1, $Operator, $Value1, $CaseField2, $Value2, $p1, $p2);
+_assertExists(_span($autoEntRuleName));
+
+//Changing the Rule Sequence
+$bo_act_autoEntitlementRule_WO.changingAutoEntitlementRule_SequenceTop($autoEntRuleName);
+
+/**
+ * Create Account, Contact,Product and Installed Product
+ */
+
+var $productFamily = ["--None--","GeneralSolution","AdvSolution","Accessory", "Storage"];
+var $productCode = "";
+
+var $accountName = $bo_act_accounts.createAccount();
+var $contactName = $bo_act_contacts.createContact($accountName);
+var $productName = $bo_act_products.createProduct($productCode, $productFamily[0]);
+var $IBName = $bo_act_installedProduct.createInstalledProduct($productName, $accountName, $contactName);
+
+/**
+ * Create 5 Year WN Template
+ */
+var $exchangeType = ["--None--","Advance Exchange","Return Exchange"];
+var $unitOfTimeForCoverage = ["--None--","Days","Weeks","Months","Years"];
+var $coverageEffectiveFrom = ["--None--","Date Installed","Date Ordered","Date Shipped","Last Activity Date","Last Date Shipped","Warranty Start Date","Warranty End Date"];
+var $materialPercentCovered = 10;
+var $laborPercentCovered = 20;
+var $expensesPercentCovered = 30;
+var $durationOfCoverage = 5;
+var $seperator = "/";
+
+var $warrantyName = $bo_act_warrantyTerms.createWarrantyTerms($exchangeType[2],"10","5",$unitOfTimeForCoverage[4],"20","5",$unitOfTimeForCoverage[4],"30","5",$unitOfTimeForCoverage[4],$coverageEffectiveFrom[1]);
+$bo_act_warrantyTerms.createApplicableProducts($productName, $warrantyName); //Create Applicable product for warranty Terms
+$bo_act_navigation.navigateToCreatedRecordUsingGlobalSearch($IBName); 	//Navigate to Installed Product Page using global search
+$bo_act_warrantyTerms.createWarranty($warrantyName);
+
+//Create Support Case From IB record
+var $status = "New";
+var $priority = "Low";
+var $caseOrigin = "Web";
+var $caseNumber = $bo_act_installedProduct.createSupportCaseFromIB($IBName,$status,$priority,$caseOrigin);
+
+//Perform Auto Entitlement on Case Object Record
+_click($bo_pg_Cases.btn_editCase);
+if(_isChecked(_checkbox("Is Entitlement Performed"))){
+	_logOutput("Auto Entitlement is Performed");
+}
+else{
+	_click(_checkbox("Perform Auto Entitlement"));
+	}
+_click(_submit(" Save "));
+
+
+//validation of Entitlement Parameters On Case
+
+if(_isVisible(_image("Checked",_rightOf(_cell("/Is Entitlement Performed/"))))){
+	_logOutput("Entitlement is Performed Successfully = PASS");
+	}else{
+	_fail("Entitlement is Not Performed = Failed");
+	}
+
+//var $actual_warranty = _getText(_link(0,_rightOf(_span("/Warranty/"))));
+var $actual_EntitlementType = _getText(_div(0,_rightOf(_cell("/Entitlement Type/"))));
+var $actual_BillingType = _getText(_div(0,_rightOf(_cell("/Billing Type/"))));
+var $actual_AutoEntStatus = _getText(_div(0,_rightOf(_cell("/Auto Entitlement Status/"))));
+
+if(_isVisible(_cell("Service/Maintenance Contract"))){
+	var $actual_warranty = _getText(_link("/WN/", _rightOf(_cell("/Warranty/"))));
+	
+}else{
+	var $actual_warranty = _getText(_link("/WN/",_rightOf(_span("/Warranty/"))));
+}
+
+_assertNotNull($actual_warranty,"Warranty is Null on case record");
+_assertEqual($actual_AutoEntStatus,"Success","Actual and expected Auto Entitlement Status are not same");
+_assertEqual($actual_EntitlementType,"AUTO","Actual and expected Entitlement Type are not same");
+_assertEqual($actual_BillingType,"Warranty","Actual and expected Billing Type are not same");
+
+
+//Clean up function
+
+$bo_act_autoEntitlementRule_Case.deleteAutoEntitlementRule_Case($autoEntRuleName);
+
+$bo_act_login.logOut(); 
+
+$RS_7305.end();

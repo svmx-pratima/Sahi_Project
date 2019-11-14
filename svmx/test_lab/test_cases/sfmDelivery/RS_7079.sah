@@ -1,0 +1,80 @@
+//Author: Anand Kakhandaki
+var $rs_7079 = _testcase("RS_7079","Adding Questions in Checklist Question Library");
+$rs_7079.start();
+_setSpeed(300);
+
+		/**
+		 * pre-Req: Ensure that the setting GBL029 Enable Checklist Capabilities is set to 
+		 * TRUE under module "Common" and SubModule " Global Settings" in Global profile
+		 */ 
+		
+		//Login to app
+		$bo_act_login.login($g_url,$sfmdUsn,$sfmdPwd);
+		$sfm_act_navigation.navigateToChecklistQuestionLibrary();
+		
+		var $queNames=["How is the condition of the product?","When was the product serviced last?","How much time does it take approximately to service this product?"];
+		var $queNameVal=new Array;
+		
+		//Common fields
+		var $queType="Picklist";
+		var $queName=$bo_act_common.generateRandomName($queNames[0]+"_");
+		$queNameVal[0]=$queName;
+		var $helpURL="http://Google.com/Doc";
+		var $tag="rs-7079-01";
+		var $queCommonDetails=[$queType,$queName,$helpURL,$tag];
+		
+		var $responseSet="Create New";
+		var $responseSetName=$bo_act_common.generateRandomName("rs7079_PicklistOpt_");
+		var $ansValueSet=["Good","Worse","Dont know"];
+		var $default=[false,false,false];
+		$queSpecificDetails=[$responseSet,$responseSetName,$ansValueSet,$default];
+		$sfm_act_checklistQuestionLibrary.createCheckListQuestionInLib($queCommonDetails, $queSpecificDetails);
+		
+		
+		//Common fields
+		var $queType="Date";
+		var $queName=$bo_act_common.generateRandomName($queNames[1]+"_");
+		$queNameVal[1]=$queName;
+		var $helpURL="http://Google.com/Doc";
+		var $tag="rs-7079-01";
+		var $queCommonDetails=[$queType,$queName,$helpURL,$tag];
+		
+		var $defaultAnsType="Function";
+		var $defaultVal="Today";
+		var $queSpecificDetails=[$defaultAnsType,$defaultVal];
+		$sfm_act_checklistQuestionLibrary.createCheckListQuestionInLib($queCommonDetails, $queSpecificDetails);
+	
+		
+		//Common fields
+		var $queType="DateTime";
+		var $queName=$bo_act_common.generateRandomName($queNames[2]+"_");
+		$queNameVal[2]=$queName;
+		var $helpURL="http://Google.com/Doc";
+		var $tag="rs-7079-01";
+		var $queCommonDetails=[$queType,$queName,$helpURL,$tag];
+		
+		var $defaultAnsType="Value";
+		var $defaultVal=getToday();
+		var $queSpecificDetails=[$defaultAnsType,$defaultVal];
+		_log("$defaultAnsType: "+$queSpecificDetails[0]);
+		$sfm_act_checklistQuestionLibrary.createCheckListQuestionInLib($queCommonDetails, $queSpecificDetails);
+		
+		_log("length: "+$queNameVal.length);
+		for (var $i = 0; $i < $queNameVal.length; $i++) {
+			$sfm_act_checklistQuestionLibrary.searchQueInLib($queNameVal[$i]);
+			_assertExists(_div($queNameVal[$i]));
+		}
+		
+		
+		
+function getToday(){
+	var $currentTime = new Date();
+	var $month = $currentTime.getMonth() + 1;
+	var $day = $currentTime.getDate();
+	var $year = $currentTime.getFullYear();
+	var $ret=$month+"/"+$day+"/"+$year;
+	_log("Today date: "+$ret);
+	return $ret;
+};
+
+$rs_7079.end();

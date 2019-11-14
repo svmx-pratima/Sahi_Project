@@ -1,0 +1,40 @@
+/**
+ * Functions for Interactive Entitlement Case
+ */
+var $bo_act_interactiveEntitlement_Case = new function bo_act_interactiveEntitlement_Case() {
+
+	/**
+	 * Perform Interactive Entitlement Case
+	 * 
+	 */
+	this.performInteractiveEntitlement_Case = function($caseNumber, $SconName) {
+		//Navigate to the case and click on check Entitlement SFM
+		$bo_act_Cases.checkEntitlementOnCase($caseNumber);
+		_wait(15000, _isVisible($bo_pg_interactiveEntitlement_CaseAndWO.btn_checkEntitlement_Case));
+		_click($bo_pg_interactiveEntitlement_CaseAndWO.btn_checkEntitlement_Case);
+		$bo_pg_interactiveEntitlement_CaseAndWO.selectWarrantyOrContractCasePage($SconName);
+	
+	};
+	
+	this.saveInteractiveEntitlement_CasePage = function() {
+	_click($bo_pg_interactiveEntitlement_CaseAndWO.btn_saveEntitlementCase);
+	_wait(15000, _isVisible($bo_pg_Cases.txt_caseDetail));
+	_wait(3000);
+	};
+	
+	this.performInteractiveEntitlement_withOnLocation = function($caseNumber, $SconName) {
+		//Navigate to the case and click on check Entitlement SFM
+		$bo_act_Cases.checkEntitlementOnCase($caseNumber);
+		_wait(15000, _isVisible($bo_pg_interactiveEntitlement_CaseAndWO.btn_checkEntitlement_Case));
+		_click($bo_pg_interactiveEntitlement_CaseAndWO.btn_checkEntitlement_Case);
+		_wait(3000);
+		_click($bo_pg_interactiveEntitlement_CaseAndWO.btn_settingEntitlementCase);
+		_wait(5000, _isVisible($bo_pg_interactiveEntitlement_CaseAndWO.txt_settingEntitlement_CasePage));
+		_check($bo_pg_interactiveEntitlement_CaseAndWO.chk_settingMatchLocation_CasePage);
+		_click($bo_pg_interactiveEntitlement_CaseAndWO.btn_EntitlementTabCase);
+		_click($bo_pg_interactiveEntitlement_CaseAndWO.btn_checkEntitlement_Case);
+		_wait(3000);
+		$bo_pg_interactiveEntitlement_CaseAndWO.selectWarrantyOrContractCasePage($SconName);
+		
+	};
+};

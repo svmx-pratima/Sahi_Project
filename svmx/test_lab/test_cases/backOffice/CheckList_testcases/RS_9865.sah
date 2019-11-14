@@ -1,0 +1,38 @@
+// Author Meghana Rao P
+/*
+ * Verify question's behaviour if we add new question with/without tags.
+ */
+var $RS_9865 = _testcase("RS_9865", "Verify question's behaviour if we add new question with/without tags");
+$RS_9865.start();
+
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+
+var $QuestionName1 = $bo_act_common.generateRandomName("A RS_9865_1");
+var $QuestionName2 = $bo_act_common.generateRandomName("A RS_9865_2");
+var $QuestionName3 = $bo_act_common.generateRandomName("A RS_9865_3");
+var $Process1 = $bo_act_common.generateRandomName("A_RS_9865_Pro1");
+$bo_act_navigation.navigateToSvmxSetup();
+// To create a Checkbox Question with default checklist number 1
+
+$bo_act_navigation.navigateToSfmTransactionDesigner();
+_wait(60000, _isVisible($bo_pg_sfmTransactionAndDesigner.btn_newSFM));
+_wait(1000);
+
+// To create Checklist Process 1
+$bo_act_checklistdesigner.newChecklistTypeSFM($Process1,"to generate a Checklist/Survey type of Process", "Work Order");
+
+// Create a new Question without tags
+$bo_act_checklistdesigner.create_newquestion_tag_in_designer($QuestionName1, "");
+
+$bo_act_checklistdesigner.create_newquestion_tag_in_designer($QuestionName2, "TAG_9865");
+$bo_act_checklistdesigner.create_newquestion_tag_in_designer($QuestionName3, "TAG_9865");
+
+//_call(top.location.reload());
+$bo_act_checklistdesigner.verifythequestionsonUI($QuestionName1, $QuestionName1);
+
+$bo_act_checklistdesigner.verifythequestionsonUI($QuestionName2, "TAG_9865");
+$bo_act_checklistdesigner.verifythequestionsonUI($QuestionName3, "TAG_9865");
+
+$bo_act_login.logOut(); 
+
+$RS_9865.end();

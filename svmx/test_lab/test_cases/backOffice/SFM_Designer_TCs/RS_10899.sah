@@ -1,0 +1,86 @@
+/*Author Narendra Babu*/
+
+var RS_10899 = _testcase("RS_10899","Verify Smart Sync on Save option is available on the Advanced tab in OPDOC Process.d.");
+RS_10899.start();
+
+
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+
+
+/*Verifying the Smart Sync label in standard*/
+
+
+$bo_act_navigation.navigateToSfmTransactionDesigner();
+_setValue($bo_pg_sfmTransactionAndDesigner.txt_standardSfmTransactionQuickFind,"Work Order Service Report");
+_wait(6000);
+_click(_f("main").s_label("Work Order Service Report"));
+_wait(8000);
+_click(_f("main").tab("Advanced Options"));
+_click(_f("main").tab("Sync"));
+_assertExists(_f("main").s_checkbox("Run smart sync on save"));
+
+
+
+//clone standard Output Doc SFM Verifying the Smart Sync label */
+
+
+var $sfmNameToBeCloned="Work Order Service Report";
+var $sfmName=$bo_act_common.generateRandomName("rs_10899_");
+
+//var $object="Work Order";
+$sfm_act_SFM.cloneTDM016($sfmNameToBeCloned, $sfmName, false, "", "", [], []);
+//_click(_f("main").s_checkbox($object).near($sfm_pg_screenDesigner.sel_targetHeaderObject));
+_wait(10000);
+_click(_f("main").tab("Advanced Options"));
+_click(_f("main").tab("Sync"));
+_assertExists(_f("main").s_checkbox("Run smart sync on save"));
+_wait(15000);
+_click($bo_pg_sfmTransactionAndDesigner.btn_templateDesigner);
+_setSelected($bo_pg_sfmTransactionAndDesigner.sel_sfmTemplateforOpDoc, "Work Order Service Report");
+_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmSaveTemplateAs,$sfmName);
+_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmSaveTemplateLayoutID,$sfmName);
+_click($bo_pg_sfmTransactionAndDesigner.btn_saveAsTempDesignPage);
+_wait(10000);
+
+_setStrictVisibilityCheck(true);
+_click($bo_pg_sfmTransactionAndDesigner.btn_quickSave1);
+_wait(10000);
+_click($bo_pg_sfmTransactionAndDesigner.btn_saveAndclose);
+_setStrictVisibilityCheck(false);
+
+
+
+
+//Create New Output Doc SFM Verifying the Smart Sync label */
+
+
+
+var $SmartDocsName=$bo_act_common.generateRandomName("RS10899_Smartdoc_");
+var $sfmType="to generate an Output Document for a header record with/without its child records";
+var $object="Work Order";
+$sfm_act_Transactions.sfmPropertiesPage($SmartDocsName, $SmartDocsName, $SmartDocsName, $sfmType, "", [], $object, []);
+var $filePath="../../../../../genericOPDocFormat.txt";
+$sfm_act_Transactions.saveOPDOCTempDesigner("",$SmartDocsName, $SmartDocsName, $filePath);
+_click(_f("main").tab("Advanced Options"));
+_click(_f("main").tab("Sync"));
+_click(_f("main").s_checkbox("Run smart sync on save"));
+_click($bo_pg_sfmTransactionAndDesigner.btn_saveAndclose);
+
+
+
+
+//assigning the cloned SFM to wizard//
+
+/*
+
+var $wizardObject="Work Order";
+var $wizardName1 =$wizardName[7];
+var $wizardType="Output Document";
+var $profile="";
+var $handOver=false;
+$sfm_act_wizards.addToWizard($wizardObject, $wizardName1, $wizardType, generateRandomName("rs_10899_"), $handOver, $profile);
+
+*/
+
+
+RS_10899.end();

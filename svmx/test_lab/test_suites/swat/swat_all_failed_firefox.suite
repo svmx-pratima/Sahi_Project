@@ -1,0 +1,4 @@
+../../test_cases/swat/BVT_TC_002_SFW_with_standard_Wiz_steps.sah http://test.salesforce.com
+../../test_cases/swat/BVT_TC_003_SFW_with_cloned_Wiz_steps.sah http://test.salesforce.com
+../../test_cases/swat/BVT_TC_005_CustomLinkedProcess.sah http://test.salesforce.com
+../../test_cases/swat/checkListWithDefaultValues.sah http://test.salesforce.com

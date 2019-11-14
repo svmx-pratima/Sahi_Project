@@ -1,0 +1,49 @@
+//Author: Safi Ahmed
+
+var $rs_7015 = _testcase("RS_7015","Verify current record literals in lookup");
+$rs_7015.start();
+$sfmName = $bo_act_common.generateRandomName("RS7015_");
+$value = $bo_act_common.generateRandomName("Text_");
+$sfmPgLayoutName =	$bo_act_common.generateRandomName("SFM_Auto_Page");
+$processName = "Manage Work Order Lines - Usage";
+$lookUpName = $bo_act_common.generateRandomName("Case_lkp_");
+$wizTitle = $bo_act_common.generateRandomName("SFM Wiz");
+$bo_act_login.login($g_url,$sfmdUsn, $sfmdPwd);
+$bo_act_navigation.navigateToSfmTransactionDesigner();
+$sfm_act_Transactions.clonedsfm7015($processName,$sfmName,$sfmPgLayoutName);
+$bo_act_navigation.navigateToSfmWizard();
+$sfm_act_createCustomWizard.chooseObject("Work Order");
+$sfm_act_createCustomWizard.addManageWizSteps($wizTitle, "SFM", $sfmName);
+$caseNo = $sfm_act_createCustomWizard.createCasewithFieldValues($value);
+$sfm_act_createCustomWizard.createWOwithFieldValues($value);
+$sfm_act_createCustomWizard.clickWizardBtn($sfmName);
+//$sfm_act_createCustomWizard.verify7015();
+
+// Test Case Verification 
+var $count=0;
+_selectDomain();
+_click(_span("/lookup_icon/",_rightOf(_label("Case:"))));
+_wait(3000);
+_setStrictVisibilityCheck(true);
+_click(_span("/search-icon/"));
+_wait(3000);
+var $divs= _collect("_cell","/.*/",_under(_div("Case Number")))
+	//_alert( $divs.length);
+for($i=0;$i<$divs.length;$i++){
+	if(_getText($divs[$i])!=$caseNo)
+	{
+		$count++;
+	}
+	
+}
+	if($count==0){
+			_log("TestResult:: Pass");
+		}
+		else
+			{
+			_log("TestResult:: Fail");
+		}
+	
+
+
+$rs_7015.end();

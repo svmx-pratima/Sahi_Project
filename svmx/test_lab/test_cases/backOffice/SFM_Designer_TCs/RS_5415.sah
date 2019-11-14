@@ -1,0 +1,71 @@
+//author - Mamata Rout
+
+
+var $RS_5415 = _testcase("RS_5415", "On hiding multiple standard & user define CA from Online for a standard Object");
+$RS_5415.start();
+_setSpeed($g_stepSpeed);
+
+var $custActname=$bo_act_common.generateRandomName("5415CA");
+var $custActID=$custActname;
+var $url="https://www.google.co.in/";
+var $objectName="Installed Product";
+var $actnType="URL";
+var $wizardname=$bo_act_common.generateRandomName("5415SFW");
+var $wizardID=$wizardname;
+var $processType="SFM Custom Actions";
+var $wizardStepType="Others";
+var $wizardStepName = "Create Warranty";
+var $tabName="Installed Products";
+//**********Login to APP************************
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+//------------------------------------CREATE CUSTOM ACTION----------------------
+$bo_act_navigation.navigateToSfmCustomAction();
+$bo_act_customAction.createNewCustomAction($custActname,$custActID,$url,$objectName,$actnType);		
+_setSpeed(3000);
+
+//---------------------CREATE WIZARD AND ADD CUSTOM ACTION AND SFM TO IT---------------------------
+	$bo_act_navigation.navigateToSfmWizard();
+	$bo_act_SFW.createWizardGeneralInfo($objectName,$wizardname,$wizardID);
+	$bo_act_SFW.addCustomActionToWizard($wizardStepType,$custActname);
+	$bo_act_SFW.addCustomActionToWizard($wizardStepType,$wizardStepName);
+	$bo_act_sfmVerifyWorkOrder.showAllTab($tabName);
+	_click(_link(0,_under(_tableHeader("Installed Product ID"))));
+	_wait(10000,_isVisible(_heading2("Installed Product Detail")));
+	$bo_act_sfmVerifyWorkOrder.wizardButtonVisible($custActname);
+	
+//$bo_act_sfmVerifyWorkOrder.wizardButtonNotVisible($wizardname);
+//----------------Navigate to SFm App Permission, Disable the wizard
+	
+$bo_act_navigation.navigateToSfmAppPermission();
+	 $bo_act_SFMAppPermission.genericSearchInAppPermission($processType,$objectName,$custActname);
+	$bo_act_SFMAppPermission.disableAppPermission();
+	$bo_act_SFMAppPermission.genericSearchInAppPermission($processType,$objectName,$wizardStepName);
+	$bo_act_SFMAppPermission.disableAppPermission();
+	$bo_act_sfmVerifyWorkOrder.showAllTab($tabName);
+	_click(_link(0,_under(_tableHeader("Installed Product ID"))));
+	_wait(10000,_isVisible(_heading2("Installed Product Detail")));
+	$bo_act_sfmVerifyWorkOrder.wizardButtonNotVisible($custActname);
+	$bo_act_SFW.deleteWizards( $objectName,$wizardname);
+	$bo_act_customAction.deleteCustomAction($objectName,$custActname);
+	$bo_act_navigation.navigateToSfmAppPermission();
+	$bo_act_SFMAppPermission.genericSearchInAppPermission($processType,$objectName,$wizardStepName);
+	
+	if(_isVisible(_div("svmx-grid-checkheader"))){
+		_click(_div("svmx-grid-checkheader"));
+		_click($bo_pg_sfmAppPermissionD.btn_clickSaveAppPermission);
+		_wait(3000);
+		_click($bo_pg_sfmAppPermissionD.popUpOK)
+		}
+
+
+
+_setSpeed($g_stepSpeed);
+
+$RS_5415.end();
+
+
+
+
+
+
+

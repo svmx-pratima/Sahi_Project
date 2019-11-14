@@ -1,0 +1,53 @@
+/*Page objects of Salesforce and reusable methods
+ * 
+ */
+var $dc_pg_servicemaxsetup = new function dc_pg_servicemaxsetup() {
+	// Variables - Global for DC
+	
+
+	// Page Objects - Text Field
+	this.txtfld_Name = _textbox("Name");
+	this.txtfld_StreetTeam = _textarea("TrackTechTeam:POPUPS:PTeam:TeamSec:ItmStrt:TStreet");
+	this.txtfld_StreetTech = _textarea("TrackTechTeam:POPUPS:PbTechBlock:TechSec:ItmStret:TStreet");
+	this.txtfld_City = _textbox("City");
+	this.txtfld_State = _textbox("State");
+	this.txtfld_Zip = _textbox("Zip");
+	this.txtfld_TechnicianName = _textbox("Technician Name");
+	this.txtfld_Dispatcher = _textbox("TrackTechTeam:selected_ID:SVMXPageBlock:PbDispatch:DsptchrLst:0:j_id401");
+
+	// Page Objects - Button
+	this.btn_ServiceOrganization = _div("Service Organization");
+	this.btn_ServiceOrg = _div("Service Org");
+	this.btn_NewServiceTeam = _button("New Service Team");
+	this.btn_NewTechnician = _button("New Technician");
+	this.btn_Save = _button("Save");
+	this.btn_Dispatcher = _cell("Dispatcher");
+	this.btn_AddDispatcher = _button("Add Dispatcher");
+
+	// Page Objects - Link
+	this.link_servicemaxSetup = _link("ServiceMax Setup");
+
+	// Page Objects - Text
+	this.txt_WelcometoServiceMaxSetup = _div("Welcome to ServiceMax Setup Home.");
+	this.txt_AddEditTeam = _heading3("Add/Edit Team");
+	this.txt_AddEditTechnician = _heading3("Add/Edit Technician");
+	this.txt_Processing = _span("Processing...");
+	this.txt_DispatcherName = _div("Dispatcher Name");
+	this.txt_Success = _heading4("Success:");
+
+	// Page Objects - CheckBox
+	this.chkbx_Active = _checkbox("Active");
+	this.chkbx_EnableScheduling = _checkbox("TrackTechTeam:POPUPS:PbTechBlock:TechSec:ItmES:TCcal");
+
+	// page Objects - ListBox
+	this.lst_CountryTeam = _select("TrackTechTeam:POPUPS:PTeam:TeamSec:ItmCntry:TCntry");
+	this.lst_CountryTech = _select("TrackTechTeam:POPUPS:PbTechBlock:TechSec:ItmCntry:TCntry");
+	this.lst_RoleTech = _select("TrackTechTeam:POPUPS:PbTechBlock:TechSec:ItmRole:TRole");
+
+	// page Objects - ListBox
+	this.img_DispatcherLookup = _image("Dispatcher Lookup (New Window)");
+
+	// page Objects - Window
+	this.win_lookup = "lookup";
+
+};

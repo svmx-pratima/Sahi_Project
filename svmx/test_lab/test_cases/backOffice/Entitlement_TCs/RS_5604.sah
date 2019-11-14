@@ -1,0 +1,170 @@
+//Tests are to be written here [Bhupendra Singh Chouhan]
+//==============
+
+var $RS_5604 = _testcase("$RS_5604","Verify the functionality of Interactive Entitlement on WO's PS lines using warranty");
+$RS_5604.start();
+_setSpeed($g_stepSpeed);
+
+/**
+ * Login to the Sandbox Org
+ */
+
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+
+//Pre - Condition Test Data
+var $productFamily = ["--None--","GeneralSolution","AdvSolution","Accessory", "Storage"];
+var $productCode = "";
+var $exchangeType = ["--None--","Advance Exchange","Return Exchange"];
+var $unitOfTimeForCoverage = ["--None--","Days","Weeks","Months","Years"];
+var $coverageEffectiveFrom = ["--None--","Date Installed","Date Ordered","Date Shipped","Last Activity Date","Last Date Shipped","Warranty Start Date","Warranty End Date"];
+var $materialPercentCovered = 10;
+var $laborPercentCovered = 20;
+var $expensesPercentCovered = 30;
+var $durationOfCoverage = 5;
+var $seperator = "/";
+
+/**
+ * Configure the Group Profile SET024 and SET025
+ */
+//var $groupProfileName = "AutoBACGroup";
+var $Module = "Entitlement Verification";
+var $SubModule = "Work Order Entitlement VF";
+var $Setting1 = "SET024";
+var $Setting2 = "SET025";
+var $value = true;
+$bo_act_configurationProfiles.editGroupProfileForBooleanSettings($groupProfileName, $Module, $SubModule, $Setting1, $value);
+$bo_act_configurationProfiles.editGroupProfileForBooleanSettings($groupProfileName, $Module, $SubModule, $Setting2, $value);
+
+/**
+ * Create Account, Contact, Location, Product and Installed Product
+ */
+var $accountName = $bo_act_accounts.createAccount();
+var $contactName = $bo_act_contacts.createContact($accountName);
+var $productName = $bo_act_products.createProduct($productCode, $productFamily[0]);
+var $IBName = $bo_act_installedProduct.createInstalledProduct($productName, $accountName, $contactName);
+
+/**
+ * Create 5 Year WN Template
+ */
+var $warrantyName = $bo_act_warrantyTerms.createWarrantyTerms($exchangeType[2],"10","5",$unitOfTimeForCoverage[4],"20","5",$unitOfTimeForCoverage[4],"30","5",$unitOfTimeForCoverage[4],$coverageEffectiveFrom[1]);
+$bo_act_warrantyTerms.createApplicableProducts($productName, $warrantyName); //Create Applicable product for warranty Terms
+$bo_act_navigation.navigateToCreatedRecordUsingGlobalSearch($IBName); 	//Navigate to Installed Product Page using global search
+$bo_act_warrantyTerms.createWarranty($warrantyName);
+
+$bo_act_navigation.navigateToCreatedRecordUsingGlobalSearch($IBName);	//Navigate to Installed Product Page using global search
+
+var $materialPercentCoveredActulOn_IB = _getText(_cell(0,_under(_tableHeader("Material % Covered"))));
+var $timePercentCoveredActulOn_IB = _getText(_cell(0,_under(_tableHeader("Time % Covered"))));
+var $expensesPercentCoveredActulOn_IB = _getText(_cell(0,_under(_tableHeader("Expenses % Covered"))));
+
+//validation
+//Validating the Material Labor and Expenses Percent
+_assertEqual($materialPercentCovered,$materialPercentCoveredActulOn_IB,"Actual and expected Material % covered are not same");
+_assertEqual($laborPercentCovered,$timePercentCoveredActulOn_IB,"Actual and expected Time % covered are not same");
+_assertEqual($expensesPercentCovered,$expensesPercentCoveredActulOn_IB,"Actual and expected Expenses % covered are not same");
+
+var $startDateExpectedOn_IB = _getText(_div(0,_rightOf(_cell("/Date Installed/"))));
+
+var $endDateExpectedOn_IB =  $bo_act_common.endDateCalculationForIB($startDateExpectedOn_IB, $durationOfCoverage, $seperator);
+_logOutput($endDateExpectedOn_IB);
+
+var $startDateActulOn_IB = _getText(_cell(0,_under(_tableHeader("Start Date"))));
+var $endDateActulOn_IB = _getText(_cell(0,_under(_tableHeader("End Date"))));
+
+//Validating the Actual and expected Start/End Dates on IB
+_assertEqual($startDateExpectedOn_IB,$startDateActulOn_IB,"Actual and expected Start Dates are not same");
+_assertEqual($endDateExpectedOn_IB,$endDateActulOn_IB,"Actual and expected End Dates are not same");
+
+
+/**
+* Create SFM Wizard for WO with Steps as Check Entitlement PS line
+*/
+
+var $wizardTitleName = $bo_act_common.generateRandomName("SFWTitle");
+var $wizardIDName = $bo_act_common.generateRandomName("SFWId");
+var $fieldActnType = "Others";
+var $actnName = "Check Entitlement PS";
+
+$bo_act_navigation.navigateToSfmWizard();
+$bo_act_SFW.createWizardGeneralInfo("Work Order", $wizardTitleName, $wizardIDName);
+$bo_act_SFW.addCustomActionToWizard($fieldActnType, $actnName);
+$bo_act_SFW.quickSaveSFWizard();
+
+/**
+ * Create Case record
+ */
+var $caseStatus = "New";
+var $casePriority = "Medium";
+var $caseOrigin = "Phone";
+var $caseNumber = $bo_act_Cases.createCase($caseStatus, $casePriority, $caseOrigin);
+
+/**
+ * Create Work Order record
+ */
+var $orderStatus = "Open";
+var $priority = "Medium";
+var $orderType = "Field Service";
+var $IBName1 = "";
+
+var $WO_Number = $bo_act_workOrders.createWorkOrder($caseNumber,$accountName,$contactName,$IBName1,$orderStatus,$priority,$orderType);
+
+/**
+ * Create Work Details record
+ */
+var $WDrecordType =  ["Estimate","Products Serviced","Request/Receipt","Usage/Consumption"];
+var $WDActivityType =  ["--None--","Calibration","Cleanup","Installation","Repair","Service"];
+var $WDLineType = ["--None--","Parts","Labor","Expenses"];
+
+var $WDNumber = $bo_act_workDetails.createWorkDetails($WO_Number, $WDrecordType[1], $IBName, $WDActivityType[1], $WDLineType[2]);
+
+// Validation for Work Details Work Order record
+/*var $actualWDNumber_onWO = _getText(_link(0,_under(_tableHeader("Line Number"))));
+var $actualWDRecordType_onWO = _getText(_cell(0,_under(_tableHeader("Record Type"))));
+
+_assertEqual($actualWDNumber_onWO, $WDNumber,"Actual and expected work details number not Same");
+_assertEqual($actualWDRecordType_onWO, $WDrecordType[1],"Actual and expected work detail's Record Type not Same");
+*/
+/**
+ * Perform Interactive Entitlement on WO PS line
+ */
+$bo_act_interactiveEntitlement_WO.performInteractiveEntitlement_WOPSLines($WO_Number, $IBName, $warrantyName);
+
+/**
+ * Navigate to the WO's Work details for validation of Entitlement
+ */
+
+$bo_act_workDetails.navigateToWorkDetails($WO_Number, $WDNumber);
+
+var $productWarranty = _getText(_link(0,_rightOf(_cell("Product Warranty"))));
+
+_assertNotNull($productWarranty, "Product Warranty is Null");
+
+// Validation of "Is Entitlement Performed?" Checkbox
+
+if(_isVisible(_image("Checked",_rightOf(_cell("/Is Entitlement Performed/"))))){
+	_logOutput("Entitlement is Performed = PASS");
+	}else{
+	_fail("Entitlement is Not Performed = Failed");
+	}
+
+//Clean up function
+
+
+$bo_act_common.deleteAccount($bac_un, $bac_pwd, $accountName);
+$bo_act_common.deleteContact($bac_un, $bac_pwd, $contactName);
+$bo_act_common.deleteProduct($bac_un, $bac_pwd,$productName);
+$bo_act_common.deleteWorkOrder($bac_un, $bac_pwd, $orgnamespace,$WO_Number);
+$bo_act_common.deleteWarranty($bac_un, $bac_pwd, $orgnamespace,$warrantyName);
+$bo_act_common.deleteCase($bac_un, $bac_pwd,$caseNumber);
+//
+//var $datacreated = [$WO_Number,$caseNumber,$IBName,$productName,$contactName,$accountName,$warrantyName];
+//for (var i = 0; i < $datacreated.length; i++) {
+//	$bo_act_common.cleanUpfunction($datacreated[i]);
+//}
+
+//Delete SFM Wizard 
+$bo_act_SFW.deleteSFMWizard("Work Order", $wizardIDName);
+
+$bo_act_login.logOut(); 
+
+$RS_5604.end();

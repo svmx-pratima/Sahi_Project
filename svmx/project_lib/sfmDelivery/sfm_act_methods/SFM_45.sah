@@ -1,0 +1,6 @@
+var $SFM_45 = new function SFM_45() {
+	this.abcTest=function(){
+_click($SFM_123.btn_ServSetUp);
+_click($SFM_123.btn_ServFlowManger);
+	   }
+	   }

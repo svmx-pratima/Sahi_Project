@@ -1,0 +1,55 @@
+var $user_credentials = $excel.readFromCustomExcel("../optimax/op_excleData/automation.xlsx", "User_Details","","");
+var $ChildTerrData = $excel.readFromCustomExcel("../optimax/op_excleData/automation.xlsx", "Rules","","");
+
+//var $nArr;
+//Calling the sforce API
+for(var $i=0;$i<$user_credentials.length;$i++)
+{
+var $g_un = $user_credentials[$i][0];
+var $g_pwd = $user_credentials[$i][1];
+var $g_url = $user_credentials[$i][2];
+}
+
+var $RS_6322 = _testcase("RS_6322", "Delete Child Territory");
+
+$RS_6322.start();
+
+/*var $g_url = "https://test.salesforce.com/";
+var $g_un = "govendhan@svmx-cct5.org.cct5part1";
+var $g_pwd = "maxpl0re2";*/
+
+$bo_act_login.login($g_url, $g_un, $g_pwd);
+		
+var $ChildTerr = $ChildTerrData[0][5];
+
+_click(_link("ServiceMax Setup"));
+_wait(20000,_isVisible(_div("Service Organization")))
+_click(_div("Service Organization"));
+_wait(20000,_isVisible(_div("Territories")))
+_click(_div("Territories"));
+_click(_link($ChildTerr));
+_expectConfirm("Are you sure?", true);
+_click(_button("Delete"));
+_assertEqual("Are you sure?", _lastConfirm());
+_click(_link("Home"));
+_click(_link("ServiceMax Setup"));
+_wait(20000,_isVisible(_div("Service Organization")))
+_click(_div("Service Organization"));
+_wait(20000,_isVisible(_div("Territories")))
+_click(_div("Territories"));
+
+var $test = _isVisible($ChildTerr);
+_log($test);
+
+if($test)
+	{
+	_fail("Error in Deleting Child Territory")
+	}
+else
+	{
+	_log("Child Territory Deleted Successfully");
+	}
+
+$bo_act_login.logOut();
+
+$RS_6322.end();

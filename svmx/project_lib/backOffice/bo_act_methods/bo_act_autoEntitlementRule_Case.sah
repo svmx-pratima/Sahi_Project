@@ -1,0 +1,116 @@
+/**
+ * Functions for the Warranty Terms Records
+ */
+var $bo_act_autoEntitlementRule_Case = new function bo_act_autoEntitlementRule_Case() {
+
+	/**
+	 * Create a Auto Entitlement Rule Case
+	 * 
+	 */
+	this.createAutoEntitlementRule_Case = function($CaseField1,$Operator,$Value1,$CaseField2,$Value2, $p1, $p2) {
+		var $autoEntitlementRuleName_Case = $bo_act_common.generateRandomName("autoEntRule_Case");
+		$bo_act_navigation.navigateToAutoEntitlementRulesForCase();
+		_click($bo_pg_autoEntitlementRule_CaseAndWO.btn_newRule);
+		
+		_setValue($bo_pg_autoEntitlementRule_CaseAndWO.txt_autoEntitlementRuleName, $autoEntitlementRuleName_Case);
+		_setValue($bo_pg_autoEntitlementRule_CaseAndWO.txt_autoEntitlementRuleDescription, $autoEntitlementRuleName_Case);
+		
+		//Entitlement Rule 1st row acts 
+		_setSelected($bo_pg_autoEntitlementRule_CaseAndWO.sel_workOrderField, $CaseField1);
+		_setSelected($bo_pg_autoEntitlementRule_CaseAndWO.sel_workOrderFieldOperator, $Operator);
+		_setValue($bo_pg_autoEntitlementRule_CaseAndWO.sel_workOrderFieldValue, $Value1);
+		
+		//Entitlement Rule 2nd row acts
+		_setSelected($bo_pg_autoEntitlementRule_CaseAndWO.sel_CaseOrWOField2ndRow, $CaseField2);
+		_setSelected($bo_pg_autoEntitlementRule_CaseAndWO.sel_CaseOrWOFieldOperator2ndRow, $Operator);
+		_setValue($bo_pg_autoEntitlementRule_CaseAndWO.sel_CaseOrWOFieldValue2ndRow, $Value2);
+				
+		//Under the section "Specify the Entitlement settings to be used when a Work Order matches the above criteria."
+		//_setSelected($bo_pg_autoEntitlementRule_CaseAndWO.sel_entitlementBePerformedOn_ProductsServiced, $p1); // $p1 = Yes/No for Select should Entitlement Be Performed On Products Serviced?
+		//_setSelected($bo_pg_autoEntitlementRule_CaseAndWO.sel_parentIBOfComponentBeIncluded, $p2); // $p2 = Yes/No for Select should Parent IB Of Component Be Included for Entitlement check?
+		//_setSelected($bo_pg_autoEntitlementRule_CaseAndWO.sel_topLevelIBOfComponentBeIncluded, $p3); // $p3 = Yes/No for Select should Top-Level IB Of Component Be Included for Entitlement check?
+		_setSelected($bo_pg_autoEntitlementRule_CaseAndWO.sel_entitlementConsider_warrantiesORSconORBoth, $p1); // $p4 = Warranties/Scon/Both for Entitlement check?
+		_wait(10000);
+		//_setSelected($bo_pg_autoEntitlementRule_CaseAndWO.sel_accountOnWoMatchedWithScon, $p5); // $p5 = Yes/No Account on WO matched to Scon
+		//_setSelected($bo_pg_autoEntitlementRule_CaseAndWO.sel_contactOnWoMatchedWithScon, $p6); // $p6 = Yes/No Contact on WO matched to Scon
+		//_setSelected($bo_pg_autoEntitlementRule_CaseAndWO.sel_locationOnWoIncluded, $p7); // $p7 = Yes/No Location included for Entitlement
+		_setSelected($bo_pg_autoEntitlementRule_CaseAndWO.sel_warrantiesOrSconSearched, $p2); // $p8 = Validity dates/Counters/Both
+		_wait(10000);
+		//_setSelected($bo_pg_autoEntitlementRule_CaseAndWO.sel_ConsiderSlaCoverageDefined, $p9); // $p9 = Yes/No SLA Coverage for Entitlement
+				
+		_click($bo_pg_autoEntitlementRule_CaseAndWO.btn_save);
+		_assertNotVisible(_heading4("/Error:/"));
+		_wait(10000, _isVisible($autoEntitlementRuleName_Case));
+		//_assertExists(_cell($autoEntitlementRuleName_Case));
+		
+		return $autoEntitlementRuleName_Case;	
+	};
+	
+	this.createAutoEntRule_CaseWithAllFields = function($CaseField,$Operator,$Value,$pIB,$topIB,$WarnOrSCON,$Act,$Cont,$Loc,$searchedUsing,$slaCov) {
+		var $autoEntitlementRuleName_Case = $bo_act_common.generateRandomName("autoEntRule_Case");
+		$bo_act_navigation.navigateToAutoEntitlementRulesForCase();
+		_click($bo_pg_autoEntitlementRule_CaseAndWO.btn_newRule);
+		
+		_setValue($bo_pg_autoEntitlementRule_CaseAndWO.txt_autoEntitlementRuleName, $autoEntitlementRuleName_Case);
+		_setValue($bo_pg_autoEntitlementRule_CaseAndWO.txt_autoEntitlementRuleDescription, $autoEntitlementRuleName_Case);
+		
+		//Entitlement Rule 1st row acts 
+		_setSelected($bo_pg_autoEntitlementRule_CaseAndWO.sel_workOrderField, $CaseField);
+		_setSelected($bo_pg_autoEntitlementRule_CaseAndWO.sel_workOrderFieldOperator, $Operator);
+		_setValue($bo_pg_autoEntitlementRule_CaseAndWO.sel_workOrderFieldValue, $Value);
+					
+		//Under the section "Specify the Entitlement settings to be used when a Case matches the above criteria."
+		//_setSelected($bo_pg_autoEntitlementRule_CaseAndWO.sel_entitlementBePerformedOn_ProductsServiced, $p1); // $p1 = Yes/No for Select should Entitlement Be Performed On Products Serviced?
+		_setSelected($bo_pg_autoEntitlementRule_CaseAndWO.sel_parentIBOfComponentBeIncluded, $pIB); // $p2 = Yes/No for Select should Parent IB Of Component Be Included for Entitlement check?
+		_setSelected($bo_pg_autoEntitlementRule_CaseAndWO.sel_topLevelIBOfComponentBeIncluded, $topIB); // $p3 = Yes/No for Select should Top-Level IB Of Component Be Included for Entitlement check?
+		_setSelected($bo_pg_autoEntitlementRule_CaseAndWO.sel_entitlementConsider_warrantiesORSconORBoth, $WarnOrSCON); // $p4 = Warranties/Scon/Both for Entitlement check?
+		_wait(10000);
+		_setSelected($bo_pg_autoEntitlementRule_CaseAndWO.sel_accountOnCaseMatchedWithScon, $Act); // $p5 = Yes/No Account on WO matched to Scon
+		_setSelected($bo_pg_autoEntitlementRule_CaseAndWO.sel_contactOnCaseMatchedWithScon, $Cont); // $p6 = Yes/No Contact on WO matched to Scon
+		_setSelected($bo_pg_autoEntitlementRule_CaseAndWO.sel_locationOnCaseIncluded, $Loc); // $p7 = Yes/No Location included for Entitlement
+		_setSelected($bo_pg_autoEntitlementRule_CaseAndWO.sel_warrantiesOrSconSearched, $searchedUsing); // $p8 = Validity dates/Counters/Both
+		_wait(10000);
+		_setSelected($bo_pg_autoEntitlementRule_CaseAndWO.sel_ConsiderSlaCoverageDefined, $slaCov); // $p9 = Yes/No SLA Coverage for Entitlement
+				
+		_click($bo_pg_autoEntitlementRule_CaseAndWO.btn_save);
+		_assertNotVisible(_heading4("/Error:/"));
+		_wait(10000, _isVisible($autoEntitlementRuleName_Case));
+		//_assertExists(_cell($autoEntitlementRuleName_Case));
+		
+		return $autoEntitlementRuleName_Case;	
+	};	
+	// Create Auto Entitlement on WO with Default values/Warranty
+	
+	this.createAutoEntitlementRuleWithDefaultValues_Case = function($WOField, $Operator, $Value) {
+		var $autoEntitlementRuleName_Case = $bo_act_common.generateRandomName("autoEntRule_Case");
+		$bo_act_navigation.navigateToAutoEntitlementRulesForCase();
+		_click($bo_pg_autoEntitlementRule_CaseAndWO.btn_newRule);
+		
+		_setValue($bo_pg_autoEntitlementRule_CaseAndWO.txt_autoEntitlementRuleName, $autoEntitlementRuleName_Case);
+		_setValue($bo_pg_autoEntitlementRule_CaseAndWO.txt_autoEntitlementRuleDescription, $autoEntitlementRuleName_Case);
+		
+		_setSelected($bo_pg_autoEntitlementRule_CaseAndWO.sel_workOrderField, $WOField);
+		_setSelected($bo_pg_autoEntitlementRule_CaseAndWO.sel_workOrderFieldOperator, $Operator);
+		_setValue($bo_pg_autoEntitlementRule_CaseAndWO.sel_workOrderFieldValue, $Value);
+		
+		_click($bo_pg_autoEntitlementRule_CaseAndWO.btn_save);
+		_assertNotVisible(_heading4("/Error:/"));
+		_wait(30000, _isVisible($autoEntitlementRuleName_Case));
+		_assertExists(_cell($autoEntitlementRuleName_Case));
+		
+		return $autoEntitlementRuleName_Case;	
+	};
+		
+	this.performAutoEntitlement_Case = function($workOrderNumber) {
+		$bo_act_workOrders.editWorkOrder($workOrderNumber);
+		_click(_checkbox("Perform Auto Entitlement"));
+		$bo_act_workOrders.saveWorkOrder();
+	};
+	
+	this.deleteAutoEntitlementRule_Case = function($autoEntitlementRule_Name) {
+		$bo_act_navigation.navigateToAutoEntitlementRulesForCase();
+		$bo_pg_autoEntitlementRule_CaseAndWO.selectAutoEntitlementRule_CaseAndWO($autoEntitlementRule_Name);
+		_click($bo_pg_autoEntitlementRule_CaseAndWO.btn_deleteRule);
+	};
+};
+

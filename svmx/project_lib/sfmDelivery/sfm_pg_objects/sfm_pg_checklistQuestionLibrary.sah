@@ -1,0 +1,80 @@
+/**
+* SFM  Custom Actions object repository 
+*/
+
+var $sfm_pg_checklistQuestionLibrary = new function sfm_pg_checklistQuestionLibrary() {
+	this.sel_createSFMTransaction= _f("main").s_dropdownlist("purposeCombo");
+	this.txt_targetObject= _f("main").s_textinput("textInput[1]");
+	this.lbl_workOrder= _f("main").s_label("Work Order[5]");
+	
+	this.btn_backToSetupHome =_submit("Back To Setup Home");
+	
+	this.txt_checklistQuestionLibrary=_span("Checklist Question Library");
+	this.btn_addQuestion=_div("Add");
+	this.txt_addQuestion=_span("Add Question");
+	this.txt_responseType=_textbox("Answer Type:");
+	this.sel_textAnswerType=_listItem("Text");
+	this.sel_checkBoxAnswerType= _listItem("Checkbox");
+	this.sel_radioButtonAnswerType=_listItem("Radio Button");
+	this.sel_picklistAnswerType=_listItem("Picklist");
+	this.sel_multiSelectPicklistAnswerType=_listItem("Multi-select Picklist");
+	this.sel_numberAnswerType=_listItem("Number");
+	this.sel_dateAnswerType=_listItem("Date");
+	this.sel_dateTimeAnswerType=_listItem("DateTime");
+	this.sel_datePickerIcon=_div("/svmx-form-date-trigger svmx-form-trigger-last svmx-unselectable/");//added by Shruthi Shanthappa
+	this.sel_datePicker=_div("/datepicker/");//added by Shruthi Shanthappa
+	this.sel_todayDate=_span("Today");//added by Shruthi Shanthappa
+	this.btn_submitChecklist =_span("Submit"); //added by Shruthi Shanthappa
+	this.txt_defaultResponseDate=_textbox("defaultResponseDate");//added by Shruthi Shanthappa
+	this.txt_questionText=_textbox("questionText");
+	this.txt_helpURL=_textbox("helpURL");
+	this.txt_responseSetName=_textbox("newResponseSetName");
+	this.txt_answerValue1=_textbox("answers");
+	this.txt_answerValue2=_textbox("answers[1]");
+	this.txt_answerValue3=_textbox("answers[2]");
+	this.txt_tagName=_textbox("TagField");
+	this.txt_defaultText=_textbox("defaultResponseText"); //added by Shruthi Shanthappa
+	this.btn_descriptionRequired=_f("main").s_checkbox("Description required");
+	this.btn_addAnswer=_div("+Add Answer");
+	this.btn_saveQuestion=_span("Save");
+	this.txt_saveSucessMessage=_span("Success");
+	this.btn_okMessage=_span("OK");	
+	this.txt_dateoptionFunction=_textbox("valueFunctionCombo");
+	this.sel_dateoptionValue=_listItem("Function");
+	this.txt_dateoptionLiteral=_textbox("literalCombo");
+	this.sel_todayLiteral=_listItem("Today");	
+	this.sel_yesterdayLiteral=_listItem("Yesterday");
+	this.sel_nowLiteral=_listItem("Now");
+	this.txt_checklistQuestionSearch=_textbox(1);
+	this.btn_Delete=_button("Delete");
+	this.selQuestion=_div("svmx-grid-row-checker");
+	this.seldeletionConfirm=_span("Yes");
+	this.txt_deleteSucessMessage=_div("Record(s) deleted successfully");
+	this.txt_confirmDelete=_div("Confirm Delete");
+	this.txt_successHeaderMsg=_div("Success");
+	this.btn_yes = _span("Yes");
+	// Owner Meghana Rao
+	this.btn_checklistdefaultbutton1 = _button(3);
+	this.btn_checklistdefaultbutton2 = _button(4);
+	
+	
+	//Anand
+	this.btn_includeINPDOC=_button(0,_near(_label("Include in Output Document")));
+	this.btn_descReq=_button("/Description_Required/");
+	this.txt_responseSetList=_textbox("responseSetName");
+	this.label_ansValue=_div("Answer Values");
+	this.txt_Number=_textbox("defaultResponseNumber");
+	this.btn_saveMsg=_div("Record(s) saved successfully");
+	this.btn_saveOK=_span("OK");
+	this.txt_search=_textbox(0,_near(_button("Add")));
+	this.btn_deleteMsg=_div("The question will be deleted. This action cannot be undone");
+	this.btn_ye
+	
+	
+	
+	//Added By Bhupendra Singh
+	this.sel_selectQuestionFromQBM = function($questiontext){
+		_click(_div("/svmx-grid-row-checker/",_near(_div($questiontext))));
+	};
+
+};

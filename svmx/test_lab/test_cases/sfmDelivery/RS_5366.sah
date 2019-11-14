@@ -1,0 +1,28 @@
+var $rs_5366 = _testcase("RS_5366","Verify 'Manage permission' for standard search as well as for custom search.");
+$rs_5366.start();
+var $standardSearch = "SVMXSTD: Timesheet Manager";
+$button = "Manage Permissions";
+$profile = "Clone Default Group Profile";
+var $clonedSearch = $bo_act_common.generateRandomName("RS_5366_ClonedSearch_");
+
+$bo_act_login.login($g_url,$sfmdUsn,$sfmdPwd);
+$bo_act_navigation.navigateToSfmSearchDesigner();
+//clone std search 
+$sfm_act_search.cloneSearch("SVMXSTD: Account Search", $clonedSearch,$clonedSearch);
+_wait(5000);
+//add cloned std search to the profile 
+$sfm_act_search.managePermissionSearch($clonedSearch, $button,$profile );
+_wait(5000);
+//add standard search to a user profile
+$sfm_act_search.managePermissionSearch($standardSearch, $button,$profile );
+_wait(5000);
+
+$bo_act_navigation.navigateToHome();
+_selectDomain($g_domain);
+_click($sfm_pg_search.btn_go);
+_selectDomain();
+//$sfm_act_search.searchSfmSearches($standardSearch);
+_assertVisible(_span($standardSearch),"Search which is assigned to this profile is not visible");
+_assertVisible(_span($clonedSearch),"Search which is assigned to this profile is not visible");
+//$sfm_pg_search.verifyIfSearchVisible($standardSearch);
+$rs_5366.end();

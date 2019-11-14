@@ -1,0 +1,28 @@
+../../test_cases/optimax/RS-10192.sah https://login.salesforce.com
+../../test_cases/optimax/RS-10193.sah https://login.salesforce.com
+../../test_cases/optimax/RS-10195.sah https://login.salesforce.com
+../../test_cases/optimax/RS-10194.sah https://login.salesforce.com
+../../test_cases/optimax/RS-10196.js https://login.salesforce.com
+../../test_cases/optimax/RS-10197.js https://login.salesforce.com
+../../test_cases/optimax/RS-10198.js https://login.salesforce.com
+../../test_cases/optimax/RS-10199.sah https://login.salesforce.com
+../../test_cases/optimax/RS-10200.sah https://login.salesforce.com
+../../test_cases/optimax/RS-10201.sah https://login.salesforce.com
+../../test_cases/optimax/RS-10203.js https://login.salesforce.com
+../../test_cases/optimax/RS-10205.js https://login.salesforce.com
+../../test_cases/optimax/RS-10206.js https://login.salesforce.com
+../../test_cases/optimax/RS-10207.js https://login.salesforce.com
+../../test_cases/optimax/RS-10209.sah https://login.salesforce.com
+../../test_cases/optimax/RS-10208.js https://login.salesforce.com
+../../test_cases/optimax/RS-10210.js https://login.salesforce.com
+../../test_cases/optimax/RS-10211.js https://login.salesforce.com
+../../test_cases/optimax/RS-10214.js https://login.salesforce.com
+../../test_cases/optimax/RS-10223.sah https://login.salesforce.com
+../../test_cases/optimax/RS-10227.sah https://login.salesforce.com
+../../test_cases/optimax/RS-10254.js https://login.salesforce.com
+../../test_cases/optimax/RS-10411-E2E_AB https://login.salesforce.com/with default value coinciding with PST and PET.sah
+../../test_cases/optimax/RS-10412-E2E_Appointment https://login.salesforce.com/assignment to WO.sah
+../../test_cases/optimax/RS-10413-E2E_Appointment https://login.salesforce.com/Booking Window default to scheduling horizon value if the WO has no PST and PET.js
+../../test_cases/optimax/RS-10414-E2E_Promised https://login.salesforce.com/Start Date not Null on selecting Slot in AB.sah
+../../test_cases/optimax/RS-10415-E2E_RTO https://login.salesforce.com/trigger on Appointment Assignment.js
+../../test_cases/optimax/RS-10416-E2E_Time https://login.salesforce.com/Slots availability for Appointment Type.sah

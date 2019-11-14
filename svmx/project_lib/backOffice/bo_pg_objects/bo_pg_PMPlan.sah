@@ -1,0 +1,101 @@
+
+
+/**
+ * Home page object repository
+ */
+
+var $bo_pg_PMPlan = new function bo_pg_PMPlan(){
+//SFM Wizards
+	this.btn_createPMPlan = _button("Create PM Plan");
+	this.btn_NewConditionBasedPMPlanfromServiceContract = _button("New Condition Based PM Plan from Service Contract");
+	this.btn_NewConditionBasedPMPlanFromLocation = _button("New Condition Based PM Plan from Location");
+	this.btn_NewConditionBasedPMPlanFromAccount = _button("New Condition Based PM Plan from Account");
+	this.btn_NewConditionBasedPMPlanFromInstalledProduct = _button("New Condition Based PM Plan from IB");
+	this.txt_PMPlanTemplateName = _textbox(0,_near(_label("PM Plan Template:")));
+	this.txt_PMPlanName = _textbox(0,_near(_label("PM Plan Name:")));
+	this.txt_startDate = _textbox(0,_near(_label("Start Date:")));
+	this.txt_Account = _textbox("accountName");
+	this.txt_endDate = _textbox(0,_near(_label("End Date:")));
+	this.btn_save = _span("/svmx-sfmd-save-icon/");
+	this.sel_coverageType = _div(0,_rightOf(_label("Coverage Type:")));
+	this.btn_delete = _button("Delete");
+	this.noRecordsToDisplayUnderPreventiveMaintenanceCoverages = _tableHeader("No records to display"),_under(_heading3("Preventive Maintenance Coverages"));
+	this.link_firstLinkInPMcoverages = _link(0,_under(_tableHeader("PM Coverage Number")),_under(_heading3("Preventive Maintenance Coverages")));
+	this.div_startDate = _div(0,_rightOf(_cell("Start Date")));
+	this.link_firstLinkInPMSchedule = _link(0,_under(_tableHeader("/Record Number/",_near(_cell("PM Schedule")))));
+	this.link_secondLinkInPMSchedule = _link(1,_under(_tableHeader("/Record Number/",_near(_cell("PM Schedule")))));
+	this.link_firstLinkInWorkOrders = _link(0,_near(_tableHeader("Work Order Number")),_under(_tableHeader("Work Order Number")));
+	this.link_secondLinkInWorkOrders = _link(0,_near(_tableHeader("Work Order Number")),_under(_tableHeader("Work Order Number")));
+//PM Schedule
+	
+	this.txt_lastRunDate = _div(0,_rightOf(_cell("Last Run Date")));
+	this.txt_scheduledOnDate = _div(0,_rightOf(_cell("Scheduled On")));
+
+	
+//PM Coverages
+	this.link_locationname = _link(0,_rightOf(_cell("Location Name")));
+	this.cell_locationName = _cell("Location Name");
+
+
+//Custom UI for Condition Based PM
+	this.txt_planName = _textbox("planName");
+	this.btn_addcoverage = _span("Add coverage");
+	this.txt_addIB = _textbox("coveredIBName");
+	this.btn_cancel_IB = _span("Cancel[1]"); // Owner Meghana Rao
+	this.btn_save_IB = _span("Save[1]");
+	this.txt_planTemplateName = _textbox("planTemplateName");
+	this.txt_startDateInput = _textbox("startDate-inputEl");
+	this.txt_endDateInput = _textbox("endDate-inputEl");
+	this.btn_saveCustomUI = _span("Save");
+	this.btn_popup_addrow = _span("+ Add Row");
+
+	this.txt_fieldbox = _div("/svmx-grid-cell-inner/",_under(_div("Field")));
+	this.txt_field = _div("/svmx-trigger-index/",_under(_div("Field")));
+this.txt_operatorbox = _div("/svmx-grid-cell-inner/",_under(_div("Operator")));
+this.txt_operator = _div("/svmx-trigger-index/",_under(_div("Operator")));
+this.txt_frequencybox = _div("/svmx-grid-cell-inner/",_under(_div("Frequency")));
+this.txt_frequency1 = _div("/svmx-trigger-index/",_under(_div("Frequency")));
+this.txt_frequencytxt = _textbox(0,_under(_div("Frequency")));
+this.txt_startAtbox = _div("/svmx-grid-cell-inner/",_under(_div("Start At")));
+this.txt_startAt = _textbox(0,_under(_div("Start At")));
+this.txt_stopAtbox = _div("/svmx-grid-cell-inner/",_under(_div("Stop At")));
+this.txt_stopAt = _textbox(0,_under(_div("Stop At")));
+this.txt_adjustmentTypebox = _div("/svmx-grid-cell-inner/",_under(_div("Adjustment Type")));
+this.txt_adjustmentType = _div("/svmx-grid-cell-inner/",_under(_div("Adjustment Type")));
+this.txt_minAdjbox = _div("/svmx-grid-cell-inner/",_under(_div("Minimum Adjustment")));
+this.txt_minAdj = _textbox("/numberfield/",_under(_div("Minimum Adjustment")));
+this.txt_maxAdjbox = _div("/svmx-grid-cell-inner/",_under(_div("Maximum Adjustment")));
+this.txt_maxAdj = _textbox("/numberfield/",_under(_div("Maximum Adjustment")));
+this.txt_adjValuebox = _div("/svmx-grid-cell-inner/",_under(_div("Adjustment Value")));
+this.txt_adjValue = _textbox("/numberfield/",_under(_div("Adjustment Value")));
+
+this.txt_adjUnitbox = _div("/svmx-grid-cell-inner/",_under(_div("Adjustment Unit")));
+this.txt_adjUnit = _div("/svmx-trigger-index/",_under(_div("Adjustment Unit")));
+this.btn_customUISave = _span("Save");
+this.img_messagebox = _span("svmx-quick-msgbox-info");
+this.img_arrow = _div("/svmx-trigger-index/",_under(_div("Adjustment Type")));
+this.txt_conditionType = _textbox("conditionType");
+// Criteria Based
+this.link_addRowCriteria = _span("addRowButton_CB-btnInnerEl");
+this.txt_attributeCriteria = _div("/svmx-trigger-index/",_under(_div("/Attribute/")));
+this.txt_operatorCriteria = _div("/svmx-trigger-index/",_under(_div("/Operator/")));
+this.txt_valueCriteria = _div("/svmx-trigger-index/",_under(_div("/Value/")));
+
+	this.btn_yes= _span("Yes");
+	
+//Edit Salesforce page
+	this.picklist_Status = _select(0,_rightOf(_label("Status")));
+	this.head_PMPlan = _heading1("Preventive Maintenance Plan:");
+	
+//PM Plan SFM Wizard buttons - Cancel PM Plan
+	this.btn_cancelPMPlanSFM = _button("Cancel PM Plan");
+	this.btn_cancelPMPlan = _span("Cancel PM Plan");
+
+//PM Plan SFM Wizard buttons - Activate PM Plan
+	this.btn_activatePMPlanSFM = _button("Activate PM Plan");
+	this.btn_activatePMPlan = _span("Activate PM Plan");
+};
+
+
+
+

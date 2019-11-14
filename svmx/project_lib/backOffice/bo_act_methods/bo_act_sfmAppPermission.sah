@@ -1,0 +1,160 @@
+var $bo_act_SFMAppPermission = new function bo_act_SFMAppPermission() {
+
+	this.setSFMAppPermission = function($searchText,$isOnlineHideRequired,$isOnlineRequired){
+	_click($bo_pg_sfmAppPermission.combo_listItemProcessType);
+	_click($bo_pg_sfmAppPermission.combo_selectObject);
+	_click($bo_pg_sfmAppPermission.scroll_selectObject);
+	_click($bo_pg_sfmAppPermission.combo_listItemSelectObject);
+	this.setSearchText($searchText);
+	if(isOnlineHideRequired)
+	{
+		this.hideProcessIDOnlineDisplay();
+	}
+	if(isOnlineRequired)
+	{
+		this.ProcessIDOnlineDisplay();
+	}
+	_click($bo_pg_sfmAppPermission.btn_Save);
+	_click($bo_pg_sfmAppPermission.btn_popupOK);
+	_click($bo_pg_sfmAppPermission.btn_backSetupHome);
+}
+	this.hideProcessIDOnlineDisplay = function(){
+	_click($bo_pg_sfmAppPermission.hideChkBox_ProcessOnline);
+	}
+		
+	this.ProcessIDOnlineDisplay = function(){
+	_click($bo_pg_sfmAppPermission.chkBox_ProcessOnline);
+	}
+		
+	this.setSearchText = function($searchText){
+	_setValue($bo_pg_sfmAppPermission.txtSearch_ProcessNameID,$searchText );
+	
+	}
+		
+		this.searchSFMDisplay=function($searchText){
+		_click($bo_pg_sfmAppPermissionD.txt_focusProcessType);
+		_click($bo_pg_sfmAppPermissionD.sel_processType);
+		_wait(1000);
+		_setValue($bo_pg_sfmAppPermissionD.txt_enterObjType,"");
+		_setValue($bo_pg_sfmAppPermissionD.txt_enterObjType,"Work Order");
+		_click($bo_pg_sfmAppPermissionD.sel_objtypeWO);
+		_wait(2000);
+		 _setValue($bo_pg_sfmAppPermissionD.txt_searchProcess,$searchText);
+		_wait(3000);					
+		};
+		
+		this.genericSearchInAppPermission=function($processType,$objType,$searchText){
+				 $bo_pg_sfmAppPermissionD.selProcessTypeInSFMAppPermission($processType);
+				 _wait(1000);
+				 $bo_pg_sfmAppPermissionD.selObjTypeInSFMAppPermission($objType);
+				_wait(2000);
+				_setValue($bo_pg_sfmAppPermissionD.txt_searchProcess,$searchText);
+				_wait(3000);			
+			};
+			
+			
+			
+	this.appPermissionOnPMPObj=function($sfmName){
+		_click($bo_pg_sfmAppPermissionD.txt_focusProcessType);
+		_click($bo_pg_sfmAppPermissionD.sel_processType);
+		_wait(1000);
+		_setValue($bo_pg_sfmAppPermissionD.txt_enterObjType,"");
+		_setValue($bo_pg_sfmAppPermissionD.txt_enterObjType,"Preventive Maintenance Plan");
+		_click($bo_pg_sfmAppPermissionD.sel_objtypePMP);
+		_wait(2000);
+		 _setValue($bo_pg_sfmAppPermissionD.txt_searchProcess,$sfmName);
+		_wait(3000);
+		_click($bo_pg_sfmAppPermissionD.chk_clickToUncheck);
+		_click($bo_pg_sfmAppPermissionD.btn_clickSaveAppPermission);
+		_wait(3000);
+		_click($bo_pg_sfmAppPermissionD.popUpOK)
+		var $isvisible = _exists(_div("App Permissions saved successfully"));
+		$callBack.returnResult($isvisible, true, "App Permission is not saved successfully");
+		  
+}
+		this.appPermissionOnWOObj=function($sfmName){
+		_click($bo_pg_sfmAppPermissionD.txt_focusProcessType);
+		_click($bo_pg_sfmAppPermissionD.sel_processType);
+		_wait(2000);
+		_setValue($bo_pg_sfmAppPermissionD.txt_enterObjType,"");
+		_setValue($bo_pg_sfmAppPermissionD.txt_enterObjType,"Work Order");
+		_click($bo_pg_sfmAppPermissionD.sel_objtypeWO);
+		_wait(2000);
+		 _setValue($bo_pg_sfmAppPermissionD.txt_searchProcess,$sfmName);
+		_wait(3000);
+		_click($bo_pg_sfmAppPermissionD.chk_clickToUncheck);
+		_click($bo_pg_sfmAppPermissionD.btn_clickSaveAppPermission);
+		_wait(3000);
+		_click($bo_pg_sfmAppPermissionD.popUpOK)
+		var $isvisible = _exists(_div("App Permissions saved successfully"));
+		$callBack.returnResult($isvisible, true, "App Permission is not saved successfully");
+		
+		  
+}
+			this.enableAppPermission=function($sfmName){
+				_click($bo_pg_sfmAppPermissionD.txt_focusProcessType);
+				_click($bo_pg_sfmAppPermissionD.sel_processType);
+				_wait(2000);
+				_setValue($bo_pg_sfmAppPermissionD.txt_enterObjType,"");
+				_setValue($bo_pg_sfmAppPermissionD.txt_enterObjType,"Work Order");
+				_click($bo_pg_sfmAppPermissionD.sel_objtypeWO);
+				_wait(2000);
+				 _setValue($bo_pg_sfmAppPermissionD.txt_searchProcess,$sfmName);
+				_wait(3000);
+				if(_isVisible(_div("svmx-grid-checkheader"))){
+				_click(_div("svmx-grid-checkheader"));
+				_click($bo_pg_sfmAppPermissionD.btn_clickSaveAppPermission);
+				_wait(3000);
+				_click($bo_pg_sfmAppPermissionD.popUpOK)
+					}
+				//var $isvisible = _exists(_div("App Permissions saved successfully"));
+				
+				//$callBack.returnResult($isvisible, true, "App Permission is not saved successfully");
+			}
+				this.disableAppPermission=function(){
+					_click($bo_pg_sfmAppPermissionD.chk_clickToUncheck);
+					_click($bo_pg_sfmAppPermissionD.btn_clickSaveAppPermission);
+					_wait(3000);
+					_click($bo_pg_sfmAppPermissionD.popUpOK)
+					var $isvisible = _exists(_div("App Permissions saved successfully"));
+					$callBack.returnResult($isvisible, true, "App Permission is not saved successfully");
+				}
+				
+	this.setAppPermissionForWizard=function($sfmName,$objName){
+		_click($bo_pg_sfmAppPermissionD.txt_focusProcessType);
+		_click($bo_pg_sfmAppPermissionD.sel_processTypeWizard);
+		_wait(2000);
+		_setValue($bo_pg_sfmAppPermissionD.txt_enterObjType,"");
+		_setValue($bo_pg_sfmAppPermissionD.txt_enterObjType,$objName);
+		_click($bo_pg_sfmAppPermissionD.sel_objtypeWO);
+		_wait(2000);
+		 _setValue($bo_pg_sfmAppPermissionD.txt_searchProcess,$sfmName);
+		_wait(3000);
+		_click($bo_pg_sfmAppPermissionD.chk_clickToUncheck);
+		_click($bo_pg_sfmAppPermissionD.btn_clickSaveAppPermission);
+		_wait(3000);
+		_click($bo_pg_sfmAppPermissionD.popUpOK)
+		var $isvisible = _exists(_div("App Permissions saved successfully"));
+		$callBack.returnResult($isvisible, true, "App Permission is not saved successfully");
+			}
+	this.srchCutomObject=function(){
+		_click($bo_pg_sfmAppPermissionD.txt_focusProcessType);
+		_click($bo_pg_sfmAppPermissionD.sel_processType);
+		_wait(10000);
+		_setValue($bo_pg_sfmAppPermissionD.txt_enterObjType,"");
+		_setValue($bo_pg_sfmAppPermissionD.txt_enterObjType,"A");
+		if($bo_pg_sfmAppPermissionD.entireSelectObjectSection){
+			_fail("Custom object available");
+			_stopTestCase();
+		}else{
+			_log("Custom object is not in the list");
+			
+};
+			
+				
+			}
+
+
+	
+	
+}

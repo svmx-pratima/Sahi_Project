@@ -1,0 +1,55 @@
+var $rs_5454 = _testcase("RS_5454","Verify Reset Expression in SFM Delivery");
+$rs_5454.start();
+
+
+		//Login to App
+		$bo_act_login.login($g_url,$sfmdUsn,$sfmdPwd);
+		$sfm_act_expressions.navigateToExpression();
+		_wait(10000,_isVisible($sfm_pg_expressions.sel_object));
+		
+		//Create Custom Expression
+		var $object="Work Order";
+		var $comboField=["Account","Actual Initial Response","Order Status","Order Type"];
+		var $comboConditions=["Contains","Equals","Not Equal","Equals"];
+		var $comboInput=["Online","Today","Canceled","Field Service"];
+		var $toggleButton=["","Yes","",""];
+		var $advExpr="";
+		var $errMsg="";
+		var $exprsnName = $bo_act_common.generateRandomName("RS_5454_expr");
+		$sfm_act_expressions.newCustomAction($object);
+		$sfm_act_expressions.addExpressionRows($comboField, $comboConditions, $toggleButton, $comboInput);
+		
+		//Reset before save
+		_click($sfm_pg_expressions.btn_reset);
+		
+		//Assert reset function before save
+		_assertEqual(_getValue($sfm_pg_expressions.sel_comboField.near(_f("SFMExpressionBuilderSWF").s_label("1"))),"");
+		_assertEqual(_getValue($sfm_pg_expressions.sel_comboField.near(_f("SFMExpressionBuilderSWF").s_label("2"))),"");
+		
+		//Add row and save expression
+		  $sfm_act_expressions.createCustomExpression($object, $comboField, $comboConditions, $toggleButton, $comboInput, $advExpr, $errMsg, $exprsnName);
+		
+		
+		//Change the expression values
+		_setValue($sfm_pg_expressions.txt_input.near(_f("SFMExpressionBuilderSWF").s_label("1")),"Ofline");
+		_setSelected($sfm_pg_expressions.btn_inputCombobox.near(_f("SFMExpressionBuilderSWF").s_label("2")),"Tomorrow");
+		_setSelected($sfm_pg_expressions.btn_inputCombobox.near(_f("SFMExpressionBuilderSWF").s_label("3")),"Closed");
+		_setSelected($sfm_pg_expressions.btn_inputCombobox.near(_f("SFMExpressionBuilderSWF").s_label("4")),"Depot Repair");
+		
+		
+		//Reset and assert
+		_click($sfm_pg_expressions.btn_reset);
+		//$sfm_act_expressions.navigateToExpression();
+		var $getExprDetails=$sfm_act_Transactions.getExpressionValues($object, $exprsnName);
+		var $retcomboField=$getExprDetails[0];
+		var $retcomboConditions=$getExprDetails[1];
+		var $comboInput=$getExprDetails[2];
+		
+		for (var $i = 0; $i < $getExprDetails.length; $i++) {
+			_assertEqual($retcomboField[$i],$comboField[$i]);
+			_assertEqual($retcomboConditions[$i],$comboConditions[$i]);
+			_assertEqual($comboInput[$i],$comboInput[$i]);
+		}
+
+
+$rs_5454.end();

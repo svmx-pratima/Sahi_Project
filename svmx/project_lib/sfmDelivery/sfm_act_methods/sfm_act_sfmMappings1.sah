@@ -1,0 +1,85 @@
+/**
+ * Function to perform SFM work flows
+ */
+var $sfm_act_sfmMappings1 = new function sfm_act_sfmMappings1() {
+
+	/**
+	 * Function to Clone SFM
+	 * @param $sfmNameToBeCloned
+	 * @param $sfmName
+	 * @param $isCustom
+	 * @param $sfmTemplate
+	 * @param $sfmTemplateSaveAsName
+	 * @param $fieldName
+	 * @param $containerName
+	 */
+
+	this.addMappings = function($value, $mappingsName) {
+
+
+	_click($bo_pg_sfmTransactionAndDesigner.btn_mappings);
+	_click($bo_pg_sfmTransactionAndDesigner.btn_addMappings);
+	_wait(6000);
+	
+	//_click($bo_pg_sfmTransactionAndDesigner.btn_toggle, _rightOf(_f("main").listbasecontentholder("Actual Intial Response")));
+	
+	
+	_click($bo_pg_sfmTransactionAndDesigner.btn_toggle);
+	_click($bo_pg_sfmTransactionAndDesigner.selMapping);
+	//_click($bo_pg_sfmTransactionAndDesigner.lbl_tmrw);
+	
+	_setSelected($bo_pg_sfmTransactionAndDesigner.selMapping, $value);
+	
+	_wait(3000);
+	_setValue($bo_pg_sfmTransactionAndDesigner.txt_mappingName, $mappingsName);		
+	_setValue($bo_pg_sfmTransactionAndDesigner.txt_mapID, $mappingsName);
+	
+	_click($bo_pg_sfmTransactionAndDesigner.btn_saveMap);
+	_wait(3000);
+	_click($bo_pg_sfmTransactionAndDesigner.btn_saveAndclose);
+	_wait(6000);
+
+	
+     /**
+
+		$sfm_act_SFM.selectSFM($sfmNameToBeCloned, $isCustom);
+		_click($bo_pg_sfmTransactionAndDesigner.btn_clone);
+		_wait(3000)
+		_wait(60000, _isVisible($bo_pg_sfmTransactionAndDesigner.txt_name));
+		_setValue($bo_pg_sfmTransactionAndDesigner.txt_name, $sfmName);
+		_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmTransactionId, "");
+		_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmTransactionId, $sfmName);
+
+		_click($bo_pg_sfmTransactionAndDesigner.btn_qualifyingCriteriaAndFieldMapping);
+		_click($bo_pg_sfmTransactionAndDesigner.btn_screenDesigner);
+		_wait(60000, _isVisible($bo_pg_sfmTransactionAndDesigner.lbl_workOrder));
+
+		_setSelected($bo_pg_sfmTransactionAndDesigner.sel_sfmTemplate, $sfmTemplate);
+		_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmSavePageLayoutAs, $sfmTemplateSaveAsName);
+		_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmSavePageLayoutAsId, $sfmTemplateSaveAsName);
+_wait(3000);
+		$bo_pg_sfmTransactionAndDesigner.addField($fieldName, $containerName);
+
+		_click($bo_pg_sfmTransactionAndDesigner.btn_quickSave);
+
+		if (_exists($bo_pg_sfmTransactionAndDesigner.alert_sfm)) {
+			_focusWindow();
+			_takeScreenShot();
+			_click($bo_pg_sfmTransactionAndDesigner.btn_ok);
+			_logExceptionAsFailure("Page not saved, refer screenshot for error");
+			_click($bo_pg_sfmTransactionAndDesigner.btn_backToList);
+			_click($bo_pg_sfmTransactionAndDesigner.btn_yes);
+			$result = false;
+		} else {
+			//_click($bo_pg_sfmTransactionAndDesigner.btn_saveAndclose);
+			$result = true;
+		}
+
+		return $callBack.returnResult($result, "","cloneSfm");
+
+		_setSpeed($g_stepSpeed);
+		
+		*/
+	};
+
+}

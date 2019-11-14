@@ -1,0 +1,41 @@
+var $TopLevelCase = new function TopLevelCase (){
+	
+	
+this.an_toplevelcase = function()
+
+{
+	_click($an_pg_rv.link_home);
+	_click($an_pg_rv.link_servicemaxSetup);
+	_click($an_pg_rv.btn_serviceperformancemetrics);
+	_click($an_pg_rv.btn_serviceperformancemetricsetup);
+
+	_click($an_pg_rv.span_businessprocessconfig);
+	_click($an_pg_rv.txt_issuetracker);
+	_click($an_pg_rv.listItemCase);
+	_click($an_pg_rv.txt_businessQualificationExpr);
+	_click($an_pg_rv.list_closedcases);
+	_click($an_pg_rv.btn_save);
+	_click($an_pg_rv.btn_click_OK);
+	
+};
+
+this.an_toplevelcase_custom= function()
+
+{
+	_click($an_pg_rv.link_home);
+	_click($an_pg_rv.link_servicemaxSetup);
+	_click($an_pg_rv.btn_serviceperformancemetrics);
+	_click($an_pg_rv.btn_serviceperformancemetricsetup);
+
+	_click($an_pg_rv.span_businessprocessconfig);
+	_click($an_pg_rv.txt_issuetracker);
+	_click($an_pg_rv.listItemCase);
+	_click($an_pg_rv.txt_businessQualificationExpr);
+	_click(_listItem("Custom_exp_case"));
+	_click($an_pg_rv.btn_save);
+	_click($an_pg_rv.btn_click_OK);
+	
+};
+
+
+};

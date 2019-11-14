@@ -1,0 +1,69 @@
+var $user_credentials = $excel.readFromCustomExcel("../optimax/op_excleData/automation.xlsx", "User_Details","","");
+var $TerrData = $excel.readFromCustomExcel("../optimax/op_excleData/automation.xlsx", "Rules","","");
+var $BH = $excel.readFromCustomExcel("../optimax/op_excleData/automation.xlsx", "BusinessHours","","");
+
+//var $nArr;
+//Calling the sforce API
+for(var $i=0;$i<$user_credentials.length;$i++)
+{
+var $g_un = $user_credentials[$i][0];
+var $g_pwd = $user_credentials[$i][1];
+var $g_url = $user_credentials[$i][2];
+}
+
+var $RS_6321 = _testcase("RS_6321", "Add Child Territory");
+
+$RS_6321.start();
+
+/*var $g_url = "https://test.salesforce.com/";
+var $g_un = "govendhan@svmx-cct5.org.cct5part1";
+var $g_pwd = "maxpl0re2";*/
+
+$bo_act_login.login($g_url, $g_un, $g_pwd);
+		
+var $ParentTerr = $TerrData[0][4];
+var $date = "" + new Date();
+var $TerrName = "AutomationChildTerritory_" + $date;
+var $BH_Name = $BH[0][1];
+
+_click(_link("ServiceMax Setup"));
+_wait(20000,_isVisible(_div("Service Organization")))
+_click(_div("Service Organization"));
+_wait(20000,_isVisible(_div("Territories")))
+_click(_div("Territories"));
+_wait(20000,_isVisible(_button("Add Territory")))
+_click(_button("Add Territory"));
+_setValue(_textbox("Territory:POPUPS:TerritoryBlock:j_id30:j_id31:TTname"), $TerrName);
+_setValue(_textbox("Territory:POPUPS:TerritoryBlock:j_id30:j_id37:TTparent"), $ParentTerr);
+_click(_image("Parent Territory Lookup (New Window)"));
+_selectWindow("lookup");
+_click(_link($ParentTerr));
+_selectWindow();
+_setValue(_textbox("Territory:POPUPS:TerritoryBlock:j_id30:j_id37:TTparent"), $ParentTerr);
+_click(_image("Territory's Business Hours Lookup (New Window)"));
+_selectWindow("lookup");
+_setValue(_textbox("lksrch"), "TX");
+_click(_submit(" Go! "));
+_click(_link("TX"));
+//_click(_link($BH_Name));
+_selectWindow();
+_setValue(_textbox("Territory:POPUPS:TerritoryBlock:j_id43:j_id44:TTBussHrs"), "TX");
+//_setValue(_textbox("Territory:POPUPS:TerritoryBlock:j_id43:j_id44:TTBussHrs"), $BH_Name);
+_click(_submit("Submit"));
+_click(_link($TerrName));
+
+if(_exists($ParentTerr))
+	{
+	_log("Child Territory: " + $TerrName + "Created Successfully for Parent Territory: " + $ParentTerr);
+	
+	//$excel.writeToExcel("insertAtIndex", "../optimax/op_excleData/automation.xlsx", "ChildTerritory", $TerrName, "1");
+	$excel.insertUnderColumn("../optimax/op_excleData/automation.xlsx", "Rules", "Child Territory", $TerrName, "1");
+	}
+else
+	{
+	_fail("Error in Creating Child Territory");
+	}
+
+$bo_act_login.logOut();
+
+$RS_6321.end();

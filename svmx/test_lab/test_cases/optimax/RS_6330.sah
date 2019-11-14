@@ -1,0 +1,86 @@
+var $user_credentials = $excel.readFromCustomExcel("../optimax/op_excleData/automation.xlsx", "User_Details","","");
+var $dp_details = $excel.readFromCustomExcel("../optimax/op_excleData/automation.xlsx", "RS_6329","","");
+
+//var $nArr;
+//Calling the sforce API
+for(var $i=0;$i<$user_credentials.length;$i++)
+{
+var $g_un = $user_credentials[$i][0];
+var $g_pwd = $user_credentials[$i][1];
+var $g_url = $user_credentials[$i][2];
+}
+
+var $DPName = $dp_details[0][0];
+
+var $RS_6330 = _testcase("RS_6330", "Edit a Batch Dispatch Process");
+
+$RS_6330.start();
+
+/*var $g_url = "https://test.salesforce.com/";
+var $g_un = "govendhan@svmx-cct5.org.cct5part1";
+var $g_pwd = "maxpl0re2";*/
+
+$bo_act_login.login($g_url, $g_un, $g_pwd);
+	
+_log($DPName);
+var $rowCount = 0;
+
+_click(_link("ServiceMax Setup"));
+_wait(20000,_isVisible(_div("Dispatch Management")));
+_click(_div("Dispatch Management"));
+_wait(20000,_isVisible(_div("Dispatch Processes")));
+_click(_div("Dispatch Processes"));
+
+_set($rowCount, _table("page1:form1:block1:j_id81:j_id82").rows.length);
+for (var $i = 0; $i < $rowCount; $i++) 
+{
+	var $temp = _getText(_cell("page1:form1:block1:j_id81:j_id82:" + $i
+			+ ":j_id86"));
+	if (_areEqual($DPName, $temp)) 
+	{
+		$rowCount = $i;
+	}
+}
+_check(_checkbox("page1:form1:block1:j_id81:j_id82:" + $rowCount
+		+ ":j_id85"));
+
+_click(_submit("Edit"));
+_click(_imageSubmitButton("page1:form1:block1:tab1block1:j_id114:j_id115:tab1table1:2:hdraddrow"));
+_setSelected(_select("page1:form1:block1:tab1block1:j_id114:j_id115:tab1table1:3:j_id120"), "Billing Type");
+_setSelected(_select("page1:form1:block1:tab1block1:j_id114:j_id115:tab1table1:3:j_id124"), "Equals");
+_setValue(_textbox("page1:form1:block1:tab1block1:j_id114:j_id115:tab1table1:3:j_id128"), "Paid");
+_setValue(_textbox("page1:form1:block1:tab1block1:j_id136:HdrAdvOption"), "1 AND (2 OR 3 OR 4)");
+_click(_cell("Cost Factors"));
+_setSelected(_select("page1:form1:block1:tab6block1:j_id490:j_id492:j_id493"), "Right Person to Right Job");
+_click(_cell("Scheduling"));
+_setSelected(_select("page1:form1:block1:tab7block1:j_id557:j_id588:0:runAt"), "3:30 PM");
+_click(_submit("Save And Close[1]"));
+_click(_submit("Back To Dispatch Process"));
+
+_set($rowCount, _table("page1:form1:block1:j_id81:j_id82").rows.length);
+for (var $i = 0; $i < $rowCount; $i++) 
+{
+	var $temp = _getText(_cell("page1:form1:block1:j_id81:j_id82:" + $i
+			+ ":j_id86"));
+	if (_areEqual($DPName, $temp)) 
+	{
+		$rowCount = $i;
+	}
+}
+_check(_checkbox("page1:form1:block1:j_id81:j_id82:" + $rowCount
+		+ ":j_id85"));
+_click(_submit("Edit"));
+
+var $temp = _getText(_textbox("page1:form1:block1:tab1block1:j_id136:HdrAdvOption"));
+
+	if (_areEqual("1 AND (2 OR 3 OR 4)", $temp)) 
+	{
+		_log("Dispatch Process Updated successfully");
+	}
+	else
+	{
+		_fail("Error in Updating Dispatch Process");
+	}
+
+$bo_act_login.logOut();
+$RS_6330.end();

@@ -1,0 +1,48 @@
+/*SFM Delivery page Objects */
+
+var $swat_pg_sfmDelivery = new function swat_pg_sfmDelivery(){
+	
+	this.btn_PartsTab = _span("Parts");
+	this.btn_LaborTab = _span("Labor");
+	this.btn_ExpensesTab = _span("Expenses");
+	this.btn_ExpenseTab = _span("Expense");
+	this.btn_TravelTab = _span("Travel");
+	this.btn_ProductServiced =_span("Products Serviced");
+	
+	
+	this.btn_AddRowParts = _span("/add-line-icon/");
+	this.btn_AddRowLabor = _span("svmx-btn-icon svmx-sfmd-add-line-icon[1]");
+	this.btn_AddRowExpense = _span("svmx-btn-icon svmx-sfmd-add-line-icon[2]");
+	this.btn_AddRowExpenses = _span("svmx-btn-icon svmx-sfmd-add-line-icon[2]");
+	this.btn_AddRowTravel = _span("svmx-btn-icon svmx-sfmd-add-line-icon[3]");
+	
+	this.btn_ExtendedEdit = _image("/edit-icon/", _in(_div("svmx-grid-cell-inner ")));
+	
+	
+	this.txt_part= _textbox(0,_rightOf(_label("/Part/")));
+	
+	this.lbl_ProductLabel = _label("Product:");
+	this.btn_ProductLookup = _span("/svmx_lookup_icon/");
+	this.txt_Qty = _textbox("Qty:");
+	this.txt_UnitPrice =(_textbox(0, _near(_label("Unit Price:"))));
+	this.btn_Update =_span("Update");
+	this.btn_Save =_span("svmx-btn-icon svmx-sfmd-save-icon");
+	this.btn_QuickSave = _span("svmx-btn-icon svmx-sfmd-quicksave-icon");
+	
+	this.btn_downArrow= _xy(_span("/svmx-sfmd-detail-actions-icon/"),30,20);
+	this.btn_addWorkDetails= _span("Add/Modify Work Details");
+	
+	this.lbl_PriceNotCalculated = _div("Price not calculated, because entitlement check has not been performed.");
+	this.btn_Ok =_span("Ok");
+	this.lbl_workOrderDetail = _heading2("Work Order Detail");
+	
+	this.hdr_ServiceQuote = _heading1("Service Quote:");
+	this.hdr_ServiceQuoteDetail = _heading2("Service Quote Detail");
+	this.hdr_QuoteNo= _heading2("pageDescription");
+	this.lbl_LineType= _tableHeader("Line Type");
+	
+	this.txt_unableConnect = _div("/Unable to connect to/");
+	
+	
+	
+};

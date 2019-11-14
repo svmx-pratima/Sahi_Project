@@ -1,0 +1,42 @@
+var $data = _readExcelFile("../../analytics/an_excleData/an_Datasheet1.xlsx","Sheet1",true);
+var $un =$bac_un ;
+var $pwd =$bac_pwd;
+var $url = "https://test.salesforce.com";
+var $user_meghana = $data[1]["user_meghana"];
+$bo_act_login.login($url, $un, $pwd);
+
+$delete1 = "delete [Select Id from SVMXC__Installed_Product__c where Createdby.Id = '"+$user_meghana+"' AND Name like '%IB%'];";
+var $delete_data = $op_act_sForceApiCall.sForceQuery($un, $pwd, $delete1 , "create");
+
+_wait(1000);
+
+$delete2 = "delete [Select Id from SVMXC__Service_Contract__c where Createdby.Id = '"+$user_meghana+"' AND Name like '%ANA%'];";
+var $delete_data = $op_act_sForceApiCall.sForceQuery($un, $pwd, $delete2 , "create");
+
+_wait(1000);
+
+$delete3 = "delete [Select Id from SVMXC__Service_Order__c];";
+var $delete_data = $op_act_sForceApiCall.sForceQuery($un, $pwd, $delete3 , "create");
+
+_wait(1000);
+$delete4 = "delete [Select Id from SVMXC__Down_Time__c];";
+var $delete_data = $op_act_sForceApiCall.sForceQuery($un, $pwd, $delete4 , "create");
+
+_wait(1000);
+
+$delete5 = "delete [Select Id from 	SVMXC__SPM_Contract_Up_Time__c];";
+var $delete_data = $op_act_sForceApiCall.sForceQuery($un, $pwd, $delete5 , "create");
+
+_wait(1000);
+
+$delete6 = "delete [Select Id from 	SVMXC__SPM_Down_Time_Detail__c];";
+var $delete_data = $op_act_sForceApiCall.sForceQuery($un, $pwd, $delete6 , "create");
+
+_wait(1000);
+$delete7 = "delete [Select Id from SVMXC__Installed_Product__c where Createdby.Id = '"+$user_meghana+"' AND Name like ‘%RS%’];";
+var $delete_data = $op_act_sForceApiCall.sForceQuery($un, $pwd, $delete7 , "create");
+
+_wait(1000);
+
+$delete8 = "delete [Select Id from SVMXC__Service_Contract__c where Createdby.Id = '"+$user_meghana+"' AND Name like ‘%RS%’];";
+var $delete_data = $op_act_sForceApiCall.sForceQuery($un, $pwd, $delete8 , "create");

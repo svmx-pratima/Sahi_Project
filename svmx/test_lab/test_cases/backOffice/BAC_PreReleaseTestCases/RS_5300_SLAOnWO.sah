@@ -1,0 +1,54 @@
+
+//author - Noor Salma Sharieff
+
+var $RS_5300 = _testcase("$RS_5300","Verify the impact of SLA setting values SET003 on SLA clocks on WO object");
+$RS_5300.start();
+_setSpeed($g_stepSpeed);
+
+//Pre - Condition 
+$bo_act_login.login($PRT_url, $bac_PRTun, $bac_PRTpwd);
+$bo_act_navigation.navigateToConfigurationProfilesPage();
+$bo_act_configurationProfiles.editGlobalProfileForBooleanSettings("Service Level Agreement", "SLA Clock on Work Order", "SET003", false);
+$bo_act_configurationProfiles.editGlobalProfileForBooleanSettings("Service Level Agreement", "SLA Clock on Work Order", "SET005", false);
+
+var $accName = $bo_act_accounts.createAccount();
+var $proName = $bo_act_products.createProductSimple();
+var $IBName = $bo_act_installedProduct.createInstalledProduct($proName,$accName,"");
+var $contactName = $bo_act_contacts.createContact($accName); 
+var $WONumber = $bo_act_installedProduct.createWOFromIB($IBName);
+
+//$bo_act_workOrders.checkFieldAvailableInPageLayout($bo_pg_workOrders.slaTerm,$bo_pg_salesforcePageSetUp.btn_slaTerm);
+//$bo_act_workOrders.checkFieldAvailableInPageLayout($bo_pg_workOrders.intialResponseInternalBy,$bo_pg_salesforcePageSetUp.btn_InitialResponseInternalBy);
+//$bo_act_workOrders.checkFieldAvailableInPageLayout($bo_pg_workOrders.intialResponseCustomerBy,$bo_pg_salesforcePageSetUp.btn_InitialResponseCustomerBy);
+//$bo_act_workOrders.checkFieldAvailableInPageLayout($bo_pg_workOrders.actualInitialResponse,$bo_pg_salesforcePageSetUp.btn_actualInitialResponse);
+//$bo_act_workOrders.checkFieldAvailableInPageLayout($bo_pg_workOrders.timeToInitialResponse,$bo_pg_salesforcePageSetUp.btn_timeToInitialResponse);
+
+var $slaterm = $bo_act_slaTerms.createSlaTerms("Default");
+$bo_act_slaTerms.addInitialResponseToSLA($slaterm, "WorkOrder","All", "High", "Created Date", 30, 60, "SLA");
+var $caseNumber = $bo_act_installedProduct.createSupportCase("New");
+
+$bo_act_workOrders.editWorkOrder($WONumber);
+$bo_act_workOrders.updateTextBoxFields($bo_pg_workOrders.txt_slaTerms, $slaterm);
+$bo_act_workOrders.updateTextBoxFields($bo_pg_workOrders.txt_case, $caseNumber);
+$bo_act_workOrders.updateTextBoxFields($bo_pg_workOrders.txt_contact, $contactName);
+$bo_act_workOrders.updateDropDownFields($bo_pg_workOrders.sel_priority, "High");
+$bo_act_workOrders.saveWorkOrder();
+
+
+//Validations
+_selectDomain($g_domain);
+_wait(3000,_isVisible(_table("/timer/")));
+_assertContainsText("Initial Response 00:00:00:00",_table("/CH_dtimer1/"),"SLA Clock Issue");
+_selectDomain();
+_assertEqual(_getText(_div(0,_rightOf(_span("/Initial Response Internal By/"))))," ","Issue in Initial Response Internal By field");
+_assertEqual(_getText(_div(0,_rightOf(_cell("/Initial Response Customer By/"))))," ","Issue in Initial Response Customer By field");
+
+//Clean up function
+
+$bo_act_login.logOut(); 
+_closeWindow();
+
+$RS_5300.end();
+
+
+

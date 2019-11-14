@@ -1,0 +1,87 @@
+
+var $an_pg_techutilization = new function an_pg_techutilization() {
+	
+	this.link_home = _link("Home");
+	this.link_servicemaxSetup = _link("ServiceMax Setup");
+	this.btn_serviceperformancemetrics = _div("Service Performance Metrics");
+	this.btn_serviceperformancemetricsetup = _div("Service Performance Metrics Setup");
+	this.btn_technician_utilization = _span("Utilization");
+	this.btn_add = _span("Add[1]");
+	this.btn_active = _button("svmx-form-field svmx-form-checkbox");
+	this.txt_description = _textarea("appliesTo");
+	this.btn_settings = _span("Settings");
+	this.list_productivetime_choose = _textbox("Select one or more type(s) for Non Productive Time");
+	this.btn_training = _listItem("Training");
+	this.list_leave_types = _textbox("Select one or more activity types for leaves");
+	this.btn_Sick_leave = _listItem("Training[1]");
+	this.list_breaktime = _textbox("Select the source for Break Time field");
+	this.btn_criteria = _span("Criteria");
+	this.list_qualification_metric_criteria = _textbox("tabPanel_6_editprocesspanel_expression_QualificationCriteriafieldset_id-inputEl");
+	this.btn_custom_time_sheet = _listItem("Custom Timesheet");
+
+	this.btn_save = _span("Save");
+	this.btn_OK = _span("OK");
+	this.btn_schedule_notifications = _span("Schedule & Notifications[1]");
+	this.list_timezone = _textbox("timezone");
+	this.btn_ist_timezone = _listItem("(GMT+05:30) India Standard Time (Asia/Kolkata)");
+	this.list_period = _textbox("period");
+	this.btn_choose_daily = _listItem("Daily");
+	this.list_choose_time = _textbox("timeAt");
+	this.btn_time_chosen = _listItem("9:00 AM");
+	this.txt_emailOnsuccess = _textbox("emailOnSuccess");
+	this.btn_run_now = _link("Run Now");
+	
+	
+	// To create Time sheet manager.
+	this.btn_service_organization = _div("Service Organization");
+	this.btn_timesheet = _div("Timesheet");
+	this.btn_timesheet_add = _span("Add");
+	this.btn_timesheet_active = _button("svmx-checkbox-1035-inputEl");
+	this.txt_timesheet_name = _textbox("timesheetName");
+	this.txt_timesheet_description = _textarea("description");
+	this.list_timesheet_frequency = _textbox("period");
+	this.btn_weekly = _listItem("Weekly");
+	this.list_week_on = _textbox("weekOn");
+	this.btn_Monday = _listItem("Monday",_near(_div("svmx-boundlist-list-ct")));
+	this.list_timesheet_time_at = _textbox("timeAt");
+	this.btn_timesheet_time = _listItem("9:00 am");
+	this.list_timesheet_timezone = _textbox("timezone");
+	this.btn_timesheet_ist = _listItem("(GMT+05:30) India Standard Time (Asia/Kolkata)");
+	this.btn_starting_on = _textbox("startingon");
+	this.btn_ending_on = _textbox("continuingthrough");
+	this.btn_startdate_set = _textbox("startOfPeriodDate");
+	this.btn_enddate_set = _textbox("endOfPeriodDate");
+	this.btn_timesheet_emailOnsuccess = _textbox("emailOnSuccess");
+	this.btn_autofill = _span("Autofill");
+	this.btn_timesheet2_active = _button("svmx-checkbox-1063-inputEl");
+	this.list_workdetail_ownership = _div(240);
+	this.btn_createdbyID = _listItem("Created By ID");
+	this.list_workdetailcriteria = _div(246);
+	this.btn_standard_line_usage = _listItem("SVMXSTD: Labor Lines Only");
+	this.list_workdetail_map_timentry = _div(249);
+	this.btn_custom_maps = _listItem("Map 1 Time sheet");
+	this.list_events = _div(269);
+	this.btn_servicemax_events = _listItem("ServiceMax Event");
+	this.list_event_expressions = _div(284);
+	this.btn_custom_events_expr = _listItem("Servicemax event Expr");
+	this.list_event_map_expressions = _div(287);
+	this.btn_custom_events_maps = _listItem("Service Max Event MAps");
+	this.list_autofill_period = _textbox("period[1]");
+	this.btn_timesheet_autofill_daily = _listItem("Daily");
+	this.list_autofill_timeat = _textbox("timeAt[1]");
+	this.btn_autofill_time = _listItem("9:00 am[1]");
+	this.btn_autofill_run_now = _link("Run Now[1]");
+	this.btn_autofill_OK = _span("OK");
+	this.btn_assignment = _span("Assignment");
+	this.btn_assignment_add = _span("Add[1]");
+	this.btn_default_profile = _div("Default Group Profile");
+	this.btn_apply = _span("Apply");
+	this.btn_timesheet_save = _span("Save");
+	this.btn_properties_run_now = _link("Run Now");
+	this.btn_properties_OK = _span("OK");
+	this.btn_click_timesheet = _div("Time sheet for SPM");
+	
+	
+};
+
+

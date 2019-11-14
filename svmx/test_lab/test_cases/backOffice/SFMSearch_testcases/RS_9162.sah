@@ -1,0 +1,60 @@
+//Tests are to be written here [Srinivasa Murthy S]
+// Creating variable for the printing the test case number and name
+var $RS_9162 = _testcase("RS_9162","SFM Search - Delivery - SFW buttons");
+$RS_9162.start();
+//var $orgnamespace = "SVMXC";
+var $restAccName = $bo_act_common.generateRandomName("RS_9162_");
+
+
+
+//Pre-requisite for this test case to check if Standard Account Search is cloned and available. RS_9159 test case needs to be executed before running this test.
+
+
+var $objName= "Account";
+var $obJson = "{\"Name\":\""+$restAccName+"\"}"; 
+var $columnName = "Name";
+var $filter="id";
+//create an account
+var $account=$sfm_act_restApiMethods.postRestApi($bac_un,$bac_pwd,$bac_client_id,$bac_client_secret,$bac_orginstance,$objName,$obJson,"POST");
+_log($account);
+$accountName =$sfm_act_restApiMethods.getRestApi($bac_un,$bac_pwd,$bac_client_id,$bac_client_secret,$bac_orginstance,"GET", $objName, $columnName, $filter, $account);
+_log($accountName);
+//get the caseNumber
+
+
+var $objName1= "Case";
+var $obJson1 = "{\"AccountId\":\""+$account+"\",\""+$orgnamespace+"__Billing_Type__c\":\"Loan\",\""+$orgnamespace+"__Scheduled_Date__c\":\"2018-08-23\",\""+$orgnamespace+"__Actual_Initial_Response__c\":\"2018-08-23T00:00:00.000Z\",\"Status\":\"Open\"}";
+var $columnName1 = "CaseNumber";
+var $filter1="id";
+//create  case with above created account and other parameters
+var $filterValue1=$sfm_act_restApiMethods.postRestApi($bac_un,$bac_pwd,$bac_client_id,$bac_client_secret,$bac_orginstance,$objName1,$obJson1,"POST");
+//get the caseNumber
+var $caseNumber1 =$sfm_act_restApiMethods.getRestApi($bac_un,$bac_pwd,$bac_client_id,$bac_client_secret,$bac_orginstance,"GET", $objName1, $columnName1, $filter1, $filterValue1);
+
+
+
+//Login to the Sandbox using the credentials from 
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+
+
+//Launch the SFM Search
+$sfm_act_search.launchGivenSearch("Cln - SVMXSTD: Account Search","");
+_wait(5000);
+_click(_span("Open Cases (10)"));
+_setValue(_textbox(3), $accountName);
+_click(_span("Go"));
+_wait(2000);
+_click(_div("svmx-grid-radioheader svmx-grid-radioheader-unselected svmx-grid-radiocolumn-contentalign-undefined"));
+_wait(5000, isVisble(_span("Add/Edit Case Lines")));
+_click(_span("Add/Edit Case Lines"));
+_wait(10000, isVisble(_span("Case Lines")));
+_wait(3000,_isVisible(_span("svmx-btn-icon svmx-sfmd-add-line-icon")));
+$bo_act_Cases.addCaseLines("ABC IB",2);
+//_click(_span("svmx-btn-icon svmx-sfmd-add-line-icon"))
+//_click(_span(51)); 
+//_click(_image("gif[4]"));
+//_setValue(_textbox(11),"ABC IB");
+//_click(_span("Update"));
+
+
+$RS_9162.end();

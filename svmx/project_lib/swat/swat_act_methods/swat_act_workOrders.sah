@@ -1,0 +1,119 @@
+/**
+ * Functions to create a Work Order record.
+ */
+var $swat_act_workOrders = new function swat_act_workOrders() {
+
+	/**
+	 * Create an Work Order
+	 */
+	this.createWorkOrder = function($caseNumber,$accountName,$contactName,$IBName,$orderStatus,$priority,$orderType){
+		$bo_act_navigation.navigateToWorkOrdersTab();
+		_click($bo_pg_workOrders.btn_newWorkOrder);
+		_setValue($bo_pg_workOrders.txt_case, $caseNumber);
+		_setValue($bo_pg_workOrders.txt_account, $accountName);
+		_setValue($bo_pg_workOrders.txt_contact, $contactName);
+		_setSelected($bo_pg_workOrders.sel_orderStatus, $orderStatus);
+		_setSelected($bo_pg_workOrders.sel_priority, $priority);
+		_setSelected($bo_pg_workOrders.sel_orderType, $orderType);
+		_setValue($bo_pg_workOrders.txt_component, $IBName);
+		_click($bo_pg_workOrders.btn_saveWorkOrder);
+		_assertNotVisible(_div("/Error: Invalid Data/"));
+		_wait(15000, _isVisible($bo_pg_workOrders.txt_workOrderDetails));
+		var $workOrderNumber =  _getText($bo_pg_workOrders.txt_getWONumber);
+		_logOutput($workOrderNumber+ " Work Order is created");
+		return $workOrderNumber;
+	};
+		
+	
+	this.clickLinktoUpdateTextfields = function($object){
+		_click($object);
+		
+	};
+	
+	this.saveWorkOrder = function(){
+		_click($bo_pg_workOrders.btn_saveWorkOrder);
+		_assertNotVisible(_div("/Error: Invalid Data/"));
+		_wait(15000, _isVisible($bo_pg_workOrders.txt_workOrderDetails));
+		//return $callBack.returnResult([_isVisible($accountName), "Account not created",$accountName] );
+	};
+	
+	this.checkEntitlement = function($workOrderNumber){
+		$bo_act_navigation.navigateToWorkOrdersTab();
+		_click(_link($workOrderNumber));
+		_selectDomain($g_domain);
+		_click($bo_pg_workOrders.btn_SFWCheckEntitlement);
+		_selectDomain();
+	};
+	
+	this.checkEntitlementPS = function($workOrderNumber){
+		$bo_act_navigation.navigateToWorkOrdersTab();
+		_click(_link($workOrderNumber));
+		_selectDomain($g_domain);
+		_click($bo_pg_workOrders.btn_SFWCheckEntitlementPS);
+		_selectDomain();
+	};
+	
+	this.invokeTDM016SFM = function($workOrderNumber){
+		$bo_act_navigation.navigateToWorkOrdersTab();
+		_click(_link($workOrderNumber));
+		_selectDomain($g_domain);
+		_click($bo_pg_workOrders.btn_sfmTDM016);
+		_selectDomain();
+	};
+
+	this.pauseSLAClock = function(){
+		_selectDomain($g_domain);
+		_click($bo_pg_workOrders.btn_SLAPause);
+		_setSelected($bo_pg_workOrders.sel_ReasonSLA,"Customer Not Available");
+		_click($bo_pg_workOrders.btn_popUpPause);
+		_selectDomain();
+	};
+	
+	this.resumeSLAClock = function($extendingSLACommitmentYesorNo){
+		_selectDomain($g_domain);
+		_click($bo_pg_workOrders.btn_SLAResume);
+		_click(_button($extendingSLACommitmentYesorNo));
+		_selectDomain();
+	//	_setSelected($bo_pg_workOrders.sel_ReasonSLA,"Customer Not Available");
+	//	_click($bo_pg_workOrders.btn_popUpPause);
+	};
+	
+	this.deleteWorkOrder = function($workOrderNumber){
+		$bo_act_navigation.navigateToWorkOrdersTab();
+		_click(_link($workOrderNumber));
+		_click($bo_pg_workOrders.btn_deleteWorkOrder);
+	};
+	
+	/**
+	 * Author		:	Ashwini Holagi
+	 * Function		:	Verify Record Type of WOrk Detail Line Item
+	*/	
+	this.verifyRecordTypeofLineItem = function($recordType,$lineType){
+		var $workDetailRecordType =_getCellText(_cell($recordType), _near(_cell($lineType)));
+		if(_assertEqual($recordType, $workDetailRecordType)==true){
+			_log("Work Details of Record Type: "+$recordType+ " is created for Line Type :"+$lineType);
+		}else{
+			_log("Work Detail is NOT created");
+		}
+		
+	};
+	
+	
+	this.verifyAccountInserted = function ($successMessage){
+		if(_isVisible(_div($successMessage))==true){
+			_log("Pass : Account created successfully");
+			_click(_submit("Return"));
+			_wait(5000);
+		}else{
+			_log("Fail : Account NOT created successfully");
+		}
+	};
+	
+	this.verifyInvoiceNumber = function (){
+		if(_isVisible(_heading2("Proforma Invoice Detail"))==true){
+			_log("Pass :: Successfully");
+		}
+		else
+			_log("Fail :: Not successful");		
+	};
+};

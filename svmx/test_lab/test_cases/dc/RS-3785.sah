@@ -1,0 +1,41 @@
+var $url= "http://test.salesforce.com" ;
+var $un = "commonuser@svmxpqt.com";
+var $pwd = "servicemax2";
+ 
+var $RS_3785 = _testcase("RS_3785", "Setting up of DC Console Field Updates");
+$RS_3785.start();
+
+$bo_act_login.login($url, $un, $pwd);
+_click($dc_pg_consoleFieldUpdates.link_home);
+_click($dc_pg_consoleFieldUpdates.link_servicemaxSetup);
+_wait(60000,_isVisible($dc_pg_consoleFieldUpdates.link_DispatchManagement));
+_click($dc_pg_consoleFieldUpdates.link_DispatchManagement);
+_wait(60000,_isVisible($dc_pg_consoleFieldUpdates.link_DispatchConsoleFieldUpdates));
+_click($dc_pg_consoleFieldUpdates.link_DispatchConsoleFieldUpdates);
+_wait(60000, _isVisible($dc_pg_consoleFieldUpdates.btn_Reset));
+_log("Dspatch Console Field Updates Page is loaded successfully");
+_wait(10000);
+$dc_act_consoleFieldUpdates.verifyDispatchConsoleFields();
+$dc_act_consoleFieldUpdates.setDispatchConsoleFields();
+_wait(10000);
+
+$expectedMessage="Success:Saved successfully";
+$actualMessage=_getText(_div("message confirmM3"));
+_log($actualMessage);
+_assertEqual($expectedMessage,$actualMessage,"DC Console Fields could not be updated");
+ 
+var $valueBeforeReset=_getSelectedText($dc_pg_consoleFieldUpdates.sel_updateField2Value);
+_wait(3000);
+_logOutput("Value Before Reset button click", $valueBeforeReset);
+
+_setSelected($dc_pg_consoleFieldUpdates.sel_updateField2, "Invoice Number");
+_wait(1000);
+_click(btn_Reset);
+var $valueAfterReset=_getSelectedText($dc_pg_consoleFieldUpdates.sel_updateField2Value);
+_logOutput("Value After Reset button click",$valueAfterReset); 
+
+//Assert for Reset Functionality
+_assertTrue($valueAfterReset == $valueBeforeReset," Reset functionality failed");
+ 
+
+ 

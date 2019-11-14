@@ -1,0 +1,44 @@
+
+//author - Noor Salma Sharieff
+
+var $RS_5247 = _testcase("$RS_5247","Verify the impact of SLA setting values SET003 on SLA clocks on Case object");
+$RS_5247.start();
+_setSpeed($g_stepSpeed);
+
+//Pre - Condition 
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+$bo_act_navigation.navigateToConfigurationProfilesPage();
+$bo_act_configurationProfiles.editGlobalProfileForBooleanSettings("Service Level Agreement", "SLA Clock on Case", "SET003", false);
+$bo_act_configurationProfiles.editGlobalProfileForBooleanSettings("Service Level Agreement", "SLA Clock on Case", "SET005", false);
+
+var $slaterm = $bo_act_slaTerms.createSlaTerms("Default");
+$bo_act_slaTerms.addInitialResponseToSLA($slaterm, "Case","Problem", "High", "Created Date", 30, 60, "SLA");
+
+var $caseNumber = $bo_act_Cases.createCase("New", "High", "Email");
+
+$bo_act_Cases.editCaseOnly($caseNumber);
+$bo_act_Cases.updateTextBoxFields($bo_pg_Cases.txt_slaTermOnEdit, $slaterm);
+$bo_act_Cases.updateDropdownFields($bo_pg_Cases.sel_TypeOnEdit, "Problem");
+$bo_act_Cases.saveCase();
+
+//Validations
+_selectDomain($g_domain);
+_wait(3000,_isVisible($bo_pg_Cases.txt_SLAClock));
+_assertEqual("Initial Response 00:00:00:00 Onsite Response 00:00:00:00 Restoration 00:00:00:00 Resolution 00:00:00:00",_getText($bo_pg_Cases.txt_SLAClock),"SLA Clock Issue");
+_selectDomain();
+_assertEqual(_getText($bo_pg_Cases.txt_InitialResponseInternalBy)," ","Issue in Initial Response Internal By field");
+_assertEqual(_getText($bo_pg_Cases.txt_InitialResponseCustomerBy)," ","Issue in Initial response Customer By field");
+
+//Clean up function
+
+//var $datacreated = [$slaterm,$caseNumber];
+//for (var i = 0; i < $datacreated.length; i++) {
+	//$bo_act_common.cleanUpfunction($datacreated[i]);
+//}
+
+$bo_act_slaTerms.deleteSLATerm($slaterm);
+
+$RS_5247.end();
+
+
+

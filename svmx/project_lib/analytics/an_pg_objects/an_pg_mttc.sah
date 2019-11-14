@@ -1,0 +1,36 @@
+var $an_pg_mttc = new function an_pg_mttc() {
+this.link_home = _link("Home");
+this.link_servicemaxSetup = _link("ServiceMax Setup");
+this.metrics=_span("Metrics");
+this.btn_mttc =_span("Mean Time To Complete");
+this.btn_addmttc =_span("Add[1]");
+this.btn_activecheckboxmttc =_button("svmx-form-field svmx-form-checkbox");
+this.txt_mttc_description = _textarea("appliesTo");
+this.btn_settings = _span("Settings");
+this.source_Technician=_textbox("Select the source for Technician field");
+this.listitem_technician=_listItem("Technician");
+this.listitem_pre_technician=_listItem("Preferred Technician");
+this.source_product=_textbox("Select the source for Product field");
+this.listitem_product=_listItem("Product");
+this.source_create_on_field=_textbox("Select the source for Service Created On field");
+this.listitem_created_date=_listItem("Created Date");
+this.source_completed=_textbox("Select the source for Service Completed On field");
+this.listitem_createddatetime=_listItem("Completed Date Time");
+this.listitem_closedon=_listItem("Closed On[1]");
+this.source_Account=_textbox("Select the source for Account field");
+this.listitem_account=_listItem("Account");
+this.listitem_Customaccount=_listItem("Custom Account");
+this.listitem_partneraccount=_listItem("Partner Account");
+this.mapping=_textbox("Select an object mapping to store additional data for this metric");
+this.none=_listItem("--None--");
+this.Criteria=_span("Criteria");
+this.WO_QC=_textbox("/processpanel_expression_QualificationCriteriafieldset/");
+this.Closed_Work_Orders=_listItem("SVMXSTD: Closed Work Orders");
+this.UK_WO=_listItem("Closed UK WO");
+this.save=_span("Save");
+this.ok=_span("OK");
+this.btn_click_Schedule_Notifications = _span("Schedule & Notifications[1]");
+this.txt_Email_onSuccess = _textbox("emailOnSuccess");
+this.btn_click_run = _link("Run Now");
+};
+

@@ -1,0 +1,78 @@
+
+
+/**
+ * PM Plan Template object repository
+ */
+
+var $bo_pg_PMPlanTemplate = new function bo_pg_pmPlanTemplate(){
+	this.btn_newPMPlanTemplate = _button("New PM Plan Template");
+	this.txt_PMPlanTemplateName = _textbox("/PM Plan Template Name/");
+	this.txt_coverageType = _textbox("Coverage Type:");
+	this.txt_coverageTypeProduct = _listItem("Product (Must Have IB)");
+	this.txt_sequence = _textbox("/Sequence:/");
+	this.txt_frequency = _textbox("Frequency:");
+	this.txt_frequencyUnit = _textbox("Frequency Unit:");
+	this.btn_recurring = _button("Recurring:");
+	this.btn_update = _span("Update");
+	this.btn_applicableProducts = _span("Applicable Products");
+	this.link_editIcon = _image("/svmx-sfmd-edit-icon/");
+	this.btn_saveIcon = _span("/svmx-sfmd-save-icon/");
+	this.btn_save = _submit(" Save ");
+	this.txt_advanced_expression = _textbox("advancedExpression");
+	this.btn_save = _span("Save");
+	this.expression_notvalid = _span("Advanced Expression is not valid");
+	this.btn_today = _span("Today");
+	this.txt_activitydate = _textbox("activityDate");
+	this.picklist_IB_filter = _textbox("installedProductFilter");
+	
+	this.btn_delete = _button("Delete");
+	this.$1BAC_accName;
+	
+// Condition Based
+	this.btn_createConditionBasedPMPTemplate = _submit("Create Condition Based PM Plan Template");
+	
+	this.txt_templateName = _textbox("templateName");
+	this.txt_product = _textbox("product");
+//	this.img_filterIcon = _image("/svmx-filter-icon/");
+	this.img_filterIcon = _click(_image("gif"));
+	this.link_addRow = _span("addRowButton-btnInnerEl");
+	this.txt_attributebox = _div("/svmx-grid-cell-inner/",_under(_div("Attribute[1]")));
+	this.txt_attribute = _div("/svmx-trigger-index/",_under(_div("Attribute[1]")));
+this.txt_operatorbox = _div("/svmx-grid-cell-inner/",_under(_div("Operator[1]")));
+this.txt_operator = _div("/svmx-trigger-index/",_under(_div("Operator[1]")));
+this.txt_frequencybox = _div("/svmx-grid-cell-inner/",_under(_div("Frequency")));
+this.txt_frequency1 = _div("/svmx-trigger-index/",_under(_div("Frequency")));
+this.txt_frequencytxt = _textbox(0,_under(_div("Frequency")));
+this.txt_startAtbox = _div("/svmx-grid-cell-inner/",_under(_div("Start At")));
+this.txt_startAt = _textbox(0,_under(_div("Start At")));
+this.txt_stopAtbox = _div("/svmx-grid-cell-inner/",_under(_div("Stop At")));
+this.txt_stopAt = _textbox(0,_under(_div("Stop At")));
+this.txt_adjustmentTypebox = _div("/svmx-grid-cell-inner/",_under(_div("Adjustment Type")));
+this.txt_adjustmentType = _div("/svmx-grid-cell-inner/",_under(_div("Adjustment Type")));
+this.txt_minAdjbox = _div("/svmx-grid-cell-inner/",_under(_div("Minimum Adjustment")));
+this.txt_minAdj = _textbox("/numberfield/",_under(_div("Minimum Adjustment")));
+this.txt_maxAdjbox = _div("/svmx-grid-cell-inner/",_under(_div("Maximum Adjustment")));
+this.txt_maxAdj = _textbox("/numberfield/",_under(_div("Maximum Adjustment")));
+this.txt_adjValuebox = _div("/svmx-grid-cell-inner/",_under(_div("Adjustment Value")));
+this.txt_adjValue = _textbox("/numberfield/",_under(_div("Adjustment Value")));
+this.txt_adjUnitbox = _div("/svmx-grid-cell-inner/",_under(_div("Adjustment Unit")));
+this.txt_adjUnit = _div("/svmx-trigger-index/",_under(_div("Adjustment Unit")));
+this.btn_customUISave = _span("Save");
+this.img_messagebox = _span("svmx-quick-msgbox-info");
+this.img_arrow = _div("/svmx-trigger-index/",_under(_div("Adjustment Type")));
+this.txt_conditionType = _textbox("conditionType");
+// Criteria Based
+this.link_addRowCriteria = _span("addRowButton_CB-btnInnerEl");
+this.txt_attributeCriteria = _div("/svmx-trigger-index/",_under(_div("/Attribute/")));
+this.txt_operatorCriteria = _div("/svmx-trigger-index/",_under(_div("/Operator/")));
+this.txt_valueCriteria = _div("/svmx-trigger-index/",_under(_div("/Value/")));
+
+this.startDateDelay = _cell("Start Date Delay");
+this.startDateDelayUnit = _cell("Start Date Delay Unit");
+
+this.txt_startDateDelay = _textbox(0,_rightOf(_label("Start Date Delay")));
+this.txt_startDateDelayUnit = _select(0,_rightOf(_label("Start Date Delay Unit")));
+
+this.txt_workOrderPurpose = _textbox("workOrderPurpose");
+};
+

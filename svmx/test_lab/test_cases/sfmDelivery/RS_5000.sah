@@ -1,0 +1,46 @@
+
+var $RS_5000 = _testcase("RS_5000", "Verify Web Service call at Record level: After Add Record");
+$RS_5000.start();
+var $sfmNameToBeCloned = "Manage Work Order Lines - Usage";
+var $sfmName=$bo_act_common.generateRandomName("RS_5000_");
+var $isCustom = false;
+var $sfmTemplate = "SVMXSTD: Manage WO Usage Lines";
+var $sfmTemplateSaveAsName = $sfmName;
+var $containerName = ["Order Status","Order Status","Order Status","Order Status"];
+var $fieldName=["Order Type","Zip","Is Entitlement Performed","Driving Time (in Minutes)"];
+var $webServiceObject ="Parts" ;
+var $event = "After Add Record";
+var $eventType = "Webservice";
+var $methodName = "objWebService.afterAddRecord";
+var $wizardObject ="Work Order";
+
+
+
+//Create WO through REST API
+var $woNumber = $sfm_act_createCustomWizard.createBlankWoFromRest($sfmdUsn, $sfmdPwd, $sfmClientId, $sfmConsumerSecret, $sfmOrgInstance);
+
+//login
+_setSpeed($g_stepSpeed);
+$bo_act_login.login($g_url, $sfmdUsn, $sfmdPwd); 
+
+//clone Source to Target Child Process
+$sfm_act_SFM.cloneTDM016($sfmNameToBeCloned,$sfmName,$isCustom, $sfmTemplateSaveAsName,$sfmTemplate,$fieldName, $containerName);
+$sfm_act_SFM.setWebservice($webServiceObject, $event, $eventType, $methodName);
+_click($sfm_pg_sfmDesigner.btn_saveSFM); 
+
+//add the process to wizard
+$sfm_act_wizards.addToWizard($wizardObject, $sfmd_wizardName[1], $sfmd_wizardType[1], $sfmName);  
+
+//Navigate to the WO for validation
+$bo_act_navigation.navigateToCreatedRecordUsingGlobalSearch($woNumber);
+
+$sfm_act_createCustomWizard.clickWizardBtn($sfmName);
+_setValue($sfm_pg_sfmDesigner.txt_zip,"");
+
+//Validate in delivery after changing adding a part
+_click($sfm_pg_sfmDesigner.btn_deliveryAddRowParts);
+_assertEqual("Depot Repair", _getText($sfm_pg_sfmDesigner.txt_orderType), "Order type is not updated");
+_assertEqual("560001",_getText($sfm_pg_sfmDesigner.txt_zip),"Zip is not updated");
+_assertEqual("31",_getText($sfm_pg_sfmDesigner.txt_drivingTime),"Driving time is not updated");
+_assertEqual(true,$sfm_act_common. verifyCheckBoxValues(["Is Entitlement Performed:"],[true]),"Is Entitlement Performed is not checked");
+$RS_5000.end();

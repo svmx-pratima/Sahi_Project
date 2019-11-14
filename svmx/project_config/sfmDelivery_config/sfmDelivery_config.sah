@@ -1,0 +1,117 @@
+//Append "sfm_" for all variables
+//SFMD Global Variables
+/*
+//dev credentials -1
+var $sfmdUsn = "svmx-sfdtest@svmx-sfdtest.org.sfdtest1"; // dev
+var $sfmdPwd = "servicemax4";
+var $sfmClientId ="YjkyMzJmNDUzMGNmOTYzODVlNDQ0ZjE2OTUxOTU1NDI5MGViN2I3NWU3YTFjNmY300D4F0000008iwP";
+var $sfmConsumerSecret = "939409183430414665";
+var $sfmOrgInstance = "cs93";
+var $sfd_myDomain = "/lightning/";
+var $sfmd_Profile = "Clone Default Group Profile"; */
+
+//dev credentials -2
+
+/*var $sfmdUsn = "sfmdauto@dev.com"; // dev
+var $sfmdPwd = "servicemax0";
+var $sfmClientId ="3MVG90D5vR7Utjbq11Xruz7O6hQKxZR7XqU4qBTufscW715MqtB7Ej_dLuODdcNvcmAw.Hqlf4_VuxRs48LXA";
+var $sfmConsumerSecret = "65B712362A3A7FC16E05F8ED21E0A54BC5CFBEB25E239DA1820443210369562E";
+var $sfmOrgInstance = "cs23";
+var $sfd_myDomain = "/lightning/";
+var $sfmd_Profile = "Clone Default Group Profile"; */
+
+
+//PQT base org credentials 
+//installation key for seed : "TURCRU1IZ3dNREF3TURBNU5WZGx8MDFka01pelRzNnBSOTc5UFlYL0t5RWx1eGlFeXdFemZjSHFRQk55ZUtqNXpTeE9kRGVidFludytZRlVVS1ZzYnxSR1ZtWVhWc2RBPT18VkdWemRHbHVadz09fE1qQXVNQT09fFJXNTBaWEp3Y21selpRPT18"
+ var $sfmdUsn = "sfdclassic_auto@automation.com"; // base
+ var $sfmdPwd = "servicemax0";
+ var $sfmd_Profile = "Clone Default Group Profile";
+ var $sfmClientId ="3MVG9Yb5IgqnkB4owQxzN1UlGcDR2YtvFglStOG0bhaYQa9JJh8mQVLghm2UgK5jNW1vBVGhMT65KaKPGkTEg";
+ var $sfmConsumerSecret = "C77A58AC49312133B4343494AC71D249EA855AFEAD18297BD39550E887FB13A8";
+ var $sfmOrgInstance = "cs95";
+ var $sfd_myDomain = "/lightning/";
+ var $sfmd_Profile = "Clone Default Group Profile";
+ 
+
+
+ 
+//CI CD credentials
+/* var $sfmdUsn = "lakshmisha.svmxds@servicemax.com";
+ var $sfmdPwd = "servicemax0";
+ var $sfmd_Profile = "Clone Default Group Profile";
+ var $sfmClientId ="3MVG90rhzMxc2Gf5KrpxEX36EEnNYVNAJg7qmdI06GfEh31omoBYfb_CErcGY.72NgWbThJKsPgRWRE.MOFmG";
+ var $sfmConsumerSecret = "CDD37FCF69D9DA985DAE97E2A3510A26E7A912AF895F890AEF6BBA3F453FB77B";
+ var $sfmOrgInstance = "na93"; 
+ */
+
+/*//SFMD Pre-release variables
+var $sfmdUsn = "SFMD@commonused.com"; 
+var $sfmdPwd = "servicemax1";
+var $sfmd_Profile = "SFM Delivery Profile";
+var $sfmClientId ="3MVG93MGy9V8hF9NVNYggwPP81MtItachKuD1TOUfTboGFccMoJP3obvejcITFqS.9PTSqv1A0pbPIl2M8AWl";
+var $sfmConsumerSecret = "9D3731EC95F89BE01E2901FC4336B7077651E70FFC8B4D313EA21AD88F6A940B";
+var $sfmOrgInstance = "cs44";*/
+
+/*
+//SFMD track team credentials 
+ var $sfmdUsn = "safi.svmxc@regression-test.com"; // base
+ var $sfmdPwd = "servicemax3";
+ var $sfmd_Profile = "Clone Default Group Profile";
+ var $sfmClientId ="3MVG967gVD5fuTmJDUYl3CqfoDDIJCrERH58M6IVLSR9_59tseNZmMS_kwu.nA1nSfIBskN_SjbHCG0v01owu";
+ var $sfmConsumerSecret = "51966F535082EEFF643981672D43E9B7208A83D23C8F7C0EA823C7836842DD9F";
+ var $sfmOrgInstance = "cs64"; 
+//Added by Rubi Agrawal to add technician profile & credential 
+ var $sfmtUsn= "technician@autoclassic.com";
+ var $sfmtPwd="svmx12345";
+ var $tech_Profile="ServiceMax Service User"; */
+
+
+ var $sfmd_wizardName = ["SFMDAuto_Classic_DVR", "SFMDAuto_Classic_WebServices","SFMDAuto_Classic_Process","SFMDAuto_Classic_LookUP","SFMDAuto_Classic_Mappings",
+                    "SFMDAuto_Classic_Formula","SFMDAuto_Classic_Expression","SFMAuto_Classic_Wizards"];
+var $sfmd_wizardType = ["None","SFM","Inventory","Others","Output Document","Checklist"];
+
+/*
+//SFMD Auto-Execution org -- Always run scripts on this org
+//installation key for seed "TURCRU1VUXdNREF3TURBeFFUWjZ8MDJQYi95OWpSYTBLV0JoTWl0T2c1QUFUZElkVVNhQnRVcXNrSVBkUE52R2Q1bDBCdjFZbGttNTBab05ZNUd5M3xSR1ZtWVhWc2RBPT18VkdWemRHbHVadz09fE1qQXVNQT09fFJXNTBaWEp3Y21selpRPT18"
+var $sfmdUsn = "svmx-sfmd@classic-automation.org"; // base
+var $sfmdPwd = "servicemax0";
+var $sfmd_Profile = "Clone Default Group Profile";
+var $sfmClientId ="3MVG9U_dUptXGpYJ20jd9Q2YKBUZHRfST38lfIv.NqIzn1q6r3Vjs0AonZgHgD31hU99TDp2mDqe6mElffpAg";
+var $sfmConsumerSecret = "26C4064FBD65F29481325CEC05FA523F4C6F6E267769EFE2D839997D3E1BFA1A";
+var $sfmOrgInstance = "cs68";
+var $sfd_myDomain = "/lightning/";
+var $sfmd_Profile = "Clone Default Group Profile";*/
+
+ /* unused variables
+  * var $sfmUsn = "sfdclassic_auto@automation.com"; // base
+ var $sfmPwd = "Maxplore4"; */
+
+
+/*
+//SWAT 18.2 Server Credentials 
+var $sfmdUsn = "18.2classic@autoadmin.com";
+var $sfmdPwd = "classic1";
+var $sfmClientId ="3MVG9ahGHqp.k2_zM9EPRKP58tVsjxGffBYT6WE2bM5ljol0iZDDaHY2ohHOMi9jpBqGDhEZVkHXKaxpf5ftf";
+var $sfmConsumerSecret = "098BC2C4EE5BA1C0602B646544244FDF964581FF656E9BF429FEDA9C6FE6202C";
+var $sfmOrgInstance = "cs17"; 
+var $sfmd_Profile = "Clone Default Group Profile"; 
+
+
+//SWAT 18.3 Server Credentials 
+var $sfmdUsn = "18.3classic@autoadmin.com";
+var $sfmdPwd = "classic3";
+var $sfmClientId ="3MVG9ahGHqp.k2_z9GYe2pGnvhTAXc2NOFmPTDtLXzJK0xCn7X9rte1qVGDzIydr4pSpoFqKtpC4RP9adiaGL";
+var $sfmConsumerSecret = "D052397068D574DB73B3384516026FD70F37884239FD52A4815004CF14EB0E48";
+var $sfmOrgInstance =  "cs17"; 
+var $sfmd_Profile = "Clone Default Group Profile";
+
+
+//SWAT 19.1 Org Details
+var $sfmdUsn = "19.1lightning@autoadmin.com";
+var $sfmdPwd = "lightning19";
+var $sfmClientId ="3MVG9lJB4lV8F4Sj1241lRQujvj21um.f.WpNOEXIMZhd4N3_wQGZUFlr4YMrQUDSSjnT3O1kHrD_oD9m50eG";
+var $sfmConsumerSecret = "332E26496AC1D93C9907F3A9659FF8A1F98296D0BD41E1AC3F01B563636AA77C";
+var $sfmOrgInstance = "cs35"; 
+var $sfmd_Profile = "Clone Default Group Profile";
+*/
+

@@ -1,0 +1,67 @@
+var $user_credentials = $excel.readFromCustomExcel("../optimax/op_excleData/automation.xlsx", "User_Details","","");
+
+//var $nArr;
+//Calling the sforce API
+for(var $i=0;$i<$user_credentials.length;$i++)
+{
+var $g_un = $user_credentials[$i][0];
+var $g_pwd = $user_credentials[$i][1];
+var $g_url = $user_credentials[$i][2];
+}
+
+var $RS_6323 = _testcase("RS_6323", "Create New Territory Match Rule");
+
+$RS_6323.start();
+
+/*var $g_url = "https://test.salesforce.com/";
+var $g_un = "govendhan@svmx-cct5.org.cct5part1";
+var $g_pwd = "maxpl0re2";*/
+
+$bo_act_login.login($g_url, $g_un, $g_pwd);
+		
+
+var $date = "" + new Date();
+var $TerrName = "TerritoryRule_" + $date;
+var $rowCount = 0;
+var $rowIndex = 1;
+
+_click(_link("ServiceMax Setup"));
+_wait(20000,_isVisible(_div("Dispatch Management")));
+_click(_div("Dispatch Management"));
+_wait(20000,_isVisible(_div("Territory Match Rules")));
+_click(_div("Territory Match Rules"));
+_set($rowCount, _table("TRTRYRule:RuleForm:RuleBlock:TrtryRuleList").rows.length);
+$rowCount=$rowCount-1;
+_click(_button("New Rule"));
+_setValue(_textbox("TRTRYRule:RuleForm:RuleBlock:TrtryRuleList:"+$rowCount+":j_id91"), $TerrName);
+_setValue(_textarea("TRTRYRule:RuleForm:RuleBlock:TrtryRuleList:"+$rowCount+":j_id95"), "Territory Match Rule Automation");
+_setSelected(_select("TRTRYRule:RuleForm:RuleBlock:j_id99:j_id100:table1:0:j_id105"), "Order Status");
+_setSelected(_select("TRTRYRule:RuleForm:RuleBlock:j_id99:j_id100:table1:0:j_id110"), "Equals");
+_setValue(_textbox("TRTRYRule:RuleForm:RuleBlock:j_id99:j_id100:table1:0:j_id114"), "Open");
+_setSelected(_select("TRTRYRule:RuleForm:RuleBlock:j_id99:j_id100:table1:1:j_id105"), "Order Status");
+_setSelected(_select("TRTRYRule:RuleForm:RuleBlock:j_id99:j_id100:table1:1:j_id105"), "Order Type");
+_setSelected(_select("TRTRYRule:RuleForm:RuleBlock:j_id99:j_id100:table1:1:j_id110"), "Equals");
+_setValue(_textbox("TRTRYRule:RuleForm:RuleBlock:j_id99:j_id100:table1:1:j_id114"), "Cleaning");
+_click(_imageSubmitButton("Add"));
+_setSelected(_select("TRTRYRule:RuleForm:RuleBlock:j_id99:j_id100:table1:2:j_id105"), "Order Type");
+_setSelected(_select("TRTRYRule:RuleForm:RuleBlock:j_id99:j_id100:table1:2:j_id110"), "Equals");
+_setValue(_textbox("TRTRYRule:RuleForm:RuleBlock:j_id99:j_id100:table1:2:j_id114"), "Repair");
+_setValue(_textbox("TRTRYRule:RuleForm:RuleBlock:j_id120:HdrAdvOption"), "1 AND (2 OR 3)");
+_setSelected(_select("TRTRYRule:RuleForm:RuleBlock:Trtrytable:2:j_id132"), "State");
+_click(_button("Save"));
+_log("Territory Match Rule = "+$TerrName);
+
+if(_exists($TerrName))
+	{
+	_log("Territory Match Rule Created Successfully");
+	//$excel.writeToExcel("insertAtIndex", "../optimax/op_excleData/automation.xlsx", "TerritoryRule", $TerrName, $rowIndex);
+	$excel.insertUnderColumn("../optimax/op_excleData/automation.xlsx", "Rules", "Territory Match Rule", $TerrName, $rowIndex);
+	}
+else
+	{
+	_fail("Error in Creating Territory Match Rule");
+	}
+
+$bo_act_login.logOut();
+
+$RS_6323.end();

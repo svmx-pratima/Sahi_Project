@@ -1,0 +1,262 @@
+/**
+ * Functions for the SFM delivery
+ */
+var $swat_act_sfmDelivery= new function swat_act_sfmDelivery() {
+
+	/**
+	 * Author		:	Ashwini Holagi
+	 * Function		:	Launch SFM Delivery through WorkOrder
+	 */
+	this.launchSfmDelivery = function($wizardStepName,$wizardTitleName){
+		_selectDomain($g_domain);
+	    //_call(_button($wizardStepName, _in(_cell($wizardTitleName))).scrollIntoView());
+		_click(_button($wizardStepName, _in(_cell($wizardTitleName))));
+		_selectDomain();
+		_wait(3000);
+		_call(top.location.reload(true));
+		_wait(10000);
+		_selectDomain();
+		if(_isVisible($swat_pg_sfmDelivery.txt_unableConnect)==true){
+		$sfm_act_common.clearSvmxCache();
+		_wait(5000);
+		_assertNotVisible ($swat_pg_sfmDelivery.txt_unableConnect);
+		}
+		};
+		
+		/**
+		 * Author		:	Ashwini Holagi
+		 * Function		:	Launch Custom Action through WorkOrder
+		 */
+		this.launchCutomAction = function($actionId,$wizardTitleName){
+			_selectDomain($g_domain);
+			_wait(15000,_isVisible(_cell($wizardTitleName)));
+			_click(_button($actionId, _in(_cell($wizardTitleName))));
+			_wait(15000);
+			_selectDomain();
+			_wait(2000);
+			};
+		
+	/**
+	 * Author		:	Ashwini Holagi
+	 * Function		:	Add Child Lines
+	*/	
+	this.addChildLine = function($childName){
+		if($childName == 'Parts'){
+			_click($swat_pg_sfmDelivery.btn_PartsTab);
+			_wait(5000,_isVisible($swat_pg_sfmDelivery.btn_AddRowParts));
+			_click($swat_pg_sfmDelivery.btn_AddRowParts);
+		}else if($childName == 'Labor'){
+			_click($swat_pg_sfmDelivery.btn_LaborTab);
+			_wait(3000,_isVisible($swat_pg_sfmDelivery.btn_AddRowLabor));
+			_click($swat_pg_sfmDelivery.btn_AddRowLabor);			
+		}else if($childName == 'Expense'){
+			_click($swat_pg_sfmDelivery.btn_ExpenseTab);
+			_wait(3000,_isVisible($swat_pg_sfmDelivery.btn_AddRowExpenses));
+			_click($swat_pg_sfmDelivery.btn_AddRowExpenses);			
+		}else if($childName == 'Expenses'){
+			_click($swat_pg_sfmDelivery.btn_ExpenseTab);
+			_wait(3000,_isVisible($swat_pg_sfmDelivery.btn_AddRowExpenses));
+			_click($swat_pg_sfmDelivery.btn_AddRowExpenses);		
+		}else if($childName == 'Travel'){
+			_click($swat_pg_sfmDelivery.btn_TravelTab);
+			_wait(3000,_isVisible($swat_pg_sfmDelivery.btn_AddRowTravel));
+			_click($swat_pg_sfmDelivery.btn_AddRowTravel);
+		}else{
+			_click($swat_pg_sfmDelivery.btn_ProductServiced);
+			_wait(3000,_isVisible($swat_pg_sfmDelivery.btn_AddRowParts));
+			_click($swat_pg_sfmDelivery.btn_AddRowParts);
+		}
+		_setStrictVisibilityCheck(true);
+		_click($swat_pg_sfmDelivery.btn_ExtendedEdit);
+		_setStrictVisibilityCheck(false);	
+	};	
+
+	/**
+	 * Author		:	Ashwini Holagi
+	 * Function		:	Add Status and Valid until fields in CreateQuoteFromWO 
+	*/	
+	this.addFieldsCreateQuoteFromWO = function(){
+		_selectDomain();
+		_wait(10000,_isVisible(_label("Status:")));
+		_setValue(_textbox("Status:"), "Presented");
+		_click(_div("/sfm-button-/", _near(_label("Valid Until:"))));
+		_wait(2000);
+	};
+	
+	
+	/**
+	 * Author		:	Ashwini Holagi
+	 * Function		:	Add Parts line in CreateQuoteFromWO 
+	*/	
+	this.addPartsLineCreateQuoteFromWO= function($childName,$Product){
+		$swat_act_sfmDelivery.addChildLine($childName);
+		 _wait(10000,_isVisible($swat_pg_sfmDelivery.btn_ProductLookup));
+		_click($swat_pg_sfmDelivery.btn_ProductLookup, _near($swat_pg_sfmDelivery.lbl_ProductLabel));
+		$bo_act_common.searchfunction($Product);
+		_setValue($swat_pg_sfmDelivery.txt_Qty, "2");
+		_setValue($swat_pg_sfmDelivery.txt_UnitPrice, "4000");
+		_wait(2000);
+		_click($swat_pg_sfmDelivery.btn_Update);
+		_wait(2000);
+	};
+
+	/**
+	 * Author		:	Ashwini Holagi
+	 * Function		:	Add Labor and Expense child lines in CreateQuoteFromWO 
+	*/	
+	this.addChildLineCreateQuoteFromWO = function($childName){
+		$swat_act_sfmDelivery.addChildLine($childName);
+		_setValue($swat_pg_sfmDelivery.txt_Qty, "2");
+		_setValue($swat_pg_sfmDelivery.txt_UnitPrice, "4000");
+		_wait(2000);
+		_click($swat_pg_sfmDelivery.btn_Update);
+		_wait(2000);
+	};
+	
+	
+	
+	/**
+	 * Author		:	Ashwini Holagi
+	 * Function		:	Click on Save button in SFM delivery
+	*/	
+	this.saveSfmDelivery = function(){
+		_click($swat_pg_sfmDelivery.btn_Save);
+		_wait(15000);
+	};
+	
+	
+	/**
+	 * Author		:	Ashwini Holagi
+	 * Function		:	Click on Save button in SFM delivery without click on Get Price button
+	*/	
+	this.saveSfmDeliveryWithoutGetPrice = function(){
+		_click($swat_pg_sfmDelivery.btn_Save);
+		_wait(5000);
+		if(_isVisible($swat_pg_sfmDelivery.lbl_PriceNotCalculated)==true){
+			_click($swat_pg_sfmDelivery.btn_Ok);
+			_wait(10000);
+			_assertVisible($swat_pg_sfmDelivery.lbl_workOrderDetail);
+		}else{
+			_wait(5000);
+			_assertVisible($swat_pg_sfmDelivery.lbl_workOrderDetail);
+		}
+	};
+	
+	/**
+	 * Author		:	Ashwini Holagi
+	 * Function		:	Verify Service Quote is created
+	*/	
+	this.verifyServiceQuoteIsCreated = function(){
+		_wait(5000, _isVisible($swat_pg_sfmDelivery.hdr_ServiceQuote));
+		_assertVisible($swat_pg_sfmDelivery.hdr_ServiceQuoteDetail);
+		var $QuoteNumber = _getText($swat_pg_sfmDelivery.hdr_QuoteNo);
+		_log("Service Quote is created : "+$QuoteNumber);
+	};
+
+	/**
+	 * Author		:	Ashwini Holagi
+	 * Function		:	Verify Quote Items
+	*/	
+	this.verifyQuoteItems = function (){
+		var $lineType = ["Parts", "Labor", "Expense"];
+		for (i=0; i<=3; i++){
+		var $actualLineType =  _getText(_cell(i,_under($swat_pg_sfmDelivery.lbl_LineType)));
+		_assertEqual($lineType[i], $actualLineType);
+		_log("Line Type parts is created : "+$actualLineType);
+		}
+	};
+	
+	
+	/**
+	 * Author		:	Ashwini Holagi
+	 * Function		:	Is Billable CheckBox Validation
+	*/	
+	this.isBillableCheckBoxValidation = function(){
+		_setStrictVisibilityCheck(true);
+		var $isBillableCheckBoxStatus = _isVisible(_div("/svmx-grid-checkheader-unchecked/",_under(_span("Is Billable"))));
+			if ($isBillableCheckBoxStatus==true) {
+				_log("inside If isBillableCheckBoxStatus loop");
+				_check(_div("/svmx-grid-checkheader-unchecked/",_under(_span("Is Billable"))));
+			}
+		_setStrictVisibilityCheck(false);
+	};
+	
+	/**
+	 * Author		:	Ashwini Holagi
+	 * Function		:	Click on Finalize button in Service Report , Click on WorkOrder Link
+	 * 					Verify Service Report is attached to Work Order
+	*/		
+	this.verifyServiceReportAttchedToWO = function($workOrderNo){
+		_wait(5000, _isVisible(_button("Finalize")));
+		_click(_button("Finalize"));
+		_wait(5000, _isVisible(_link($workOrderNo)));
+		_click(_link($workOrderNo));	
+		_wait(5000,_isVisible($bo_pg_workOrders.txt_workOrderDetails));
+		if(_assertExists(_link("/WO_ServiceReport/"))==true){
+			_log("Work Order Service Report is attached to Work Order");
+			}else{
+				_log("Work Order Service Report is NOT attached to Work Order");	
+			}
+	};
+	
+	/**
+	 * Author		:	Ashwini Holagi
+	 * Function		:	Verify Price Calculated in SFM Delivery 
+	*/	
+	this.verifyPriceCalculated = function($lineType, $expectedPrice){
+		_click(_span($lineType));
+		_wait(5000);
+		_setStrictVisibilityCheck(true);
+		var $actualPartPrice=_getCellText(_div("/svmx-grid-cell-inner/",_under(_div("/svmx-column-header-inner/",_near(_div("Billable Line Price"))))));
+		if(_assertEqual($expectedPrice,$actualPartPrice)==true){
+			_log("Actual and expected Parts Price is same");
+		}else{
+			_log("Actual and expected Parts Price is NOT same");	
+		}	
+	};
+		
+	
+	/**
+	 * Author		:	Ashwini Holagi
+	 * Function		:	Add Product Serviced child line
+	*/	
+	this.addProductServiced = function ($childName, $Product){
+		$swat_act_sfmDelivery.addChildLine($childName);
+		_setValue($swat_pg_sfmDelivery.txt_part,$Product);
+		_click($swat_pg_sfmDelivery.btn_Update);
+		_wait(2000);
+		_click($swat_pg_sfmDelivery.btn_QuickSave);
+		_wait(10000);
+	};
+	
+	/**
+	 * Author		:	Ashwini Holagi
+	 * Function		:	Add Modify Work Details in 'Add/Edit Product Serviced' SFM delivery
+	*/
+	this.addModifyWorkDetails = function (){
+		_click($swat_pg_sfmDelivery.btn_downArrow);
+		_wait(3000);
+		_click($swat_pg_sfmDelivery.btn_addWorkDetails);
+		_wait(15000);
+		if(_isVisible(_div("Unable to connect to the server. More..."))==true){
+			$sfm_act_common.clearSvmxCache();
+			_assertNotVisible (_div("Unable to connect to the server. More..."));
+			_click($swat_pg_sfmDelivery.btn_downArrow);
+			_wait(3000);
+			_click($swat_pg_sfmDelivery.btn_addWorkDetails);
+			_wait(15000);
+		}
+	};
+	
+	/**
+	 * Author		:	Ashwini Holagi
+	 * Function		:	Click on Save button in 'Add/Edit Product Serviced' SFM delivery
+	*/
+	this.saveSfmProductServiced = function (){
+		if(_isVisible(_div("Unable to connect to the server. More..."))==true){
+			$sfm_act_common.clearSvmxCache();
+			_assertNotVisible (_div("Unable to connect to the server. More..."));
+		}
+		$swat_act_sfmDelivery.saveSfmDelivery();
+	};
+};

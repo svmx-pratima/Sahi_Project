@@ -1,0 +1,116 @@
+var $sfm_pg_formDesigner = new function sfm_pg_formDesigner() {
+	
+	this.tab_formDesigner=_f("main").tab("Form Designer");
+	this.btn_addSection=_f("main").s_button("Add a section");
+	this.btn_removeQuestion=_f("main").s_button("/Remove Question/");
+	this.btn_addQuestion=_f("main").s_button("Add question to form");
+	this.txt_searchQuestion=_f("main").s_textinput("searchText").near(_f("main").s_label("Question List"));
+	
+	//.near(_f("main").s_label("What is time"))
+	
+	
+	
+	
+	//Editing Info section
+	this.btn_editSection=_f("main").s_button("editBtn");
+	this.div_information=_click(_f("main").tab("Information"));
+	this.label_sectionName=_f("main").s_label("Name*");
+	this.txt_sectionName=_f("main").s_textinput(0).near(this.label_sectionName);
+	this.label_sectionDescription=_f("main").s_label("Description");
+	this.txt_sectionDescription=_f("main").s_textarea(0).near(this.label_sectionDescription);
+	this.label_helpURL=_f("main").s_label("Help URL");
+	this.txt_helpURL=_f("main").s_textinput(0).near(this.label_helpURL);
+
+	
+	//Entry criteria tab objects
+	this.tab_entryCriteria=_f("main").tab("Entry Criteria");
+	this.sel_searchEntryCriteria=_f("main").s_combobox("/searchCombo/").near(this.tab_entryCriteria);
+	this.txt_saveAsTextField=_f("main").s_textinput("/Save this filter as/").near(this.sel_searchEntryCriteria);
+	this.txt_saveAsIDTextField=_f("main").s_textinput("/Input ID Here/").near(this.sel_searchEntryCriteria);
+	this.btn_saveEntryCriteria=_f("main").s_button("/saveBtn/").near(this.sel_searchEntryCriteria);
+	this.btn_newEntryCriteriaFilter=_f("main").s_button("/New/").near(this.sel_searchEntryCriteria);
+	this.btn_reset=_f("main").s_button("/Reset/").s_button("/New/").near(this.sel_searchEntryCriteria);
+	this.btn_delete=_f("main").s_button("/Delete/").s_button("/New/").near(this.sel_searchEntryCriteria);
+	
+	this.btn_applySectionWindow=_f("main").s_button("/Apply/").near(this.tab_entryCriteria);
+	this.btn_cancelSectionWindow=_f("main").s_button("/Cancel/").near(this.tab_entryCriteria);
+	this.btn_entryCriteriaDeleteRow=_f("main").s_button("Delete");
+	this.btn_entryCriteriaApplyButton=_f("main").s_togglebutton("Apply/Remove Entry Criteria");
+	this.label_saveEntryCriteriaMsg=_f("main").uiftetextfield("Entry Criteria Map Saved Successfully");
+	
+	
+	
+	//Exit Criteria Tab general objects
+	this.tab_exitCriteria=_f("main").tab("Exit Criteria");
+	this.label_evaluation=_f("main").s_label("Evaluation");
+	this.sel_questionSelect=_f("main").s_dropdownlist(0);
+	this.link_addAnswer=_f("main").linkbutton("+Add Answer");
+	this.link_addQuestion=_f("main").linkbutton("+Add Question");
+	this.btn_applyRemove=_f("main").s_togglebutton("Apply/Remove Exit criteria");
+	
+	//Date question fields
+	this.sel_comboFiled=_f("main").s_dropdownlist("evaluationCombo");
+	this.sel_operandType=_f("main").s_dropdownlist("operandTypeCombo");
+	this.sel_ansPicklist=_f("main").s_combobox("picklist");
+	this.sel_skipToSection=_f("main").s_dropdownlist("sectionListCombo");
+	this.txt_ansTextValue=_f("main").s_textinput("operandValue");
+	
+	//Edit Question
+	this.btn_editQuestion=_f("main").s_button("Edit Question");
+	this.tab_dataValidation=_f("main").tab("Data Validation");
+	this.label_dvrExpr=_f("main").s_label("Expressions").near(this.tab_dataValidation);
+	
+	//DVR page
+	this.txt_dvrName=_f("main").s_textinput("validationName");
+	this.txt_dvrID=_f("main").s_textinput("validationId");
+	this.sel_dvrComboField=_f("main").s_dropdownlist("conditionsCombo");
+	//this.txt_dvrAnsValue=_f("main").s_textinput("textInput");
+	this.txt_dvrDateAnsValue=_f("main").s_richeditabletext("textDisplay");
+	this.txt_dvrNumberAnsValue=_f("main").s_textinput("operandValue");
+	this.btn_dvrAddRow=_f("main").s_button("Add a row");
+	this.txt_dvrAdvExpr=_f("main").s_textinput("advExpIP");
+	this.sel_dvrMsgType=_f("main").s_dropdownlist("msgType");
+	this.txt_dvrErrorMsg=_f("main").s_textarea("message");
+	this.tab_questionDetails=_f("main").tab("Question Details");
+	this.btn_dvrSave=_f("main").s_button("Save").near(this.tab_questionDetails);
+	
+	
+	//Create Checklsit Objects
+	this.btn_addNewQuestion=_f("main").s_button("Add new question");
+	this.txt_queName=_f("main").s_textinput("questionText");
+	this.txt_helpURL=_f("main").s_textinput("helpUrl");
+	this.txt_tag=_f("main").uitextfield(0).near(_f("main").s_label("Tags").near(_f("main").s_button("Add to Library Only")));
+	this.btn_addToLib=_f("main").s_button("Add to Library Only");
+	this.btn_addToLibAndForm=_f("main").s_button("Add to Library and Form");
+	this.btn_closeChkWindow=_f("main").s_button("closeButton");
+	
+	//attachment
+	this.btn_includeINPDOC=_f("main").s_checkbox("Include in Output Document");
+	this.btn_descReq=_f("main").s_checkbox("Description required");
+	
+	//Checkbox
+	this.label_ansValue=_f("main").s_label("Answer Values");
+	this.btn_addAns=_f("main").s_button("Add an Answer");
+	this.label_saveEditSectionMsg=_f("main").uiftetextfield("Please save SFM Transaction to save changes");
+	this.btn_default=_f("main").s_checkbox("Default");
+	this.txt_responseSetName=_f("main").s_textinput("responseSetName");
+	this.sel_responseSet=_f("main").s_dropdownlist("responseSet");
+	
+	//Date
+	this.btn_preFill=_f("main").s_checkbox("Prefill with value from Work Order");
+	this.sel_sourceField=_f("main").s_combobox("sourceObjPickList");
+	this.sel_defaultAnsType=_f("main").s_dropdownlist("operandTypeCombo");
+	this.txt_dateField=_f("main").s_richeditabletext("/textDisplay/").near(_f("main").mxftetextinput(0));
+	this.sel_dateFunction=_f("main").s_combobox("picklist");
+	
+	//Number
+	this.txt_defaultAns=_f("main").s_textinput("defaultResponseIdTxtInp");
+	
+	//picklsit
+	this.btn_preFillinNumberQue=_f("main").s_checkbox("Prefill with value from Work Order").near(this.sel_responseSet);
+	this.sel_sourceFieldinNumberQue=_f("main").s_combobox("sourceObjPickListMulti");
+	
+	
+	
+};
+

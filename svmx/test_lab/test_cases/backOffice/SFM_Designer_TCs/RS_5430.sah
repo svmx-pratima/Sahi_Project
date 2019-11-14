@@ -1,0 +1,52 @@
+//_includeOnce("../../../references/references.js");
+
+//author - Mamata Rout
+
+//Pre-requisite 
+//Ensure that the Translation WorkBench is enabled on the org
+var $RS_5430 = _testcase("RS_5430", "Validate the page on translating the custom labels");
+$RS_5430.start();
+_setSpeed($g_stepSpeed);
+
+var $newTransValue="trans-Process ID";
+var $viewName=$bo_act_common.generateRandomName("ViewName5430_");
+
+//var $viewName="ViewName5430";
+var $viewID=$viewName;
+var $labelStartsWith="Process ID";
+var $filterLanguage="English";
+
+//LOGIN TO SYSTEM
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+
+//GO TO SALESFORCE SET UP->CUSTOM LABEL AND CREATE NEW CUSTOM LABEL FOR LABEL "PROCESS ID" 
+$bo_act_customLabel.createNewView($viewName,$viewID,$labelStartsWith,$filterLanguage);
+$bo_act_customLabel.createCustomLabelForAppPermission($newTransValue);
+_log("custom label created successfully");
+
+//NAVIGATING SFM APP PERMISSION AND SELECTING OBJECT TYPE WORK ORDER AND PROCESS TYPE SFM TRANSACTION
+//SND VERIFYING IF THE TRANSLATED DATA MATCH TO THE DISPLAYED DATA
+$bo_act_navigation.navigateToSfmAppPermission();
+	_click($bo_pg_sfmAppPermissionD.txt_focusProcessType);
+		_click($bo_pg_sfmAppPermissionD.sel_processType);
+		_wait(10000);
+		_setValue($bo_pg_sfmAppPermissionD.txt_enterObjType,"");
+		_setValue($bo_pg_sfmAppPermissionD.txt_enterObjType,"Work Order");
+		_click($bo_pg_sfmAppPermissionD.sel_objtypeWO);
+		_wait(20000);
+		
+		var $actValue=_getText(_span("svmx-column-header-text"));
+
+		if ($newTransValue== $actValue){
+			_log("Custom Label translation is successful");
+		}else{
+			_log("Custom Label translation was unsuccessful");
+		}
+
+//DELETE THE TRANSLATED DATA TO REVERT BACK TO ORIGINAL
+$bo_act_customLabel.deleteNewTranslatedValue();
+_log("custom label deleted successfully");
+$bo_act_customLabel.deleteView($viewName);
+_setSpeed($g_stepSpeed);
+
+$RS_5430.end();

@@ -1,0 +1,12 @@
+
+this.AddCoveredProducToServiceContract =  function($sconName,$installedProduct,$slaName,$pastYear, $futureYear ){
+	_click($bo_pg_serviceMaintenanceContracts.btn_newCoveredProduct);
+	_wait(10000, _isVisible(_heading2("New Covered Product")));
+    _setValue($bo_pg_serviceMaintenanceContracts.txt_installedProduct,$installedProduct);
+    _setValue($bo_pg_serviceMaintenanceContracts.txt_slaTermName,$slaName);
+    _setValue($bo_pg_serviceMaintenanceContracts.txt_startDate, $bo_act_common.getPastDate($pastYear,"/"));
+	_setValue($bo_pg_serviceMaintenanceContracts.txt_endDate, $bo_act_common.getfutureDate($futureYear, "/"));
+	_click($bo_pg_serviceMaintenanceContracts.btn_save);
+	_assertNotVisible(_div("/Error: Invalid Data/"));
+	$bo_pg_serviceMaintenanceContracts.clickOnServiceContract($sconName);
+};

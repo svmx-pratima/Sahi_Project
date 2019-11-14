@@ -1,0 +1,114 @@
+// Author Bhupendra Singh Chouhan
+
+/*
+ * SOU For upgrade Scenario
+ */
+var $RS_10343 = _testcase("RS_10343", "SOU For Existing Record:- Verify SOU fields in SFD when SOU with questions are configured in checklist designer.");
+$RS_10343.start();
+
+$bo_act_login.login($PRT_url, $bac_PRTun, $bac_PRTpwd);
+
+//var $number1 = $bo_act_common.generateRandomName("num");
+var $QuestionName1 = $bo_act_common.generateRandomName("Number Question_");
+var $QuestionName2 = $bo_act_common.generateRandomName("Text Question_");
+var $QuestionName3 = $bo_act_common.generateRandomName("Date Question_");
+var $QuestionName4 = $bo_act_common.generateRandomName("DateTime Question_");
+var $QuestionName5 = $bo_act_common.generateRandomName("Picklist Question_");
+var $responseSetName = $bo_act_common.generateRandomName("RSet_");
+var $answerValue1 = "Field Service";
+var $answerValue2 = "Depot Repair";
+var $answerValue3 = "May Be";
+var $checklistProcessName = $bo_act_common.generateRandomName("ChecklistProcess_");
+var $AnswerType1 = "Number";
+var $AnswerType2 = "Text";
+var $AnswerType3 = "Date";
+var $AnswerType4 = "Date Time";
+var $AnswerType5 = "Picklist";
+var $operandType = "Question"; 
+var $fieldName1 = "Scheduled Duration";
+var $fieldName2 = "Entitlement Notes";
+var $fieldName3 = "Scheduled Date";
+var $fieldName4 = "Actual Initial Response";
+var $fieldName5 = "Order Type";
+
+// To create a Checkbox Question with default checklist number 1
+
+$bo_act_navigation.navigateToSfmTransactionDesigner();
+_wait(60000, _isVisible($bo_pg_sfmTransactionAndDesigner.btn_newSFM));
+_wait(1000);
+
+// To create Checklist Process 
+$bo_act_checklistdesigner.newChecklistTypeSFM($checklistProcessName,"to generate a Checklist/Survey type of Process", "Work Order");
+
+$bo_act_checklistdesigner.addQuestionToChecklistProcess($QuestionName1, $AnswerType1);
+$bo_act_checklistdesigner.addQuestionToChecklistProcess($QuestionName2, $AnswerType2);
+$bo_act_checklistdesigner.addQuestionToChecklistProcess($QuestionName3, $AnswerType3);
+$bo_act_checklistdesigner.addQuestionToChecklistProcess($QuestionName4, $AnswerType4);
+$bo_act_checklistdesigner.addQuestionWithResponseSetToChecklistProcess($QuestionName5, $AnswerType5, $responseSetName, $answerValue1, $answerValue2, $answerValue3);
+
+//To create SOU configuration for Checklist Process
+//	SOU Row 1st
+$bo_act_checklistdesigner.configureSOUToChecklistProcess($fieldName1, $operandType, $QuestionName1);
+//SOU Row 2nd
+$bo_act_checklistdesigner.configureSOUToChecklistProcess($fieldName2, $operandType, $QuestionName2);
+//SOU Row 3rd
+$bo_act_checklistdesigner.configureSOUToChecklistProcess($fieldName3, $operandType, $QuestionName3);
+//SOU Row 4th
+$bo_act_checklistdesigner.configureSOUToChecklistProcess($fieldName4, $operandType, $QuestionName4);
+//SOU Row 5th
+$bo_act_checklistdesigner.configureSOUToChecklistProcess($fieldName5, $operandType, $QuestionName5);
+
+//Save Checklist Process
+$bo_act_checklistdesigner.saveAndCloseChecklistProcess();
+
+// Create WO record
+var $WONumber = $bo_act_workOrders.createWorkOrder("", "", "", "", "Open", "High", "Field Service");
+
+/**
+*Invoke "Default title for Checklist" SFM from WO record
+*/
+$bo_act_workOrders.invokeDefaultTitleForChecklistSFM($WONumber);
+
+// Invoke Specific Checklist process
+$bo_act_checklistdesigner.invokeSpecificChecklistProcess($checklistProcessName);
+
+//Answer Checklist Question in Checklist delivery page
+
+//Answer Number Question 1
+var $answerNumber = 143;
+$bo_act_checklistdesigner.answerNumberQuestionInSFD($answerNumber, $QuestionName1);
+
+var $answerText = "Text Question answer is given in SFD";
+$bo_act_checklistdesigner.answerTextQuestionInSFD($answerText, $QuestionName2);
+
+var $answerDate = "5/15/2020";
+$bo_act_checklistdesigner.answerDateAndDateTimeQuestionInSFD($answerDate, $QuestionName3);
+
+var $answerDateTime = "5/15/2022";
+$bo_act_checklistdesigner.answerDateAndDateTimeQuestionInSFD($answerDateTime, $QuestionName4);
+
+var $answerPicklist = "Depot Repair";
+$bo_act_checklistdesigner.answerPicklistQuestionInSFD($answerPicklist, $QuestionName5);
+
+//Submit checklist process in SFD
+$bo_act_checklistdesigner.submitChecklistProcessInSFD();
+
+//Navigate to WO record
+$bo_act_workOrders.navigateToWorkOrder($WONumber);
+var $actualScheduleDuration = _getText(_div(0,_rightOf(_cell("/Scheduled Duration/"))));
+var $actualOrderType = _getText(_div(0,_rightOf(_cell("/Order Type/"))));
+var $actualEntitlementNotes = _getText(_div(0,_rightOf(_cell("/Entitlement Notes/"))));
+var $acualScheduledDate = _getText(_div(0,_rightOf(_cell("Scheduled Date"))));
+var $actualInitialResponse = _getText(_div(0,_rightOf(_cell("/Actual Initial Response/"))));
+
+_assertEqual($actualScheduleDuration,$answerNumber,"Actual and expected Scheduled Duration on Work Order are not same");
+_assertEqual($actualOrderType,$answerPicklist,"Actual and expected Order Type on Work Order are not same");
+_assertEqual($actualEntitlementNotes,$answerText,"Actual and expected Entitlement Notes on Work Order are not same");
+_assertEqual($acualScheduledDate,$answerDate,"Actual and expected Scheduled Date on Work Order are not same");
+//_assertEqual(_getText(_div(0,_rightOf(_cell("/Actual Initial Response/")))),$answerDateTime,"Actual and expected Actual Initial Response on Work Order are not same");
+_assertEqual($actualInitialResponse,"5/15/2022 12:00 AM","Actual and expected Actual Initial Response on Work Order are not same");
+
+$bo_act_login.logOut(); 
+_closeWindow(); 
+
+$RS_10343.end();

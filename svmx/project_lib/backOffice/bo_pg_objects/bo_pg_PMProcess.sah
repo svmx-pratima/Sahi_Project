@@ -1,0 +1,43 @@
+
+
+/**
+ * Home page object repository
+ */
+
+var $bo_pg_PMProcess = new function bo_pg_PMProcess(){
+	this.btn_new = _button("New");
+	this.txt_processType = _select("/CONF_SetupPMProcess/");
+	this.txt_processName = _textbox("/CONF_SetupPMProcess:SVMX_/",_rightOf(_span("Process Name")));
+	this.txt_processId = _textbox("/CONF_SetupPMProcess:SVMX_/",_rightOf(_span("Process Id")));
+	this.chk_active = _checkbox("/CONF_SetupPMProcess:SVMX_/",_rightOf(_span("Active")));
+	this.txt_createWorkOrderNDaysBeforeScheduledDate = _textbox("/CONF_SetupPMProcess:SVMX_/",_rightOf(_span("Create Work Order 'n' days before scheduled date")));
+	this.btn_createNewExpression = _span("Create New");
+	this.txt_fieldName = _select("/CONF_SetupPMProcess:SVMX/",_under(_tableHeader("Field Name")));
+	this.txt_operator = _select("/CONF_SetupPMProcess:SVMX/",_under(_tableHeader("Operator")));
+	this.txt_value = _textbox("/CONF_SetupPMProcess:SVMX/",_under(_tableHeader("Value")));
+	this.txt_expressionName = _textbox("/CONF_SetupPMProcess:SVMX/",_rightOf(_label("Expression Name")));
+	this.txt_expressionId = _textbox("/CONF_SetupPMProcess:SVMX/",_rightOf(_label("Expression Id")));
+	this.tab_workOrderRules = _cell("Work Order Rules");
+	this.txt_numberOfWorkOrder = _select("/CONF_SetupPMProcess:SVMX/",_rightOf(_span("Number of Work Orders")));
+	this.txt_coverageType = _select("/CONF_SetupPMProcess:SVMX/",_rightOf(_span("Field Map (Coverage Type: Product or Account)")));
+	this.txt_coverageTypeLocation = _select("/CONF_SetupPMProcess:SVMX/",_rightOf(_span("Field Map (Coverage Type: Location )")));
+	this.tab_scheduleAndNotifications = _cell("Schedule & Notifications");
+	this.txt_sendErrorNotificationsToThisEmailAddress = _textbox("/CONF_SetupPMProcess:SVMX/",_rightOf(_span("Send error notifications to this email address")));
+	this.btn_quickSave = _button("Quick Save");
+	this.btn_delete = _button("Delete");
+	this.btn_std_view = _submit("View");
+	this.btn_std_clone = _submit("Clone");
+	this.btn_std_backtosetuphome = _submit("Back To Setup Home");
+	this.btn_custom_new = _button("New");
+	this.btn_custom_edit = _button("Edit");
+	this.btn_custom_clone = _button("Clone");
+	this.btn_custom_delete = _button("Delete");
+	this.btn_custom_backtosetuphome = _submit("/Back To Setup Home/");
+	this.sel_AssignTo = _select(0,_rightOf(_span("Assign To")));
+	this.sel_SelectTaskObject = _select(0,_rightOf(_span("Select task object")));
+	this.sel_TaskMapToUse = _select(0,_rightOf(_label("Task map to use")));
+	
+	
+	
+	
+};

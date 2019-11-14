@@ -1,0 +1,62 @@
+var $user_credentials = $excel.readFromCustomExcel("../optimax/op_excleData/automation.xlsx", "User_Details","","");
+var $work_Orders_Xl = $excel.readFromCustomExcel("../optimax/op_excleData/automation.xlsx", "RS_6299_RS_6300","","");
+//var $nArr;
+//Calling the sforce API
+for(var $i=0;$i<$user_credentials.length;$i++)
+{
+var $g_un = $user_credentials[$i][0];
+var $g_pwd = $user_credentials[$i][1];
+var $g_url = $user_credentials[$i][2];
+}
+
+var $wo_type = $work_Orders_Xl[1][0];
+var $wo_status = $work_Orders_Xl[1][1];
+
+
+var $RS_6300 = _testcase("RS_6300", "Validating MTTS by creating an invalid WO");
+
+$RS_6300.start();
+
+$bo_act_login.login($g_url, $g_un, $g_pwd);
+
+_set($login_result, _fetch(login($g_un,$g_pwd)));
+_log($login_result);
+
+_set($create_MTTS_WO, _fetch(create_WO($wo_type , $wo_status)));
+_log($create_MTTS_WO);
+
+//<browser>
+function login($g_un,$g_pwd){
+	
+	var $login_result = sforce.connection.login($g_un,$g_pwd);
+	return $login_result;
+}
+
+function create_WO ($wo_type , $wo_status)
+{
+	var workorder = new sforce.SObject("SVMXC__Service_Order__c");
+	workorder.SVMXC__Order_Type__c = $wo_type;
+	workorder.SVMXC__Order_Status__c = $wo_status;
+	result = sforce.connection.create([workorder]);
+		
+	var mtts_WO_List = sforce.connection.query("Select Id, SVMXC__Service_Duration__c, SVMXC__Order_Type__c, SVMXC__Order_Status__c From SVMXC__Service_Order__c Where Id = '" +result[0].id+"'");
+	var mtts_WO_arr = mtts_WO_List.getArray("records");
+	for(var $s=0;$s<mtts_WO_arr.length;$s++)
+	{
+		var mtts_WO = mtts_WO_arr[$s];
+		_log("SVMXC__Order_Type__c = "+mtts_WO.SVMXC__Order_Type__c+" , SVMXC__Order_Status__c = "+mtts_WO.SVMXC__Order_Status__c+" , SVMXC__Service_Duration__c = "+ mtts_WO.SVMXC__Service_Duration__c);
+		if(mtts_WO.SVMXC__Order_Type__c === 'Repair' & mtts_WO.SVMXC__Order_Status__c === 'Closed' & mtts_WO.SVMXC__Service_Duration__c === '3600.0')
+		{
+			_log("MTTS updated as expected from Setting def value 3600 sec");
+		}
+		else
+		{
+			_log("MTTS is not calculated. SVMXC__Service_Duration__c = "+ mtts_WO.SVMXC__Service_Duration__c);
+		}
+	}
+
+	return result;
+}	
+
+//</browser>
+$RS_6300.end();

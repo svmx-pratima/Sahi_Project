@@ -1,0 +1,13 @@
+
+/*Test case Manage translations - Get Translations*/
+
+
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+$bo_act_navigation.navigateToSvmxSetup();
+_click($bo_pg_servicemaxSetup.btn_app_administration);
+_assertEqual(true, _isVisible($bo_pg_servicemaxSetup.btn_Translations));
+_click($bo_pg_servicemaxSetup.btn_Translations);
+_wait(30000, _isVisible(_heading2("Manage Translations")));
+_setSelected(_select(0,_near(_div("Language"))), "French");
+_click(_button("Get Translations"));
+_assertEqual(_getText(_textarea(0,_near(_cell("Wizard Name")))),"");

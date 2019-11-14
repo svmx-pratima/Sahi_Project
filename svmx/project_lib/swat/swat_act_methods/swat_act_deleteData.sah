@@ -1,0 +1,18 @@
+
+var $swat_act_deleteData= new function swat_act_deleteData() {
+
+	/**
+	 * Author		:	Ashwini Holagi
+	 * Function		:	Delete Data
+	 */
+	this.deleteData = function($delete){
+		$sfm_act_common.globalSearch($delete);
+		_wait(10000);
+		_click(_button("Delete"));
+		_wait(10000);
+		_assertVisible ($swat_pg_deleteData.lbl_Home);
+		_wait(5000);
+		};
+	
+		
+};

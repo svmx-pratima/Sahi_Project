@@ -1,0 +1,161 @@
+//Assuming that dispatch process is already created & the criteria is Order Type = Cleaning or Repair
+
+var $user_credentials = $excel.readFromCustomExcel("../optimax/op_excleData/automation.xlsx", "User_Details","","");
+var $work_Orders_Xl = $excel.readFromCustomExcel("../optimax/op_excleData/automation.xlsx", "RS_6299_RS_6300","","");
+var $dispatch_Process_Xl = $excel.readFromCustomExcel("../optimax/op_excleData/automation.xlsx", "Dispatch_Process","","");
+
+for(var $i=0;$i<$user_credentials.length;$i++)
+{
+var $g_un = $user_credentials[$i][0];
+var $g_pwd = $user_credentials[$i][1];
+var $g_url = $user_credentials[$i][2];
+}
+
+
+var $dp_Name = $dispatch_Process_Xl[0][0];
+var $dp_Id = $dispatch_Process_Xl[0][1];
+var $dp_Territory_Id = $dispatch_Process_Xl[0][2];
+
+
+var $wo_type = $work_Orders_Xl[0][0];
+var $wo_status = $work_Orders_Xl[0][1];
+var $wo_state = $work_Orders_Xl[0][2];
+var $wo_zip = $work_Orders_Xl[0][3];
+
+
+var $RS_6268 = _testcase("RS_6268", "Business Hour without holiday for new Work Order");
+
+$RS_6268.start();
+
+var $sfdc_sessionId = null;
+
+$bo_act_login.login($g_url, $g_un, $g_pwd);
+
+_click(_link("ServiceMax Setup"));
+_wait(20000, _isVisible(_div("Configuration Profiles")));
+_click(_div("Configuration Profiles"));
+$op_utility.search_ActiveProfile();
+_click(_submit("Edit"));
+_setSelected(_select("conf_prof:F_conf_prof:Setting_Block:j_id114:j_id115:Modulelist"), "OptiMax");
+_setSelected(_select("conf_prof:F_conf_prof:Setting_Block:j_id114:j_id122:SubModulelist"), "Dispatch Calculations");
+_click(_link("Edit[13]"));
+_selectWindow("Servicemax_Conf_Prof");
+_click(_radio("disp_setting:disp_setting:j_id1:DispSection:j_id37:j_id40"));
+_click(_button("Save"));
+_click(_submit("Close"));
+_selectWindow();
+_click(_link("Edit[23]"));
+_selectWindow("Servicemax_Conf_Prof");
+_click(_radio("disp_setting:disp_setting:j_id1:DispSection:j_id37:j_id40"));
+_click(_button("Save"));
+_click(_submit("Close"));
+_selectWindow();
+_click(_button("Refresh"));
+_click(_submit("Save"));
+_click(_submit("Back To Setup Home"));
+_click(_link("Home"));
+
+
+_set($login_result, _fetch(login($g_un,$g_pwd)));
+_log($login_result);
+
+$op_utility.delete_WO($dp_Id,$login_result.sessionId);
+
+_set($No_Techs, _fetch(No_Of_Techs($dp_Territory_Id)));
+_log("Number Of Technicians : " + $No_Techs);
+
+_set($Horizon, _fetch(Dp_Horizon($dp_Id)));
+$Horizon = parseInt($Horizon);
+_log("Horizon : " + $Horizon);
+
+_set($create_WO, _fetch(create_WO($wo_type , $wo_status, $dp_Territory_Id, $wo_state, $wo_zip)));
+_log($create_WO);
+
+$op_utility.run_Job_Now($dp_Name);
+
+_wait(5000);
+
+
+//validating the job is success
+if($op_utility.validate_Job_Success($dp_Id,$login_result.sessionId,200000)=== true)
+{
+	_log("job is successfully completed");
+		if(($op_utility.read_file($dp_Id,$login_result.sessionId,"ExecutionTime_WP:","Initiate Job Response1") === ($Horizon * $No_Techs)) & ($op_utility.read_file($dp_Id,$login_result.sessionId,"ExecutionTime_WP:","Initiate Job Response2") === ($Horizon + 1)))
+		{
+			_log("Working Hours are sent as per the horizon");
+		}
+		else
+		{
+			_logExceptionAsFailure("Invalid Working Hours are sent");
+		}
+		
+}
+else
+{
+	_log("job is failed in 1st verification.. so starting the 2nd verification after 5 min");
+	if($op_utility.validate_Job_Success($dp_Id,$login_result.sessionId,200000)=== true)
+	{
+		_log("job is successfully completed in 2nd verification");
+		if(($op_utility.read_file($dp_Id,$login_result.sessionId,"ExecutionTime_WP:","Initiate Job Response1") === ($Horizon * $No_Techs)) & ($op_utility.read_file($dp_Id,$login_result.sessionId,"ExecutionTime_WP:","Initiate Job Response2") === ($Horizon + 1)))
+		{
+			_log("Working Hours are sent as per the horizon");
+		}
+		else
+		{
+			_logExceptionAsFailure("Invalid Working Hours are sent");
+		}
+		
+	}
+	else
+	{
+		_log("job is failed in 2nd verification");
+	}
+}
+
+
+//<browser>
+function login($g_un,$g_pwd){
+	
+	var $login_result = sforce.connection.login($g_un,$g_pwd);
+	$sfdc_sessionId = $login_result.sessionId;
+	_log("$sfdc_sessionId = "+$sfdc_sessionId);
+	return $login_result;
+} 
+
+
+function create_WO ($wo_type , $wo_status, $dp_Territory_Id, $wo_state, $wo_zip)
+{
+	var workorder = new sforce.SObject("SVMXC__Service_Order__c");
+	workorder.SVMXC__Order_Type__c = $wo_type;
+	workorder.SVMXC__Order_Status__c = $wo_status;
+	workorder.SVMXC__Primary_Territory__c = $dp_Territory_Id;
+	workorder.SVMXC__State__c = $wo_state;
+	workorder.SVMXC__Zip__c = $wo_zip;
+	result = _call(sforce.connection.create([workorder]));
+	
+	return result[0].id;
+}
+
+
+
+function No_Of_Techs($dp_Territory_Id)
+{
+	var Tech_List = sforce.connection.query("SELECT SVMXC__Active__c,SVMXC__Service_Territory__c FROM SVMXC__Service_Group_Members__c WHERE SVMXC__Active__c = true AND SVMXC__Service_Territory__c ='"+$dp_Territory_Id+"'");
+	var Tech_Arr = Tech_List.getArray("records");
+	_log(Tech_Arr.length);
+	return Tech_Arr.length;
+	
+}
+
+function Dp_Horizon($dp_Id)
+{
+	var Dp_List = sforce.connection.query("SELECT Id,SVMXC__Calendar_End_Days__c,SVMXC__Calendar_Start_Days__c,SVMXC__Name__c FROM SVMXC__ServiceMax_Processes__c WHERE Id = '"+$dp_Id+"'");
+	var Dp_Arr = Dp_List.getArray("records");
+	_log(Dp_Arr[0].SVMXC__Calendar_End_Days__c);
+	return Dp_Arr[0].SVMXC__Calendar_End_Days__c;
+	
+}
+
+//</browser>
+
+$RS_6268.end();

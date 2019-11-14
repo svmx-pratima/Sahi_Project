@@ -1,0 +1,14 @@
+//Append "dc_" to all the variables
+
+//DC Global Variables
+var $dc_org="Base";
+var $dc_package="17.999";
+
+//DC Global Variables
+var $dc_org = $orgtype;
+var $dc_package = "17.999";
+var $dc_url = "https://test.salesforce.com";
+var $dc_un = "deepa@12x.com.cfg3";
+var $dc_pwd = "svmx1111";
+var $dc_dispatcher = "Deepa";
+var $dc_dispatName = "Deepa Aut 17 Base Admin";

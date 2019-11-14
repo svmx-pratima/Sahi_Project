@@ -1,0 +1,17 @@
+var $data = _readExcelFile("../../../analytics/Pre-Release/Data_Meghana.xlsx","Sheet1",true);
+var $un = $data[1]["Username"];
+var $pwd = $data[1]["pwd"];
+var $url = "https://test.salesforce.com";
+var $user_meghana = $data[1]["user_meghana"];
+$bo_act_login.login($url, $un, $pwd);
+$delete1 = "delete [Select Id from SVMXC__Installed_Product__c where Createdby.Id = '"+$user_meghana+"' AND Name like '%IB%'];";
+var $delete_data = $op_act_sForceApiCall.sForceQuery($un, $pwd, $delete1 , "create");
+
+
+$delete2 = "delete [Select Id from SVMXC__Service_Contract__c where Createdby.Id = '"+$user_meghana+"' AND Name like '%ANA%'];";
+var $delete_data = $op_act_sForceApiCall.sForceQuery($un, $pwd, $delete2 , "create");
+
+
+
+$delete3 = "delete [Select Id from SVMXC__SPM_Contract_Penetration__c];";
+var $delete_data = $op_act_sForceApiCall.sForceQuery($un, $pwd, $delete3 , "create");

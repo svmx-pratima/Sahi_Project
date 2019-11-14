@@ -1,0 +1,31 @@
+var $rs_5024 = _testcase("RS_5024","Verify Validate address SFM");
+$rs_5024.start();
+var $sfmName = "Validate Address";
+var $woName;
+
+//Create WO through REST API
+var $woNumber = $sfm_act_createCustomWizard.createBlankWoFromRest($sfmdUsn, $sfmdPwd, $sfmClientId, $sfmConsumerSecret, $sfmOrgInstance);
+
+_setSpeed($g_stepSpeed);
+$bo_act_login.login($g_url, $sfmdUsn, $sfmdPwd);
+
+//Navigate to the WO for validation
+$bo_act_navigation.navigateToCreatedRecordUsingGlobalSearch($woNumber);
+_selectDomain();
+
+if(_getText(_div(0,_rightOf(_cell("/Zip/"))))==""){
+	_log(" Zip is empty, cannot validate address");
+	_click($sfm_pg_wo.btn_wo_edit);
+	_setValue($sfm_pg_wo.txt_wo_zip,"560001");
+	_click($sfm_pg_wo.btn_wo_save);
+}
+_selectDomain($g_domain);
+_call(_button($sfmName).scrollIntoView()); 
+_click(_button($sfmName));
+_selectDomain();
+_wait(20000,_isVisible(_button(" Edit ")));
+if((_getText(_div(0, _rightOf(_cell("Latitude"))))!="") && (_getText(_div(0, _rightOf(_cell("Longitude"))))!="")){
+	_log("Pass ::: Lat and Long is updated");
+
+}
+$rs_5024.end();

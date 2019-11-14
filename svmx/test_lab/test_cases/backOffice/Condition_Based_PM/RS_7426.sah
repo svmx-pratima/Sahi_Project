@@ -1,0 +1,44 @@
+
+//author - Meghana Rao P
+
+var $RS_7426 = _testcase("$RS_7426","Verify adding a new covered IB on a pm plan without using a template");
+$RS_7426.start();
+_setSpeed($g_stepSpeed);
+//Pre - Condition 
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+
+//Test Data Creation
+var $accName = $bo_act_accounts.createAccount();
+var $proName = $bo_act_products.createProduct("pro12", "--None--");
+var $IBName = $bo_act_installedProduct.createInstalledProduct($proName,$accName,"");
+var $contactName = $bo_act_contacts.createContact($accName);
+var $slaterm = $bo_act_slaTerms.createSlaTerms("Default");
+
+
+var $sconName = $bo_act_serviceMaintenanceContracts.createServiceMaintenanceContract($accName, $slaterm,1,0);
+$bo_act_serviceMaintenanceContracts.AddCoveredProductToSCON($sconName, $IBName);
+var $PMPlan = $bo_act_PMPlan.createConditionBasedPlanwithoutPMPlanTemplate($sconName,$IBName, "Months", "Every", 1, $bo_act_common.currentDate("-"), $bo_act_common.getfutureDate(1,"-"),"Fixed", 1,100, 10,"Days");
+
+
+// CleanUp Function
+
+$bo_act_common.cleanUpfunction($PMPlan);
+
+$bo_act_common.deleteAccount($bac_un, $bac_pwd, $accName);
+$bo_act_common.deleteContact($bac_un, $bac_pwd, $contactName);
+$bo_act_common.deleteIB($bac_un, $bac_pwd, $orgnamespace,$IBName);
+$bo_act_common.deleteProduct($bac_un, $bac_pwd,$proName);
+$bo_act_common.deleteSLA($bac_un, $bac_pwd, $orgnamespace, $slaterm);
+$bo_act_common.deleteSCON($bac_un, $bac_pwd, $orgnamespace, $sconName);
+
+
+//var $datacreated = [$contactName,$accName,$proName,$IBName,$WONumber,$slaterm,$PMPTemplate,$sconName,$PMPlan];
+//for (var i = 0; i < $datacreated.length; i++) {
+//	$bo_act_common.cleanUpfunction($datacreated[i]);
+//}
+
+
+$RS_7426.end();
+
+
+

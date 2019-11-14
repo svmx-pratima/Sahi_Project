@@ -1,0 +1,45 @@
+var $user_credentials = $excel.readFromCustomExcel("../optimax/op_excleData/automation.xlsx", "User_Details","","");
+for(var $i=0;$i<$user_credentials.length;$i++)
+{
+var $g_un = $user_credentials[$i][0];
+var $g_pwd = $user_credentials[$i][1];
+var $g_url = $user_credentials[$i][2];
+}
+
+var $RS_9314 = _testcase("RS_9314", "Edit Time window name");
+
+$RS_9314.start();
+
+var $date = "" + new Date();
+var $WindowName = "Aautomation_" + $date;
+
+$bo_act_login.login($g_url, $g_un, $g_pwd);
+
+
+_click(_link("ServiceMax Setup"));
+_wait(20000, _isVisible(_div("Dispatch Management")));
+_click(_div("Dispatch Management"));
+_wait(20000, _isVisible(_div("Ranked Appointment Booking")));
+_click(_div("Ranked Appointment Booking"));
+_click(_submit("Manage Time Windows"));
+/*_wait(20000, _isVisible(_div("New Time Window")));
+_click(_button("New Time Window"));
+_setValue(_textbox("j_id0:form:pageblock2:j_id60:j_id61:0:j_id63"), $WindowName);
+_setValue(_textbox("j_id0:form:pageblock2:j_id60:j_id61:0:j_id65"), "15:00");
+_setValue(_textbox("j_id0:form:pageblock2:j_id60:j_id61:0:j_id67"), "18:00");
+_click(_button("Save"));*/
+_check(_checkbox("j_id0:form:pageblock1:j_id36:j_id46:j_id47:0:j_id49"));
+_click(_button("Edit Time Window"));
+_setValue(_textbox("j_id0:form:pageblock2:j_id60:j_id61:0:j_id63"),$WindowName);
+//_setValue(_textbox("j_id0:form:pageblock2:j_id60:j_id61:0:j_id65"), "13:30");
+_click(_button("Save"));
+if(_exists($WindowName))
+	{
+	_log("Window Name Updated Successfully");
+	}
+else
+	{
+	_fail("Window Name Not Updated");
+	}
+
+$RS_9314.end();

@@ -1,0 +1,32 @@
+// This file is the pre-requisite for running the Salesforce Files test suite in a new org
+// Created by Srinivasa Murthy S
+
+//Login to the Sandbox using the credentials from the Global file
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+/*
+//Create the Attachment Checklist
+$bo_act_checklistdesigner.createChecklistProcess("Attachment question RS_10921");
+$bo_act_checklistdesigner.addStandardMappingToChecklist();
+$bo_act_checklistdesigner.addQuestionToChecklistProcess("Attachment question RS_10921","Attach");
+_click($bo_pg_formDesigner.btn_save_close);
+
+//Create OPDOC with Version enabled
+$bo_act_SFM.cloneStandardOPDOCProcess("Work Order Service Report", "Attachment Service Report SF with Version", "Attachment Service Report SF with Version");
+$bo_act_SFM.editOPDOCProcessEnableVersionControl("Attachment Service Report SF with Version");
+
+//Create OPDOC with Version disabled
+$bo_act_SFM.cloneStandardOPDOCProcess("Work Order Service Report", "Attachment Service Report SF without Version", "Attachment Service Report SF without Version");
+//$bo_act_SFM.editOPDOCProcessEnableVersionControl("Attachment Service Report SF without Version"); This is not required as the Version is disabled by default in the factory defined SFM
+
+//Create Smart Doc OPDOC
+$bo_act_SFM.cloneStandardOPDOCProcess("Work Order Service Report", "Smart Doc process 01", "Smart Doc process 01");
+$bo_act_SFM.cloneStandardOPDOCProcess("Work Order Service Report", "Smart Doc process 02", "Smart Doc process 02");
+$bo_act_SFM.cloneStandardOPDOCProcess("Work Order Service Report", "Smart Doc process 03", "Smart Doc process 03");
+$bo_act_SFM.cloneStandardOPDOCProcess("Work Order Service Report", "Smart Doc process 04", "Smart Doc process 04");
+$bo_act_SFM.cloneStandardOPDOCProcess("Work Order Service Report", "Attachment Service Report Salesforce Files", "Attachment Service Report Salesforce Files");
+
+*/
+//Navigate to Service Flow Wizard
+$bo_act_navigation.navigateToSfmWizard();
+$bo_act_SFW.createSalesForceSFMWizard("Work Order");
+$bo_act_SFW.addSFMWizardGeneralInfo("Sales Force Files Wizard", "Sales_Force_Files_Wizard");

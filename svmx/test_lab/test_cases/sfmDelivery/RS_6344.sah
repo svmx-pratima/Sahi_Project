@@ -1,0 +1,82 @@
+function onScriptEnd(){
+ _selectDomain();
+ _focusWindow();
+ _takeScreenShot();
+ var $a=_scriptStatus();
+ 	 cleanUp();
+ }
+function cleanUp(){
+	_log("Performing clean up");
+	$sfm_act_search.deleteSfmSearch($searchName);
+	$sfm_act_common.logoutInClassic();
+}
+
+
+var $RS_6344 = _testcase("RS_6344","Check for the Date, DateTime fields at second level navigation in 'Displayed Under Search Result'.");
+$RS_6344.start();
+//Variables used
+var $searchName = "RS_6344";
+var $displayFields = [];
+var $displayValues = [];
+var $dateTimeValue = "11/28/2018 6:03 AM";
+var $dateValue = "11/29/2018";
+
+
+//Creating case with Scheduled Date and Actual Initial Response
+//Case
+var $obJson = "{\"Origin\":\"Email\",\"Priority\":\"High\",\"Status\":\"Escalated\",\""+$orgnamespace+"__Actual_Initial_Response__c\":\"2018-11-28T06:03:00.000Z\",\""+$orgnamespace+"__Scheduled_Date__c\":\"2018-11-29\"}";
+var $objName = "Case";
+var $caseRowId = $sfm_act_restApiMethods.postRestApi($sfmdUsn,$sfmdPwd, $sfmClientId, $sfmConsumerSecret, $sfmOrgInstance, $objName, $obJson,"POST");
+var $filterFieldName = "Id";
+var $filterFieldValue = $caseRowId;
+var $caseNumber = $sfm_act_restApiMethods.getRestApi($sfmdUsn, $sfmdPwd, $sfmClientId, $sfmConsumerSecret, $sfmOrgInstance, "GET", $objName, "CaseNumber", $filterFieldName, $filterFieldValue);
+_log($caseNumber);
+
+//Work Order with cancelled order status
+$objName= $orgnamespace+"__Service_Order__c";
+$obJson = "{\""+$orgnamespace+"__Order_Status__c\":\"Canceled\",\""+$orgnamespace+"__Case__c\":\""+$caseRowId+"\",\""+$orgnamespace+"__City__c\":\"Kashmir\"}";
+$columnName = "Name";
+$filter="id";
+var $filterValue =$sfm_act_restApiMethods.postRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,$objName,$obJson,"POST");
+$woName =$sfm_act_restApiMethods.getRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,"GET", $objName, $columnName, $filter, $filterValue);
+_log("Created Work order is" +$woName);
+
+
+//Appending current timestamp to process name to make it unique.
+var $timeStamp = $bo_act_navigation.getCurrentTimeStamp();
+$searchName = $searchName + "_" + $timeStamp;
+
+//Login and switch to classic
+//**************************************************************************************
+$bo_act_login.login($g_url,$sfmdUsn,$sfmdPwd);
+
+_wait(15000);
+
+//Setting values for case
+//Setting up new custom search
+$bo_act_navigation.navigateToSfmSearchInDesigner();
+$sfm_act_search.createNewCustomSearch($searchName, $searchName);
+var $objectsArray = "Work Order";
+var $fieldNames = ["Order Status"];
+var $operatorList = ["Equals"];
+var $valueList = ["Canceled"];
+var $advExpression ="";
+var $displayObjects = ["Work Order - Case","Work Order - Case"];
+var $displayFields = ["Actual Initial Response","Scheduled Date"];
+var $sortingObjects =[];
+var $sortingFields = [];
+var $searchOrders = [];
+$sfm_act_search.configObjectInSearch($objectsArray, $fieldNames, $operatorList, $valueList, $advExpression, $displayObjects, $displayFields, $sortingObjects, $sortingFields, $searchOrders);
+//Save the whole search after configs
+$sfm_act_search.saveAndCloseSearch();
+//Launch the search and verify results
+$sfm_act_search.launchGivenSearch($searchName,"");
+//Verify Search results
+$res = $sfm_act_search.checkAndReturnSearchResults([$woName], "Work Order");
+_assertTrue($res,"Canceled Work Order is getting displayed");
+//Verify case values
+var $dateTimeActualValue = $sfm_act_search.takeValueUnderColumn("Actual Initial Response");
+_assertEqual($dateTimeActualValue,$dateTimeValue,"DateTime fields at second level navigation - verified");
+var $dateActualValue = $sfm_act_search.takeValueUnderColumn("Scheduled Date");
+_assertEqual($dateActualValue,$dateValue,"Date fields at second level navigation - verified");
+$RS_6344.end();

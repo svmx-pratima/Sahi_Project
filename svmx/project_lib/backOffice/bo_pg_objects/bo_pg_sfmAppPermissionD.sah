@@ -1,0 +1,39 @@
+
+var $bo_pg_sfmAppPermissionD= new function bo_pg_sfmAppPermissionD(){
+	this.txt_focusProcessType=_textbox("label");
+	this.sel_processTypeWizard=_listItem("SFM Wizards");
+	this.sel_processTypeCustomAction=_listItem("SFM Custom Actions");
+	this.sel_processType=_listItem("SFM Transactions");
+	this.txt_enterObjType=_textbox("label[1]");
+	this.sel_objtypePMP=_listItem("Preventive Maintenance Plan");
+	this.sel_objtypeWO=_listItem("Work Order");
+	this.txt_searchProcess=_textbox("svmx-text-1016-inputEl");
+	this.chk_clickToUncheck=_div("svmx-grid-checkheader svmx-grid-checkheader-checked");
+	this.chk_clickToCheck=	_div("svmx-grid-checkheader");
+	this.btn_clickSaveAppPermission=_span("Save");
+	this.popUpOK=_span("OK");
+	this.entirePageofAppPermission=_div("svmx-panel-body svmx-panel-body-default svmx-panel-body-default");
+	this.entireSelectObjectSection=_exists(_div("boundlist-1039"));
+	this.clk_arrowSymbOfSelectObj=_div("svmx-trigger-index-0 svmx-form-trigger svmx-form-arrow-trigger svmx-form-trigger-last svmx-unselectable svmx-form-trigger-over svmx-form-arrow-trigger-over");
+	
+	this.selProcessTypeInSFMAppPermission=function($processType){
+		_click(_textbox("label"));
+	_click(_listItem($processType));	
+	}
+		this.selObjTypeInSFMAppPermission=function($objType){
+			_setValue(_textbox("label[1]"),"");
+			_setValue(_textbox("label[1]"),$objType);
+			_click(_listItem($objType));		
+		}
+	
+	/*
+	_click(_textbox("label"));
+_click(_listItem("SFM Transactions"));
+_setValue(_textbox("label[1]"), "");
+_setValue(_textbox("label[1]"), "Work Order");
+_click(_listItem("Work Order"));
+_setValue(_textbox("svmx-text-1016-inputEl"), "Add");
+_click(_div("svmx-grid-checkheader svmx-grid-checkheader-checked"));
+*/
+	
+}

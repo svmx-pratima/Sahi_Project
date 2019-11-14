@@ -1,0 +1,28 @@
+var $sfm_pg_sfSetup = new function sfm_pg_sfSetup() {
+	this.link_salesForceSetup = _link("Setup");
+	this.txt_quickFind = _textbox("setupSearch");
+	this.link_objects = _link("Objects",_near(_link("Create")));
+	this.link_woObject = _link("Work Order[2]");
+	this.btn_customFieldNew = _button("/New/",_near(_heading3("Custom Fields & Relationships")));
+	this.radio_text = _radio("Text");
+	this.radio_number = _radio("Number");
+	this.radio_pickList = _radio("Picklist (Multi-Select)");
+	this.radio_dateTime = _radio("Date/Time");
+	this.btn_next = _submit("/Next/");
+	this.txt_fieldLabel = _textbox("/Field Label/");
+	this.txt_length = _textbox("Length");
+	this.txt_fieldName = _textbox("/Field Name/");
+	this.btn_submit = _submit("/Save/");
+	this.radio_enterValues = _radio("Enter values, with each value separated by a new line");
+	this.txtArea_enterValues = _textarea("ptext");
+	this.link_customize = _link("Customize");
+	this.link_cases = _link("Cases");
+	this.link_addCustomField = _link("Add a custom field to cases");
+	this.btn_caseCustomFieldNew = _button("/New/",_near(_heading3("Case Custom Fields & Relationships")));
+	//************Added by Rubi Agrawal**************************************
+	this.txt_fieldsetlabel=_textbox(0,_near(_label("*Field Set Label")));
+	this.txt_fielssetName=_textbox(0,_near(_label("*Field Set Name")));
+	this.txt_feildsetDesc=_textarea(0,_near(_label("*Where is this used?")));
+	this.btn_saveFieldsetName=_submit("/Save/");
+		this.lnk_fieldSets=_link("Field Sets");//Added by Rubi Agrawal
+};

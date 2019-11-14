@@ -1,0 +1,49 @@
+// Vanditha
+var $RS_3730 = _testcase("RS_3730", "Creation of Event Hover Rule");
+$RS_3730.start();
+
+var $url= "http://test.salesforce.com" ;
+var $un = "commonuser@svmxpqt.com";
+var $pwd = "servicemax2";
+var $eventHoverRuleName = "Event Hover Rule: Work Order";
+var $eventHoverRuleDescription = "Event Hover Rule created on Work Order";
+_setSpeed(1000);
+
+ 
+//Login to the org
+$bo_act_login.login($url, $un, $pwd);
+ 
+//Verify Event Hover Rule Page Load
+$dc_act_eventHoverRule.verifyEventHoverRulePage($eventHoverRuleName, $eventHoverRuleDescription);
+if (_assertVisible($dc_pg_eventHoverRule.btn_newRule)) {
+    _log("Event Hover Rule Page is loaded successfully");
+} else {
+    _log("Event Hover Rule Page is not loaded successfully");
+};
+ 
+//Verify Event Subject Rule Creation
+$dc_act_eventHoverRule.createHoverRule($eventHoverRuleName, $eventHoverRuleDescription);
+if (_assertVisible($dc_pg_eventHoverRule.btn_newRule)) {
+    _log("Event Hover Rule created successfully");
+} else {
+	_log("Event Hover Rule not created");
+};
+ 
+//Verify Event Subject Rule Modification
+$dc_act_eventHoverRule.editAdvancedEventHoverRule($eventHoverRuleName);
+
+if (_assertVisible($dc_pg_eventHoverRule.btn_newRule)) {
+    _log("Event Hover Rule edited successfully");
+} else {
+    _log("Event Hover Rule not edited");
+};
+
+//Verify Event Subject Rule Deletion
+$dc_act_eventHoverRule.deleteEventHoverRule($eventHoverRuleName);
+
+//Validation of the Delete Message displayed
+$expectedMessage = "Success:Record(s) Deleted";
+$actualMessage=_getText(_div("messageText"));
+_log($actualMessage);
+_assertEqual($expectedMessage,$actualMessage,"Event Hover Rule deleted successfully");
+

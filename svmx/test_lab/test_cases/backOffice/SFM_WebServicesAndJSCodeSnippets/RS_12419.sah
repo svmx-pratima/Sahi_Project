@@ -1,0 +1,45 @@
+
+//author - NoorSalmaSharieff
+
+var $RS_12419 = _testcase("$RS_12419","CLONE - Verify the impact of setting SET003 (Hide SFM Wizard Display) on Classic.");
+$RS_12419.start();
+_setSpeed($g_stepSpeed);
+ 
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+
+//Set the Setting to Blank and Verify SFM Wizards must be displayed in Classic Mode.
+$bo_act_configurationProfiles.editGroupProfileForTextSettings("AutoBACGroup", "Service Flow Wizard", "Service Flow Wizard Delivery", "SET003", " ");
+var $accName = $bo_act_accounts.createAccount();
+_selectDomain("/svmx/");
+_assertExists(_button("/a/"));
+_selectDomain();
+
+//Set the Setting to Lightning and Verify SFM Wizards must be displayed in Classic Mode.
+$bo_act_configurationProfiles.editGroupProfileForTextSettings("AutoBACGroup", "Service Flow Wizard", "Service Flow Wizard Delivery", "SET003", "Lightning");
+_click(_link($accName));
+_selectDomain("/svmx/");
+_assertExists(_button("/a/"));
+_selectDomain();
+
+//Set the Setting to Salesforce1 and Verify SFM Wizards must be displayed in Classic Mode.
+$bo_act_configurationProfiles.editGroupProfileForTextSettings("AutoBACGroup", "Service Flow Wizard", "Service Flow Wizard Delivery", "SET003", "Salesforce1");
+
+_click(_link($accName));
+_selectDomain("/svmx/");
+_assertExists(_button("/a/"));
+_selectDomain();
+
+
+//Set the Setting to LIGHTNING,Salesforce1 and Verify SFM Wizards must not be displayed in Classic Mode.
+$bo_act_configurationProfiles.editGroupProfileForTextSettings("AutoBACGroup", "Service Flow Wizard", "Service Flow Wizard Delivery", "SET003", "Lightning,Salesforce1");
+_click(_link($accName));
+_selectDomain("/svmx/");
+_assertExists(_button("/a/"));
+_selectDomain();
+
+
+$RS_12419.end();
+
+
+
+

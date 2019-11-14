@@ -1,0 +1,10 @@
+var $un =$bac_un ;
+var $pwd =$bac_pwd;
+var $url = "https://test.salesforce.com";
+$bo_act_login.login($url, $un, $pwd);
+$delete1 = "delete [Selecy Id from SVMXC__Installed_Product__c where Createdby.Id = '005q0000003GGfP']";
+var $delete_data = $op_act_sForceApiCall.sForceQuery($un, $pwd, $delete1 , "create");
+
+
+$delete2 = "delete [Selecy Id from SVMXC__Service_Contract__c Createdby.Id = '005q0000003GGfP']";
+var $delete_data = $op_act_sForceApiCall.sForceQuery($un, $pwd, $delete1 , "create");

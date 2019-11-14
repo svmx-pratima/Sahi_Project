@@ -1,0 +1,206 @@
+//Assuming that dispatch process is already created & the criteria is Order Type = Cleaning or Repair
+
+var $user_credentials = $excel.readFromCustomExcel("../optimax/op_excleData/automation.xlsx", "User_Details","","");
+var $work_Orders_Xl = $excel.readFromCustomExcel("../optimax/op_excleData/automation.xlsx", "RS_6666_RS_6667","","");
+var $dispatch_Process_Xl = $excel.readFromCustomExcel("../optimax/op_excleData/automation.xlsx", "Dispatch_Process","","");
+var $event_Xl = $excel.readFromCustomExcel("../optimax/op_excleData/automation.xlsx", "RS_9299","","");
+
+for(var $i=0;$i<$user_credentials.length;$i++)
+{
+var $g_un = $user_credentials[$i][0];
+var $g_pwd = $user_credentials[$i][1];
+var $g_url = $user_credentials[$i][2];
+}
+
+
+var $dp_Name = $dispatch_Process_Xl[0][0];
+var $dp_Id = $dispatch_Process_Xl[0][1];
+var $dp_Territory_Id = $dispatch_Process_Xl[0][2];
+
+
+var $RS_9299 = _testcase("RS_9299", "Latitude and Longitude updated in Non-WO event when address details are provided for SVMX Technician");
+
+$RS_9299.start();
+
+var $sfdc_sessionId = null;
+var $rowIndex = "1";
+
+$bo_act_login.login($g_url, $g_un, $g_pwd);
+
+_click(_link("ServiceMax Setup"));
+_wait(20000, _isVisible(_div("Configuration Profiles")));
+_click(_div("Configuration Profiles"));
+$op_utility.search_ActiveProfile();
+_click(_submit("Edit"));
+_setSelected(_select("conf_prof:F_conf_prof:Setting_Block:j_id114:j_id115:Modulelist"), "OptiMax");
+_setSelected(_select("conf_prof:F_conf_prof:Setting_Block:j_id114:j_id122:SubModulelist"), "Dispatch Calculations");
+_click(_link("Edit[13]"));
+_selectWindow("Servicemax_Conf_Prof");
+_click(_label("True"));
+_click(_button("Save"));
+_click(_submit("Close"));
+_selectWindow();
+_click(_link("Edit[23]"));
+_selectWindow("Servicemax_Conf_Prof");
+_click(_label("True"));
+_click(_button("Save"));
+_click(_submit("Close"));
+_selectWindow();
+_click(_button("Refresh"));
+_click(_submit("Save"));
+_click(_submit("Back To Setup Home"));
+_click(_link("Home"));
+
+
+_set($login_result, _fetch(login($g_un,$g_pwd)));
+_log($login_result);
+
+$op_utility.delete_WO($dp_Id,$login_result.sessionId);
+
+_set($Event_ID, _fetch(create_NonWOEvent($dp_Territory_Id,$event_Xl)));
+_log("Event ID" + $Event_ID);
+$excel.insertUnderColumn("../optimax/op_excleData/automation.xlsx", "RS_9299", "EventID", $Event_ID, $rowIndex);
+
+_set($create_WO, _fetch(create_WO($work_Orders_Xl , $dp_Territory_Id, $dp_Id)));
+_log($create_WO);
+
+$op_utility.run_Job_Now($dp_Name);
+
+_wait(5000);
+
+//validating the job is success
+if($op_utility.validate_Job_Success($dp_Id,$login_result.sessionId,120000)=== true)
+{
+	_log("job is successfully completed");
+	_set($validate_Location, _fetch(validate_Location($Event_ID)));
+	_log($validate_Location);
+	if($validate_Location === true)
+	{
+		_log("Latitude and Longitude have been calculated for the Non WO Event");
+		if($op_utility.read_file($dp_Id,$login_result.sessionId,"eventtype=CalendarGeoItem","Initiate Job Response1") === 1){
+			_log("Non WO Event with location details is sent as a CalendarGeoItem");
+		}
+		else{
+			_logExceptionAsFailure("Non WO Event with location details is sent as a CalendarGeoItem")
+		}
+	}
+	else{
+		_logExceptionAsFailure("Non WO Event with location details is sent as a CalendarGeoItem");
+	}
+}
+else
+{
+	_log("job is failed in 1st verification.. so starting the 2nd verification after 5 min");
+	if($op_utility.validate_Job_Success($dp_Id,$login_result.sessionId,200000)=== true){
+		_log("job is successfully completed");
+		_set($validate_Location, _fetch(validate_Location($Event_Id)));
+		_log($validate_Location);
+		if($validate_Location === true)
+		{
+			_log("Latitude and Longitude have been calculated for the Non WO Event");
+			if($op_utility.read_file($dp_Id,$login_result.sessionId,"eventtype=CalendarGeoItem","Initiate Job Response1") === 1){
+				_log("Non WO Event with location details is sent as a CalendarGeoItem");
+			}
+			else{
+				_logExceptionAsFailure("Non WO Event with location details is sent as a CalendarGeoItem")
+			}
+		}
+		else{
+			_logExceptionAsFailure("Non WO Event with location details is sent as a CalendarGeoItem");
+		}
+	}
+	else{
+		_log("job is failed in 2nd verification");
+	}
+}
+
+
+//<browser>
+function login($g_un,$g_pwd){
+	
+	var $login_result = sforce.connection.login($g_un,$g_pwd);
+	$sfdc_sessionId = $login_result.sessionId;
+	_log("$sfdc_sessionId = "+$sfdc_sessionId);
+	return $login_result;
+} 
+
+
+function create_WO ($work_Orders_Xl , $dp_Territory_Id, $dp_Id)
+{
+	var CreateWO=[];
+	var UpdateWO=[];
+	var $isSuccess = false;
+	//creating wo from the excel sheet
+	for(var $i=0;$i<1;$i++)
+	{
+		var wo_list = new sforce.SObject("SVMXC__Service_Order__c");
+		wo_list.SVMXC__Order_Type__c = $work_Orders_Xl[$i][0];
+		wo_list.SVMXC__Order_Status__c = $work_Orders_Xl[$i][1];
+		wo_list.SVMXC__Street__c = $work_Orders_Xl[$i][2];
+		wo_list.SVMXC__State__c = $work_Orders_Xl[$i][3];
+		wo_list.SVMXC__City__c = $work_Orders_Xl[$i][4];
+		wo_list.SVMXC__Zip__c = $work_Orders_Xl[$i][5];
+		wo_list.SVMXC__Country__c = $work_Orders_Xl[$i][6];
+		wo_list.SVMXC__SM_Scheduling_Options__c = $work_Orders_Xl[$i][7];
+		wo_list.SVMXC__Primary_Territory__c = $dp_Territory_Id;
+		CreateWO.push(wo_list);
+	}
+	var result = _call(sforce.connection.create(CreateWO));
+	_log("Work Orders Created = "+ result.length);
+	
+	return result.length;
+}
+
+function create_NonWOEvent ($dp_Territory_Id, $event_Xl)
+{
+	//Searching for active technician
+	var Tech_List = _call(sforce.connection.query("SELECT Id FROM SVMXC__Service_Group_Members__c WHERE SVMXC__Service_Territory__c = '" + $dp_Territory_Id + "' AND SVMXC__Active__c = true AND SVMXC__Enable_Scheduling__c = true ORDER BY Id DESC LIMIT 1"));
+	var Tech_arr = Tech_List.getArray("records");
+	var Tech = Tech_arr[0];
+	_log(Tech.Id);
+	
+	var event = new sforce.SObject("SVMXC__SVMX_Event__c");
+	event.Name = $event_Xl[0][0];
+	event.SVMXC__Type__c = $event_Xl[0][0];
+	event.SVMXC__StartDateTime__c = $event_Xl[0][1];
+	event.SVMXC__EndDateTime__c = $event_Xl[0][2];
+	event.SVMXC__Location__c = $event_Xl[0][3];
+	event.SVMXC__Technician__c = Tech.Id;
+	result = sforce.connection.create([event]);
+	_log(result[0].id);
+	
+	var Event_ID = result[0].id;
+	_log(Event_ID);
+	
+	//$excel.insertUnderColumn("../optimax/op_excleData/automation.xlsx", "RS_9299", "EventID", $Event_ID, $rowIndex);
+
+	return Event_ID;
+		
+}
+
+function validate_Location($Event_Id)
+{
+	var $isSuccess = false;
+	var Event_List = _call(sforce.connection.query("SELECT SVMXC__SM_Latitude__c,SVMXC__SM_Longitude__c FROM SVMXC__SVMX_Event__c WHERE Id = '"+$Event_Id+"'"));
+	var Event_arr = Event_List.getArray("records");
+	var Location = Event_arr[0];
+	var Latitude = Location.SVMXC__SM_Latitude__c;
+	var Longitude = Location.SVMXC__SM_Longitude__c;
+	
+	_log("Latitude : " + Latitude);
+	_log("Longitude : " + Longitude);
+	
+	if(Latitude != null & Longitude != null)
+		{
+		$isSuccess = true;
+		}
+		
+	return $isSuccess;
+}
+
+
+//</browser>
+
+$bo_act_login.logOut();
+
+$RS_9299.end();

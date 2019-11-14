@@ -1,0 +1,196 @@
+var $sfm_pg_wo = new function sfm_pg_wo() {
+	this.tab_all = _image("All Tabs");
+	this.btn_wo_new =_button("/New/");
+	this.btn_wo_continue= _submit("Continue");
+	this.btn_woStatus = _select(0,_rightOf(_label("Order Status")));
+	this.btn_wo_save = _submit(" Save ");
+	this.link_wo = _link("/Work Orders/");//Changed to hit the correct Work orders link in Lightning - JJ
+	
+	this.link_woStatus=_link(0,_near(_span("Order Status Current status of the service order")));
+	this.link_actualOnsiteResponse=_link("Date Picker",_near(_span("Actual Onsite Response",_in(_div("/modal-body/")))));
+	this.link_actualInitialResponse=_link("Date Picker",_near(_span("Actual Initial Response",_in(_div("/modal-body/")))));
+	this.link_actualResolution=_textbox(0,_near(_span("Actual Resolution",_in(_div("/modal-body/")))));
+	this.link_actualRestoration=_textbox(0,_near(_span("Actual Restoration",_in(_div("/modal-body/")))));
+	this.link_billingType=_link(0,_near(_span("Billing Type",_in(_div("/modal-body/")))));
+	this.link_date1=_link(0,_near(_span("Date1",_in(_div("/modal-body/")))));
+	
+	
+	//Added by Rubi
+	this.chk_isEntitlePerform=_checkbox(0,_near(_label("Is Entitlement Performed")));
+	this.lnk_addStdPrice=_link("Add Standard Price");
+	this.txt_listPrice=_textbox(0,_near(_label("List Price*")));
+	this.btn_getPrice=_link("Get Price");
+	this.txt_proformaInvoive=_textbox(0,_near(_label("Proforma Invoice AmountTotal Amount which is invoiced to the customer for the work performed.")));
+	
+	this.btn_editWO=_heading2("Work Order Edit");
+	
+	
+	this.btn_newWOWindow=_div("/modal-body/");
+	this.link_orderType=_link(0,_near(_span("Order Type",_in(this.btn_newWOWindow))));
+	this.lbl_Account=_span("Account",_in(this.btn_newWOWindow));
+	this.txt_Account=_textbox(0,_near(this.lbl_Account));
+	this.btn_WONewAccount=_div("New Account",_near(this.lbl_Account));
+	
+	this.WOnewAccountWindow=_parentNode(_div("New Account Close this window"),"DIV",2);
+	this.lbl_accountName=_span("Account Name",_in(this.WOnewAccountWindow));
+	this.txt_accountName=_textbox(0,_near(this.lbl_accountName));
+	this.btn_saveAccount=_button("Save",_in(this.WOnewAccountWindow));
+	
+	this.btn_today=_cell("Today");
+	
+	
+
+//	this.btn_wo_edit = _div("Edit");//Changed for Lightning.
+//	this.txt_wo_zip = _textbox("Zip");
+
+	this.btn_wo_edit = _button(" Edit ");//Changed for lightning
+	this.txt_wo_zip = _textbox("/part of the/",_near(_span("/Zip/",_in(_div("modal-container slds-modal__container")))));//changed for lightning for zip textbox with in edit WO modal window
+	this.btn_wo_edit_save = _submit("/Save/", _leftOf(_submit("Save & New"))); // new one added for lightning for save button within editWO modal window
+	this.label_wo = _heading2("/WO-/"); 
+	this.btn_next = _span("Next"); //Added for Lightning
+	this.lkup_account = _textbox(0,_near(_span("Account[1]")));//Added for Lightning
+	this.link_wopriority = _link(0,_near(_span("Priority")));//Added for Lighting
+	this.txt_actualOnsiteResponse = _textbox(0,_near(_span("Actual Onsite Response")));//Changed for Lightning,Corrected.
+	this.txt_actualInitialResponse = _textbox(0,_near(_span("Actual Initial Response")));//Changed for Lightning,corrected.
+	this.txt_actualResolution = _textbox(0,_near(_span("Actual Resolution")));//Changed for Lightning
+	this.txt_actualOnsiteResponsetimebox = _textbox(1,_near(_span("Actual Onsite Response")));//Changed for Lightning,Corrected.
+	this.txt_actualInitialResponsetimebox = _textbox(1,_near(_span("Actual Initial Response")));//Changed for Lightning,corrected.
+	this.txt_actualResolutiontimebox = _textbox(1,_near(_span("Actual Resolution")));//Changed for Lightning
+	this.btn_OK_popup = _span("OK",_in(_div("/toolbar-footer/"))); //Added by Janaki for OK button in pop up.
+	this.txt_actualRestoration = _textbox(0,_near(_span("Actual Restoration")));//Changed for Lightning
+	this.txt_actualRestorationtimebox = _textbox(1,_near(_span("Actual Restoration")));//Changed for Lightning
+	this.txt_actualnitialResponseForEditWo = _textbox(0,_near(_span("/Actual Initial Response/",_in(_div("/is-editing/")))));
+	this.txt_actualInitialResponseTimeEditWo = _textbox(1,_near(_span("/Actual Initial Response/",_in(_div("/is-editing/")))));
+	this.txt_actualOnsiteResponseForEditWo = _textbox(0,_near(_span("/Actual Onsite Response/",_in(_div("/is-editing/")))));
+	this.txt_actualOnsiteResponseTimeEditWo = _textbox(1,_near(_span("/Actual Onsite Response/",_in(_div("/is-editing/")))));
+	this.txt_actualResolutionForEditWo = _textbox(0,_near(_span("/Actual Resolution/",_in(_div("/is-editing/")))));
+	this.txt_actualResolutionEditWo = _textbox(1,_near(_span("/Actual Resolution/",_in(_div("/is-editing/")))));
+	this.txt_actualRestorationForEditWo = _textbox(0,_near(_span("/Actual Restoration/",_in(_div("/is-editing/")))));
+	this.txt_actualRestorationTimeEditWo = _textbox(1,_near(_span("/Actual Restoration/",_in(_div("/is-editing/")))));
+	
+	
+	this.cell_today = _span("Today");//Changed for Lightning
+	this.link_showmore = _link("show-link show-more-link"); //Changed for Lightning
+	this.cell_tomorrow = _cell(0,_rightOf(_cell("/todayDate/")));
+	this.link_today = _link(0,_rightOf(_label("Actual Onsite Response")));
+	this.today = _link(0,_rightOf(_label("Date Custom")));
+	this.btn_newWorkDetail = _button("New Work Detail");
+	this.sel_recordType = _select(0,_rightOf(_label("*Record Type of new record")));
+	this.btn_Continue = _button("Next"); //Changed for lightning
+	this.txt_lineQty = _textbox(0,_rightOf(_label("Line Qty")));
+	this.txt_dateCustom = _textbox(0,_rightOf(_label("Date Custom")));
+	this.txt_dateReceived = _textbox(0,_rightOf(_label("Date Received")));
+	this.txt_dateRequired = _link("/Date/",_near(_span("Date Required")));
+	this.sel_activityType = _select(0,_rightOf(_label("Activity Type")));
+	this.sel_lineType = _select(0,_rightOf(_label("*Line Type")));
+	this.link_workDetail = _link(0,_rightOf(_span("/Work Order/")));
+	this.link_edit_workDetail = _click(_link("Edit",_under(_tableHeader("Action",_under(_heading3("Work Details"))))));
+	this.txt_date1 = _textbox(0,_rightOf(_label("Date1")));
+	this.txt_date2 = _textbox(0, _rightOf(_label("Date2")));
+	this.txt_date3 = _textbox(0,_rightOf(_label("Date3")));
+	this.sel_case = _select(0,_rightOf(_label("*Case Origin")));
+	this.link_scheduledDate = _link(0,_rightOf(_label("Scheduled Date")));
+	this.link_actualInitialResp = _link(0,_rightOf(_label("Actual Initial Response")));
+	this.txt_case = _textbox("Case");
+	this.sel_orderStatus = _select(0,_rightOf(_label("Order Status")));
+	this.sel_orderType = _link(0,_near(_span("Order Type",_in(_div("/modal-container/")))));
+	
+	//Added by JJ for Object Manager navigations in Lightning.
+	this.link_lightning_setup = _link("Setup");
+	this.link_currentapp_setup = _div("Setup for current app");
+	this.link_object_manager = _span("Object Manager");
+	this.txt_quick_find = _searchbox("globalQuickfind");
+	this.link_wo_object = _link("/Work Order/");
+	this.ordertype_dependency = _tableHeader("Order Type",_under(_tableHeader("Dependent Field")));
+	this.delete_link_picklist = _link("Del",_leftOf(_tableHeader("Order Type")));
+	this.delete_link_costCategory = _link("Del",_leftOf(_tableHeader("Cost Category")));
+	this.picklist_controller = _select("controller");
+	this.picklist_dependent = _select("dependent");
+	this.btn_continue = _submit("Continue");
+	this.btn_include_values = _button("Include Values");
+	this.btn_save_dep_picklist = _submit(" Save ");
+	this.btn_new_field_dependency = _button(0,_near(_heading3("Field Dependencies")));
+	this.link_profileImageRightCorner = _div("/user-profile/");
+	this.link_lightningLogout = _link("Log Out");
+	this.link_currentUserName = _link("profile-link-label");
+	this.txt_pgLayoutQuickFind = _textbox("quickfind");
+	this.btn_pgLayoutSave = _emphasis("Save");
+	this.btn_newCustomField = _button(" New ",_near(_heading3("Custom Fields & Relationships")));
+	this.link_fieldsAndRelationships = _link("Fields & Relationships");
+	this.txt_quickFindFields = _searchbox("globalQuickfind");
+	this.btn_nextInAddCustomFields = _submit(" Next ");
+	this.txt_customFieldName = _textbox("MasterLabel");
+	this.btn_saveCustomField = _submit(" Save ");
+	this.radio_multiPicklist = _radio("/picklistType/",_in(_listItem("Enter values, with each value separated by a new line")));
+	this.txt_multiPickTextArea = _textarea("ptext");
+	this.link_editLayout = _link("Edit Layout");
+	this.link_relatedLists = _div("Related Lists");
+	this.txt_quickFind = _textbox("quickfind");
+	this.btn_Yes = _button("Yes");
+	
+//Added by JJ for SFM Delivery components . All are Lightning ready.
+	this.link_delivery_save = _link("Save");
+    this.btn_arrowNextToGetPrice = _span("/btnWrap/",_rightOf(_div("Quick SaveGet Price")));
+    this.btn_arrowNextToUserSettings = _span("/btnWrap/", _rightOf(_link("User Settings")));
+    this.btn_arrowNextToClearCache = _span("/btnWrap/",_rightOf(_span("Clear ServiceMax Cache")));
+    this.btn_rightArrow = _span("/ x-btn-arrow-right/");
+    this.link_launchSfmDesigner = _span("Launch SFM Designer");
+    this.btn_newButtonForWorkDetail = _link("New",_near(_heading2("/Work Details/")));
+    this.btn_nextForWorkDetailRecordType = _button("Next",_in(_div("modal-footer slds-modal__footer")));
+    this.link_relatedListsTab = _span("Related");
+    this.link_workDetail = _link("/WL/",_near(_tableHeader("Line Number")));
+    this.link_lineTypeArrow = _link(0,_near(_span("/Line Type/")));
+    this.link_viewAllWorkDetails = _span("View AllWork Details");
+    this.btn_editActivityType = _button("Edit Activity Type");
+    this.link_arrowToEditChildLine = _div("/x-action-col-icon x-action-/");
+    this.link_editChildLineItem = _span("Edit");
+    this.btn_cancelForSfmDelivery = _link("/Cancel/");
+    this.btn_proceedForCancel = _span("Proceed");
+    this.link_workDetailAfterCreation = _div("Work Detail");
+    this.btn_cancelExtendedEdit = _span("/Cancel/");
+    this.btn_quickSave = _span("Quick Save");
+    this.btn_okPriceNotCalculated = _span("Ok");
+    this.btn_productSearchChildLine = _link("Search");
+    this.btn_addProductChildLine = _span("Add");
+    this.btn_updateExtEdit = _span("Update");
+	this.link_today = _span("Today");
+	this.link_clearSvmxCache = _span("Clear ServiceMax Cache");
+	this.btn_saveEditWO = _submit(" Save ");
+	this.btn_pencilToEditWo =_button(" Edit ");
+	this.btn_editWizardStep = _submit("Edit");
+	this.btn_manageWizardSteps = _cell("Manage Wizard Steps");
+    this.btn_deleteStepFromWizard = _button("Delete");
+	this.msg_wizardStepDeleteSuccess = _div("Success:Successfully deleted the Wizard Step(s).");
+	
+	this.openAppLauncher = function(){
+		_wait(5000,_submit("App Launcher"));
+		if(_isVisible(_submit("App Launcher"))){
+			_click(_submit("App Launcher"));
+			_wait(5000,_heading2("App Launcher"));
+		}else if(_isVisible(_div("App Launcher"))){
+			_click(_div("App Launcher"));
+			_wait(5000,_heading2("App Launcher"));
+		}else if(_isVisible(_div("slds-icon-waffle"))){
+			_click(_div("slds-icon-waffle"));
+			_wait(5000,_heading2("App Launcher"));
+		}
+	};
+	
+	this.assert_wizard =function($wizTitle){
+		if(_exists(_span($wizTitle))){
+			_log("Fail ::: Wizard is visible which is not assigned to the profile", "FAILURE");
+		}
+		else{
+			_log("Pass ::: Wizard is not visible which is not assigned to the profile");
+		}
+		
+//		_assertExists(_cell($wizTitle),"Wizard Not Present");
+	};
+	this.clickTab = function($tabName){
+		_click(_link($tabName));
+//		_log("I am Here");
+	};
+
+		
+
+};

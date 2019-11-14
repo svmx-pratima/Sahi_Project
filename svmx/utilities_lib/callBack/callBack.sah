@@ -1,0 +1,35 @@
+/**
+ * Functions to perform specific actions during callbacks
+ */
+
+var $callBack = new function callBack() {
+
+	/**
+	 * Use this function to return the results from a function
+	 * 
+	 * @param $result
+	 * @param $isReport
+	 * @param $desc
+	 * @returns boolean
+	 */
+	this.returnResult = function($result, $desc) {
+		//if ($isReport != null && $isReport == true) {
+
+			if ($result) {
+				_log("Pass:::::::::::::Pass for "+$desc);
+				//_takeScreenShot();
+				return true;
+			} else {
+				_logExceptionAsFailure("Fail::::::::::::::Fail to "+$desc);
+				_takeScreenShot();
+				return false;
+			}
+		//} else {
+			//if ($result) {
+			//	return true;
+			//} else {
+			//	return false;
+			//}
+		//}
+	};
+};

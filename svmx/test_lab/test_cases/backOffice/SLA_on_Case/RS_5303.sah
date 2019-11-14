@@ -1,0 +1,64 @@
+
+//author - Noor Salma Sharieff
+
+var $RS_5303 = _testcase("$RS_5303","RESOLUTION response on Case:Clock paused/resumed on extending SLA commitment");
+$RS_5303.start();
+_setSpeed($g_stepSpeed);
+
+//Pre - Condition 
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+$bo_act_navigation.navigateToConfigurationProfilesPage();
+$bo_act_configurationProfiles.editGlobalProfileForBooleanSettings("Service Level Agreement", "SLA Clock on Case", "SET003", true);
+$bo_act_configurationProfiles.editGlobalProfileForBooleanSettings("Service Level Agreement", "SLA Clock on Case", "SET005", true);
+
+var $slaterm = $bo_act_slaTerms.createSlaTerms("Default");
+$bo_act_slaTerms.addResolutionToSLA($slaterm, "Case","Problem", "High", "Created Date", 30, 60, "SLA");
+
+var $caseNumber = $bo_act_Cases.createCase("New", "High", "Email");
+
+$bo_act_Cases.editCaseOnly($caseNumber);
+$bo_act_Cases.updateTextBoxFields($bo_pg_Cases.txt_slaTermOnEdit, $slaterm);
+$bo_act_Cases.updateDropdownFields($bo_pg_Cases.sel_TypeOnEdit, "Problem");
+$bo_act_Cases.saveCase();
+
+//Validations
+_selectDomain($g_domain);
+_wait(3000,_isVisible($bo_pg_Cases.txt_SLAClock));
+_assertNotContainsText("Resolution 00:00:00:00",$bo_pg_Cases.txt_SLAClock,"SLA Clock Issue");
+_selectDomain();
+_assertNotEqual(_getText($bo_pg_Cases.txt_ResolutionInternalBy)," ","Issue in Resolution Internal By field");
+_assertNotEqual(_getText($bo_pg_Cases.txt_ResolutionCustomerBy)," ","Issue in Resolution Customer By field");
+
+$bo_act_workOrders.pauseSLAClock();
+_wait(60000);
+$bo_act_workOrders.resumeSLAClock("Yes");
+_wait(5000);
+
+_selectDomain($g_domain);
+_assertNotContainsText("Resolution 00:00:00:00",$bo_pg_Cases.txt_SLAClock,"SLA Clock Issue");
+_selectDomain();
+
+_call(location.reload());
+_assertExists($bo_pg_workOrders.link_SLAClockStop);
+_assertExists($bo_pg_workOrders.link_SLAClockStart);
+
+
+$bo_act_Cases.editCaseOnly($caseNumber);
+$bo_act_Cases.clickLinktoUpdateTextfields($bo_pg_Cases.txt_actualResolutionOnEdit);
+$bo_act_Cases.saveCase();
+
+_assertNotEqual(_getText($bo_pg_Cases.txt_TimeToResolve),"", "issue in Time to Resolve");
+
+//Clean up function
+
+//var $datacreated = [$slaterm,$caseNumber];
+//for (var i = 0; i < $datacreated.length; i++) {
+	//$bo_act_common.cleanUpfunction($datacreated[i]);
+//}
+
+$bo_act_slaTerms.deleteSLATerm($slaterm);
+
+$RS_5303.end();
+
+
+

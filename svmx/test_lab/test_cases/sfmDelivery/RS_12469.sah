@@ -1,0 +1,57 @@
+//Author:Rubi Agrawal
+
+var $RS_12469 = _testcase("$RS_12469","Verify SFM Section layout button toggle functionalities");
+$RS_12469.start();
+
+var $sfmNameToBeCloned = "Manage Work Order Lines - Usage";
+var $sfmName=$bo_act_common.generateRandomName("RS_12469_");
+var $isCustom = false;
+var $sfmTemplate = "SVMXSTD: Manage WO Usage Lines";
+var $sfmTemplateSaveAsName = $sfmName;
+var $containerName = [];
+var $fieldName=[];
+var $webServiceObject = "Work Order";
+var $wizardObject ="Work Order";
+
+//Create WO through REST API
+var $woNumber = $sfm_act_createCustomWizard.createBlankWoFromRest($sfmdUsn, $sfmdPwd, $sfmClientId, $sfmConsumerSecret, $sfmOrgInstance);
+
+//Login and switch to classic
+$bo_act_login.login($g_url,$sfmdUsn,$sfmdPwd);
+_wait(15000);
+
+//clone Source to Target Child Process
+$sfm_act_SFM.cloneTDM016($sfmNameToBeCloned,$sfmName,$isCustom, $sfmTemplateSaveAsName,$sfmTemplate,$fieldName, $containerName);
+_click($sfm_pg_sfmDesigner.btn_saveSFM); 
+
+//add the process to wizard
+$sfm_act_wizards.addToWizard($wizardObject, $sfmd_wizardName[1], $sfmd_wizardType[1], $sfmName);  
+
+//Navigate to the WO for validation
+$bo_act_navigation.navigateToCreatedRecordUsingGlobalSearch($woNumber);
+$sfm_act_createCustomWizard.clickWizardBtn($sfmName);
+_wait(10000);
+if(_isVisible($bo_pg_getPrice.btn_partsLine && $bo_pg_getPrice.btn_laborLine && $bo_pg_getPrice.btn_expensesLine && $bo_pg_getPrice.btn_travelLine))
+{
+	_log("PASSED:::Layout display of section in Tab view");
+	
+}
+else
+	{
+	  _log("FAILED:::Layout display of section NOT in Tab view");
+	}
+_click($sfm_pg_sfmDesigner.btn_toggleSwitchButton);
+if(_isVisible($sfm_pg_sfmDesigner.btn_collapseExpandParts))
+	{
+	  _click($sfm_pg_sfmDesigner.btn_collapseExpandParts);
+	  if(_isVisible($sfm_pg_sfmDesigner.btn_collapseExpandLabor))
+		  {
+		   _log("PASSED:::Sections displayed in list view.");
+		  }
+	  else
+		  {
+		  _log("FAILED:::Sections did NOT display in list view.");
+		  }
+	}
+
+$RS_12469.end();

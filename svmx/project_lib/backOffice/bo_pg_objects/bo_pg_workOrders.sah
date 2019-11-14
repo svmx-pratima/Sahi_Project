@@ -1,0 +1,98 @@
+
+
+/**
+ * Home page object repository
+ */
+
+var $bo_pg_workOrders = new function bo_pg_workOrders(){
+	
+	this.btn_editWorkOrder = _button(" Edit ");
+	this.btn_newWorkOrder = _button(" New ");
+	this.btn_deleteWorkOrder = _button("Delete");
+	this.txt_slaTerms = _textbox(0,_rightOf(_label("SLA Terms")));
+	this.sel_priority = _select(0,_rightOf(_cell("/\\*Priority|^Priority/")));
+	this.sel_orderStatus = _select(0,_rightOf(_cell("/\\*Order Status|^Order Status/")));
+	this.sel_orderType = _select(0,_rightOf(_cell("/\\*Order Type|^Order Type/")));
+	this.btn_saveWorkOrder = _submit(" Save ");
+	this.txt_case = _textbox(0,_rightOf(_label("/\\*Case|^Case/")));
+	this.txt_account = _textbox(0,_rightOf(_label("/\\*Account|^Account/")));
+	this.txt_contact = _textbox(0,_rightOf(_label("/\\*Contact|^Contact/")));
+	this.btn_SFWCheckEntitlement = _button("/Check Entitlement/");
+	this.btn_SFWCheckEntitlementPS = _button("Check Entitlement PS");
+	this.btn_sfmTDM016 = _button("Manage Work Order Lines - Usage");
+	this.btn_DefaultTitleForChecklist = _button("/Default title for Checklist/");
+	this.txt_component = _textbox("/\\*Component|^Component/");
+	this.txt_workOrderDetails = _heading2("Work Order Detail");
+	this.txt_getWONumber = _heading2("/WO-/");
+	this.btn_newWD=_button("New Work Detail");
+	this.sel_billingType=_select(0,_rightOf((_label("Billing Type"))));
+	this.txt_scheduleDate=_textbox(0,_rightOf(_label("Scheduled Date")));
+	this.btn_fileSection=_heading3("Files");
+	this.btn_notessAndAttachementSection=_heading3("Notes & Attachments");
+	this.btn_scheduleDate=_div(0,_rightOf(_cell("Scheduled Date")));
+	this.btn_workPerformed=_div(0,_rightOf(_cell("/Work Performed/")));
+	this.btn_noOfAssigned=_div(0,_rightOf(_cell("/No Of Times Assigned/")));
+	this.isExported=_image(0,_rightOf(_cell("Is Exported")));
+	this.lbl_billingType=_cell("/Billing Type/");
+	// Click Work Details Line on Work Order Page
+	this.clickOnWorkDetails = function($WDNumber){
+		
+		_click(_link($WDNumber,(0,_under(_tableHeader("Line Number")))));
+	};
+	this.clickOnCustomSFM = function($CustomSFMName){
+		
+		_click(_button($CustomSFMName));
+	};
+	
+//SLA CLOCK FIELDS
+	this.txt_slaClockInitialResponse = _cell("/Initial Response/");
+	this.txt_actualInitialResponseOnEditWO = _link(0,_rightOf(_label("Actual Initial Response")));
+	this.txt_actualRestorationOnEditWO = _link(0,_rightOf(_label("Actual Restoration")));
+	this.txt_actualResolutionOnEditWO = _link(0,_rightOf(_label("Actual Resolution")));
+	this.btn_SLAPause = _button("Pause");
+	this.sel_ReasonSLA = _select(0,_rightOf(_label("Reason")));
+	this.btn_popUpPause = _button("Pause[1]");
+	this.btn_SLAResume = _button("Resume");
+	this.txt_slaClock = _table("/CH_dtimer1/");
+	this.txt_InitialResponseInternalBy = _div(0,_rightOf(_cell("/Initial Response Internal By/")));
+	//this.txt_InitialResponseCustomerBy = _div(0,_rightOf(_cell("/Initial Response Customer By/")));
+	this.txt_TimeToInitialResponse = _div(0,_rightOf(_cell("/Time to Initial Response/")));
+	this.txt_InitialResponseInternalBy = _div(0,_rightOf(_cell("/Initial Response Internal By/")));
+	this.txt_InitialResponseCustomerBy = _div(0,_rightOf(_cell("/Initial Response Customer By/")));
+	this.txt_RestorationInternalBy = _div(0,_rightOf(_cell("/Restoration Internal By/")));
+	this.txt_RestorationCustomerBy = _div(0,_rightOf(_cell("/Restoration Customer By/")));
+	this.txt_ResolutionInternalBy = _div(0,_rightOf(_cell("/Resolution Internal By/")));
+	this.txt_ResolutionCustomerBy = _div(0,_rightOf(_cell("/Resolution Customer By/")));
+	this.txt_TimeToOnsiteResponse = _div(0,_rightOf(_cell("/Time to Onsite Response/")));
+	this.txt_TimeToRestore = _div(0,_rightOf(_cell("/Time to Restore/")));
+	this.txt_TimeToResolve = _div(0,_rightOf(_cell("/Time to Resolve/")));
+	this.txt_OnsiteResponseInternalBy = _div(0,_rightOf(_cell("/Onsite Response Internal By/")));
+	this.txt_OnsiteResponseCustomerBy = _div(0,_rightOf(_cell("/Onsite Response Customer By/")));
+	this.txt_actualOnsiteResponseOnEditWO = _link(0,_rightOf(_label("Actual Onsite Response")));
+	this.txt_acknowledgedByTechnicianDateTime = _link(0,_rightOf(_label("Acknowledged By Technician Date Time")));
+	
+// Activity History Related List
+	this.link_SLAClockStop = _link("SLA Clock Stop"),(_near(_tableHeader("Subject")),_under(_heading3("Activity History")));
+	this.link_SLAClockStart = _link("SLA Clock Start"),(_near(_tableHeader("Subject")),_under(_heading3("Activity History")));
+
+//Work Order page 
+	this.slaTerm = _cell("SLA Terms");
+	this.actualRestoration = _cell("/Actual Restoration/");
+	this.restorationInternalBy = _cell("/Restoration Internal/");
+	this.restorationCustomerBy = _cell("/Restoration Customer/");
+	this.timeToRestore = _cell("/Time to Restore/");
+	this.intialResponseInternalBy = _cell("/Initial Response Internal/");
+	this.intialResponseCustomerBy = _cell("/Initial Response Customer/");
+	this.actualInitialResponse = _cell("/Actual Initial Response/");
+	this.timeToInitialResponse = _cell("/Time to Initial Response/");
+	this.entitlementType = _cell("Entitlement Type");
+	this.travelRate = _cell("Travel Rate");
+	this.travelUnit = _cell("Travel Unit");
+	this.ProformaInvoiceAmount = _cell("Proforma Invoice Amount"); 
+	this.TotalBillableAmount = _cell("Total Billable Amount");
+	this.ratePricingRule = _cell("Rate (Pricing Rule)");
+	this.rateTypePricingRule = _cell("Rate Type (Pricing Rule)");
+};
+
+
+

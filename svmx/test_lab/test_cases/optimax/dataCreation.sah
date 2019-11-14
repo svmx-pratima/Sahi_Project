@@ -1,0 +1,649 @@
+var $user_credentials_xls = $excel.readFromCustomExcel("../optimax/op_excleData/automation.xlsx", "User_Details","","");
+var $businessHour_xls = $excel.readFromCustomExcel("../optimax/op_excleData/automation.xlsx", "BusinessHours","","");
+var $territory_xls = $excel.readFromCustomExcel("../optimax/op_excleData/automation.xlsx", "SVMXC__Territory__c","","");
+var $team_xls = $excel.readFromCustomExcel("../optimax/op_excleData/automation.xlsx", "SVMXC__Service_Group__c","","");
+var $tech_xls = $excel.readFromCustomExcel("../optimax/op_excleData/automation.xlsx", "SVMXC__Service_Group_Members__c","","");
+var $skill_xls = $excel.readFromCustomExcel("../optimax/op_excleData/automation.xlsx", "SVMXC__Skill__c","","");
+var $Account_xls = $excel.readFromCustomExcel("../optimax/op_excleData/automation.xlsx", "Account","","");
+var $rec_Pref_xls = $excel.readFromCustomExcel("../optimax/op_excleData/automation.xlsx", "SVMXC__Resource_Preference__c","","");
+var $RS_6694 = $excel.readFromCustomExcel("../optimax/op_excleData/automation.xlsx", "RS_6694","","");
+var $exp_xls = $excel.readFromCustomExcel("../optimax/op_excleData/automation.xlsx", "SVMXC__Service_Group_Skills__c","","");
+
+for(var $i=0;$i<$user_credentials_xls.length;$i++)
+{
+	var $g_un = $user_credentials_xls[$i][0];
+	var $g_pwd = $user_credentials_xls[$i][1];
+	var $g_url = $user_credentials_xls[$i][2];
+}
+
+for(var $i=0;$i<$businessHour_xls.length;$i++)
+{
+	var $name_BH = $businessHour_xls[$i][1];
+	_log("$name_BH = "+$name_BH);
+}
+
+_log("$exp_xls.length : " + $exp_xls.length);
+
+$bo_act_login.login($g_url, $g_un, $g_pwd);
+
+//var $rowIndex = 1;
+
+//_log($rowIndex);
+_set($login_result, _fetch(login($g_un,$g_pwd)));
+_log($login_result);
+
+_set($del_acc, _fetch(deleteAcc()));
+_log($del_acc);
+
+_set($del_terr, _fetch(deleteTerritory()));
+_log($del_terr);
+
+_set($del_teams, _fetch(deleteteams()));
+_log($del_teams);
+
+_set($del_skills, _fetch(deleteSkills()));
+_log($del_skills);
+
+_set($acc_creation, _fetch(createAcc($Account_xls)));
+_log($acc_creation);
+if($acc_creation.length != null && $acc_creation != false && $acc_creation != null){
+	//updating acc id in acc excel
+	for(var $i = 0; $i < $acc_creation.length; $i++){
+		_log("$acc_creation[i] = "+$acc_creation[$i]);
+		$excel.insertUnderColumn("../optimax/op_excleData/automation.xlsx", "Account", "Id", $acc_creation[$i],(1+$i));
+	}
+	//updating acc in prf resource
+	for(var $e=0;$e<$rec_Pref_xls.length;$e++){
+		if($e === ($rec_Pref_xls.length-1)  || $e === 0){
+			$excel.insertUnderColumn("../optimax/op_excleData/automation.xlsx", "SVMXC__Resource_Preference__c", "SVMXC__Company__c", $acc_creation[0],(1+$e));
+		}
+		else{
+			$excel.insertUnderColumn("../optimax/op_excleData/automation.xlsx", "SVMXC__Resource_Preference__c", "SVMXC__Company__c", $acc_creation[1],(1+$e));
+		}
+	}
+}
+
+//updating the acc in RS_6694
+for(var $a=0;$a<$RS_6694.length;$a++){
+	if($a < 38){
+		$excel.insertUnderColumn("../optimax/op_excleData/automation.xlsx", "RS_6694", "SVMXC__Company__c", $acc_creation[0],(1+$a));
+	}
+	else{
+		$excel.insertUnderColumn("../optimax/op_excleData/automation.xlsx", "RS_6694", "SVMXC__Company__c", $acc_creation[1],(1+$a));
+	}
+}
+_set($BH_creation, _fetch(createBH($businessHour_xls,$name_BH)));
+_log($BH_creation);
+$excel.insertUnderColumn("../optimax/op_excleData/automation.xlsx", "BusinessHours", "Id", $BH_creation, 1);
+//updating the BH in RS_6694
+for(var $b=0;$b<$RS_6694.length;$b++){
+	$excel.insertUnderColumn("../optimax/op_excleData/automation.xlsx", "RS_6694", "SVMXC__Preferred_Business_Hours__c", $BH_creation,(1+$b));
+}
+//updating bh in tech
+for(var $a=0;$a<$tech_xls.length;$a++){
+	$excel.insertUnderColumn("../optimax/op_excleData/automation.xlsx", "SVMXC__Service_Group_Members__c", "SVMXC__Working_Hours__c", $BH_creation,(1+$a));
+}
+//updating bh in territory
+for(var $d=0;$d<$territory_xls.length;$d++){
+	$excel.insertUnderColumn("../optimax/op_excleData/automation.xlsx", "SVMXC__Territory__c", "SVMXC__Territory_s_Business_Hours__c", $BH_creation,(1+$d));
+}
+if($BH_creation != null){
+	_log("business hour = "+$BH_creation);
+	_set($territory_creation, _fetch(createTerritory($territory_xls,$BH_creation)));
+	_log($territory_creation);
+	$excel.insertUnderColumn("../optimax/op_excleData/automation.xlsx", "SVMXC__Territory__c", "Id", $territory_creation, 1);
+	//updating territory id in tech
+	for(var $b=0;$b<$tech_xls.length;$b++){
+		$excel.insertUnderColumn("../optimax/op_excleData/automation.xlsx", "SVMXC__Service_Group_Members__c", "SVMXC__Service_Territory__c", $territory_creation,(1+$b));
+	}
+	//updating the territory in RS_6694
+	for(var $a=0;$a<$RS_6694.length;$a++){
+		$excel.insertUnderColumn("../optimax/op_excleData/automation.xlsx", "RS_6694", "SVMXC__Primary_Territory__c", $territory_creation,(1+$a));
+	}
+	if($territory_creation != false){
+		_set($createTeam_creation, _fetch(createTeam($team_xls)));
+		_log($createTeam_creation);
+		$excel.insertUnderColumn("../optimax/op_excleData/automation.xlsx", "SVMXC__Service_Group__c", "Id", $createTeam_creation,1);
+		//updating team id in tech
+		for(var $c=0;$c<$tech_xls.length;$c++){
+			$excel.insertUnderColumn("../optimax/op_excleData/automation.xlsx", "SVMXC__Service_Group_Members__c", "SVMXC__Service_Group__c", $createTeam_creation,(1+$c));
+		}
+		for(var $j=0;$j<$exp_xls.length;$j++){
+			$excel.insertUnderColumn("../optimax/op_excleData/automation.xlsx", "SVMXC__Service_Group_Skills__c", "SVMXC__Service_Group__c", $createTeam_creation,(1+$j));
+		}
+		if($createTeam_creation != false){
+			_set($createTech_creation, _fetch(createTech($territory_creation,$BH_creation,$createTeam_creation,$tech_xls)));
+			_log($createTech_creation);
+			_log("$createTech_creation.length = "+$createTech_creation.length);
+			if($createTech_creation.length != null && $createTech_creation != false && $createTech_creation != null){
+				_log("$createTech_creation[i] = "+$createTech_creation.length);
+				_log("$createTech_creation[i] = "+$createTech_creation);
+				//updating tech id in tech excel
+				for(var $i = 0; $i < $createTech_creation.length; $i++){
+					_log("$createTech_creation[i] = "+$createTech_creation[$i]);
+					$excel.insertUnderColumn("../optimax/op_excleData/automation.xlsx", "SVMXC__Service_Group_Members__c", "Id", $createTech_creation[$i],(1+$i));
+				}
+				//updating tech id in expertise
+				for(var $g=0;$g<$exp_xls.length;$g++){
+					$excel.insertUnderColumn("../optimax/op_excleData/automation.xlsx", "SVMXC__Service_Group_Skills__c", "SVMXC__Group_Member__c", $createTech_creation[$g],(1+$g));
+				}
+				//updating tech id in prf res
+				for(var $g=0;$g<$rec_Pref_xls.length;$g++){
+					$excel.insertUnderColumn("../optimax/op_excleData/automation.xlsx", "SVMXC__Resource_Preference__c", "SVMXC__Group_Member__c", $createTech_creation[$g],(1+$g));
+				}
+				//creating skills
+				_set($createSkill_creation, _fetch(createSkills($skill_xls)));
+				_log($createSkill_creation);
+				if($createSkill_creation.length != 0 && $createSkill_creation != false && $createSkill_creation != null){
+					for(var $f=0;$f<$skill_xls.length;$f++){
+						$excel.insertUnderColumn("../optimax/op_excleData/automation.xlsx", "SVMXC__Skill__c", "Id", $createSkill_creation[$f],(1+$f));
+					}
+					//need to look into it
+					for(var $h=0;$h<$exp_xls.length;$h++){
+						if($h > 2){
+							$excel.insertUnderColumn("../optimax/op_excleData/automation.xlsx", "SVMXC__Service_Group_Skills__c", "SVMXC__Skill__c", $createSkill_creation[1],(1+$h));
+						}
+						else{
+							$excel.insertUnderColumn("../optimax/op_excleData/automation.xlsx", "SVMXC__Service_Group_Skills__c", "SVMXC__Skill__c", $createSkill_creation[0],(1+$h));
+						}
+					}
+					var $expertise_xls = $excel.readFromCustomExcel("../optimax/op_excleData/automation.xlsx", "SVMXC__Service_Group_Skills__c","","");
+					_wait(5000);
+					_set($createExp_creation, _fetch(createExpertise($expertise_xls)));
+					_log($createExp_creation);
+					if($createExp_creation.length != 0 && $createExp_creation != false && $createExp_creation != null){
+						for(var $j=0;$j<$createExp_creation.length;$j++){
+							$excel.insertUnderColumn("../optimax/op_excleData/automation.xlsx", "SVMXC__Service_Group_Skills__c", "Id", $createExp_creation[$j],(1+$j));
+						}
+						_wait(5000);
+						var $resource_Pref_xls = $excel.readFromCustomExcel("../optimax/op_excleData/automation.xlsx", "SVMXC__Resource_Preference__c","","");
+						_set($createPrfRes_creation, _fetch(createPrfRes($resource_Pref_xls)));
+						_log($createPrfRes_creation);
+						if($createPrfRes_creation.length != 0 && $createPrfRes_creation != false && $createPrfRes_creation != null){
+							for(var $k=0;$k<$createPrfRes_creation.length;$k++){
+								$excel.insertUnderColumn("../optimax/op_excleData/automation.xlsx", "SVMXC__Resource_Preference__c", "Id", $createPrfRes_creation[$k],(1+$k));
+							}
+						}
+					}
+				}
+			}
+		}
+		else 
+		{
+			_logExceptionAsFailure("Tech is not created as expected");
+		}
+	}
+}
+
+/*_set($delAppt, _fetch(deleteAppt()));
+_log($delAppt);
+
+_set($ApptType, _fetch(createApptType($appt_type)));
+_log($ApptType);
+
+if($ApptType != null)
+{
+	$excel.insertUnderColumn("../optimax/op_excleData/automation.xlsx", "AppointmentType", "Appointment Type Id", $ApptType,1);
+	$excel.insertUnderColumn("../optimax/op_excleData/automation.xlsx", "TestAppts", "Appointment Type", $ApptType,1);
+
+	_set($TimeWindow, _fetch(createWindow($appt_window)));
+	_log($TimeWindow);
+	_log("$TimeWindow.length = "+$TimeWindow.length);
+	if($TimeWindow.length != null && $TimeWindow != false && $TimeWindow != null)
+	{
+	_log("$TimeWindow[i] = "+$TimeWindow.length);
+	_log("$TimeWindow[i] = "+$TimeWindow);
+	//updating id in window excel
+	for(var $i = 0; $i < $TimeWindow.length; $i++)
+	{
+		_log("$TimeWindow[i] = "+$TimeWindow[$i]);
+		$excel.insertUnderColumn("../optimax/op_excleData/automation.xlsx", "AppointmentWindow", "Id", $TimeWindow[$i],(1+$i));
+	}
+	var $appt_window = $excel.readFromCustomExcel("../optimax/op_excleData/automation.xlsx", "AppointmentWindow","","");
+	var $appt_type = $excel.readFromCustomExcel("../optimax/op_excleData/automation.xlsx", "AppointmentType","","");
+
+	_set($ApptDef, _fetch(createApptDef($appt_window , $appt_type)));
+	_log($ApptDef);
+	}
+}*/
+
+//$excel.writeToExcel("insertAtIndex", "../optimax/op_excleData/automation.xlsx", "BusinessHours", $BH_creation, $rowIndex);
+
+
+//<browser>
+
+function login($g_un,$g_pwd)
+{
+	var $login_result = sforce.connection.login($g_un,$g_pwd);
+	return $login_result;
+}
+
+function deleteAcc(){
+	var $isSuccess = false;
+	var delete_acc = [];
+	//deleting the existing account
+	var svmx_Job_result = _call(sforce.connection.query("SELECT Id,Name FROM Account WHERE Name LIKE '%Auto%'"));
+	var del_Acc = svmx_Job_result.getArray("records");
+	_log("del acc.length = "+del_Acc.length);
+	if(del_Acc.length > 0){
+		for(var $x=0;$x<del_Acc.length;$x++){
+			var acc = del_Acc[$x];
+			delete_acc.push(acc.Id);
+		}
+		var delResult = sforce.connection.deleteIds([delete_acc]);
+		_log("del result acc = "+delResult);
+		if(delResult.length < 0){
+			_log(delResult.length +" Account are deleted");
+		}
+	}
+	else{
+		_log("No Accounts to delete");
+	}
+}
+
+function createAcc($Account_xls){
+	var $isSuccess = false;
+	var createAcc =[];
+	var acc_Id = [];
+	//creating account
+	for(var $i=0;$i<$Account_xls.length;$i++){
+		var acc = new sforce.SObject("Account");
+		acc.Name = $Account_xls[$i][0];
+		createAcc.push(acc);
+	}
+	var $acc_result = _call(sforce.connection.create(createAcc));
+	if($acc_result != 0 && $acc_result != null){
+		$isSuccess = true
+		for(var $x=0;$x<$acc_result.length;$x++){
+			if($acc_result[$x].id === null){
+				$isSuccess = false;
+				return $isSuccess;
+			}
+			acc_Id.push($acc_result[$x].id);
+			_log("acc_Id.push = "+acc_Id);
+		}
+		_log("acc_Id = "+acc_Id);
+		return acc_Id;
+	}
+	return $isSuccess;
+}
+
+function createBH($businessHour_xls,$name_BH)
+{
+	var createBh = [];
+	var $isSuccess = false;
+	for(var $i=0;$i<$businessHour_xls.length;$i++)
+	{
+		var bh = new sforce.SObject("BusinessHours");
+		bh.Name = $businessHour_xls[$i][1];
+		bh.IsActive = $businessHour_xls[$i][2];
+		bh.TimeZoneSidKey = $businessHour_xls[$i][3];
+		bh.MondayStartTime = $businessHour_xls[$i][4];
+		bh.MondayEndTime = $businessHour_xls[$i][5];
+		bh.TuesdayStartTime = $businessHour_xls[$i][6];
+		bh.TuesdayEndTime = $businessHour_xls[$i][7];
+		bh.WednesdayStartTime  = $businessHour_xls[$i][8];
+		bh.WednesdayEndTime = $businessHour_xls[$i][9];
+		bh.ThursdayStartTime = $businessHour_xls[$i][10];
+		bh.ThursdayEndTime = $businessHour_xls[$i][11];
+		bh.FridayStartTime = $businessHour_xls[$i][12];
+		bh.FridayEndTime = $businessHour_xls[$i][13];
+		bh.SaturdayStartTime = $businessHour_xls[$i][14];
+		bh.SaturdayEndTime = $businessHour_xls[$i][15];
+		bh.SundayStartTime = $businessHour_xls[$i][16];
+		bh.SundayEndTime = $businessHour_xls[$i][17];
+		createBh.push(bh);
+	}
+	var bh_result = _call(sforce.connection.create(createBh));
+	_log("bh_result id = "+bh_result[0].id);
+	if(bh_result[0].id === null){
+		var list_BH = sforce.connection.queryAll("Select Id, Name From BusinessHours Where Name = '"+$name_BH+"'");
+		_log(" list_BHsize = "+list_BH.size);
+		var arr_BH = list_BH.getArray("records");
+		_log(" arr_BH Id = "+arr_BH[0].Id);
+		return arr_BH[0].Id;
+	}
+	return bh_result[0].id;
+}
+
+function deleteTerritory(){
+	var delete_territory = [];
+	var svmx_Job_result = _call(sforce.connection.query("SELECT Id,Name FROM SVMXC__Territory__c WHERE Name LIKE '%Auto%'"));
+	var del_Territory = svmx_Job_result.getArray("records");
+	_log("del_Territory.length = "+del_Territory.length);
+	if(del_Territory.length > 0){
+		for(var $x=0;$x<del_Territory.length;$x++){
+			var territory = del_Territory[$x];
+			delete_territory.push(territory.Id);
+		}
+		var delResult = sforce.connection.deleteIds([delete_territory]);
+		if(delResult.length < 0){
+			_log(delResult.length +" territory are deleted");
+		}
+	}
+	else{
+		_log("No territory to delete");
+	}
+}
+
+
+function createTerritory($territory_xls,$BH_creation){
+	var Territories = [];	
+
+	for(var $i=0;$i<$territory_xls.length;$i++)
+	{
+		var territory = new sforce.SObject("SVMXC__Territory__c");
+		territory.Name = $territory_xls[$i][0];
+		territory.SVMXC__Active__c = $territory_xls[$i][1];
+		territory.SVMXC__Average_Speed__c = $territory_xls[$i][2];
+		territory.SVMXC__Max_Distance__c = $territory_xls[$i][3];
+		territory.SVMXC__Fixed_Cost__c = $territory_xls[$i][4];
+		territory.SVMXC__Per_Hour_Cost__c = $territory_xls[$i][5];
+		territory.SVMXC__Per_Mile_Cost__c = $territory_xls[$i][6];
+		//territory.SVMXC__Territory_s_Business_Hours__c = $BH_creation;
+		Territories.push(territory);
+	}
+	var territory_result = _call(sforce.connection.create(Territories));
+	_log("territory_result = "+territory_result);
+	if(territory_result[0].id != null){
+		_log("territory_result[0].id = "+territory_result[0].id);
+		return territory_result[0].id;
+	}
+	return false;
+}
+
+function deleteteams(){
+	var delete_team =[];
+	//deleting the existing team
+	var svmx_Job_result = _call(sforce.connection.query("SELECT Id,Name FROM SVMXC__Service_Group__c WHERE Name LIKE '%Auto%'"));
+	var del_Teams = svmx_Job_result.getArray("records");
+	_log("del_Teams.length = "+del_Teams.length);
+	if(del_Teams.length > 0){
+		for(var $x=0;$x<del_Teams.length;$x++){
+			var team = del_Teams[$x];
+			delete_team.push(team.Id);
+		}
+		var delResult = sforce.connection.deleteIds([delete_team]);
+		if(delResult.length < 0){
+			_log(delResult.length +" teams are deleted");
+		}
+	}
+	else{
+		_log("No team to delete");
+	}
+}
+
+function createTeam($team_xls){
+	var createTeam = [];
+	
+	//creating team
+	for(var $i=0;$i<$team_xls.length;$i++)
+	{
+		var team = new sforce.SObject("SVMXC__Service_Group__c");
+		team.Name = $team_xls[$i][0];
+		team.SVMXC__Active__c = $team_xls[$i][1];
+		createTeam.push(team);
+		_log("createTeam = "+createTeam);
+	}
+	var team_result = _call(sforce.connection.create(createTeam));
+	_log("team_result = "+team_result);
+	if(team_result[0].id != null){
+		return team_result[0].id;
+	}
+	return false;
+}
+
+function createTech($territory_creation,$BH_creation,$createTeam_creation,$tech_xls){
+	var createTech = [];
+	var techId = [];
+	var $isSuccess = false;
+	_log("$tech_xls. length = "+$tech_xls.length);
+	for(var $i=0;$i<$tech_xls.length;$i++)
+	{
+		var tech = new sforce.SObject("SVMXC__Service_Group_Members__c");
+		tech.Name = $tech_xls[$i][0];
+		tech.SVMXC__Active__c = $tech_xls[$i][1];
+		tech.SVMXC__Enable_Scheduling__c = $tech_xls[$i][2];
+		tech.SVMXC__Street__c = $tech_xls[$i][3];
+		tech.SVMXC__City__c = $tech_xls[$i][4];
+		tech.SVMXC__State__c = $tech_xls[$i][5];
+		tech.SVMXC__Zip__c = $tech_xls[$i][6];
+		tech.SVMXC__Country__c = $tech_xls[$i][7];
+		tech.SVMXC__Service_Group__c = $createTeam_creation;
+		tech.SVMXC__Service_Territory__c = $territory_creation;
+		tech.SVMXC__Working_Hours__c = $BH_creation;
+		createTech.push(tech);
+	}
+	var $tech_result = _call(sforce.connection.create(createTech));
+	_log("$tech_result length = "+$tech_result.length);
+	if($tech_result != 0 && $tech_result != null){
+		$isSuccess = true
+		for(var $x=0;$x<$tech_result.length;$x++){
+			if($tech_result[$x].id === null){
+				$isSuccess = false;
+				return $isSuccess;
+			}
+			techId.push($tech_result[$x].id);
+			_log("techId.push = "+techId);
+		}
+		_log("techId = "+techId);
+		//return techId;
+	}
+	return techId;
+}
+
+function deleteSkills(){
+	var delete_Skill =[];
+	
+	
+	//deleting the existing team
+	var svmx_Job_result = _call(sforce.connection.query("SELECT Id,Name FROM SVMXC__Skill__c WHERE Name LIKE '%Auto%'"));
+	var del_Skills = svmx_Job_result.getArray("records");
+	_log("del_Skills.length = "+del_Skills.length);
+	if(del_Skills.length > 0){
+		for(var $x=0;$x<del_Skills.length;$x++){
+			var skill = del_Skills[$x];
+			delete_Skill.push(skill.Id);
+		}
+		var delResult = sforce.connection.deleteIds([delete_Skill]);
+		if(delResult.length < 0){
+			_log(delResult.length +" skills are deleted");
+		}
+	}
+	else{
+		_log("No skill to delete");
+	}
+}
+
+function createSkills($skill_xls){
+	var createSkills = [];
+	var skillId = [];
+	var $isSuccess = false;
+	
+	for(var $i=0;$i<$skill_xls.length;$i++)
+	{
+		var skill = new sforce.SObject("SVMXC__Skill__c");
+		skill.Name = $skill_xls[$i][0];
+		skill.SVMXC__Active__c = $skill_xls[$i][1];
+		skill.SVMXC__Skill_Category__c = $skill_xls[$i][2];
+		createSkills.push(skill);
+	}
+	var skill_result = _call(sforce.connection.create(createSkills));
+	if(skill_result.length != null){
+		$isSuccess = true;
+		for(var $x=0;$x<skill_result.length;$x++){
+			skillId.push(skill_result[$x].id);
+			_log("skillId.push = "+skillId);
+		}
+		_log("skill ids ="+skillId);
+		return skillId;
+	}
+	return $isSuccess;
+}
+
+function createExpertise($exp_xls){
+	var createExp = [];
+	var $isSuccess = false;
+	var expId = [];
+	for(var $i = 0;$i<$exp_xls.length;$i++){
+		var expertise = new sforce.SObject("SVMXC__Service_Group_Skills__c");
+		expertise.SVMXC__Group_Member__c=$exp_xls[$i][0];
+	    expertise.SVMXC__Service_Group__c=$exp_xls[$i][1];
+		expertise.SVMXC__Skill__c=$exp_xls[$i][2];
+		expertise.SVMXC__Skill_Level__c=$exp_xls[$i][3];
+		createExp.push(expertise);
+		_log("createExp = "+createExp);
+		_log("createExp length = "+createExp.length);
+	}
+	var exp_result = sforce.connection.create(createExp);
+	_log("exp_result ="+exp_result);
+	if(exp_result.length != null){
+		$isSuccess = true;
+		for(var $x=0;$x<exp_result.length;$x++){
+			expId.push(exp_result[$x].id);
+			_log("expId.push = "+expId);
+		}
+		_log("expId ids ="+expId);
+		return expId;
+	}
+	return $isSuccess;
+}
+
+function createPrfRes($rec_Pref_xls){
+	var createPrfRes = [];
+	var $isSuccess = false;
+	var prfResId = [];
+	for(var $i = 0;$i<$rec_Pref_xls.length;$i++){
+		var prfRes = new sforce.SObject("SVMXC__Resource_Preference__c");
+		prfRes.SVMXC__Company__c=$rec_Pref_xls[$i][0];
+		prfRes.SVMXC__Group_Member__c=$rec_Pref_xls[$i][1];
+		prfRes.SVMXC__Preference_Type__c=$rec_Pref_xls[$i][2];
+		createPrfRes.push(prfRes);
+	}
+	var pfrRes_result = sforce.connection.create(createPrfRes);
+	_log("pfrRes_result = "+pfrRes_result);
+	if(pfrRes_result.length != null){
+		_log("pfrRes_result.length = "+pfrRes_result.length);
+		$isSuccess = true;
+		for(var $x=0;$x<pfrRes_result.length;$x++){
+			prfResId.push(pfrRes_result[$x].id);
+			_log("pfrRes.push = "+prfResId);
+		}
+		_log("pfrRes ids ="+prfResId);
+		//return prfResId;
+	}
+	return prfResId;
+}
+
+function createWindow($appt_window)
+{
+	var createWindow = [];
+	var WindowId = [];
+	
+	var result = _call(sforce.connection.query("SELECT Id,Name FROM RecordType WHERE Name = 'Time Window'"));
+	var Id_result= result.getArray("records");
+	_log("Id_result = "+Id_result);
+	_log("Id = "+Id_result[0].Id);
+	
+	//creating appointment window
+	
+	for(var $i = 0;$i<$appt_window.length;$i++)
+	{
+		var window = new sforce.SObject("SVMXC__SM_Appointment_Window__c");
+		window.Name = $appt_window[$i][0];
+		window.RecordTypeId = Id_result[0].Id;
+		window.SVMXC__SM_Time_Window_Name__c = $appt_window[$i][0];
+		window.SVMXC__SM_Window_Start_Time__c	= $appt_window[$i][1];
+		window.SVMXC__SM_Window_End_Time__c	= $appt_window[$i][2];
+		createWindow.push(window);
+	}	
+		
+	var $result = _call(sforce.connection.create(createWindow));
+	_log("$result length = "+$result.length);
+	
+	if($result != 0 && $result != null)
+	{
+		$isSuccess = true;
+		for(var $x=0;$x<$result.length;$x++)
+		{
+			if($result[$x].id === null)
+			{
+				$isSuccess = false;
+				return $isSuccess;
+			}
+			WindowId.push($result[$x].id);
+			_log("Id.push = "+WindowId);
+		}
+		_log("WindowId = "+WindowId);
+		//return WindowId;
+	}
+	return WindowId;
+}
+
+function createApptDef($appt_window , $appt_type)
+{
+	var createDef = [];
+	var result = _call(sforce.connection.query("SELECT Id,Name FROM RecordType WHERE Name = 'Appointment Type Definition'"));
+	var Id_result= result.getArray("records");
+	_log("Id_result = "+Id_result);
+	_log("Id = "+Id_result[0].Id);
+	
+	for(var $i = 0;$i<$appt_window.length;$i++)
+	{
+	var window = new sforce.SObject("SVMXC__SM_Appointment_Window__c");
+	window.Name = $appt_type[0][0]+'-'+$appt_window[$i][0];
+	window.RecordTypeId = Id_result[0].Id;
+	window.SVMXC__SM_Appointment_Type__c = $appt_type[0][1];
+	window.SVMXC__SM_Time_Window__c	= $appt_window[$i][3];
+	createDef.push(window);
+	}
+	
+	var $result = _call(sforce.connection.create(createDef));
+	_log("$result length = "+$result.length);
+	_log("$result : "+$result);
+
+if($result.length != null){
+	return $result.length;
+}
+return false;
+}
+
+function createApptType($appt_type)
+{
+	var $Id_result = _call(sforce.connection.query("SELECT Id,Name FROM RecordType WHERE Name = 'Time Window'"));
+	_log("Id_result = "+$Id_result)
+		var type = new sforce.SObject("SVMXC__SM_Appointment_Window__c");
+		type.SVMXC__SM_Appointment_Type_Name__c = $appt_type[0][0];
+		type.Name = $appt_type[0][0];
+		
+		var result = sforce.connection.create([type]);
+		_log("result = "+result);
+	if(result[0].id != null){
+		return result[0].id;
+	}
+	return false;
+}
+
+function deleteAppt()
+{
+	var delete_Appt =[];
+	//deleting the existing appt
+	var svmx_Job_result = _call(sforce.connection.query("SELECT Id,Name FROM SVMXC__SM_Appointment_Window__c WHERE Name LIKE '%Auto%'"));
+	_log("svmx_Job_result : " + svmx_Job_result);
+	var del_Appts = svmx_Job_result.getArray("records");
+	_log("del_Appts.length = "+del_Appts.length);
+	if(del_Appts.length > 0){
+		for(var $x=0;$x<del_Appts.length;$x++){
+			var appt = del_Appts[$x];
+			delete_Appt.push(appt.Id);
+		}
+		var delResult = sforce.connection.deleteIds(delete_Appt);
+		if(delResult.length < 0){
+			_log(delResult.length +" Appointments are deleted");
+		}
+	}
+	else{
+		_log("No Appointments to delete");
+	}
+}
+//</browser>

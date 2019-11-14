@@ -1,0 +1,59 @@
+//Author	:- 	Shashikala Kamath
+//Modified By 	:- 	Ashwini Holagi
+	
+var $swat_tc_009_cloned_output_document = _testcase("swat_tc_009_cloned_output_document","Verify the functionality of OPDOC");
+	
+	$swat_tc_009_cloned_output_document.start();
+	_setSpeed($g_stepSpeed);
+	
+	var $wizardObjectName = "Work Order";
+	var $wizardTitleName = $bo_act_common.generateRandomName("SFWTitle");
+	var $wizardIDName = $bo_act_common.generateRandomName("SFWId");
+	var $wizardStepType = "Output Document";
+	var $selectTemplateAtRunTime = false;
+	var $sfmToBeCloned = "Work Order Service Report";
+	var $sfmName = $bo_act_common.generateRandomName("WO_ServiceReport");
+	var $sfmTemplateSaveAsName = $sfmName;	
+	var $sfmTemplate = "Work Order Service Report";   
+	var $isCustom = false;
+	
+	
+	//Login to App
+	$bo_act_login.login($swat_Url,$swat_un,$swat_pwd);
+	
+	//Create Work Order with Order Status, Order Type through API
+	var $workOrderNo = $swat_act_createDataUsingApi.createWorkOrder($swat_un, $swat_pwd, $swat_ClientId, $swat_ConsumerSecret, $swat_OrgInstance);
+	
+	//Clone SFM Process
+	$swat_act_workOrderServiceReport.cloneWOServiceReport($sfmToBeCloned, $sfmName, $isCustom, $sfmTemplateSaveAsName, $sfmTemplate, "", "");
+	
+	//Navigate to Home Page
+	_click(_link("Home"));
+	
+	///Steps to create SFM Wizard and Add Step of type SFM
+	$swat_act_sfmWizard.createSfmWizardWithStepOutputDoc($wizardObjectName,$wizardTitleName, $wizardIDName,$wizardStepType,$sfmName,$selectTemplateAtRunTime);
+	
+	global_clearBrowserCache();
+	
+	//Global Search WorkOrder
+	$sfm_act_common.globalSearch($workOrderNo);
+	_wait(10000);
+	
+	//Click 'Work Order Service Report' in SFM Wizard
+	$swat_act_sfmDelivery.launchSfmDelivery($sfmName,$wizardTitleName);
+	
+	//Verify Service Report is attached to Work Order
+	$swat_act_sfmDelivery.verifyServiceReportAttchedToWO($workOrderNo);
+	
+	//Delete SFM Wizard 
+	$bo_act_SFW.deleteSFMWizard($wizardObjectName, $wizardIDName);
+	
+	
+	//Delete SFM
+	$bo_act_navigation.navigateToSfmTransactionDesigner();
+	$bo_act_SFM.deleteSFM($sfmName);
+	
+	//Delete Work Order
+	//$swat_act_deleteData.deleteData($workOrderNo);
+	
+	$swat_tc_009_cloned_output_document.end();

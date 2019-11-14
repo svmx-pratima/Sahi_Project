@@ -1,0 +1,54 @@
+// Author Meghana Rao P
+/*
+ * This test-case verifies the new Attachment Question , HELP URL Field Limitation
+ * Alphanumeric and special characters in Question text
+ */
+var $RS_9845 = _testcase("RS_9845", "To create a new Checklist SFM Designer");
+$RS_9845.start();
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+
+$bo_act_navigation.navigateToSfmTransactionDesigner();
+_wait(60000, _isVisible($bo_pg_sfmTransactionAndDesigner.btn_newSFM));
+_wait(1000);
+
+// To verify the new Question type Attachment
+//To verify the Boundary value of HELP URL text
+
+
+var $number1 = $bo_act_common.generateRandomName("num");
+var $QuestionName = $bo_act_common.generateRandomName("A RS_9845");
+var $changedquestionname = $bo_act_common.generateRandomName("ChangedRS_9845");
+var $Process1 = $bo_act_common.generateRandomName("A_RS_9845_Pro1");
+var $Process2 = $bo_act_common.generateRandomName("A_RS_9845_Pro2");
+var $Responset = $bo_act_common.generateRandomName("AResponse_9845");
+$bo_act_checklistdesigner.newChecklistTypeSFM($Process1,"to generate a Checklist/Survey type of Process", "Work Order");
+
+
+$bo_act_checklistdesigner.addQuestionToChecklist1($QuestionName, "");
+_wait(10000);
+
+_call(top.location.reload());
+// To create another Checklist with Same Question
+$bo_act_checklistdesigner.newChecklistTypeSFM($Process2,"to generate a Checklist/Survey type of Process", "Work Order");
+
+$bo_act_checklistdesigner.addsamequestion_tochecklist($QuestionName);
+
+_wait(10000);
+
+_call(top.location.reload());
+// To make changes to the Question Bank Library
+
+$bo_act_questionlibrary.edit_question_in_library($QuestionName, $changedquestionname, $Responset);
+
+// To verify the Changes in the Transaction Designer
+$bo_act_navigation.navigateToSfmTransactionDesigner();
+_wait(60000, _isVisible($bo_pg_sfmTransactionAndDesigner.btn_newSFM));
+$bo_act_checklistdesigner.re_openChecklistTypeSFM($Process1, true);
+_wait(10000);
+$bo_act_checklistdesigner.verifythechangesinchecklistformdesigner($changedquestionname, "Answer 1", "Answer 2", "Radio Button");
+$bo_act_navigation.navigateToSfmTransactionDesigner();
+$bo_act_checklistdesigner.re_openChecklistTypeSFM($Process2, true);
+_wait(10000);
+$bo_act_checklistdesigner.verifythechangesinchecklistformdesigner($changedquestionname, "Answer 1", "Answer 2", "Radio Button");
+
+$RS_9845.end();

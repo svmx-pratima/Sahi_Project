@@ -1,0 +1,100 @@
+//_includeOnce("../../../references/references.js");
+
+//author - Mamata Rout
+
+var $RS_5435 = _testcase("RS_5435", "Verify On hiding standard SFM[mode as interactive] & Custom SFM[mode as background]");
+$RS_5435.start();
+_setSpeed($g_stepSpeed);
+
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+//Create a SFM orders test data
+
+	var $sfmName = $bo_act_common.generateRandomName("5435SFM");
+	var $wizardname2=$bo_act_common.generateRandomName("5435SFW");
+	var	$wizardID2=$wizardname2;
+	var $wizardname=$bo_act_common.generateRandomName("5435SFW2");
+	var $wizardID=$wizardname;
+	var $stndSFMName="Add/Edit Products Serviced";
+
+	var $objName2="Preventive Maintenance Plan";
+	var $objName1="Work Order";	
+	var $fieldActnType="SFM";
+
+	var $actnName2=$sfmName;
+	var $actnName1=$stndSFMName;
+	var $actnName2=$sfmName;
+	var $executionMode1 = "Interactive";
+	var $executionMode2 = "Background";
+	
+	_setSpeed($g_stepSpeed);
+
+
+//***Navigate SFm Wizard->Create new Wizard->add standard SFM->Verify its visibility in Delivery for WO object********************************************
+$bo_act_navigation.navigateToSfmAppPermission();
+$bo_act_SFMAppPermission.enableAppPermission($stndSFMName);
+
+$bo_act_navigation.navigateToSfmWizard();
+	$bo_act_SFW.createWizardGeneralInfo($objName1,$wizardname,$wizardID);
+	$bo_act_SFW.createWizardStep($fieldActnType,$actnName1,$executionMode1);
+	$bo_act_sfmVerifyWorkOrder.verifyWizardOnWOObj($sfmName);
+	_wait(2000);
+	$bo_act_sfmVerifyWorkOrder.wizardButtonVerification($stndSFMName);
+
+
+//$bo_act_sfmVerifyWorkOrder.wizardButtonVerification($wizardname);
+
+//*****************************************************************
+
+//**************Navigating to App Permission and Disable the permission for online and verify if wizard display, delete wizard finally************
+$bo_act_navigation.navigateToSfmAppPermission();
+$bo_act_SFMAppPermission.appPermissionOnWOObj($stndSFMName)	;
+$bo_act_sfmVerifyWorkOrder.verifyWizardOnWOObj($sfmName);
+_wait(2000);
+$bo_act_sfmVerifyWorkOrder.verifyAddEditWizardButton($stndSFMName);
+$bo_act_SFW.deleteWizards( $objName1,$wizardID);
+
+var $SFMToBeCloned = "Activate Preventive Maintenance Plan";
+var $isCustom = false;
+	
+//-----------Navigate to SFM Designer->Create Custom SFM -------------
+$bo_act_navigation.navigateToSfmTransactionDesigner();
+_wait(60000, _isVisible($bo_pg_sfmTransactionAndDesigner.btn_newSFM));
+$bo_act_SFM.renameClonesfm($sfmName,$SFMToBeCloned,$isCustom);
+_wait(60000, _isVisible($bo_pg_sfmTransactionAndDesigner.btn_backToList));
+	
+if (_assertExists($bo_pg_sfmTransactionAndDesigner.btn_backToList)){
+	
+	_log("SFm created successfully");
+} else {
+	_fail("SFM creation is unsuccessfull");
+	_stopTestCase();
+};
+
+
+//************Navigating SFM wizard and Creating Wizard ,Adding custom Wizard created above , verify wizard display online***************
+
+$bo_act_navigation.navigateToSfmWizard();
+	$bo_act_SFW.createWizardGeneralInfo($objName2,$wizardname2,$wizardID2);
+	$bo_act_SFW.createWizardStep($fieldActnType,$actnName2,$executionMode2);
+	$bo_act_sfmVerifyWorkOrder.verifyWizardOnPMPObj($sfmName);
+	_wait(2000);
+	$bo_act_sfmVerifyWorkOrder.wizardButtonVisible($sfmName);
+	
+
+//*****************************************************************
+
+//**************Navigating to App Permission and Disable the permission for online and verify if wizard display,delete wizard finally************
+	$bo_act_navigation.navigateToSfmAppPermission();
+	$bo_act_SFMAppPermission.appPermissionOnPMPObj($sfmName);
+	$bo_act_sfmVerifyWorkOrder.verifyWizardOnPMPObj($sfmName);
+	$bo_act_sfmVerifyWorkOrder.wizardButtonNotVisible($sfmName);
+	$bo_act_SFW.deleteWizards( $objName2,$wizardID2);
+
+
+$bo_act_navigation.navigateToSfmAppPermission();
+$bo_act_SFMAppPermission.enableAppPermission($stndSFMName);
+$bo_act_navigation.navigateToSfmTransactionDesigner();
+_wait(60000, _isVisible($bo_pg_sfmTransactionAndDesigner.btn_newSFM));
+$bo_act_SFM.deleteSFM($sfmName);
+_setSpeed($g_stepSpeed);
+$RS_5435.end();

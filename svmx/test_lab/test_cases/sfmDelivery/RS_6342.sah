@@ -1,0 +1,80 @@
+var $rs_6342 = _testcase("RS_6342","Verify Data Validation Rule for Standalone Edit - Advanced Expression - Child");
+$rs_6342.start();
+var $sfmNameToBeCloned = "Manage Work Order Lines - Usage";
+var $sfmName = $bo_act_common.generateRandomName("RS_6342_");
+var $isCustom = false;
+var $sfmTemplate = "SVMXSTD: Manage WO Usage Lines";
+var $sfmTemplateSaveAsName = $sfmName;
+var $containerName = ["Parts"];
+var $rulename = $sfmName;
+var $targetObject ="Work Detail (Work Order)";
+var $ruleDescription = "Line Qty is Greater Than 5 and Received Street Is Not Null";
+var $fieldArray = ["Line Qty","Received Street"];
+var $conditionArray = ["Greater Than","Is Not Null"];
+var $operandArray =["Value", ""];
+var $valueArray =["5", ""];
+var $advExpr= "1 AND 2";
+var $fieldName ="Line Qty";
+var $fieldName1=["Received Street"];
+var $wizardObject = "Work Order";
+var $messageType = "Error";
+var $lineQuantity="6";
+var $receivedStreet="Mysuru";
+
+//Create WO through REST API
+var $woNumber = $sfm_act_createCustomWizard.createBlankWoFromRest($sfmdUsn, $sfmdPwd, $sfmClientId, $sfmConsumerSecret, $sfmOrgInstance);
+
+//login
+_setSpeed($g_stepSpeed);
+$bo_act_login.login($g_url, $sfmdUsn, $sfmdPwd);
+
+
+//clone tmd016
+$sfm_act_SFM.cloneTDM016($sfmNameToBeCloned,$sfmName,$isCustom, $sfmTemplateSaveAsName,$sfmTemplate,$fieldName1, $containerName);
+$sfm_act_SFM.partsNotMandatory();
+
+//create Data validation rule
+$sfm_pg_dvr.newRule($targetObject, $rulename, $ruleDescription, $fieldArray, $conditionArray, $operandArray, $valueArray, $advExpr, $messageType);
+_click($sfm_pg_sfmDesigner.btn_saveSFM); 
+
+//add the process to wizard
+$sfm_act_wizards.addToWizard($wizardObject, $sfmd_wizardName[0], $sfmd_wizardType[1], $sfmName); 
+
+//Navigate to the WO for validation
+$bo_act_navigation.navigateToCreatedRecordUsingGlobalSearch($woNumber);
+
+$sfm_act_createCustomWizard.clickWizardBtn($sfmName);
+
+//Validate DVR
+_click($sfm_pg_sfmDesigner.btn_deliveryPartsTab);
+_click($sfm_pg_sfmDesigner.btn_deliveryAddRowParts);
+addPartsLine("6","");
+_click($sfm_pg_sfmDesigner.btn_deliveryQuickSave);
+_assertNotExists(_div("Parts: "+$ruleDescription), "LineQty>5 but Received Street is Null");
+//_click(_span("Ok"));
+_wait(10000);
+
+addPartsLine("3","");
+_click($sfm_pg_sfmDesigner.btn_deliveryQuickSave);
+_assertNotExists(_div("Parts: "+$ruleDescription), " LineQty<5 and Received Street is Null");
+//_click(_span("Ok"));
+_wait(10000);
+
+addPartsLine("3","Mysore");
+_click($sfm_pg_sfmDesigner.btn_deliveryQuickSave);
+_assertNotExists(_div("Parts: "+$ruleDescription), "LineQty<5 and Received Street is not Null");
+//_click(_span("Ok"));
+_wait(10000);
+
+
+addPartsLine("6","Mysuru");
+_click($sfm_pg_sfmDesigner.btn_deliveryQuickSave);
+_assertExists(_div("Parts: "+$ruleDescription), "LineQty>5 and Received Street is not Null");
+
+ function addPartsLine($lineQuantity,$receivedStreet){
+	 _click($sfm_pg_sfmDesigner.btn_deliveryExtendedEdit);
+	 _setValue($sfm_pg_sfmDesigner.txt_eeLineQty,$lineQuantity);
+	 _setValue($sfm_pg_sfmDesigner.txt_eeReceivedStreet,$receivedStreet);
+	 _click($sfm_pg_sfmDesigner.btn_eeUpdate); 
+ }
+ $rs_6342.end();

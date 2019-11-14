@@ -1,0 +1,48 @@
+/*Service Pricebooks object repository
+ */
+
+var $bo_pg_servicePricebooks = new function bo_pg_servicePricebooks(){
+	
+	// Click on Service Price Book 
+	this.clickOnServicePriceBook = function($PriceBookName){
+		
+		_click(_span($PriceBookName));
+	};
+	
+	this.btn_sfmEditServicePricebook = _button("Edit Service Pricebook");
+	this.btn_addSingleLaborLine = _span("/sfmd-add-line-icon/");
+	this.txt_standardServicePriceBook = _heading2("Service Pricebook Detail");
+	this.btn_newServicePricebookEntry = _button("New Service Pricebook Entry");
+	this.sel_unit	= _select(0,_rightOf(_label("Unit")));
+	this.txt_activityID = _textbox("Activity Id");
+	this.txt_activityProduct = _textbox("Activity Product");
+	this.txt_regularRate = _textbox("Regular Rate");
+	this.btn_saveServicePricebookEntry = _submit(" Save ");
+	this.btn_deleteServicePricebookEntry = _button("Delete"); 
+	this.btn_editServicePriceBook = _button(" Edit ");
+	this.chk_activateServicePriceBook = _checkbox("Active");
+	this.link_navigateBackToServicePriceBook = _link("/Standard Service Price Book/", _near(_heading2("Service Pricebook Entry Detail")));
+	
+	this.clickOnServicePriceBookEntry = function($ServicePricebooksEntryNumber){
+		
+		_click(_link($ServicePricebooksEntryNumber,_near(_heading3("Service Pricebook Entry"))));
+	};
+	
+    this.navigateBackToCustomServicePriceBook = function($PriceBookName){
+		
+    	_click(_link(0,_rightOf(_cell($PriceBookName,_near(_heading2("Service Pricebook Entry Detail"))))));
+    	_closeWindow();
+	};
+	
+	// Add new Service Price Book
+	this.btn_addNewServicePricebook =_button("New Service Pricebook");
+	this.link_createServicePriceBook = _link("Create Service Price Book");
+	this.txt_pricebookName = _textbox("/Pricebook Name/");
+	this.btn_laborLine = _span("Labor");
+	this.btn_editFirstRow = _image("/svmx-sfmd-edit-icon/");
+	this.txt_laborUnit	= _textbox("/Unit/");
+    this.txt_regularRateLaborServicePriceBook	= _textbox(0,_rightOf(_label("/Regular Rate/",_near(_span("/Labor/")))));
+	this.btn_update = _span("Update");
+	this.btn_saveServicePricebookDelivery = _span("/svmx-sfmd-save-icon/");
+	this.btn_deleteFirstLaborLine = _image("/svmx-sfmd-delete-icon/");
+};

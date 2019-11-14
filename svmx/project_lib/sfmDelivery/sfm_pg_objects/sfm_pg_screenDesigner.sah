@@ -1,0 +1,85 @@
+var $sfm_pg_screenDesigner = new function sfm_pg_screenDesigner(){
+	this.txt_saveExprsn =_f("main").s_textinput("Save this filter as");
+	this.sel_createSFMTransaction= _f("main").s_dropdownlist("purposeCombo");
+	this.lbl_targetRecordLabel=_f("main").s_label("...to create these records");
+	this.lbl_sourceRecordLabel=_f("main").s_label("Use data from...");
+	this.txt_sourceRecordText =  _f("main").s_textinput("textInput").near(this.lbl_sourceRecordLabel);
+	this.txt_targetObject= _f("main").s_textinput("textInput[1]").near(_f("main").s_label("...to create these records"));
+	this.sel_targetHeaderObject=_f("main").s_combobox(0).near(this.lbl_targetRecordLabel);
+	this.lbl_makeCheckListAvailableOn=_f("main").s_label("Make Checklist Available On:");
+	this.sel_checkListAvaialble=_f("main").s_combobox("/objCombo/").near(this.lbl_makeCheckListAvailableOn);
+	this.txt_checkListAvaialble=_f("main").s_textinput("textInput").near(this.lbl_makeCheckListAvailableOn);
+	this.sel_sourceHeaderObject=_f("main").s_combobox(0).near(this.lbl_sourceRecordLabel);
+	this.lbl_workOrder= _f("main").s_label("/Work Order/").near(_f("main").s_label("Work Order Dependency"));
+	this.chk_workDetail= _f("main").s_checkbox("Work Detail (Work Order)");
+	this.add_field= _f("main").fieldrenderer("[object Object]");
+	this.txt_searchField= _f("main").s_textinput("searchText").near(_f("main").s_button("/Add Field/"));
+	this.lbl_billingType= _f("main").s_label("Billing Type");
+	this.lbl_account= _f("main").s_label("Account");
+	this.txt_srcObject = _f("main").s_textinput("textInput");
+	this.btn_deleteRow=_f("main").s_button("Delete");
+	this.lbl_propDetail=_f("main").s_label("/Properties for Details:/");
+	this.sel_dataGrp=_f("main").s_datagroup("dataGroup");
+	this.txt_searchChildField=_f("main").s_textinput("Quick Find");
+	this.lbl_erroMsgOnSFMLaunch=_div("This record does not qualify as the Order Status is NOT Open");
+	//this.lbl_erroMsgOnSFMLaunch=_div("This record does not meet the qualification criteria for this SFM Transaction");
+	this.sel_selectExpression=_f("main").s_combobox("searchCombo").near(this.txt_saveExprsn);
+	this.lbl_btnok=_f("main").s_button("OK");
+	
+	this.srcHeaderObjscrollElement=_f("main").s_vscrollbar("verticalScrollBar").near(this.sel_sourceHeaderObject);
+	this.targetHeaderObjscrollElement=_f("main").s_vscrollbar("verticalScrollBar").near(this.sel_sourceHeaderObject);
+	this.sel_chkObject=_f("main").s_combobox(0).near(_f("main").s_label("Make Checklist Available On:"));
+	
+	this.lbl_addproduct = _f("main").s_label("Product[1]"); 
+	this.btn_ConfLookup = _f("main").s_button("Configure Lookup");
+	this.sel_LkupTemplate = _f("main").s_combobox("/searchCombo/").leftOf(_f("main").s_textinput("Save this Lookup as"));//Updated for Lightning
+	this.btn_Select = _f("main").s_button("Select");
+	this.btn_propoties=_f("main").tab("Properties");
+    this.txt_sfmDescription=_f("main").s_textarea("pDescription");// added for lightning
+    this.btn_qualifyingCriteriaAndFieldMapping = _f("main").tab("Qualifying Criteria and Field Mappings");// added for lightning
+    this.lbl_qualifyingCriteriaMapping=_f("main").s_label("Create qualifying criteria and/or mappings");// added for lightning
+    this.lbl_headerQualificationLabel=_f("main").s_richtext("/target/");// added for lightning
+    this.btn_newExpression=_f("main").s_button("New");
+    this.sel_comboField =_f("main").s_combobox("fieldCombo");
+    this.btn_addRow=_f("main").s_button("Add a row");
+	this.sel_comboConditions = _f("main").s_dropdownlist("conditionsCombo");
+	this.btn_toggleChoose=_f("main").s_togglebutton("I want to choose a field from the list");
+	this.btn_inputCombobox=_f("main").s_combobox("valuesCombo");
+	this.txt_input = _f("main").s_textinput("textip");
+
+	this.txt_inputId = _f("main").s_textinput("Input ID Here");
+	this.txt_advExpr=_f("main").s_textinput("advTxt");
+	this.txt_errMsg=_f("main").s_textarea("msgTxt");
+    
+	this.btn_applyExitCriteria=_f("main").s_button("saveBtnExit");
+    
+	this.chk_readOnly= _f("main").s_checkbox("Read Only");
+	this.chk_required= _f("main").s_checkbox("Required");
+	this.chk_allowNew= _f("main").s_checkbox("Allow New");
+	this.chk_allowDelete= _f("main").s_checkbox("Allow Delete");
+	this.data_Group= _f("main").s_datagroup("dataGroup[3]");
+	this.lbl_part= _f("main").s_label("Part");
+	this.section_Parts= _f("main").s_richtext("Work Detail (Work Order)");
+	this.sel_allowZeroLines= _f("main").s_combobox("ComboBox8505");
+	this.sel_allowMultiAdd= _f("main").s_combobox("/ComboBox/").near(_f("main").formitemlabel("Allow Multi Add Using"));
+	this.lbl_contact= _f("main").s_label("Contact");
+	this.lbl_autoContact= _f("main").s_label("AutoContact[1]");
+	this.lkp_parts = _f("main").s_button("refBtn");
+	this.sel_rowsToDisplay = _f("main").s_combobox("noOfRec");
+	this.txt_lookupName = _f("main").s_textinput("Save this Lookup as");
+	this.txt_lookupId = _f("main").s_textinput("/Input ID Here/").rightOf(_f("main").s_textinput("Save this Lookup as"));//updated for Lightning
+	this.btn_lookupSaveAs = _f("main").s_button("Save As").rightOf(_f("main").s_textinput("Save this Lookup as"));//updated for Lightning
+	this.btn_lookupSave=_f("main").s_button("Save").rightOf(_f("main").s_textinput("Save this Lookup as"));//updated for Lightning
+	this.lbl_lookupSaveConfirmMsg=_f("main").s_richtext("Lookup Configuration saved");
+	this.lbl_lookupFilterLabel=_f("main").s_label("Optionally, create a filter to limit the records available to users in the lookup field");
+	this.btn_lookupNewRow=_f("main").s_button("/Add a row/").near(this.lbl_lookupFilterLabel);
+	this.txt_lookupAdvExpr=_f("main").s_textinput("advExpIP");
+	this.chk_lookupDefault=_f("main").s_checkbox("/.*/").near(_f("main").s_label("/Make this/"));
+	this.btn_lookupClose = _f("main").s_button("closeButton");
+	this.btn_Parts=_button("Parts");
+	this.btn_Labor=_button("Labor");
+	this.sel_noOfRecords=_f("main").s_combobox("noOfRec");
+	
+	this.lbl_lookupFilterLabel=_f("main").s_label("Optionally, create a filter to limit the records available to users in the lookup field");
+	this.btn_lookupNewRow=_f("main").s_button("/Add a row/").near(this.lbl_lookupFilterLabel);
+};

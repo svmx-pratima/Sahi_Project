@@ -1,0 +1,17 @@
+// Author Meghana Rao P
+/*
+ * This test case verifies the quick save of SFM search and checking the SFM Search Delivery
+ */
+var $RS_10124 = _testcase("RS_10124", "Change 'object display sequence' and 'field display sequence' and verify the delivery");
+$RS_10124.start();
+
+// To generate Random names for SearchTitle and Search ID
+var $searchTitle = $bo_act_common.generateRandomName("SFMSearch");
+var $searchId = $searchTitle ; //$bo_act_common.generateRandomName("SearchId");
+// create a Work Order
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+
+// Clone standard SFM search
+
+$bo_act_sfmsearch.clonesfmsearch_objectdisplay("SVMXSTD: Account Search",$searchTitle,$searchId,"Work Orders", "Open", "Open Work Orders", true);
+$bo_act_sfmsearchdelivery.sfmsearch_verify_sequence($searchTitle,"Work Order", "/Work Orders/");

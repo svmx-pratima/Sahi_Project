@@ -1,0 +1,42 @@
+
+//author - Meghana Rao
+
+var $RS_7484 = _testcase("$RS_7484","Verify if the flag for 'Use Current Field Value' is set to true by default");
+$RS_7484.start();
+_setSpeed($g_stepSpeed);
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+
+var $proName = $bo_act_products.createProduct("pro12", "--None--");
+
+
+
+var $PMPTemplate = $bo_act_PMPlanTemplate.createUsageBasedConditionPMPTemplateNoSave($proName);
+$bo_act_PMPlanTemplate.updateUsageConditionRulesGridWithAdjFields("Months", "Every", 1, $bo_act_common.currentDate("-"), $bo_act_common.getfutureDate(1,"-"),"Fixed", 1,100, 10,"Days");
+$bo_act_PMPlanTemplate.saveConditionBasedPM();
+
+
+// Getting the values via API
+var $pmPlatevalue = "Select "+$orgnamespace+"__SM_Use_Current_Field_Value__c  from "+$orgnamespace+"__PM_Plan_Template__c where Name = '"+$PMPTemplate+"'";
+var $fetchquery = $op_act_sForceApiCall.sForceQuery($bac_un, $bac_pwd, $pmPlatevalue ,"query");
+if($orgnamespace == "SVMXC")
+{
+var $CurrentFielValue = $fetchquery[0].SVMXC__SM_Use_Current_Field_Value__c;
+
+}
+else
+{
+	
+	var $CurrentFielValue = $fetchquery[0].SVMXDEV__SM_Use_Current_Field_Value__c;
+}
+//To verify if Use Current Field Value is set to True by default
+_assertEqual("true",$CurrentFielValue);
+
+// CleanUp function
+$bo_act_common.deleteProduct($bac_un, $bac_pwd,$proName);
+$bo_act_common.deletePMPlantemplate($bac_un, $bac_pwd, $orgnamespace,$PMPTemplate);
+
+
+$RS_7484.end();
+
+
+

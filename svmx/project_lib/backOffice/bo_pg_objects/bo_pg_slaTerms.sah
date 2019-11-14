@@ -1,0 +1,41 @@
+
+
+/**
+ * SLA Term page object repository
+ */
+
+var $bo_pg_slaTerms = new function bo_pg_slaTerms(){
+	this.btn_newSlaTerms = _button("New SLA Terms");
+	this.txt_slaTermName = _textbox(0,_near(_div("SLA Terms Name")));
+	this.txt_defaultBusinessHours = _textbox(1,_near(_div("SLA Terms Name")));
+	this.chk_active = _checkbox(0,_under(_div("Active")));
+	
+	this.btn_initialResponse = _cell("Initial Response");
+	this.sel_responseTrackedOn = _select("responseTrackedOn");
+	this.btn_AddRecord = _button("Add Record");
+	this.sel_orderType = _select(0,_near(_div("Type")));
+	this.sel_priority = _select(1,_near(_div("Type")));
+	this.sel_clockStartsFrom = _select(2,_near(_div("Type")));
+	this.sel_businessHoursFrom = _select(3,_near(_div("Type")));
+	
+	this.sel_internalGoal = _textbox(0,_near(_div("Type")));
+	this.sel_customerCommitment = _textbox(1,_near(_div("Type")));
+	this.btn_deleteSLA = _submit("Delete");
+	
+	
+	this.btn_onsiteResponse = _cell("Onsite Response");
+	this.btn_restoration = _cell("Restoration");
+	this.btn_resolution = _cell("Resolution");
+	this.btn_services = _click(_cell("Services"));	
+	
+	this.btn_save = _button("Save");
+	
+	this.selectSLA = function($slaName){
+		
+		_click(_checkbox(0,_leftOf(_span($slaName,_near(_div("SLA Terms Name"))))));
+		
+		};
+		this.btn_editSLA =_button("Edit");
+};
+
+

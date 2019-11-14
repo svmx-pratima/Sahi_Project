@@ -1,0 +1,31 @@
+var $sfm_act_sfmMapping = new function sfm_act_sfmMapping() {
+
+	this.createMappingFromMapping = function($sourceObj,$targetObj,$mappingName,$mappingField,$mappingValue){
+		$bo_act_navigation.navigateToSvmxSetup();
+		 //_selectDomain("/svmx/");
+		_click($bo_pg_servicemaxSetup.btn_serviceFlowManager);
+		_wait(3000);
+		_click($bo_pg_servicemaxSetup.btn_sfmMappings);
+		_wait(8000,_isVisible($sfm_pg_sfmMapping.label_configureSFMMapping));
+		_setSelected($sfm_pg_sfmMapping.txt_sourceObject_SFMMapping,$sourceObj);
+		_setSelected($sfm_pg_sfmMapping.txt_targetObject_SFMMapping,$targetObj);
+		_click($sfm_pg_sfmMapping.btn_new_SFMMapping);
+		_wait(5000);
+
+		if(_isVisible($sfm_pg_sfmMapping.tab_fieldMapForExisting_SFMMapping)){
+			for(var $i=0; $i<$mappingField.length;$i++){
+				_setSelected(_f("SFMExpressionBuilderSWF").s_combobox("valuesCombo").rightOf(_f("SFMExpressionBuilderSWF").ftedatagriditemrenderer($mappingField[$i])), $mappingValue[$i]);
+			}
+		}else{
+				//logic to be written for value mapping
+		}
+		_setValue($sfm_pg_sfmMapping.txt_mappingName_SFMMapping,$mappingName);
+		_setValue($sfm_pg_sfmMapping.txt_mappingId_SFMMapping,"");
+		_setValue($sfm_pg_sfmMapping.txt_mappingId_SFMMapping,$mappingName);
+		_click($sfm_pg_sfmMapping.btn_saveMapping_SFMMapping);
+		_wait(10000,_isVisible($sfm_pg_sfmMapping.label_mapSaved_SFMMapping));
+		_click($sfm_pg_sfmMapping.btn_showMappedFields_SFMMapping);
+		
+	};
+
+};

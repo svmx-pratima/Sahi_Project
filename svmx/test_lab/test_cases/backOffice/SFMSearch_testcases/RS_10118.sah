@@ -1,0 +1,19 @@
+// Author Meghana Rao P
+/*
+ * This test case verifies the Error messages when mandatory fields are not filled in SFM Search
+ */
+var $RS_10118 = _testcase("RS_10118", "To create a new Checklist SFM Designer");
+$RS_10118.start();
+
+
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+
+
+$number1 = Math.floor(Math.random() * 10);
+$bo_act_navigation.navigateToSvmxSetup();
+$bo_act_sfmsearch.createsfmsearch("", "", "Work Order", "Priority", "High", "Equals");
+// To verify the Error messages when mandatory fields are not filled
+_assertEqual(true, _isVisible(_listItem("Please enter a valid ID for this Search Configuration")));
+_assertEqual(true, _isVisible(_listItem("Please enter a valid name for this Search Configuration")));
+
+$RS_10118.end();

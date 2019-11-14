@@ -1,0 +1,32 @@
+//author - Srinivasa Murthy S
+
+var $RS_12407 = _testcase("RS_12407","BAC: Capture Configuration Profile Changes");
+$RS_12407.start();
+_setSpeed($g_stepSpeed);
+
+
+
+
+//Pre - Condition 
+/*
+ * Create a tab for "View ServiceMax Configuration Changes" to view the logged messages
+ * A Salesforce Profile is available that is not used in any ServiceMax Profiles
+ * Create a Custom Setting for Org-wide and Group-wide configurations
+ * 
+ */
+
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+
+$bo_act_navigation.navigateToConfigurationProfilesPage();
+
+$bo_act_configurationProfiles.createEmptyGroupProfile("RS_12407");
+
+$bo_act_navigation.navigateToViewSVMXConfigurationTab();
+
+_click(_link("/00/", _near(_tableHeader("Record Number"))));
+
+_assertVisible(_div("Cloned Default Group Profile to RS_12407"));
+
+$bo_act_configurationProfiles.deleteEmptyGroupProfile("RS_12407");
+
+$RS_12407.end();

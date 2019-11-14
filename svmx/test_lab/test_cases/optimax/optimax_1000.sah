@@ -1,0 +1,50 @@
+////http://community.sahipro.com/forums/discussion/1811/how-to-include-custom-js-libraries-with-sahi
+//https://developer.salesforce.com/forums/?id=906F000000093ubIAA
+//http://www.sfdcpoint.com/salesforce/soql-query-in-javascript-example/
+//Download the files from here https://test.salesforce.com/soap/ajax/28.0/connection.js
+
+var $optimax_1000 = _testcase("optimax_1000","Verify query from sforce api");
+$optimax_1000.start();
+var $un = "govendhan@svmx-cp.org.part1";
+var $pwd = "maxpl0re1";
+$bo_act_login.login($g_url, $un, $pwd);
+
+var $queryComplex = "Select Id, SVMXC__ProcessID__c, SVMXC__Name__c, SVMXC__Rule_Type__c, SVMXC__Parent_Object_Criteria__c from SVMXC__ServiceMax_Processes__c Where SVMXC__ProcessID__c = 'EXPR038' OR SVMXC__ProcessID__c = 'EXPR037'";
+/*
+var $queryFromFile = $excel.readFromCustomExcel("../optimax/op_excleData/CA500_auto.xlsx", "CA 500","","");
+
+for(var $i =0;$i<3;$i++){
+var $SVMXC__Street__c = $queryFromFile[$i]["SVMXC__Street__c"];
+var $SVMXC__City__c = $queryFromFile[$i]["SVMXC__City__c"];
+var $SVMXC__State__c = $queryFromFile[$i]["SVMXC__State__c"];
+var $SVMXC__Zip__c = $queryFromFile[$i]["SVMXC__Zip__c"];
+var $SVMXC__Country__c = $queryFromFile[$i]["SVMXC__Country__c"];
+var $SVMXC__Primary_Territory__c = $queryFromFile[$i]["SVMXC__Primary_Territory__c"];
+var $SVMXC__SM_Scheduling_Options__c = $queryFromFile[$i]["SVMXC__SM_Scheduling_Options__c"];
+var $SVMXC__Preferred_Start_Time__c = $queryFromFile[$i]["SVMXC__Preferred_Start_Time__c"];
+var $SVMXC__Preferred_End_Time__c = $queryFromFile[$i]["SVMXC__Preferred_End_Time__c"];
+var $SVMXC__Apply_Business_Hours_For_OptiMax__c = $queryFromFile[$i]["SVMXC__Apply_Business_Hours_For_OptiMax__c"];
+var $SVMXC__Preferred_Business_Hours__c = $queryFromFile[$i]["SVMXC__Preferred_Business_Hours__c"];
+
+
+var $blukWoQuer = "List<SVMXC__Service_Order__c> wo_list = new List<SVMXC__Service_Order__c> ();for(){List<SVMXC__Service_Order__c> new_wo = new List<SVMXC__Service_Order__c>();new_wo.SVMXC__Street__c = '"+$SVMXC__Street__c+"';new_wo.SVMXC__City__c = '"+$SVMXC__City__c+"';new_wo.SVMXC__State__c = '"+$SVMXC__State__c+"';new_wo.SVMXC__Zip__c = '"+$SVMXC__Zip__c+"';new_wo.SVMXC__Country__c = '"+$SVMXC__Country__c+"';new_wo.SVMXC__Primary_Territory__c = '"+$SVMXC__Primary_Territory__c+"';new_wo.SVMXC__SM_Scheduling_Options__c = '"+$SVMXC__SM_Scheduling_Options__c+"';new_wo.SVMXC__Preferred_Start_Time__c = '"+$SVMXC__Preferred_Start_Time__c+"';new_wo.SVMXC__Preferred_End_Time__c = '"+$SVMXC__Preferred_End_Time__c+"';new_wo.SVMXC__Apply_Business_Hours_For_OptiMax__c = '"+$SVMXC__Apply_Business_Hours_For_OptiMax__c+"';new_wo.SVMXC__Preferred_Business_Hours__c = '"+$SVMXC__Preferred_Business_Hours__c+"';wo_list.add(new_wo);}insert new_wo;"
+
+$bo_act_login.login($g_url, $un, $pwd);*/
+/*
+var $resultArr = $op_act_sForceApiCall.sForceQuery($un, $pwd, $queryComplex);
+
+$resultArr.forEach(function($arrValue) {
+		_log($arrValue.Id);
+		_log($arrValue.SVMXC__ProcessID__c);
+		_log($arrValue.SVMXC__Name__c);
+
+});
+*/
+$insert_WO = "Account acct = New Account (Name= 'ok_123');insert acct;" ;
+
+var $resultArr2 = $op_act_sForceApiCall.sForceQuery($un, $pwd, $queryComplex , "query");
+_log($resultArr2)
+
+//}
+
+$optimax_1000.end();

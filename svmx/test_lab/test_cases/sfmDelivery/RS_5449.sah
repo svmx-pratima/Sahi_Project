@@ -1,0 +1,118 @@
+var $rs_5449 = _testcase("RS_5449","Verify new single expression for both Header and Child and launch SFM in delivery.");
+$rs_5449.start();
+		
+		//pre-req
+		//Create Product
+		$objName= "Product2";
+		$productName=$bo_act_common.generateRandomName("Pro_RS_5449_");
+		_log("Product Name: "+$productName);
+		$obJson = "{\"Name\":\""+$productName+"\"}";
+		$filterPValue=$sfm_act_restApiMethods.postRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,$objName,$obJson,"POST");
+		
+		//Create WO with close and open status
+		var $woStatus=["Open","Closed"];
+		var $WONumber=new Array;
+		var $openWOID;
+		$objName= $orgnamespace+"__Service_Order__c";
+		for (var $i = 0; $i < $woStatus.length; $i++) {
+			$obJson = "{\""+$orgnamespace+"__Order_Status__c\":\""+$woStatus[$i]+"\",\""+$orgnamespace+"__Order_Type__c\":\"Field Service\"}";
+			$columnName = "Name";
+			$filter="id";
+			$filterValue=$sfm_act_restApiMethods.postRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,$objName,$obJson,"POST");
+			if ($i==0) {
+				$openWOID=$filterValue;
+				_log("Open WO id: "+$openWOID);
+			}
+			$WO =$sfm_act_restApiMethods.getRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,"GET", $objName, $columnName, $filter, $filterValue);
+			_log("WO number with Order status "+$woStatus[$i]+" is : "+$WO);
+			$WONumber[$i]=$WO;
+		}
+		
+		//Create WD(parts) under Open WO
+		$objName= $orgnamespace+"__Service_Order_Line__c";
+		$obJson = "{\""+$orgnamespace+"__Line_Type__c\":\"Parts\",\""+$orgnamespace+"__Activity_Type__c\":\"Installation\",\""+$orgnamespace+"__Product__c\":\""+$filterPValue+"\",\""+$orgnamespace+"__Service_Order__c\":\""+$openWOID+"\"}";
+		$columnName = "Name";
+		$filter="id";
+		$filterValue=$sfm_act_restApiMethods.postRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,$objName,$obJson,"POST");
+		$WDNumber =$sfm_act_restApiMethods.getRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,"GET", $objName, $columnName, $filter, $filterValue);
+		_log("WO number: "+$WDNumber);
+		
+		
+		var $trgHeaderObj="Work Order";
+		var $trgChildObj="Parts";
+		
+		//Header Qualification criteria
+		var $headerComboField=["Order Status"];
+		var $headerComboConditions=["Equals"]; 
+		var $headerToggleButton=[""];
+		var $headerCmboInput=["Open"];
+		var $advExpr="";
+		var $errMsg="This record does not qualify as the Order Status is NOT Open";
+		var $exprsnName=$bo_act_common.generateRandomName("SFM_WO_Exprsn_");
+		var $headerExprFieldsDetails=[$headerComboField,$headerComboConditions,$headerToggleButton,$headerCmboInput,$advExpr,$errMsg,$exprsnName];
+		var $headerMappingDetails="";
+		
+		//Header Qualification criteria
+		var $childComboField=["Activity Type"];
+		var $childComboConditions=["Equals"]; 
+		var $childToggleButton=[""];
+		var $childCmboInput=["Installation"];
+		var $childadvExpr="";
+		var $childerrMsg="";
+		var $childexprsnName=$bo_act_common.generateRandomName("SFM_WD_Exprsn_");
+		var $childExprFieldsDetails=[$childComboField,$childComboConditions,$childToggleButton,$childCmboInput,$childadvExpr,$childerrMsg,$childexprsnName];
+		var $childMappingDetails="";
+		
+		
+		//Login to App and navigate to sfm transaction and designer page
+		$bo_act_login.login($g_url,$sfmdUsn,$sfmdPwd);
+		
+		//clone standard SFM
+		var $sfmNameToBeCloned="Manage Work Order Lines - Usage";
+		var $sfmName=$bo_act_common.generateRandomName("rs_5449_");
+		var $sfmTemplateSaveAsName=$bo_act_common.generateRandomName("SFM_Page_");
+		var $sfmTemplate="SVMXSTD: Manage WO Usage Lines";
+		var $fieldName=["Order Type","Activity Type","Line Type"];
+		var $containerName=["Order Status","Parts","Parts"];
+		$sfm_act_SFM.cloneTDM016($sfmNameToBeCloned, $sfmName, false, $sfmTemplateSaveAsName, $sfmTemplate, $fieldName, $containerName);
+		
+		$sfm_act_Transactions.sfmQualifyingCriteriaieldMappings($trgHeaderObj, $headerExprFieldsDetails, $headerMappingDetails,"","");
+		$sfm_act_Transactions.sfmQualifyingCriteriaieldMappings($trgChildObj, $childExprFieldsDetails, $childMappingDetails,"","");
+		
+		_setStrictVisibilityCheck(true);
+		_click($bo_pg_sfmTransactionAndDesigner.btn_pageLayoutSave);
+		_wait(5000,_isVisible($bo_pg_sfmTransactionAndDesigner.btn_sfmpageSaveConfirmMsg));
+		_click($bo_pg_sfmTransactionAndDesigner.btn_saveAndclose);
+		_setStrictVisibilityCheck(false);
+		
+		var $wizardObject="Work Order";
+		var $sfmd_wizardName1 =$sfmd_wizardName[6];
+		var $sfmd_wizardType="SFM";
+		var $profile="";
+		var $handOver=false;
+		_log($sfmd_wizardName1);
+		$sfm_act_wizards.addToWizard($wizardObject, $sfmd_wizardName1, $sfmd_wizardType, $sfmName, $handOver, $profile);  
+		
+		RS5449_searchWOandLaunchSFM($WONumber[1],$sfmName);
+		_wait(10000,_isVisible(_div($errMsg)));
+		_assertExists(_div($errMsg));
+		
+		RS5449_searchWOandLaunchSFM($WONumber[0],$sfmName);
+		_setStrictVisibilityCheck(true);;
+		_assertExists(_link("/"+$sfmName+"/"));
+		_assertExists(_button($trgChildObj));
+		_assertExists(_cell($productName));
+		_setStrictVisibilityCheck(false);
+		
+
+
+function RS5449_searchWOandLaunchSFM($WONumber,$sfmName){
+$sfm_act_common.globalSearchOnce($WONumber);
+_wait(10000);
+_setStrictVisibilityCheck(true);
+$sfm_act_createCustomWizard.clickWizardBtn($sfmName);
+_wait(5000,_isVisible(_div("/"+$sfmName+"/")));
+}	
+
+
+$rs_5449.start();

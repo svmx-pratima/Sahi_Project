@@ -1,0 +1,22 @@
+
+
+var $swat_act_pageLoadWait = new function swat_act_pageLoadWait() {
+	
+	
+	this.waitTillPageLoads = function($Object){
+		for (var $i = 0; $i < 50; $i++) {
+            if(_isVisible($Object)){
+           
+                            break;
+            }
+            else 
+            {
+                            _call(top.location.reload());
+
+                            _wait(10000, _isVisible($Object));
+            }
+		}
+	};
+	
+	
+};

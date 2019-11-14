@@ -1,0 +1,84 @@
+var $RS_7432 = _testcase("RS_7432","Verify adjustments are not performed, if the WO is not closed.");
+$RS_7432.start();
+
+var $excel = _getExcel("C:\\auto\\sahi_pro\\userdata\\scripts\\Sahi_Project\\svmx\\test_lab\\test_cases\\backOffice\\bo_excleData\\BAC_TestData.xlsx","Sheet1");
+var $workBenchUrl = "https://workbench.developerforce.com/login.php";;
+$templateName = $bo_act_common.generateRandomName("temp");
+$taskTitle = $bo_act_common.generateRandomName("task");
+$pmPlanName = $bo_act_common.generateRandomName("pmPlan");
+var $PMTemplateName = "";
+var $PMProcessName = $bo_act_common.generateRandomName("PMProName");
+var $pmProcessId = $bo_act_common.generateRandomName("PMProId");
+//var $productName = $excel.get(2,1);
+
+var $proName = $bo_act_products.createProduct("pro12", "--None--");
+
+$bo_act_login.login($g_url,$bac_un,$bac_pwd);
+var $templateName = $bo_act_common.generateRandomName("Task");
+$bo_act_taskTemplate.createTaskTemplate($templateName);
+$bo_act_taskTemplate.addTask(1, $templateName, $templateName, "High");
+//$bo_act_taskTemplate.addRequiredParts(1, $excel.get(2,1));
+
+//Vanditha: Fixing since script is failing
+$bo_act_taskTemplate.addRequiredParts("1",$proName);
+
+$bo_act_taskTemplate.saveTaskTemplate();
+
+//_click(_span("/save-icon/"));
+_wait(3000);
+$PMTemplateName = $bo_act_PMPlanTemplate.createUsageBasedConditionPMPTemplateNoSave($productName);
+$bo_act_PMPlanTemplate.addRowUsageBased("Years", "Every","1","Actual","5","10","Days");
+_click(_span("Save"));
+_wait(9000,_isVisibile(_heading2("PM Plan Template Detail")));
+$bo_act_installedProduct.createInstalledProduct($productName,$excel.get(1,1),"");
+_selectDomain($g_domain);
+_click(_button("New Condition Based PM Plan from IB"));
+_selectDomain();
+_wait(1000);
+	for (var $i = 0; $i < 25; $i++) {
+	if (_isVisible(_span("Preventive Maintenance Plan"))) {
+		break;
+	}
+	else {
+		_call(top.location.reload());
+		_wait(10000, _isVisible(_span("Preventive Maintenance Plan")));
+		}
+		}
+$bo_act_PMPlanTemplate.createPmPlan($pmPlanName, $PMTemplateName, $templateName);
+$bo_act_navigation.navigateToPMProcess();
+$bo_act_PMProcess.addNewPMProcess("Condition Based Preventive Maintenance", $PMProcessName, $pmProcessId,"40");
+_click(_button("Save & Close"));
+$recordId = $bo_act_PMProcess.fetchRecordId($pmProcessId);
+$bo_act_login.loginToWorkBench($workBenchUrl, "Sandbox", $bac_un,$bac_pwd);
+$script = "SVMXC.PREV_Conditional_Engine_Batch batchable = new SVMXC.PREV_Conditional_Engine_Batch();batchable.setProcessIds = new Set<String>{'"
+	+$recordId+
+	"'};Database.executeBatch(batchable, 1);";
+$bo_act_login.runApexScriptinWB($script);
+$bo_act_login.login($g_url,$bac_un,$bac_pwd);
+$bo_act_navigation.navigateToPreventiveMaintenancePlans();
+_click(_link($pmPlanName));
+_wait(60000);
+_click($bo_pg_PMPlan.link_firstLinkInWorkOrders);
+$bo_act_workOrders.editWorkOrderOnWOPage();
+$bo_act_workOrders.updateTextBoxFields($bo_pg_workOrders.txt_slaTerms, $excel.get(5,1));
+$bo_act_workOrders.updateTextBoxFields($bo_pg_workOrders.txt_case, $excel.get(6,1));
+$bo_act_workOrders.updateTextBoxFields($bo_pg_workOrders.txt_contact, $excel.get(4,1));
+$bo_act_workOrders.updateDropDownFields($bo_pg_workOrders.sel_priority, "High");
+$bo_act_workOrders.saveWorkOrder();
+
+$bo_act_navigation.navigateToPreventiveMaintenancePlans();
+_click(_link($PMPlan));
+_click($bo_pg_PMPlan.link_firstLinkInPMSchedule);
+var $actualPMScheduleStatus = _getText(_div(0,_rightOf(_cell("/Status/"))));
+_assertEqual($actualPMScheduleStatus,"Work Order Created","Status is not equal to Work Order Created");
+
+//$bo_act_workOrders.clickLinktoUpdateTextfields($bo_pg_workOrders.txt_acknowledgedByTechnicianDateTime);
+$bo_act_workOrders.saveWorkOrder();
+
+$bo_act_navigation.navigateToPreventiveMaintenancePlans();
+_click(_link($pmPlanName));
+_click($bo_pg_PMPlan.link_firstLinkInPMSchedule);
+var $actualPMScheduleStatus = _getText(_div(0,_rightOf(_cell("/Status/"))));
+_assertEqual($actualPMScheduleStatus,"Work Order Created","Status is not equal to Work Order Created");
+
+$RS_7432.end();

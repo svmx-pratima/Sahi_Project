@@ -1,0 +1,186 @@
+var $an_act_ART = new function an_act_ART() {
+
+this.ART_closed_wo_calc = function($Calculationmethodname) {
+
+		// To setup the values
+	$TopLevelSR.an_topLevelSR();
+		_click($an_pg_art.metrics);
+		_click($an_pg_art.btn_art);
+		_click($an_pg_art.btn_addart);
+		_wait(200);
+		_click($an_pg_art.btn_activecheckboxart);
+		_setValue($an_pg_art.txt_art_description, $Calculationmethodname);
+		_wait(200);
+		_click($an_pg_art.btn_settings);
+		_click($an_pg_art.source_Technician);
+		_click($an_pg_art.listitem_technician);
+		_click($an_pg_art.source_product);
+		_click($an_pg_art.listitem_product);
+		_click($an_pg_art.source_service_deliver);
+		_click($an_pg_art.listitem_closed_on);
+		_click($an_pg_art.source_Account);
+		_click($an_pg_art.listitem_account);
+		_click($an_pg_art.mapping);
+		_click($an_pg_art.none);
+		_wait(200);
+		_click($an_pg_art.Criteria);
+		_click($an_pg_art.WO_QC);
+		_click($an_pg_art.Closed_Work_Orders);
+		_click($an_pg_art.save);
+		_click($an_pg_art.ok);
+		
+	};	
+	
+	this.art_runEngine = function($emailId)
+	{
+		_click($an_pg_art.metrics);
+		_click($an_pg_art.btn_art);
+		_click($an_pg_art.btn_click_Schedule_Notifications);
+		_click($an_pg_mttr.list_timezone);
+	    _click($an_pg_mttr.btn_ist_timezone);
+	    _click($an_pg_mttr.btn_period);
+	    _click($an_pg_mttr.btn_daily);
+	    _click($an_pg_mttr.list_time);
+	    _click($an_pg_mttr.btn_time);
+		_click($an_pg_art.txt_Email_onSuccess);
+		_setValue($an_pg_art.txt_Email_onSuccess, $emailId);
+		_click($an_pg_art.save);
+		_click($an_pg_art.ok);
+		_wait(300);
+		_click($an_pg_art.btn_click_run);
+		_click($an_pg_art.ok);
+		_wait(1000);
+		
+	};
+	
+this.SLA=function(){
+	_click(_link("Home"));
+	_click(_link("ServiceMax Setup"));
+	_click(_div("Warranties & Service Contracts"));
+	_click(_div("middle[54]"));
+	_click(_button("New SLA Terms"));
+	_wait(500);
+	_setValue(_textbox(0,_near(_div("SLA Terms Name"))),"Automation_terms");
+	_setValue(_textarea(0,_near(_div("SLA Terms Name"))),"Used for Automation");
+	_check(_checkbox(0,_under(_div("Active"))),true);
+	_selectWindow();
+	_click(_image("Business Hours Lookup (New Window)"));
+	_wait(500);
+	_selectWindow("lookup");
+	_click(_link("Default"));
+	//_click(_image("Business Hours Lookup (New Window)"));
+	//_click(_link("Default"));
+	_selectWindow();
+	_setSelected(_select(0,_rightOf(_label("Initial Response Tracked On"))),"WorkOrder");
+	_wait(500);
+	_click(_button("Add Record"));
+	_setSelected(_select(0,_near(_div("Type"))), "Field Service");
+	_setSelected(_select(0,_under(_tableHeader("Priority"))), "High");
+	_setSelected(_select(0,_under(_tableHeader("Clock Starts From"))), "Created Date");
+	_setValue(_textbox(0,_under(_tableHeader("Internal Goal (Minutes)"))), 15);
+	_setValue(_textbox(0,_under(_tableHeader("Customer Commitment (Minutes)"))), 20);
+	_setSelected(_select(0,_under(_tableHeader("Business Hours From"))), "SLA");
+	_click(_button("Next >>"));
+	_wait(500);
+    _setSelected(_select(0,_rightOf(_label("Onsite Response Tracked On"))),"WorkOrder");
+    _click(_button("Add Record[1]"));
+    _wait(500);
+    _setSelected(_select(0,_near(_div("Type[1]"))), "Field Service");
+    _setSelected(_select(0,_under(_tableHeader("Priority[1]"))), "High");
+    _setSelected(_select(0,_under(_tableHeader("Clock Starts From[1]"))), "Actual Initial Response");
+    _setValue(_textbox(0,_under(_tableHeader("Internal Goal (Minutes)[1]"))), 30);
+    _setValue(_textbox(0,_under(_tableHeader("Customer Commitment (Minutes)[1]"))), 30);
+    _setSelected(_select(0,_under(_tableHeader("Business Hours From[1]"))), "SLA");
+    _click(_button("Next >>[1]"));
+	_wait(500);
+    _setSelected(_select(0,_rightOf(_label("Restoration Tracked On"))),"WorkOrder");
+    _click(_button("Add Record[2]"));
+    _wait(500);
+    _setSelected(_select(0,_under(_tableHeader("Type[2]"))),"Field Service");
+    _setSelected(_select(0,_under(_tableHeader("Priority[2]"))),"High");
+    _setSelected(_select(0,_under(_tableHeader("Clock Starts From[2]"))),"Actual Onsite Response");
+    _setValue(_textbox(0,_under(_tableHeader("Internal Goal (Minutes)[2]"))),30);
+    _setValue(_textbox(0,_under(_tableHeader("Customer Commitment (Minutes)[2]"))),30);
+    _setSelected(_select(0,_under(_tableHeader("Business Hours From[2]"))),"SLA");
+    _click(_button("Next >>[2]"));	
+    _wait(500);
+    _setSelected(_select(0,_rightOf(_label("Resolution Tracked On"))),"WorkOrder");
+    _click(_button("Add Record[3]"));
+    _wait(500);
+    _setSelected(_select(0,_under(_tableHeader("Type[3]"))),"Field Service");
+    _setSelected(_select(0,_under(_tableHeader("Priority[3]"))),"High");
+    _setSelected(_select(0,_under(_tableHeader("Clock Starts From[3]"))),"Actual Restoration");
+    _setValue(_textbox(0,_under(_tableHeader("Internal Goal (Minutes)[3]"))),30);
+    _setValue(_textbox(0,_under(_tableHeader("Customer Commitment (Minutes)[3]"))),45);
+    _setSelected(_select(0,_under(_tableHeader("Business Hours From[3]"))),"SLA");
+    _click(_button("Next >>[3]"));
+    _click(_button("Save"));
+    
+};
+
+this.ART_custom_exp_calc = function($Calculationmethodname) {
+
+	// To setup the values
+$TopLevelSR.an_topLevelSR();
+	_click($an_pg_art.metrics);
+	_click($an_pg_art.btn_art);
+	_click($an_pg_art.btn_addart);
+	_wait(200);
+	_click($an_pg_art.btn_activecheckboxart);
+	_setValue($an_pg_art.txt_art_description, $Calculationmethodname);
+	_wait(200);
+	_click($an_pg_art.btn_settings);
+	_click($an_pg_art.source_Technician);
+	_click($an_pg_art.listitem_technician);
+	_click($an_pg_art.source_product);
+	_click($an_pg_art.listitem_product);
+	_click($an_pg_art.source_service_deliver);
+	_click($an_pg_art.listitem_closed_on);
+	_click($an_pg_art.source_Account);
+	_click($an_pg_art.listitem_account);
+	_click($an_pg_art.mapping);
+	_click($an_pg_art.Auto_lookup);
+	_wait(200);
+	_click($an_pg_art.Criteria);
+	_click($an_pg_art.WO_QC);
+	_click($an_pg_art.Auto_exp);
+	_click($an_pg_art.save);
+	_click($an_pg_art.ok);
+
+};
+
+this.ART_custom_field_calc = function($Calculationmethodname) {
+
+	// To setup the values
+	$TopLevelWO.an_toplevelwo();
+
+	_click($an_pg_art.metrics);
+	_click($an_pg_art.btn_art);
+	_click($an_pg_art.btn_addart);
+	_wait(200);
+	_click($an_pg_art.btn_activecheckboxart);
+	_setValue($an_pg_art.txt_art_description, $Calculationmethodname);
+	_wait(200);
+	_click($an_pg_art.btn_settings);
+	_click($an_pg_art.source_Technician);
+	_click($an_pg_art.listitem_technician);
+	_click($an_pg_art.source_product);
+	_click($an_pg_art.listitem_product);
+	_click($an_pg_art.source_service_deliver);
+	_click($an_pg_art.listitem_closed_on);
+	_click($an_pg_art.source_Account);
+	_click($an_pg_art.listitem_Customaccount);
+	_click($an_pg_art.mapping);
+	_click($an_pg_art.none);
+	_wait(200);
+	_click($an_pg_art.Criteria);
+	_click($an_pg_art.WO_QC);
+	_click($an_pg_art.Contract_Field_service);
+	_click($an_pg_art.save);
+	_click($an_pg_art.ok);
+
+};
+
+
+
+};

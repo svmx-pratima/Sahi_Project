@@ -1,0 +1,69 @@
+//Page objects for some of the common salesforce functionalities
+
+//Owner: Janaki.
+
+var $sfm_pg_commonSfdc = new function sfm_pg_commonSfdc(){
+	
+	this.link_switchLightning = _link("Switch to Lightning Experience");
+	this.link_switchClassic = _link("Switch to Salesforce Classic");
+	this.link_userProfile = _div("/user-profile/");
+	this.text_setUpSearch =  _textbox("setupSearch");
+	this.link_objLink = _link("Objects");
+	this.link_setup=_link("Setup");
+	this.ordertype_dependency = _tableHeader("Order Type",_under(_tableHeader("Dependent Field")));
+	this.delete_link_picklist = _link("Del",_leftOf(_tableHeader("Order Type")));
+	this.btn_continue = _submit("Continue");
+	this.btn_new_field_dependency = _button(0,_near(_heading3("Field Dependencies")));
+	this.picklist_controller = _select("controller");
+	this.picklist_dependent = _select("dependent");
+	this.btn_include_values = _button("Include Values");
+	this.btn_save_dep_picklist = _submit(" Save ");
+	this.btn_allTabs = _image("All Tabs");
+	this.link_workOrder = _link("Work Orders");
+	this.btn_newWo = _button(" New ");
+	this.btn_saveWo = _submit(" Save ");
+	this.btn_editWo = _button(" Edit ");
+	this.btn_saveProcess = _span("svmx-btn-icon svmx-sfmd-save-icon");
+	this.btn_okSaveProcess = _span("Ok");
+	this.btn_userArrow =_div("userNavButton");
+	this.link_logout = _link("Logout");
+	this.link_home = _link("Home");
+	this.txt_searchBox =  _textbox("str");
+	this.btn_globalSearch = _button("Search",_in(_div("searchButtonContainer")));
+	this.btn_quickSave = _span("svmx-btn-icon svmx-sfmd-quicksave-icon");
+	this.btn_addLine = _span("svmx-btn-icon svmx-sfmd-add-line-icon");
+	this.btn_productSearch = _span("svmx-btn-icon svmx-sfmd-search-icon ");
+	this.btn_updateExtEdit = _span("Update");
+	this.btn_newWorkDetail = _button("New Work Detail");
+	this.btn_clearSvmxCache = _span("svmx-btn-icon svmx-sfmd-cache-icon");
+	this.btn_proceedPopUp = _span("Proceed");
+	this.btn_multiArrow = _image("Add");
+	this.btn_usernameArrow = _div("userNav-arrow");
+	this.link_userProfile = _link("My Profile");
+	this.link_userActionMenu = _link("User Action Menu");
+	this.link_mySettings =  _span("My Settings");
+	this.link_personal = _span("Personal");
+	this.link_advUserDetails = _span("Advanced User Details");
+	this.txt_userName = _textbox("Username");
+	this.btn_cancel = _submit("Cancel");
+	this.btn_selectProdSearch = _span("Select");
+	this.link_editLayout =  _link("Edit Layout");
+	this.btn_relatedLists = _div("Related Lists");
+	this.btn_addColumnToRelatedList = _image("rlPropFields_iconRight");
+	this.btn_okaddColumnToRelatedList = _cell("OK");
+	this.btn_savePageLayout = _emphasis(" Save ");
+	this.txt_sortingRelatedList = _textbox("sortBy");
+	this.radio_descending = _radio("rlProps_columnSort_desc");
+	this.radio_ascending = _radio("rlProps_columnSort_asc");
+	this.link_userProfileInLightning = _div("/user-profile/");
+	this.link_switchToClassic = _link("Switch to Salesforce Classic");
+	this.btn_edit =_submit("Edit");
+	this.btn_save = _button("Save");
+	this.btn_saveGlobal = _submit("Save");
+	this.btn_closeGlobal = _submit("Close");
+	//Added By Rubi Agrawal
+	this.btn_FieldandRelation =_div("/Custom Fields & Relationships/");
+	this.btn_FieldLevelSecure =_button("Set Field-Level Security");
+	this.btn_FieldLevelSecureSave=_submit("save"),_in(_div("ep"));
+	this.btn_FieldLevelSecureCancel=_submit("Cancel");
+};

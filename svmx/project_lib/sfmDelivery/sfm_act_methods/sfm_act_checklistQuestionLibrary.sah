@@ -1,0 +1,509 @@
+var $sfm_act_checklistQuestionLibrary = new function sfm_act_checklistQuestionLibrary() {
+	
+	
+	
+	/**
+	 * Author		:	Anand Kakhandaki
+	 * Function		: 	To Create CheckList Question in Lib
+	 * Parameter	:	$sectionName=Section name
+	 * 					$queCommonDetails=Array of $queType,$queName,$helpURL,$tag details
+	 * 					$queSpecificDetails=Array of details needed for specific question
+	 * Example		:	Refer RS_7079 file for function usage
+	 */
+	this.createCheckListQuestionInLib=function($queCommonDetails,$queSpecificDetails){
+		var $queType=$queCommonDetails[0];
+		
+		_click($sfm_pg_checklistQuestionLibrary.btn_addQuestion);
+		_click($sfm_pg_checklistQuestionLibrary.txt_responseType);
+		_click(_listItem($queType));
+		
+		//adding question details
+		this.addEditCheckListQuestionDetailsInLib($queCommonDetails, $queSpecificDetails);
+
+	};
+
+	
+	/**
+	 * Author		:	Anand Kakhandaki
+	 * Function		: 	To Create CheckList Question in Lib
+	 * Parameter	:	$sectionName=Section name
+	 * 					$queCommonDetails=Array of $queType,$queName,$helpURL,$tag,$addToLibAndForm details
+	 * 					$queSpecificDetails=Array of details needed for specific question
+	 * Example		:	Refer RS_7079 file for function usage
+	 */
+	this.addEditCheckListQuestionDetailsInLib=function($queCommonDetails, $queSpecificDetails){
+		var $queType=$queCommonDetails[0];
+		var $queName=$queCommonDetails[1];
+		var $helpURL=$queCommonDetails[2];
+		var $tag=$queCommonDetails[3];
+		var $addToLibAndForm=$queCommonDetails[4];
+		
+		_wait(2000,_isVisible($sfm_pg_checklistQuestionLibrary.txt_addQuestion));
+		//Common fields
+		_setValue($sfm_pg_checklistQuestionLibrary.txt_questionText,$queName);
+		_setValue($sfm_pg_checklistQuestionLibrary.txt_helpURL,$helpURL);
+		_setValue(_setValue($sfm_pg_checklistQuestionLibrary.txt_tagName,$tag));
+		if (_isVisible(_listItem($tag))) {
+			_click(_listItem($tag));
+		}
+		
+		if ($queType=="Attachment") {
+			this.createAttachementQue($queSpecificDetails);
+		}else if ($queType=="Checkbox" || $queType=="Multi-select Picklist" ) {
+			this.createCheckBoxQue($queSpecificDetails);
+		}else if ($queType=="Date"||$queType=="DateTime") {
+			this.createDateQue($queSpecificDetails);
+		}else if ($queType=="Picklist"||$queType=="Radio Button") {
+			this.createPicklistQue($queSpecificDetails);
+		}else if ($queType=="Number"||$queType=="Text") {
+			this.createNumberQue($queSpecificDetails);
+		}
+		_wait(5000);
+		_click($sfm_pg_checklistQuestionLibrary.btn_saveQuestion);	
+		if (_isVisible($sfm_pg_checklistQuestionLibrary.btn_saveMsg)==true) {
+			_click($sfm_pg_checklistQuestionLibrary.btn_saveOK);
+		}
+	};
+	
+	
+	/**
+	 * Author		:	Anand Kakhandaki
+	 * Function		: 	To Create CheckList Question -Attachment type
+	 * Parameter	:	$attQueDetails=Array of $includeINOPDOC,$descReq details in true/false
+	 * 
+	 * Example		:	Refer _ _ _ _ file for function usage
+	 */
+	this.createAttachementQue=function($attQueDetails){
+		//attachment parameter
+		//$attQueDetails=[$includeINOPDOC,$descReq]
+		var $includeINOPDOC=$attQueDetails[0];
+		var $descReq=$attQueDetails[1];
+
+		if ($includeINOPDOC==false) {
+			_click($sfm_pg_checklistQuestionLibrary.btn_includeINPDOC);
+		}
+		if ($descReq==false) {
+			_click($sfm_pg_checklistQuestionLibrary.btn_descReq);
+		}
+	};
+	
+	/**
+	 * Author		:	Anand Kakhandaki
+	 * Function		: 	To Create CheckList Question - Checkbox / Multi-select Picklist type
+	 * Parameter	:	$attQueDetails=Array of $responseSet,$responseSetName,$ansValueSet,$default
+	 * 				:   $responseSet=Name of already available Response set name
+	 * 				:   $responseSetName= New Response set name
+	 * 				:   $ansValueSet=Array of answer values
+	 * 				:   $default=Array containing detail to select value as default or not in true/false format
+	 * Example		:	Refer _ _ _ _ file for function usage
+	 */
+	this.createCheckBoxQue=function($chkQueDetails){
+		//$chkQueDetails=[$responseSet,$responseSetName,$ansValueSet,$default]
+		var $responseSet=$chkQueDetails[0];
+		var $responseSetName=$chkQueDetails[1];
+		var $ansValueSet=$chkQueDetails[2];
+		var $default=$chkQueDetails[3];
+		
+		if ($responseSet=="Create New") {
+			_setValue($sfm_pg_checklistQuestionLibrary.txt_responseSetName, $responseSetName);
+			for (var $i = 0; $i < $ansValueSet.length; $i++) {
+				var $ansField=null;
+				if ($i==0) {
+					//$ansField=_f("main").s_textinput("/ansValue/").near($sfm_pg_checklistQuestionLibrary.label_ansValue);
+					$ansField=_textbox("answers",_near($sfm_pg_checklistQuestionLibrary.label_ansValue));
+					_setValue($ansField,$ansValueSet[$i]);	
+				}else{
+					_click($sfm_pg_checklistQuestionLibrary.btn_addAnswer);
+					$ansField=_textbox("answers["+$i+"]",_near($sfm_pg_checklistQuestionLibrary.label_ansValue));
+					_setValue($ansField,$ansValueSet[$i]);	
+				}
+				if ($default[$i]==true) {
+					//_click($sfm_pg_checklistQuestionLibrary.btn_default.near($ansField));
+					_click(_button("/checkbox/",_near($ansField)));
+				}
+			}
+		}else {
+			_click($sfm_pg_checklistQuestionLibrary.txt_responseSetList);
+			_click(_listItem($responseSet));
+		}
+	};
+	
+	
+	/**
+	 * Author		:	Anand Kakhandaki
+	 * Function		: 	To Create CheckList Question - Date / Date Time Type
+	 * Parameter	:	$dateQueDetails=Array of $defaultAnsType,$defaultVal
+	 * 				:   $defaultAnsType= if no preFill, what is Ans type in Value/Function
+	 * 				:   $defaultVal=Ans value. Ex source field name if prefill selected, or date if value selected or today if function selected
+	 * Example		:	Refer _ _ _ _ file for function usage
+	 */
+	this.createDateQue=function($dateQueDetails){
+		//$dateQueDetails=[$defaultAnsType,$defaultVal];
+		var $defaultAnsType=$dateQueDetails[0];
+		var $defaultVal=$dateQueDetails[1];
+	
+			_click($sfm_pg_checklistQuestionLibrary.txt_dateoptionFunction);
+			_click(_listItem($defaultAnsType));
+			if ($defaultAnsType=="Value") {
+				_log("Inside Value loop");
+				_log("$defaultAnsType: "+$defaultAnsType);
+				_setValue($sfm_pg_checklistQuestionLibrary.txt_defaultResponseDate,$defaultVal);
+			}else {
+				_click($sfm_pg_checklistQuestionLibrary.txt_dateoptionLiteral);
+				_click(_listItem($defaultVal));
+		}
+	};
+	
+	/**
+	 * Author		:	Anand Kakhandaki
+	 * Function		: 	To Create CheckList Question - Number / Text Type
+	 * Parameter	:	$numberQueDetails=Array of $preFillFromWO,$defaultVal
+	 * 				:   $preFillFromWO= prefill from WO in true/false format
+	 * 				:   $defaultVal=Ans value. Ex source field name if prefill selected, or text value
+	 * Example		:	Refer _ _ _ _ file for function usage
+	 */
+	this.createNumberQue=function($numberQueDetails){
+		//$numberQueDetails=[$defaultVal]
+		var $defaultVal=$numberQueDetails[0];
+		_setValue($sfm_pg_checklistQuestionLibrary.txt_Number,$defaultVal);
+	
+	};
+	
+	/**
+	 * Author		:	Anand Kakhandaki
+	 * Function		: 	To Create CheckList Question - Picklist / Radio Button Type
+	 * Parameter	:	$$picklistQueDetails=Array of $preFillFromWO,$responseSet,$responseSetName,$ansValueSet,$default
+	 * 				:   $preFillFromWO= prefill from WO in true/false format
+	 * 				:   $responseSet=Name of already available Response set name
+	 * 				:   $responseSetName= New Response set name
+	 * 				:   $ansValueSet=Array of answer values
+	 * 				:   $default=Array containing detail to select value as default or not in true/false format
+	 * Example		:	Refer _ _ _ _ file for function usage
+	 */
+	this.createPicklistQue=function($picklistQueDetails){
+		//$picklistQueDetails=[$responseSet,$responseSetName,$ansValueSet,$default]
+		var $responseSet=$picklistQueDetails[0];
+		var $responseSetName=$picklistQueDetails[1];
+		var $ansValueSet=$picklistQueDetails[2];
+		var $default=$picklistQueDetails[3];
+		
+		if ($responseSet=="Create New") {
+			_setValue($sfm_pg_checklistQuestionLibrary.txt_responseSetName, $responseSetName);
+			for (var $i = 0; $i < $ansValueSet.length; $i++) {
+				var $ansField=null;
+				if ($i==0) {
+					//$ansField=_f("main").s_textinput("/ansValue/").near($sfm_pg_checklistQuestionLibrary.label_ansValue);
+					$ansField=_textbox("answers",_near($sfm_pg_checklistQuestionLibrary.label_ansValue));
+					_setValue($ansField,$ansValueSet[$i]);	
+				}else{
+					_click($sfm_pg_checklistQuestionLibrary.btn_addAnswer);
+					$ansField=_textbox("answers["+$i+"]",_near($sfm_pg_checklistQuestionLibrary.label_ansValue));
+					_setValue($ansField,$ansValueSet[$i]);	
+				}
+				if ($default[$i]==true) {
+					//_click($sfm_pg_checklistQuestionLibrary.btn_default.near($ansField));
+					_click(_button("/checkbox/",_near($ansField)));
+				}
+			}
+		}else {
+			_click($sfm_pg_checklistQuestionLibrary.txt_responseSetList);
+			_click(_listItem($responseSet));
+		}
+	};
+	
+	this.searchQueInLib=function($questioName){
+		_setValue($sfm_pg_checklistQuestionLibrary.txt_search,$questioName);
+	};
+	
+	this.checkQuestionInLib=function($questioName){
+		var $retValue=false;
+		this.searchQueInLib($questioName);
+		if(_isVisible(_div($questioName))){
+			$retValue=true;
+		}
+		return $retValue;
+	};
+	
+	this.deleteQueInLib=function($questioName){
+		if(this.checkQuestionInLib($questioName)){
+			_click(_div("/checker/",_near(_div($questioName))));
+			_click($sfm_pg_checklistQuestionLibrary.btn_Delete);
+			if (_isVisible($sfm_pg_checklistQuestionLibrary.btn_deleteMsg)) {
+				_clik($sfm_pg_checklistQuestionLibrary.seldeletionConfirm);
+				wait(3000);
+				_click($sfm_pg_checklistQuestionLibrary.btn_saveOK);
+			}
+		}
+	};
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	this.createPicklistQuestion=function($questionText,$answerType,$picklistAnswerValues,$helpURL1)
+	{
+		_click($sfm_pg_checklistQuestionLibrary.btn_addQuestion);
+		_wait(3000,(_isVisible($sfm_pg_checklistQuestionLibrary.txt_addQuestion)));
+		_click($sfm_pg_checklistQuestionLibrary.txt_responseType);
+		_click($sfm_pg_checklistQuestionLibrary.sel_picklistAnswerType);
+		_setValue($sfm_pg_checklistQuestionLibrary.txt_questionText, $questionText);
+		_setValue($sfm_pg_checklistQuestionLibrary.txt_helpURL,$helpURL1);
+
+		var $responseSetName=$bo_act_common.generateRandomName("AutoRS");
+		
+		_setValue($sfm_pg_checklistQuestionLibrary.txt_responseSetName,$responseSetName);
+		_setValue($sfm_pg_checklistQuestionLibrary.txt_answerValue1, $picklistAnswerValues[0]);
+		_click($sfm_pg_checklistQuestionLibrary.btn_addAnswer);
+		_setValue($sfm_pg_checklistQuestionLibrary.txt_answerValue2, $picklistAnswerValues[1]);
+		_click($sfm_pg_checklistQuestionLibrary.btn_addAnswer);
+		_setValue($sfm_pg_checklistQuestionLibrary.txt_answerValue3, $picklistAnswerValues[2]);
+		_click($sfm_pg_checklistQuestionLibrary.btn_saveQuestion);
+		_wait(2000,_isVisible($sfm_pg_checklistQuestionLibrary.txt_saveSucessMessage));
+		if(_assert(_isVisible($sfm_pg_checklistQuestionLibrary.txt_saveSucessMessage)))
+		{
+			_log("Picklist Question Created successfully");
+		}else{		
+			_log("Error while creating Picklist Question");
+			}
+
+		_click($sfm_pg_checklistQuestionLibrary.btn_okMessage);
+
+} ;
+
+this.createDateQuestion=function($questionText,$answerType,$helpURL2)
+{
+	_click($sfm_pg_checklistQuestionLibrary.btn_addQuestion);
+	_wait(3000,(_isVisible($sfm_pg_checklistQuestionLibrary.txt_addQuestion)));
+	_click($sfm_pg_checklistQuestionLibrary.txt_responseType);
+	_click($sfm_pg_checklistQuestionLibrary.sel_dateAnswerType);
+	_setValue($sfm_pg_checklistQuestionLibrary.txt_questionText, $questionText);
+	_setValue($sfm_pg_checklistQuestionLibrary.txt_helpURL,$helpURL2);
+
+
+/*Applicable for Win18 build onwards
+	_click($sfm_pg_checklistQuestionLibrary.sel_dateoptionFunction);
+	_click($sfm_pg_checklistQuestionLibrary.sel_dateoptionValue);
+
+	_click($sfm_pg_checklistQuestionLibrary.sel_dateoptionLiteral);
+	_click($sfm_pg_checklistQuestionLibrary.sel_todayLiteral);
+	
+	*/
+	_click($sfm_pg_checklistQuestionLibrary.btn_saveQuestion);
+	_wait(2000,_isVisible($sfm_pg_checklistQuestionLibrary.txt_saveSucessMessage));
+
+	
+	if(_assert(_isVisible($sfm_pg_checklistQuestionLibrary.txt_saveSucessMessage)))
+	{
+		_log("Date Question Created successfully");
+	}else{		
+		_log("Error while creating Date Question");
+		}
+
+	_click($sfm_pg_checklistQuestionLibrary.btn_okMessage);
+
+} ;
+
+this.createDateTimeQuestion=function($questionText,$answerType,$helpURL3)
+{
+	_click($sfm_pg_checklistQuestionLibrary.btn_addQuestion);
+	_wait(3000,(_isVisible($sfm_pg_checklistQuestionLibrary.txt_addQuestion)));
+	_click($sfm_pg_checklistQuestionLibrary.txt_responseType);
+	_click($sfm_pg_checklistQuestionLibrary.sel_dateTimeAnswerType);
+	_setValue($sfm_pg_checklistQuestionLibrary.txt_questionText, $questionText);
+	_setValue($sfm_pg_checklistQuestionLibrary.txt_helpURL,$helpURL3);
+
+
+/* Applicable for Win18 build onwards
+	_click($sfm_pg_checklistQuestionLibrary.sel_dateoptionFunction);
+	_click($sfm_pg_checklistQuestionLibrary.sel_dateoptionValue);
+
+	_click($sfm_pg_checklistQuestionLibrary.sel_dateoptionLiteral);
+	_click($sfm_pg_checklistQuestionLibrary.sel_todayLiteral);
+	
+	*/
+	_click($sfm_pg_checklistQuestionLibrary.btn_saveQuestion);
+	_wait(2000,_isVisible($sfm_pg_checklistQuestionLibrary.txt_saveSucessMessage));
+
+	
+	if(_assert(_isVisible($sfm_pg_checklistQuestionLibrary.txt_saveSucessMessage)))
+	{
+		_log("Date Time Question Created successfully");
+	}else{		
+		_log("Error while creating Date Time Question");
+		}
+
+	_click($sfm_pg_checklistQuestionLibrary.btn_okMessage);
+
+} ;
+this.verifyQuestionExists=function($questionText)
+{
+	_wait(3000,(_isVisible($sfm_pg_checklistQuestionLibrary.txt_addQuestion)));
+	_setValue($sfm_pg_checklistQuestionLibrary.txt_checklistQuestionSearch,$questionText);
+
+	if(_assert(_isVisible(_div($questionText))))
+ 	{
+		_log("Created Question "+ $questionText+ " exists");
+	}
+	else{		
+		_log("Could not find the created question: " + $questionText);
+		}
+} ;
+
+this.createAllResponseTypeofQuestions=function($questionTextArray,$answerTypeArray,$picklistAnswerValuesArray,$checkboxRadioAnswerValuesArray,$helpURLArray)
+{
+	var $tagName=$bo_act_common.generateRandomName("TAG");
+	for(var $i=0; $i<$questionTextArray.length; $i++) {
+		
+		_click($sfm_pg_checklistQuestionLibrary.btn_addQuestion);
+		_wait(3000,(_isVisible($sfm_pg_checklistQuestionLibrary.txt_addQuestion)));
+		_click($sfm_pg_checklistQuestionLibrary.txt_responseType);
+		_setValue($sfm_pg_checklistQuestionLibrary.txt_questionText, $questionTextArray[$i]);
+
+		if($answerTypeArray[$i]=="Text")
+		{
+			_click($sfm_pg_checklistQuestionLibrary.sel_textAnswerType);
+			_setValue($sfm_pg_checklistQuestionLibrary.txt_helpURL,$helpURLArray[$i]);
+		}
+ 
+		if($answerTypeArray[$i]=="Checkbox")
+		{
+			_click($sfm_pg_checklistQuestionLibrary.sel_checkBoxAnswerType);
+			_setValue($sfm_pg_checklistQuestionLibrary.txt_helpURL,$helpURLArray[$i]);
+			var $responseSetName=$bo_act_common.generateRandomName("AutoRS");
+			
+			_setValue($sfm_pg_checklistQuestionLibrary.txt_responseSetName,$responseSetName);
+			_wait(3000);
+			_setValue($sfm_pg_checklistQuestionLibrary.txt_answerValue1, $checkboxRadioAnswerValuesArray[0]);
+			_click($sfm_pg_checklistQuestionLibrary.btn_addAnswer);
+			_wait(3000);
+			_setValue($sfm_pg_checklistQuestionLibrary.txt_answerValue2, $checkboxRadioAnswerValuesArray[1]);
+
+		}
+		
+		if($answerTypeArray[$i]=="Radio Button")
+		{
+			_click($sfm_pg_checklistQuestionLibrary.sel_radioButtonAnswerType);
+			_setValue($sfm_pg_checklistQuestionLibrary.txt_helpURL,$helpURLArray[$i]);
+			var $responseSetName=$bo_act_common.generateRandomName("AutoRS");
+
+			_setValue($sfm_pg_checklistQuestionLibrary.txt_responseSetName,$responseSetName);
+			_wait(3000);
+			_setValue($sfm_pg_checklistQuestionLibrary.txt_answerValue1, $checkboxRadioAnswerValuesArray[0]);
+			_click($sfm_pg_checklistQuestionLibrary.btn_addAnswer);
+			_wait(3000);
+			_setValue($sfm_pg_checklistQuestionLibrary.txt_answerValue2, $checkboxRadioAnswerValuesArray[1]);
+		}
+		
+		if($answerTypeArray[$i]=="Picklist")
+		{
+			_click($sfm_pg_checklistQuestionLibrary.sel_picklistAnswerType);
+			_setValue($sfm_pg_checklistQuestionLibrary.txt_helpURL,$helpURLArray[$i]);
+
+			var $responseSetName=$bo_act_common.generateRandomName("AutoRS");
+			
+			_setValue($sfm_pg_checklistQuestionLibrary.txt_responseSetName,$responseSetName);
+			_wait(3000);
+			_setValue($sfm_pg_checklistQuestionLibrary.txt_answerValue1, $picklistAnswerValuesArray[0]);
+			_click($sfm_pg_checklistQuestionLibrary.btn_addAnswer);
+			_wait(3000);
+			_setValue($sfm_pg_checklistQuestionLibrary.txt_answerValue2, $picklistAnswerValuesArray[1]);
+			_click($sfm_pg_checklistQuestionLibrary.btn_addAnswer);
+			_wait(3000);
+			_setValue($sfm_pg_checklistQuestionLibrary.txt_answerValue3, $picklistAnswerValuesArray[2]);
+			_wait(3000);
+
+		}
+		if($answerTypeArray[$i]=="Multi-select Picklist")
+		{
+			_click($sfm_pg_checklistQuestionLibrary.sel_multiSelectPicklistAnswerType);
+			var $responseSetName=$bo_act_common.generateRandomName("AutoRS");
+			
+			_setValue($sfm_pg_checklistQuestionLibrary.txt_responseSetName,$responseSetName);
+			_wait(3000);
+			_setValue($sfm_pg_checklistQuestionLibrary.txt_answerValue1, $picklistAnswerValuesArray[0]);
+			_click($sfm_pg_checklistQuestionLibrary.btn_addAnswer);
+			_wait(3000);
+			_setValue($sfm_pg_checklistQuestionLibrary.txt_answerValue2, $picklistAnswerValuesArray[1]);
+			_click($sfm_pg_checklistQuestionLibrary.btn_addAnswer);
+			_wait(3000);
+			_setValue($sfm_pg_checklistQuestionLibrary.txt_answerValue3, $picklistAnswerValuesArray[2]);
+			_wait(3000);
+		}
+		if($answerTypeArray[$i]=="Number")
+		{
+			_click($sfm_pg_checklistQuestionLibrary.sel_numberAnswerType);
+		}
+		if($answerTypeArray[$i]=="DateTime")
+		{
+			_click($sfm_pg_checklistQuestionLibrary.sel_dateTimeAnswerType);
+
+		}
+		if($answerTypeArray[$i]=="Date")
+		{
+			_click($sfm_pg_checklistQuestionLibrary.sel_dateAnswerType);
+
+
+		}
+		_click($sfm_pg_checklistQuestionLibrary.btn_saveQuestion);
+		_wait(20000,_isVisible($sfm_pg_checklistQuestionLibrary.txt_saveSucessMessage));
+/*
+		if(_isVisible($sfm_pg_checklistQuestionLibrary.txt_saveSucessMessage))
+		{
+			_log($answerTypeArray[$i]+ ":Question Created successfully:" + $questionTextArray[$i]);
+		}else{		
+			_log("Error while creating Question "+ $questionTextArray[$i]);
+			}
+*/
+		_click($sfm_pg_checklistQuestionLibrary.btn_okMessage);
+	}
+}
+ 
+
+this.deleteQuestions=function($questionTextArray)
+{
+	var $i;
+	_wait(3000,(_isVisible($sfm_pg_checklistQuestionLibrary.txt_checklistQuestionLibrary)));
+	_setValue($sfm_pg_checklistQuestionLibrary.txt_checklistQuestionSearch," ");
+
+	for(var $i=0; $i<$questionTextArray.length; $i++) {
+		_log("Question Text", $questionTextArray[$i]);
+		
+	_setValue($sfm_pg_checklistQuestionLibrary.txt_checklistQuestionSearch,$questionTextArray[$i]);
+	_wait(4000);
+ 
+	if(_isVisible(_div($questionTextArray[$i])))
+ 	{
+		_log("Created Question "+ $questionTextArray[$i]+ " exists");
+		_click($sfm_pg_checklistQuestionLibrary.selQuestion);
+		_click($sfm_pg_checklistQuestionLibrary.btnDelete);
+		_wait(3000,_isVisible($sfm_pg_checklistQuestionLibrary.txt_confirmDelete));
+		_click($sfm_pg_checklistQuestionLibrary.seldeletionConfirm);
+		_wait(3000,_isVisible($sfm_pg_checklistQuestionLibrary.txt_successHeaderMsg));
+		
+		if(_isVisible($sfm_pg_checklistQuestionLibrary.txt_deleteSucessMessage))
+		{
+			_click($sfm_pg_checklistQuestionLibrary.btn_okMessage);
+			_log("Questions deleted successfully");
+		}else
+		{		
+			_log("Error while deleting Questions");
+		}
+	}
+	else
+	{		
+		_log("Could not find the created question to delete: " + $questionTextArray[$i]);
+	}
+ 
+}
+	
+} ;
+} ;

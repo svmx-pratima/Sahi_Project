@@ -1,0 +1,105 @@
+var $sfm_act_sfSetup = new function sfm_act_sfSetup() {
+	this.navigateToWoObject = function(){
+		_click($sfm_pg_sfSetup.link_salesForceSetup);
+		_setValue($sfm_pg_sfSetup.txt_quickFind,"object");
+		_click($sfm_pg_sfSetup.link_objects);
+		_click($sfm_pg_sfSetup.link_woObject);
+		
+	};
+	this.addCustomTextField = function($fieldLabel,$length){
+		if(_isVisible($sfm_pg_sfSetup.btn_customFieldNew)){
+			_click($sfm_pg_sfSetup.btn_customFieldNew);
+		}
+		else if(_isVisible($sfm_pg_sfSetup.btn_caseCustomFieldNew)){
+			_click($sfm_pg_sfSetup.btn_caseCustomFieldNew);
+		}
+		_click($sfm_pg_sfSetup.radio_text);
+		_click($sfm_pg_sfSetup.btn_next);
+		_setValue($sfm_pg_sfSetup.txt_fieldLabel,$fieldLabel);
+		_setValue($sfm_pg_sfSetup.txt_length,$length);
+		_click($sfm_pg_sfSetup.btn_next);
+		_click($sfm_pg_sfSetup.btn_next);
+		_click($sfm_pg_sfSetup.btn_submit);
+	};
+	this.addCustomPickListField = function($fieldLabel,$pickListValue){
+		if(_isVisible($sfm_pg_sfSetup.btn_customFieldNew)){
+			_click($sfm_pg_sfSetup.btn_customFieldNew);
+		}
+		else if(_isVisible($sfm_pg_sfSetup.btn_caseCustomFieldNew)){
+			_click($sfm_pg_sfSetup.btn_caseCustomFieldNew);
+		}
+		_click($sfm_pg_sfSetup.radio_pickList);
+		_click($sfm_pg_sfSetup.btn_next);
+		_setValue($sfm_pg_sfSetup.txt_fieldLabel,$fieldLabel);
+		_click($sfm_pg_sfSetup.radio_enterValues);
+		_setValue($sfm_pg_sfSetup.txtArea_enterValues,$pickListValue);
+		_click($sfm_pg_sfSetup.btn_next);
+		_click($sfm_pg_sfSetup.btn_next);
+		_click($sfm_pg_sfSetup.btn_submit);
+	};
+	this.addDateTimeField = function($fieldLabel){
+		if(_isVisible($sfm_pg_sfSetup.btn_customFieldNew)){
+			_click($sfm_pg_sfSetup.btn_customFieldNew);
+		}
+		else if(_isVisible($sfm_pg_sfSetup.btn_caseCustomFieldNew)){
+			_click($sfm_pg_sfSetup.btn_caseCustomFieldNew);
+		}
+		_click($sfm_pg_sfSetup.radio_dateTime);
+		_click($sfm_pg_sfSetup.btn_next);
+		_setValue($sfm_pg_sfSetup.txt_fieldLabel,$fieldLabel);
+		_click($sfm_pg_sfSetup.btn_next);
+		_click($sfm_pg_sfSetup.btn_next);
+		_click($sfm_pg_sfSetup.btn_submit);
+	};
+	this.addNumberField = function($fieldLabel){
+		if(_isVisible($sfm_pg_sfSetup.btn_customFieldNew)){
+			_click($sfm_pg_sfSetup.btn_customFieldNew);
+		}
+		else if(_isVisible($sfm_pg_sfSetup.btn_caseCustomFieldNew)){
+			_click($sfm_pg_sfSetup.btn_caseCustomFieldNew);
+		}
+		_click($sfm_pg_sfSetup.radio_number);
+		_click($sfm_pg_sfSetup.btn_next);
+		_setValue($sfm_pg_sfSetup.txt_fieldLabel,$fieldLabel);
+		_click($sfm_pg_sfSetup.btn_next);
+		_click($sfm_pg_sfSetup.btn_next);
+		_click($sfm_pg_sfSetup.btn_submit);
+	};
+	this.navigateToCustomize = function(){
+		_click($sfm_pg_sfSetup.link_salesForceSetup);
+		_setValue($sfm_pg_sfSetup.txt_quickFind,"object");
+		_click($sfm_pg_sfSetup.link_customize);
+		_click($sfm_pg_sfSetup.link_cases);
+		_click($sfm_pg_sfSetup.link_addCustomField);
+	};
+	/*Added by Rubi Agrawal
+	--- Function to add field sets to the WO object--*/
+	this.addfieldsetToWoClassic = function($object_name,$fieldsetName,$fieldsArray)
+	{
+		//var $object_name="Work Order";
+	    //var $fieldsetName=$bo_act_common.generateRandomName("Fieldset_");
+		_click(_link("Setup"));
+		_setValue($sfm_pg_commonSfdc.text_setUpSearch,$object_name);
+		_click($sfm_pg_commonSfdc.link_objLink);
+		_click(_link($object_name));
+	_wait(5000);
+		//_click(_link("FieldSetList_link"));
+	_click( _button(0,_in(_row("Field SetsField Sets Help"))));
+	_selectWindow();
+			_setValue($sfm_pg_sfSetup.txt_fieldsetlabel,$fieldsetName);
+			_setValue($sfm_pg_sfSetup.txt_fielssetName,$fieldsetName);
+			_setValue($sfm_pg_sfSetup.txt_feildsetDesc,$fieldsetName);
+			_click($sfm_pg_sfSetup.btn_saveFieldsetName);
+			_wait(20000);
+			var $i = 0;
+			var $fieldsArray=["Proforma Invoice Amount"];
+			for($i=0;$i<$fieldsArray.length;$i++){
+				_setValue($sfm_pg_wo.txt_pgLayoutQuickFind,$fieldsArray[$i]);
+				var $shortName = $fieldsArray[$i].substr(0,4);
+				_dragDrop(_span("/"+$shortName+"/"),_div("Drag and drop the fields you want listed in the Field Set."));
+			}
+			_click($sfm_pg_wo.btn_pgLayoutSave);
+			_wait(6000);
+		
+	};
+};

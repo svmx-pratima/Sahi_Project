@@ -1,0 +1,199 @@
+var $user_credentials = $excel.readFromCustomExcel("../op_excleData/automation.xlsx", "User_Details","","");
+var $DPData = $excel.readFromCustomExcel("../op_excleData/automation.xlsx", "RTO_DispatchProcess","","");
+var $TerrData = $excel.readFromCustomExcel("../op_excleData/automation.xlsx", "RS_6708","","");
+
+//var $nArr;
+//Calling the sforce API
+for(var $i=0;$i<$user_credentials.length;$i++)
+{
+var $g_un = $user_credentials[$i][0];
+var $g_pwd = $user_credentials[$i][1];
+var $g_url = $user_credentials[$i][2];
+}
+
+var $RS_6708 = _testcase("RS_6708", "Create RTO Dispatch Process");
+
+$RS_6708.start();
+
+/*var $g_url = "https://test.salesforce.com/";
+var $g_un = "govendhan@svmx-cct5.org.cct5part1";
+var $g_pwd = "maxpl0re2";*/
+
+$bo_act_login.login($g_url, $g_un, $g_pwd);
+		
+var $PrimaryTerr = $TerrData[0][2];
+var $horizon = $DPData[0][1];
+var $threshold = $DPData[0][2];
+var $syncInterval = $DPData[0][3];
+var $date = "" + new Date();
+var $DPName = "Eco_DPName_" + $date;
+var $rowCount = 0;
+var $rowIndex = "1";
+
+
+_set($login_result, _fetch(login($g_un,$g_pwd)));
+_log($login_result);
+
+_set($email, _fetch(get_Email($g_un)));
+_log($email);
+
+
+_click(_link("Home"));
+_click(_link("ServiceMax Setup"));
+_wait(20000,_isVisible(_div("Dispatch Management")));
+_click(_div("Dispatch Management"));
+_wait(20000,_isVisible(_div("Dispatch Processes")));
+_click(_div("Dispatch Processes"));
+_click(_submit("New Process"));
+_setValue(_textbox("page1:form1:block1:tab1block1:j_id77:j_id78:name"), $DPName);
+_setSelected(_select("page1:form1:block1:tab1block1:j_id77:j_id85:j_id89"), "Real Time Optimization");
+_setSelected(_select("page1:form1:block1:tab1block1:j_id114:j_id115:tab1table1:0:j_id120"), "Order Status");
+_setSelected(_select("page1:form1:block1:tab1block1:j_id114:j_id115:tab1table1:0:j_id124"), "Equals");
+_setValue(_textbox("page1:form1:block1:tab1block1:j_id114:j_id115:tab1table1:0:j_id128"), "Open");
+_setSelected(_select("page1:form1:block1:tab1block1:j_id114:j_id115:tab1table1:1:j_id120"), "Order Type");
+_setSelected(_select("page1:form1:block1:tab1block1:j_id114:j_id115:tab1table1:1:j_id124"), "Equals");
+_setValue(_textbox("page1:form1:block1:tab1block1:j_id114:j_id115:tab1table1:1:j_id128"), "Cleaning");
+_setSelected(_select("page1:form1:block1:tab1block1:j_id114:j_id115:tab1table1:2:j_id120"), "Order Type");
+_setSelected(_select("page1:form1:block1:tab1block1:j_id114:j_id115:tab1table1:2:j_id124"), "Equals");
+_setValue(_textbox("page1:form1:block1:tab1block1:j_id114:j_id115:tab1table1:2:j_id128"), "Repair");
+_setValue(_textbox("page1:form1:block1:tab1block1:j_id136:HdrAdvOption"), "1 AND (2 OR 3)");
+_click(_button("Next >>"));
+_click(_button("Add Territory"));
+_setValue(_textbox("page1:form1:block1:tab3block1:tab3block2:j_id322:0:j_id328"), $PrimaryTerr);
+_click(_image("Territory Lookup (New Window)"));
+_selectWindow("lookup");
+_click(_link($PrimaryTerr));
+_selectWindow();
+_setValue(_textbox("page1:form1:block1:tab3block1:tab3block2:j_id322:0:j_id328"), $PrimaryTerr);
+_click(_button("Prioritization >>"));
+_check(_checkbox("page1:form1:block1:tab4block1:j_id407:j_id408:tab4table1:0:j_id412"));
+_click(_button("Edit Rule"));
+_setSelected(_select("page1:form1:block1:tab4block1:PriorityBlkSec:j_id419:j_id420:tab4table2:0:j_id425"), "Priority");
+_setSelected(_select("page1:form1:block1:tab4block1:PriorityBlkSec:j_id419:j_id420:tab4table2:0:j_id429"), "Equals");
+_setValue(_textbox("page1:form1:block1:tab4block1:PriorityBlkSec:j_id419:j_id420:tab4table2:0:j_id433"), "High");
+_setValue(_textarea("page1:form1:block1:tab4block1:j_id407:j_id408:tab4table1:0:j_id418"), "High");
+_click(_button("Save"));
+_check(_checkbox("page1:form1:block1:tab4block1:j_id407:j_id408:tab4table1:1:j_id412"));
+_click(_button("Edit Rule"));
+_setSelected(_select("page1:form1:block1:tab4block1:PriorityBlkSec:j_id419:j_id420:tab4table2:0:j_id425"), "Priority");
+_setSelected(_select("page1:form1:block1:tab4block1:PriorityBlkSec:j_id419:j_id420:tab4table2:0:j_id429"), "Equals");
+_setValue(_textbox("page1:form1:block1:tab4block1:PriorityBlkSec:j_id419:j_id420:tab4table2:0:j_id433"), "Medium");
+_setValue(_textarea("page1:form1:block1:tab4block1:j_id407:j_id408:tab4table1:1:j_id418"), "Medium");
+_click(_button("Save"));
+_check(_checkbox("page1:form1:block1:tab4block1:j_id407:j_id408:tab4table1:2:j_id412"));
+_click(_button("Edit Rule"));
+_setValue(_textarea("page1:form1:block1:tab4block1:j_id407:j_id408:tab4table1:2:j_id418"), "Low");
+_setSelected(_select("page1:form1:block1:tab4block1:PriorityBlkSec:j_id419:j_id420:tab4table2:0:j_id425"), "Priority");
+_setSelected(_select("page1:form1:block1:tab4block1:PriorityBlkSec:j_id419:j_id420:tab4table2:0:j_id429"), "Equals");
+_setValue(_textbox("page1:form1:block1:tab4block1:PriorityBlkSec:j_id419:j_id420:tab4table2:0:j_id433"), "Low");
+_click(_button("Save"));
+_check(_checkbox("page1:form1:block1:tab4block1:j_id407:j_id408:tab4table1:3:j_id412"));
+_click(_button("Edit Rule"));
+_setValue(_textarea("page1:form1:block1:tab4block1:j_id407:j_id408:tab4table1:3:j_id418"), "None");
+_click(_cell("dataCell[36]"));
+_setSelected(_select("page1:form1:block1:tab4block1:PriorityBlkSec:j_id419:j_id420:tab4table2:0:j_id425"), "Priority");
+//_click(_cell("--None--EqualsNot EqualGreater ThanGreater or Equal ToLess ThanLess or Equal ToStarts WithContainsDoes Not ContainIncludesExcludesIs NullIs Not Null[3]"));
+_setSelected(_select("page1:form1:block1:tab4block1:PriorityBlkSec:j_id419:j_id420:tab4table2:0:j_id429"), "Is Null");
+_click(_button("Save"));
+_click(_button("Constraints >>"));
+_click(_div("dhxsl_runner[1]"));
+_click(_div("dhxsl_runner[3]"));
+_click(_button("Cost Factors >>"));
+_setSelected(_select("page1:form1:block1:tab6block1:j_id490:j_id492:j_id493"), "Minimize Overall Cost");
+_click(_div("dhxsl_runner[4]"));
+_click(_button("Scheduling >>"));
+_setValue(_textbox("page1:form1:block1:tab8block1:LeadTimeSection:LeadTimeItem:LeadTime"), $threshold);
+_setValue(_textbox("page1:form1:block1:tab8block1:LeadTimeSection:OptimizerSyncIntervalItem:SyncTime"), $syncInterval);
+_setValue(_textbox("page1:form1:block1:tab8block1:j_id668:j_id669:j_id674"), $horizon);
+_setValue(_textbox("page1:form1:block1:tab8block1:SuccessSection:SuccessItem:SuccessEmail"), $email);
+_setValue(_textbox("page1:form1:block1:tab8block1:SuccessSection:ErrorItem:ErrorEmail"), $email);
+_click(_submit("Save And Close[1]"));
+_click(_submit("Back To Dispatch Process"));
+
+var $test = _exists($DPName);
+_log($test);
+
+if($test)
+	{
+	_log("Dispatch Process Created Successfully")
+	}
+else
+	{
+	_fail("Error in Creating Dispatch Process");
+	}
+
+
+_set($login_result, _fetch(login($g_un,$g_pwd)));
+_log($login_result);
+
+_set($DP_Id, _fetch(get_DP_Id($DPName)));
+_log($DP_Id);
+
+_set($Terr_Id, _fetch(get_Terr_Id($PrimaryTerr)));
+_log($Terr_Id);
+
+$excel.insertUnderColumn("../op_excleData/automation.xlsx", "RS_6708", "Process Name", $DPName, $rowIndex);
+$excel.insertUnderColumn("../op_excleData/automation.xlsx", "RS_6708", "Process Id", $DP_Id, $rowIndex);
+//$excel.insertUnderColumn("../optimax/op_excleData/automation.xlsx", "Dispatch_Process", "Territory ID", $Terr_Id, $rowIndex);
+
+var $rowCount = 0;
+_set($rowCount, _table("page1:form1:block1:j_id81:j_id82").rows.length);
+for (var $i = 0; $i < $rowCount; $i++) 
+{
+	var $temp = _getText(_cell("page1:form1:block1:j_id81:j_id82:" + $i
+			+ ":j_id86"));
+	if (_areEqual($DPName, $temp)) 
+	{
+		$rowCount = $i;
+	}
+}
+_check(_checkbox("page1:form1:block1:j_id81:j_id82:" + $rowCount
+		+ ":j_id85"));
+_click(_submit("Delete"));
+_assertEqual("Do you want to delete the selected dispatch processes?", _lastConfirm());
+_click(_cell("pbTitle"));
+_windowAction("refresh");
+
+
+
+//<browser>
+
+function login($g_un,$g_pwd){
+	
+	var $login_result = sforce.connection.login($g_un,$g_pwd);
+	return $login_result;
+}
+
+
+function get_Email ($g_un)
+{
+var Email_List = sforce.connection.query("SELECT Email,Username FROM User WHERE Username = '" + $g_un + "'");
+var Email_Arr = Email_List.getArray("records");
+var Email_Id = Email_Arr[0];
+
+return Email_Id.Email;
+}
+
+function get_DP_Id ($DPName)
+{
+var DP_List = sforce.connection.query("SELECT Id, SVMXDEV__Name__c  FROM SVMXDEV__ServiceMax_Processes__c WHERE SVMXDEV__Name__c = '" + $DPName + "'");
+var DP_Arr = DP_List.getArray("records");
+var DP_Id = DP_Arr[0];
+
+return DP_Id.Id;
+}
+
+function get_Terr_Id ($PrimaryTerr)
+{
+var Terr_List = sforce.connection.query("SELECT Id, Name FROM SVMXDEV__Territory__c WHERE Name = '" + $PrimaryTerr + "'");
+var Terr_Arr = Terr_List.getArray("records");
+var Terr_Id = Terr_Arr[0];
+
+return Terr_Id.Id;
+}
+
+//</browser>
+
+$bo_act_login.logOut();
+
+$RS_6708.end();

@@ -1,0 +1,17 @@
+var $rs_6905 = _testcase("RS_6905","Verify Lookup Context Header to Child.");
+
+//Pre-Requisites: Create a custom lookup field contact for child.
+$sfmName= $bo_act_common.generateRandomName("SFM_Auto_");
+$sfmPgLayoutName= $bo_act_common.generateRandomName("SFM Wiz");
+$wizTitle = $bo_act_common.generateRandomName("SFM Wiz");
+$rs_6905.start();
+$bo_act_login.login($g_url,$sfmdUsn, $sfmdPwd);
+$bo_act_navigation.navigateToSfmTransactionDesigner();
+$sfm_act_Transactions.newsfm6905($sfmName, $sfmPgLayoutName);
+$bo_act_navigation.navigateToSfmWizard();
+$sfm_act_createCustomWizard.chooseObject("Work Order");
+$sfm_act_createCustomWizard.addManageWizSteps($wizTitle,"SFM",$sfmName);
+$sfm_act_createCustomWizard.createBlankWo();
+$sfm_act_createCustomWizard.clickWizardBtn($sfmName);
+$sfm_act_createCustomWizard.verify6905();
+$rs_6905.end();	

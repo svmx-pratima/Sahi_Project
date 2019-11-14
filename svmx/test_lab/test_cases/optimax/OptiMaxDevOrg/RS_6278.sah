@@ -1,0 +1,207 @@
+
+var $user_credentials = $excel.readFromCustomExcel("../op_excleData/automation.xlsx", "User_Details","","");
+var $Dispatch_Process = $excel.readFromCustomExcel("../op_excleData/automation.xlsx", "Dispatch_Process","","");
+
+//var $nArr;
+//Calling the sforce API
+for(var $i=0;$i<$user_credentials.length;$i++)
+{
+var $g_un = $user_credentials[$i][0];
+var $g_pwd = $user_credentials[$i][1];
+var $g_url = $user_credentials[$i][2];
+}
+
+//for(var $i=0;$i<$Dispatch_Process.length;$i++)
+//{
+var $dp_Id = $Dispatch_Process[0][1];
+var $dp_Terr_Id = $Dispatch_Process[0][2];
+//}
+
+var $RS_6278 = _testcase("RS_6278", "Disable MCTM");
+var $account = null;
+var $team = null;
+$RS_6278.start();
+
+
+$bo_act_login.login($g_url, $g_un, $g_pwd);
+
+_set($login_result, _fetch(login($g_un,$g_pwd)));
+_log($login_result);
+
+_click(_link("ServiceMax Setup"));
+_wait(20000, _isVisible(_div("Configuration Profiles")));
+_click(_div("Configuration Profiles"));
+$op_utility.search_ActiveProfile();
+_click(_submit("Edit"));
+_setSelected(_select("conf_prof:F_conf_prof:Setting_Block:j_id114:j_id115:Modulelist"), "Common");
+_setSelected(_select("conf_prof:F_conf_prof:Setting_Block:j_id114:j_id122:SubModulelist"), "Global Settings");
+_click(_link("Edit[6]"));
+_selectWindow("Servicemax_Conf_Prof");
+_check(_radio("disp_setting:disp_setting:j_id1:DispSection:j_id37:j_id40"));
+_click(_button("Save"));
+_click(_submit("Close"));
+_selectWindow();
+_click(_button("Refresh"));
+_doubleClick(_button("Refresh"));
+_setSelected(_select("conf_prof:F_conf_prof:Setting_Block:j_id114:j_id115:Modulelist"), "OptiMax");
+_setSelected(_select("conf_prof:F_conf_prof:Setting_Block:j_id114:j_id122:SubModulelist"), "Manage OptiMax Settings");
+_click(_link("Edit[13]"));
+_selectWindow("Servicemax_Conf_Prof");
+_check(_radio("disp_setting:disp_setting:j_id1:DispSection:j_id37:j_id40[1]"));
+_click(_button("Save"));
+_click(_submit("Close"));
+_selectWindow();
+_click(_button("Refresh"));
+_doubleClick(_button("Refresh"));
+_click(_submit("Save"));
+
+_set($login_result, _fetch(login($g_un,$g_pwd)));
+_log($login_result);
+
+
+_set($create_team, _fetch(create_Team($dp_Terr_Id)));
+_log($create_team);
+
+_click(_link("Home"));
+_click(_link("ServiceMax Setup"));
+_wait(20000, _isVisible(_div("Configuration Profiles")));
+_click(_div("Configuration Profiles"));
+$op_utility.search_ActiveProfile();
+_click(_submit("Edit"));
+_setSelected(_select("conf_prof:F_conf_prof:Setting_Block:j_id114:j_id115:Modulelist"), "OptiMax");
+_setSelected(_select("conf_prof:F_conf_prof:Setting_Block:j_id114:j_id122:SubModulelist"), "Manage OptiMax Settings");
+_click(_link("Edit[13]"));
+_selectWindow("Servicemax_Conf_Prof");
+_check(_radio("disp_setting:disp_setting:j_id1:DispSection:j_id37:j_id40"));
+_click(_button("Save"));
+_click(_submit("Close"));
+_selectWindow();
+
+
+//<browser>
+function login($g_un,$g_pwd){
+	
+	var $login_result = sforce.connection.login($g_un,$g_pwd);
+	return $login_result;
+}
+
+
+
+function create_Team ($dp_Terr_Id){
+
+	   
+	//Creating Account
+	
+	var Acc = new sforce.SObject("Account");
+	Acc.Name = "Resource Preference Account";
+	var result_Acc = sforce.connection.create([Acc]);
+	_log(" Account= "+result_Acc[0].id);
+	$account = result_Acc[0].id;
+	
+	// Creating Team
+	var Team = new sforce.SObject("SVMXDEV__Service_Group__c");
+	Team.RecordTypeId='0123B000000CnBXQA0';
+	Team.Name="ResPreference_Team";
+	Team.SVMXDEV__Active__c='True';
+	Team.SVMXDEV__Country__c="India";
+	var result_Team = sforce.connection.create([Team]);
+
+	$team = result_Team[0].id;
+	_log(" Team = "+$team);
+	
+		
+	// Mapping Team to a Technician
+	var CreateRecords=[];
+	var CreateResRecords=[];
+	for(var $i=1;$i<4;$i++)
+	{
+	var Tech = new sforce.SObject("SVMXDEV__Service_Group_Members__c");
+	Tech.SVMXDEV__Service_Group__c=$team;
+
+	_log(" Team = "+$team);
+	Tech.Name="ResPreference"+$i;
+	Tech.SVMXDEV__Active__c='True';
+	Tech.SVMXDEV__Street__c="MG road";
+	Tech.SVMXDEV__City__c="Bangalore";
+	Tech.SVMXDEV__Service_Territory__c=$dp_Terr_Id;
+	Tech.SVMXDEV__Enable_Scheduling__c='True';
+	Tech.SVMXDEV__Zip__c='560034';
+	Tech.SVMXDEV__Country__c="India";
+	CreateRecords.push(Tech);
+	}
+	result = sforce.connection.create(CreateRecords);
+	
+	//Updating Preferred for the technician which is created above
+	if(result.length != 0){
+		for(var $s=0;$s<result.length;$s++){
+			var Res = new sforce.SObject("SVMXDEV__Resource_Preference__c");
+			Res.SVMXDEV__Company__c =$account;
+			Res.SVMXDEV__Group_Member__c=result[$s].id;
+			Res.SVMXDEV__Preference_Type__c="Preferred";
+			CreateResRecords.push(Res);
+		}
+		var result_Team = sforce.connection.create(CreateResRecords);
+	}
+	
+//Mapping Skills to a technician
+	
+	var Skill_list = _call(sforce.connection.query("Select Name,Id from SVMXDEV__Skill__c"));
+	var Tech_skill = Skill_list.getArray("records");
+	
+	_log("Tech_skill.length="+Tech_skill.length);
+	
+	    for(var $x=0;$x<Tech_skill.length;$x++){
+		var $Skill= Tech_skill[$x];
+		_log("result.length="+result.length+" ,$x="+$x);
+		
+			  
+		    for(var $s=0;$s<result.length;$s++){
+			var Expertise = new sforce.SObject("SVMXDEV__Service_Group_Skills__c");
+			Expertise.SVMXDEV__Group_Member__c=result[$s].id;
+            _log("result[$s].id="+result[$s].id+",$s="+$s);
+			Expertise.SVMXDEV__Service_Group__c=$team;
+			Expertise.SVMXDEV__Skill_Level__c=8;
+			Expertise.SVMXDEV__Skill__c=$Skill.Id;
+			CreateResRecords.push(Expertise);
+			_log("CreateResRecords="+CreateResRecords);
+					                           }
+		    
+	                                       }
+	    var result1 = sforce.connection.create(CreateResRecords);
+		_log("result11="+result1);
+		
+	// Creating Work order with Account which mapped to Preferred Technician list 
+	
+	var WO = new sforce.SObject("SVMXDEV__Service_Order__c");
+	WO.SVMXDEV__Company__c=$account;
+	WO.SVMXDEV__Primary_Territory__c=$dp_Terr_Id;
+	WO.SVMXDEV__Order_Type__c="Cleaning";
+	WO.SVMXDEV__Order_Status__c='Open';	
+	var result_WO = sforce.connection.create([WO]);
+	_log(" Work order= "+result_WO[0].id);
+	
+	// Validating the Population 
+    var wo_result = sforce.connection.query("Select Id, SVMXDEV__Qualified_Technicians__c from SVMXDEV__Service_Order__c Where Id = '"+result_WO[0].id+"'");
+    _log(" wo_result= "+wo_result);
+    var QTLlist_WO_arr = wo_result.getArray("records");
+    _log(QTLlist_WO_arr.length);
+    for (var $i=0; $i< QTLlist_WO_arr.length; $i++) 
+    {
+     var QTLlist_WO = QTLlist_WO_arr[$i];
+     var QTLlist= QTLlist_WO.SVMXDEV__Qualified_Technicians__c;
+     //_log("records.SVMXDEV__Qualified_Technicians__c = "+records.SVMXDEV__Qualified_Technicians__c);
+       if(QTLlist_WO.SVMXDEV__Qualified_Technicians__c === null)
+       {
+         _log("Skill Set and QTL list is not Populated");
+       }
+      else
+         {
+	     _log("Skill Set and QTL list is Populated");
+         }
+}
+    
+	return result;
+}
+
+//</browser>
+$RS_6278.end();

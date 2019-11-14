@@ -1,0 +1,254 @@
+var $RS_5025 = _testcase("RS_5025","Verify Field Map for existing records - Header");
+$RS_5025.start();
+//Variables used
+var $objectName = "Work Order";
+var $processName = "RS_5025";
+var $process_to_clone = "Create Follow-Up Work Order from Work Order";
+var $sfmTemplate = "SVMXSTD: Manage WO Usage Lines";
+var $isCustom = false;
+var $ctr = 0;
+var $i = 0;
+var $success_message = "Work Order was saved.";
+var $containerName = [];
+var $fieldName=[];
+var $fieldsToMap = ["Account","Sub Status","Actual Onsite Response","Clock Paused Forever","Proforma Invoice Amount","Scheduled Date","Group Email","Estimated Duration","Order Status","City","Street","Problem Description","Automation multipicklist","Automation Percent","Automation Phone","Automation URL"];
+var $containerName = ["Order Status","Order Status","Order Status","Order Status","Order Status","Order Status","Order Status","Order Status","Order Status","Order Status","Order Status","Order Status","Order Status"];
+var $currentWizardName = $sfmd_wizardName[4];
+var $productName = "Chrome";
+var $lineType = "Parts";
+var $fieldsAbsentInPage = [];
+var $missingStdDataTypes = ["URL","Picklist (Multi-Select)","Percent","Phone","Date","Date"];
+var $customFieldsNames = ["Automation URL","Automation multipicklist","Automation Percent","Automation Phone","Automation Date2","Automation Date3"];
+var $pageLayoutForProfile = "SVMX Work Order - Admin";
+var $myDomain = "/lightning/";
+var $multiPicklistValues = ["Multipicklist1","Multipicklist2","Multipicklist3"];
+var $mapType = "Field Map For Existing Records";
+var $headerFields = ["Age"];
+
+//Appending current timestamp to process name to make it unique.
+var $timeStamp = $bo_act_navigation.getCurrentTimeStamp();
+$processName = $processName + "_" + $timeStamp;
+var $pageLayoutName = $processName + "pg";
+var $mapName = $processName + "mp";
+
+//**************************************************************************************
+//Login and switch to classic
+$bo_act_login.login($g_url,$sfmdUsn,$sfmdPwd);
+
+_wait(15000);
+
+//Create custom fields if needed
+$sfm_act_common.addCustomFields($objectName, $customFieldsNames, $missingStdDataTypes,$multiPicklistValues);
+
+
+//Create work order
+var $wo_number = $sfm_act_common.createWoInClassic();
+var $x = $fieldsToMap.indexOf("Record Type ID");
+if($x != -1) {
+		$fieldsToMap[$x] = "Record Type";
+}
+
+//Find missing fields in Work Order Page Layout and them to the layout
+for($i=0;$i<$fieldsToMap.length;$i++){
+	if(!$sfm_act_common.findIfFieldPresentInPageLayout($fieldsToMap[$i])){
+		$fieldsAbsentInPage.push($fieldsToMap[$i]);
+	}	
+}
+_log($fieldsAbsentInPage);
+
+if($fieldsAbsentInPage.length > 0){
+	$sfm_act_common.navigateToObjectsInClassic($objectName);
+	$sfm_act_common.addFieldsToLightningPageLayout($objectName,$pageLayoutForProfile,$fieldsAbsentInPage,$myDomain);
+}
+
+
+var $x = $fieldsToMap.indexOf("Record Type");
+if($x != -1) {
+		$fieldsToMap[$x] = "Record Type ID";
+}
+
+$sfm_act_common.logoutInClassic();
+//Login and switch to lightning
+
+$bo_act_login.login($g_url,$sfmdUsn,$sfmdPwd);
+
+_wait(15000);
+
+//**************************************************************************************************
+
+//Navigate to servicemax setup and setup required process.
+
+_setSpeed(3000);
+$bo_act_navigation.navigateToSfmTransactionDesigner();
+$sfm_act_SFM.selectSFM($process_to_clone,$isCustom);
+_click($bo_pg_sfmTransactionAndDesigner.btn_clone);
+_wait(60000, _isVisible($bo_pg_sfmTransactionAndDesigner.txt_name));
+_setValue($bo_pg_sfmTransactionAndDesigner.txt_name, $processName);
+_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmTransactionId,"");
+_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmTransactionId,$processName);
+//_click($bo_pg_sfmTransactionAndDesigner.btn_quickSave1);
+_click($bo_pg_sfmTransactionAndDesigner.btn_screenDesigner);
+_click($bo_pg_sfmTransactionAndDesigner.btn_newPageLayout);
+$bo_act_navigation.designHeaderScreen($pageLayoutName,$headerFields);
+
+_click($bo_pg_sfmTransactionAndDesigner.btn_quickSave1);
+_wait(3000);
+
+//Create mapping for all possible standard data types.
+var $x = $fieldsToMap.indexOf("Record Type ID");
+if($x != -1) {
+		$fieldsToMap[$x] = "Record ID";
+}
+_click($bo_pg_sfmTransactionAndDesigner.btn_qualifyingCriteriaAndFieldMapping);
+$bo_act_mappings.createMapping("Work Order",$mapType,$fieldsToMap,$fieldsToMap,[],[],$mapName);
+_selectDomain();
+_setSpeed(1000);
+
+//Add the custom process to SFM wizard.
+$sfm_act_wizards.addToWizard($objectName,$currentWizardName,"SFM",$processName);
+_selectDomain();
+
+var $wo_number = $sfm_act_common.createWoInClassic();
+var $wlNumber = $sfm_act_common.createWorkDetail($lineType, "Usage/Consumption");
+//Add all needed details to the parent work order
+var $x = $fieldsToMap.indexOf("Record Type ID");
+if($x != -1) {
+		$fieldsToMap[$x] = "Record Type";
+}
+
+$sfm_act_common.globalSearchOnce($wo_number);
+var $textLabels = ["Proforma Invoice Amount","Scheduled Date","Estimated Duration","City","Automation Percent"];
+var $textValues = ["6600","4/21/2018","345","Bengaluru","44"];
+var $pickListLabels = ["Order Status","Sub Status"];
+var $pickListValues = ["Completed","Unresolved"];
+var $textAreaLabels = ["Street","Problem Description"];
+var $textAreaValues = ["123 somestreet,walnut corner","This machines gets stuck while printing"];
+var $checkBoxLabels = ["Clock Paused Forever"];
+var $checkBoxValues = ["true"];
+var $dateTimeLabels = ["Actual Onsite Response"];
+var $dateTimeDateValues = ["4/11/2018"];
+var $timeValues = ["3:30 PM"];
+var $emailLabels = ["Group Email"];
+var $emailValues = ["groupemail@group.com"];
+var $multiPickLabels = ["Automation multipicklist","Automation multipicklist"];
+var $multiPickValues = ["Multipicklist1","Multipicklist3"];
+var $urlLabels = ["Automation URL"];
+var $urlValues = ["www.google.com"];
+var $telephoneLabels = ["Automation Phone"];
+var $telephoneValues = ["2345407"];
+var $lookUpLabels = ["Account"];
+var $lookUpValues = ["HCSAccountForTesting"];
+_wait(2000);
+$sfm_act_common.editWorkOrder($textLabels, $textValues, $pickListLabels, $pickListValues, $textAreaLabels, $textAreaValues, $checkBoxLabels, $checkBoxValues, $dateTimeLabels, $dateTimeDateValues, $timeValues,$emailLabels,$emailValues,$multiPickLabels,$multiPickValues,$urlLabels,$urlValues,$telephoneLabels,$telephoneValues,$lookUpLabels,$lookUpValues);
+
+//Launch the process in SFM Delivery
+$sfm_act_common.launchSFMProcessInClassic($processName);
+_wait(10000);
+
+//Verify all the values without the fields in the page layout.
+_click($sfm_pg_commonSfdc.btn_saveProcess);
+_wait(14000,_isVisible($sfm_pg_wo.label_wo));
+$childWoId= _getText($sfm_pg_wo.label_wo);
+_log("Child Work Order id "+ $childWoId);
+$textValues = ["6,600.000","4/21/2018","345.00","Bengaluru","44"];
+var $lookUpLabels = ["Account"];
+var $lookUpValues = ["HCSAccountForTesting"];
+//Verify all values in the newly created Work order
+var $res = $sfm_act_common.verifyValues($textLabels, $textValues, $pickListLabels, $pickListValues, $textAreaLabels, $textAreaValues, $checkBoxLabels, $checkBoxValues, $dateTimeLabels, $dateTimeDateValues, $timeValues,$emailLabels,$emailValues,$lookUpLabels,$lookUpValues,$multiPickLabels,$multiPickValues,$urlLabels,$urlValues,$telephoneLabels,$telephoneValues);
+_assertTrue($res);
+if($res){
+	_log("PASS: Newly created follow up order has values as per mapping");
+}
+else {
+	_log("FAIL: Newly created follow up order does not have values as per mapping");
+}
+var $x = $fieldsToMap.indexOf("Record Type");
+if($x != -1) {
+		$fieldsToMap[$x] = "Record Type ID";
+}
+_selectDomain();
+//Add the fields in the Screen designer
+$sfm_act_common.launchSFMProcessInClassic($processName);
+$sfm_act_common.openSfmProcess($processName);
+_click($bo_pg_sfmTransactionAndDesigner.btn_screenDesigner);
+$bo_act_navigation.designHeaderScreen($pageLayoutName, $fieldsToMap);
+
+_wait(2000);
+
+_click($bo_pg_sfmTransactionAndDesigner.btn_finalQuickSave);
+_wait(2000);
+_closeWindow();
+_selectWindow();
+$sfm_act_common.clearSvmxCache();
+//Verifying values in SFM Delivery
+$dateTimeDateValues = ["04/11/2018"];
+var $textPicklistDateLabels = [];
+var $textPicklistDateExpValues = [];
+$textValues = ["6600","4/21/2018","345","Bengaluru","44"];
+for($i=0;$i<$textLabels.length;$i++){
+	if($textLabels[$i] === "Scheduled Date"){
+		$textValues[$i] = "04/21/2018";
+		var $temp = $i;
+	}
+	$textPicklistDateLabels.push($textLabels[$i]);
+	$textPicklistDateExpValues.push($textValues[$i]);
+}
+for($i=0;$i<$pickListLabels.length;$i++){
+	$textPicklistDateLabels.push($pickListLabels[$i]);
+	$textPicklistDateExpValues.push($pickListValues[$i]);
+}
+for($i=0;$i<$dateTimeLabels.length;$i++){
+	$textPicklistDateLabels.push($dateTimeLabels[$i]);
+	$textPicklistDateExpValues.push($dateTimeDateValues[$i]);
+}
+for($i=0;$i<$lookUpLabels.length;$i++){
+	$textPicklistDateLabels.push($lookUpLabels[$i]);
+	$textPicklistDateExpValues.push($lookUpValues[$i]);
+}
+for($i=0;$i<$urlLabels.length;$i++){
+	$textPicklistDateLabels.push($urlLabels[$i]);
+	$textPicklistDateExpValues.push($urlValues[$i]);
+}
+for($i=0;$i<$telephoneLabels.length;$i++){
+	$textPicklistDateLabels.push($telephoneLabels[$i]);
+	$textPicklistDateExpValues.push($telephoneValues[$i]);
+}
+for($i=0;$i<$emailLabels.length;$i++){
+	$textPicklistDateLabels.push($emailLabels[$i]);
+	$textPicklistDateExpValues.push($emailValues[$i]);
+}
+
+$verifyResult = $sfm_act_common.verifyValuesInDelivery($textPicklistDateLabels,$textPicklistDateExpValues,$dateTimeLabels,$timeValues,$textAreaLabels,$textAreaValues,$checkBoxLabels,[true],$multiPickLabels,$multiPickValues);
+_assertTrue($verifyResult);
+if($verifyResult){
+	_log("PASS:Follow up Work order values are verified in SFM Delivery");
+}
+else {
+	_log("FAIL:Follow up Work order values not verified in SFM Delivery");
+}
+
+//Now Save the SFM Delivery and verify the values in the newly created work order
+$sfm_act_common.saveClassicSfmProcess();
+_wait(14000,_isVisible($sfm_pg_wo.label_wo));
+$childWoId= _getText($sfm_pg_wo.label_wo);
+_log("Child Work Order id "+ $childWoId);
+$textValues = ["6,600.000","4/21/2018","345.00","Bengaluru","44"];
+$dateTimeDateValues = ["4/11/2018"];
+var $lookUpLabels = ["Account"];
+var $lookUpValues = ["HCSAccountForTesting"];
+//Verify all values in the newly created Work order
+var $res = $sfm_act_common.verifyValues($textLabels, $textValues, $pickListLabels, $pickListValues, $textAreaLabels, $textAreaValues, $checkBoxLabels, $checkBoxValues, $dateTimeLabels, $dateTimeDateValues, $timeValues,$emailLabels,$emailValues,$lookUpLabels,$lookUpValues,$multiPickLabels,$multiPickValues,$urlLabels,$urlValues,$telephoneLabels,$telephoneValues);
+_assertTrue($res);
+if($res){
+	_log("PASS: Newly created follow up order has values as per mapping");
+}
+else {
+	_log("FAIL: Newly created follow up order does not have values as per mapping");
+}
+
+
+
+$sfm_act_common.logoutInClassic();
+_setSpeed($g_stepSpeed);		
+//cleanUp();
+$RS_5025.end();

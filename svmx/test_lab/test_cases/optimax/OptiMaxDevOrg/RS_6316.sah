@@ -1,0 +1,46 @@
+var $user_credentials = $excel.readFromCustomExcel("../op_excleData/automation.xlsx", "User_Details","","");
+var $SkillRuleData = $excel.readFromCustomExcel("../op_excleData/automation.xlsx", "Rules","","");
+
+//var $nArr;
+//Calling the sforce API
+for(var $i=0;$i<$user_credentials.length;$i++)
+{
+var $g_un = $user_credentials[$i][0];
+var $g_pwd = $user_credentials[$i][1];
+var $g_url = $user_credentials[$i][2];
+}
+
+
+var $RS_6316 = _testcase("RS_6316", "Changing Rule Sequence of Skill Match Rule");
+
+$RS_6316.start();
+
+$bo_act_login.login($g_url, $g_un, $g_pwd);
+var $skillRuleName = $SkillRuleData[0][1];
+
+_log($skillRuleName);
+
+_click(_link("ServiceMax Setup"));
+_wait(20000,_isVisible(_div("Dispatch Management")));
+_click(_div("Dispatch Management"));
+_wait(20000,_isVisible(_div("Skill Match Rules")));
+_click(_div("Skill Match Rules"));
+_click(_button("Rule Sequence"));
+_setSelected(_select("j_id0:SVMX_FORM:Svmx_PageBlock:list1:j_id38"), [$skillRuleName]);
+_click(_imageSubmitButton("Top"));
+_click(_button("Save"));
+_click(_image("radio_chk0.gif"));
+
+$varSkillName =  _getText(_textbox("j_id0:SVMX_FORM:SMXC_PageBLOCK1:j_id88:j_id94:j_id97:j_id98"));
+
+if (_areEqual($skillRuleName, $varSkillName)) 
+{
+	_log("Skill Rule Sequence Updated Successfully");
+}
+else
+	{
+	_fail("Error in Updating the Skill Rule Sequence");
+	}
+
+$bo_act_login.logOut();
+$RS_6316.end();

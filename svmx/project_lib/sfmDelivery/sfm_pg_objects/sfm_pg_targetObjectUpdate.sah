@@ -1,0 +1,18 @@
+var $sfm_pg_targetObjectUpdate = new function sfm_pg_targetObjectUpdate(){
+
+
+	this.tab_TOU=_f("main").tab("Target Object Update");
+	this.lbl_selectTrgObject=_f("main").s_label("Target objects used in this SFM Transaction");
+	this.lbl_trgFieldUpdates=_f("main").s_label("/Field updates required for/");
+	this.btn_addTOU=_f("main").s_button("Add a row");
+	this.lbl_clickToAddField=_f("main").s_label("Click to add field");
+	this.btn_AddFieldTOU = _f("main").s_button("Add Field");
+	this.txt_quickFindTOU = _f("main").s_textinput("searchText").near(this.btn_AddFieldTOU);
+	
+	this.btn_toggleValueTOU = _f("main").s_togglebutton("I want to enter a specific value for this field");
+
+	
+	
+	
+	
+};

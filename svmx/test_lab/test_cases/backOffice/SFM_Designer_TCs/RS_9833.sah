@@ -1,0 +1,38 @@
+var $RS_9833 = _testcase("$RS_9833","Verify the search functionality using Quick Find on Template Designer for Smart Doc Type Process.");
+$RS_9833.start();
+$processName = "Service Quote Report";
+$searchString = "contact";
+$templateName = $bo_act_common.generateRandomName("Temp"); 
+$expected = "Template saved";
+$bo_act_login.login($g_url,$bac_un,$bac_pwd);
+$bo_act_navigation.navigateToSfmTransactionDesigner();
+$sfm_act_SFM.selectSFM($processName,false);
+_click($bo_pg_sfmTransactionAndDesigner.btn_clone);
+_click(_f("main").tab("Template Designer"));
+_setValue(_textbox("expressionFilter"),$searchString);
+
+var $searchedItems= _collectAttributes("_link", "/jstree-search/","sahiText",_in(_listItem("jstree-open")));
+for(var $i=0; $i<$searchedItems.length; $i++){
+_assertTrue($searchedItems[$i].toLowerCase().indexOf($searchString)!=-1);
+}
+_setValue(_f("main").s_textinput("Save template as"),$templateName);
+_setValue(_f("main").s_textinput("Input ID Here[4]"),$templateName);
+_wait(5000);														// Added By Bhupendra Singh
+if(_isVisible(_f("main").s_button("Save[4]"))){			
+	_click(_f("main").s_button("Save[4]"));
+}
+else {
+	_click(_f("main").s_button("/saveBtn/").near(_f("main").s_textinput("Save template as"))); 
+}
+
+_wait(10000,_isVisible(_f("main").label("Template saved")));
+var $actual =  _getValue(_f("main").label("Template saved"));
+_logOutput($actual);
+_assertEqual($actual,$expected,"Actual and expected Templates are not same saved");		// Added By Bhupendra Singh
+/*_click(_f("main").s_button("Save & Close"));
+_wait(10000,_isVisible(_f("main").s_label("Service Flow Manager")));
+_click(_f("main").s_label("< Back To Setup Home"));
+_wait(10000,_isVisible(_div("Service Flow Manager")));
+
+$bo_act_login.logOut(); */
+$RS_9833.end();

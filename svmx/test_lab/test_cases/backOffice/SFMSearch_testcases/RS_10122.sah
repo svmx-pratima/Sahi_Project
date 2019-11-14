@@ -1,0 +1,90 @@
+// Author Meghana Rao P
+/*
+ * To verify the Scope of search being 1 Object and then checking it in delivery - For Account object
+ */
+var $RS_10122 = _testcase("RS_10122", "Creating a SFM Search with only 1 object");
+$RS_10122.start();
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+_wait(10000);
+
+// To create Service Contract for the Given Test case
+var $data1 = _readExcelFile("../../backOffice/bo_excleData/BORegressionDatasheet.xlsx",$orgtype,true);
+var $createservice_contract = $data1[1]["CreateServiceContract"];
+var $fetch_sc = $data1[1]["FetchServiceContract"];
+
+var $randomnumber = $bo_act_common.generateRandomName("");
+var $Account = "Account acc1 = New Account(Name ='Acc"+$randomnumber+"', Type = 'Analyst');insert acc1;";
+var $rs_10119_account = $op_act_sForceApiCall.sForceQuery($bac_un, $bac_pwd, $Account ,"create");
+var $rs_10119_query_acc = "Select Id from Account where Name ='Acc"+$randomnumber+"'";
+var $rs_10119_fetch2 = $op_act_sForceApiCall.sForceQuery($bac_un, $bac_pwd, $rs_10119_query_acc ,"query");
+
+var $AccountID = $rs_10119_fetch2[0].Id;
+
+
+var $rs_10122_sc = $op_act_sForceApiCall.sForceQuery($bac_un, $bac_pwd, $createservice_contract ,"create");
+var $rs_10122_query_sc = $fetch_sc;
+var $rs_10122_fetch_sc = $op_act_sForceApiCall.sForceQuery($bac_un, $bac_pwd, $rs_10122_query_sc ,"query");
+
+$rs_10122_SC = $rs_10122_fetch_sc[0].Name;
+$rs_10122_SC_ID = $rs_10122_fetch_sc[0].Id;
+
+//To Creat WO under the Service Contract
+
+//This code supports name spaces and assigns the variable with correct namespace script  [Added by Bhupendra Singh]
+$bo_act_navigation.navigateToSetUpAndSearch("Installed Packages");
+_click(_link("/ServiceMax/"));
+
+var $orgdetails = _getText(_cell(0,_rightOf(_cell("Namespace Prefix"))));
+
+if ($orgdetails == "SVMXC")
+	
+	{
+	
+	var $insert_wo_low1 = "SVMXC__Service_Order__c WO = new SVMXC__Service_Order__c ( SVMXC__Company__c = '"+$Account+"', SVMXC__Order_Status__c = 'Canceled' ,SVMXC__Country__c = 'United States', SVMXC__Sub_Status__c = 'Resolved', SVMXC__Priority__c = 'Low', SVMXC__Service_Contract__c = '"+$rs_10122_SC_ID+"');insert WO;";
+	var rs_1022_wo_create1 = $op_act_sForceApiCall.sForceQuery($bac_un, $bac_pwd, $insert_wo_low1 ,"create");
+	var $insert_wo_query1 = "Select Name , Id from SVMXC__Service_Order__c where Createdby.Id = '"+$bac_un+"' Order by CreatedDate DESC Limit 1";
+	var $fetch_wo1 = $op_act_sForceApiCall.sForceQuery($bac_un, $bac_pwd, $insert_wo_query1 ,"query");
+
+	$rs_10122_WO = $fetch_wo1[0].Name;
+	
+	}
+
+else 	
+	{
+	var $insert_wo_low = "SVMXDEV__Service_Order__c WO = new SVMXDEV__Service_Order__c ( SVMXDEV__Company__c = '"+$Account+"', SVMXDEV__Order_Status__c = 'Canceled' ,SVMXDEV__Country__c = 'United States', SVMXDEV__Sub_Status__c = 'Resolved', SVMXDEV__Priority__c = 'Low', SVMXDEV__Service_Contract__c = '"+$rs_10122_SC_ID+"');insert WO;";
+	var rs_1022_wo_create = $op_act_sForceApiCall.sForceQuery($bac_un, $bac_pwd, $insert_wo_low ,"create");
+	var $insert_wo_query = "Select Name , Id from SVMXDEV__Service_Order__c where Createdby.Id = '"+$bac_un+"' Order by CreatedDate DESC Limit 1";
+	var $fetch_wo = $op_act_sForceApiCall.sForceQuery($bac_un, $bac_pwd, $insert_wo_query ,"query");
+	$rs_10122_WO = $fetch_wo[0].Name;
+	}
+
+$bo_act_navigation.navigateToSvmxSetup();
+var $searchTitle = $bo_act_common.generateRandomName("Search");
+var $searchId = $bo_act_common.generateRandomName("SearchId");
+// Creating a new Custom SFM Search
+$bo_act_sfmsearch.sfmsearch_multipleobjects($searchId,$searchTitle, "Work Order", "Order Status", "Canceled", "Equals","Priority", "Low", "Service/Maintenance Contract", "All Contacts Covered", "true", "Equals");
+$bo_act_sfmsearchdelivery.sfmsearch_multipleobjects($searchTitle,"Work Orders", "Service\\/Maintenance Contract", $rs_10122_WO , $rs_10122_SC);
+
+
+// To delete the service contracts and Work Orders
+
+if ($orgdetails == "SVMXC")
+	
+{
+	$delete_sc = "delete[Select Id from SVMXC__Service_Contract__c where Name = 'SCON RS_1022' AND Createdby.Id = '"+$bac_un+"'];";
+	var $delete_data = $op_act_sForceApiCall.sForceQuery($bac_un, $bac_pwd, $delete_sc , "create");
+	_wait(500);
+	$delete_wo =  "delete [Select Id from SVMXC__Service_Order__c where Createdby.Id = '"+$bac_un+"'];";
+	var $delete_data = $op_act_sForceApiCall.sForceQuery($bac_un, $bac_pwd, $delete_wo , "create");
+}
+
+else
+	{
+	$delete_sc = "delete [Select Id from SVMXDEV__Service_Contract__c where Name = 'SCON RS_1022' AND Createdby.Id = '"+$bac_un+"'];";
+	var $delete_data = $op_act_sForceApiCall.sForceQuery($bac_un, $bac_pwd, $delete_sc , "create");
+	_wait(500);
+	$delete_wo =  "delete [Select Id from SVMXDEV__Service_Order__c where Createdby.Id = '"+$bac_un+"'];";
+	var $delete_data = $op_act_sForceApiCall.sForceQuery($bac_un, $bac_pwd, $delete_wo , "create");
+	
+	}
+$RS_10122.end();

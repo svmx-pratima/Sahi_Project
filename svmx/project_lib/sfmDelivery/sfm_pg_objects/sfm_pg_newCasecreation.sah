@@ -1,0 +1,14 @@
+var $sfm_pg_caseCreationFields = new function sfm_pg_caseCreationFields(){
+	//Objects of SFD page
+	this.case_Account=  _textbox(0,_rightOf(_label("Account Name")));
+	this.case_Account_edit = _textbox("Account Name");
+	this.caseBillingType1=_select(0,_rightOf(_label("Billing Type")));
+	//this.case_City=_textbox(0,rightOf()));
+	this.case_Component=_textbox("Component SN");//_textbox(0,_rightOf(_label("Component SN")));
+	this.case_Contact=_textbox("Contact Name");//_textbox(0,_rightOf(_label("Contact Name")));
+	this.case_Priority=_select(0,_rightOf(_label("Priority")));
+	this.case_Description=_textarea(0,_rightOf(_label("Description")));
+	//this.case_Zip=_textbox(0,_rightOf()));
+	this.case_Origin=_select(0,_rightOf(_label("*Case Origin")));
+	
+};

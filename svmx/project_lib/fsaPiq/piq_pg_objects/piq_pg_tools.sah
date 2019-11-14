@@ -1,0 +1,17 @@
+
+//Tools page object repository 
+
+var $piq_pg_tools = new function piq_pg_tools(){
+	this.btn_tools = _div("Tools");
+	this.btn_dataSync = _div("Data Sync");
+	this.btn_configSync = _div("Config Sync");
+	this.btn_purgeData = _div("Purge Data");
+	this.btn_locationTracking = _div("Location Tracking");
+	this.btn_smartDocsQueue = _div("Smart Docs Queue");
+	this.btn_resetApplicationTab = _div("Reset Application");
+	this.btn_syncDataNow = _div("Sync Data Now");
+	this.btn_syncConfigNow = _div("Sync Config Now");
+	this.btn_resetApplicationBtn = _div("Reset Application[2]");
+	this.btn_about = _div("About");
+	this.btn_purgeDataNow = _span("Purge Data Now");
+};

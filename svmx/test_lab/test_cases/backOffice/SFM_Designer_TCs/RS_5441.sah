@@ -1,0 +1,62 @@
+//_includeOnce("../../../references/references.js");
+//author - Mamata Rout
+
+var $RS_5441 = _testcase("RS_5441", "Verify only completed SFM & active SFW are displayed on SFM App Permission page");
+$RS_5441.start();
+_setSpeed($g_stepSpeed);
+
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+var $sfmName= $bo_act_common.generateRandomName("5441SFM");
+var $objName2 = "Preventive Maintenance Plan";
+var $wizardname=$bo_act_common.generateRandomName("5441SFW");
+var $wizardID=$wizardname;
+var $fieldActnType="SFM";
+var $actnName2 = "Activate Preventive Maintenance Plan";
+var $executionMode2 = "Interactive";
+var $processType = "SFM Transactions";
+var $objType = "Preventive Maintenance Plan";
+var $processTypeD = "SFM Wizards";
+var $objTypeD = "Preventive Maintenance Plan";
+		
+//Navigate to designer and create one incomplete SFM
+$bo_act_navigation.navigateToSfmTransactionDesigner();
+_wait(60000, _isVisible($bo_pg_sfmTransactionAndDesigner.btn_newSFM));
+$bo_act_SFM.createIncompleteSFM($sfmName);
+_log("InComplete SFM created Successfully");
+
+//Navigate to Wizard Create one inactive Wizard
+$bo_act_navigation.navigateToSfmWizard();
+$bo_act_SFW.createWizardGeneralInfo($objName2,$wizardname,$wizardID);
+_click($bo_pg_sfmWizard.chk_activeCheckboxInGeneralInfo);
+$bo_act_SFW.createWizardStep($fieldActnType,$actnName2,$executionMode2);
+_log("InActive Wizard created successfully");
+
+//Navigate to SFm App Permission and Search for Incomplete SFM and Inactive Wizard if exist
+$bo_act_navigation.navigateToSfmAppPermission();
+$bo_act_SFMAppPermission.genericSearchInAppPermission($processType,$objType,$sfmName);
+_wait(20000);
+
+_assertNotVisible(_div($sfmName), "SFM found on the App Permission page");
+
+//_log("SFM Not found");
+
+$bo_act_SFMAppPermission.genericSearchInAppPermission($processTypeD,$objTypeD,$wizardname);
+
+_assertNotVisible(_div($wizardname), "SFM Wizard found on the App Permission page");
+
+//_log("Wizard Not Found");
+
+$bo_act_navigation.navigateToSfmTransactionDesigner();
+_wait(60000, _isVisible($bo_pg_sfmTransactionAndDesigner.btn_newSFM));
+
+//Delete incomplete SFM
+
+$bo_act_SFM.deleteSFM($sfmName);
+_log("SFM deleted successfully");
+_setSpeed($g_stepSpeed);
+
+										 
+$RS_5441.end();
+
+
+	

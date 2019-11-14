@@ -1,0 +1,160 @@
+//Tests are to be written here [Bhupendra Singh Chouhan]
+//==============
+
+var $RS_5308 = _testcase("$RS_5308","Get Price on WO:When the IB of the WO is covered under a Warranty.Calculate Expense prices");
+$RS_5308.start();
+_setSpeed($g_stepSpeed);
+
+/**
+ * Login to the Sandbox Org
+ */
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+
+//Pre - Condition Test Data
+var $productFamily = ["--None--","GeneralSolution","AdvSolution","Accessory", "Storage"];
+var $productCode = "";
+var $exchangeType = ["--None--","Advance Exchange","Return Exchange"];
+var $unitOfTimeForCoverage = ["--None--","Days","Weeks","Months","Years"];
+var $coverageEffectiveFrom = ["--None--","Date Installed","Date Ordered","Date Shipped","Last Activity Date","Last Date Shipped","Warranty Start Date","Warranty End Date"];
+var $materialPercentCovered = 10;
+var $laborPercentCovered = 55;
+var $expensesPercentCovered = 50;
+var $durationOfCoverage = 5;
+var $seperator = "/";
+
+/**
+* Create Account, Contact, Location, Product and Installed Product
+*/
+var $accountName = $bo_act_accounts.createAccount();
+var $contactName = $bo_act_contacts.createContact($accountName);
+var $productName = $bo_act_products.createProduct($productCode, $productFamily[0]);
+var $IBName = $bo_act_installedProduct.createInstalledProduct($productName, $accountName, $contactName);
+
+/**
+ * Create 5 Year WN Template
+ */
+var $warrantyName = $bo_act_warrantyTerms.createWarrantyTerms($exchangeType[2],"10","1",$unitOfTimeForCoverage[4],"55","1",$unitOfTimeForCoverage[4],"50","6",$unitOfTimeForCoverage[3],$coverageEffectiveFrom[1]);
+$bo_act_warrantyTerms.createApplicableProducts($productName, $warrantyName); //Create Applicable product for warranty Terms
+$bo_act_navigation.navigateToCreatedRecordUsingGlobalSearch($IBName); 	//Navigate to Installed Product Page using global search
+$bo_act_warrantyTerms.createWarranty($warrantyName);
+
+/**
+* Create SFM Wizard for WO with two Steps 1st-Check Entitlement and 2nd- Manage Work Order Lines - Usage(TDM016)
+*/
+
+var $wizardTitleName = $bo_act_common.generateRandomName("SFWTitle");
+var $wizardIDName = $bo_act_common.generateRandomName("SFWId");
+var $fieldActnType = "Others";
+var $actnName = "Check Entitlement WO";
+
+$bo_act_navigation.navigateToSfmWizard();
+$bo_act_SFW.createWizardGeneralInfo("Work Order", $wizardTitleName, $wizardIDName);
+$bo_act_SFW.createWizardStep("SFM", "Manage Work Order Lines - Usage", "Interactive");
+$bo_act_SFW.addCustomActionToWizard($fieldActnType, $actnName);
+$bo_act_SFW.quickSaveSFWizard();
+
+/**
+* Create Case record
+*/
+var $caseStatus = "New";
+var $casePriority = "Medium";
+var $caseOrigin = "Phone";
+var $caseNumber = $bo_act_Cases.createCase($caseStatus, $casePriority, $caseOrigin);
+
+/**
+* Navigate to IB and Create WO from IB
+*/
+var $WONumber = $bo_act_installedProduct.createWOFromIB($IBName);
+
+//Edit The Above created WO for few fields
+$bo_act_workOrders.editWorkOrder($WONumber);
+
+// Edit WO for Case 
+var $object = _textbox("/\\*Case|^Case/");
+var $objectValue = $caseNumber;
+$bo_act_workOrders.updateTextBoxFields($object, $objectValue);
+
+// Edit WO for Priority
+var $object = _select(0,_rightOf(_label("/\\*Priority|^Priority/")));
+var $objectValue = "Medium";
+$bo_act_workOrders.updateDropDownFields($object, $objectValue);
+
+// Edit WO for Billing Type
+var $object = _select(0,_rightOf(_label("Billing Type")));
+var $objectValue = "Paid";
+$bo_act_workOrders.updateDropDownFields($object, $objectValue);
+$bo_act_workOrders.saveWorkOrder();     		// Save the Edited WO
+
+/**
+*Perform Interactive Entitlement on WO using "Warranty
+*/
+$bo_act_interactiveEntitlement_WO.performInteractiveEntitlementWO_UsingWarranty($WONumber, $warrantyName);
+var $actual_EntitlementType = _getText(_div(0,_rightOf(_cell("/Entitlement Type/"))));
+var $actual_EntitlementType = _getText(_div(0,_rightOf(_cell("/Entitlement Type/"))));
+
+_assertEqual($actual_EntitlementType,"INTERACTIVE","Actual and expected Entitlement Type are not same");
+
+//validation of Entitlement Parameters On Case
+
+if(_isVisible(_image("Checked",_rightOf(_cell("/Is Entitlement Performed/"))))){
+	_logOutput("Entitlement is Performed Successfully = PASS");
+	}else{
+	_fail("Entitlement is Not Performed = Failed");
+	}
+
+/**
+*Invoke TDM016 SFM for Get Price Calculation when IB is Covered under Warranty
+*/
+$bo_act_getPrice.navigateToSFMDeliveryPageFor_TDM016($WONumber);
+
+//Add Labor Line to Above invoke TDM016 SFM
+var $expenseType = "Gas";
+var $lineQty = 5;
+var $linePricePerUnit = 120;
+$bo_act_getPrice.addExpensesLineToSFMDelivery($expenseType, $lineQty, $linePricePerUnit);
+$bo_act_getPrice.calculateGetPrice();
+$bo_pg_getPrice.btn_quickSave;
+
+//Validation of Get Price for Labor lines
+$bo_act_getPrice.editExpensesLineToSFMDelivery($expenseType);
+_setStrictVisibilityCheck(true);
+var $LaborLinePricePerUnitActual = _getText(_textbox(0,_rightOf(_label("/Line Price Per Unit/"))));
+var $LaborCoveredActual = _getText(_textbox(0,_rightOf(_label("/Covered %/"))));
+var $LaborBillableQtyActual = _getText(_textbox(0,_rightOf(_label("/Billable Qty/"))));
+var $LaborBillableLinePriceActual = _getText(_textbox(0,_rightOf(_label("/Billable Line Price/"))));
+
+var $LaborBillableLinePriceExpected = (($lineQty*$linePricePerUnit*50)/100);
+
+_assertEqual($LaborLinePricePerUnitActual,$linePricePerUnit,"Actual and expected Labor Line Price Per Unit are not same");
+_assertEqual($LaborBillableQtyActual,$lineQty,"Actual and expected Billable Qty are not same");
+_assertEqual($LaborBillableLinePriceActual,$LaborBillableLinePriceExpected,"Actual and expected Billable Line Price are not same");
+_assertEqual($LaborCoveredActual,$expensesPercentCovered,"Actual and expected labor Covered % are not same");
+
+$bo_act_getPrice.closeEditedWOLineToSFMDelivery();
+_setStrictVisibilityCheck();
+$bo_act_getPrice.saveSFMDelivery();
+
+//Delete SFM Wizard 
+$bo_act_SFW.deleteSFMWizard("Work Order", $wizardIDName);
+
+/**
+*Clean up function
+*/
+
+$bo_act_common.deleteCase($bac_un, $bac_pwd,$caseNumber);
+$bo_act_common.deleteAccount($bac_un, $bac_pwd, $accountName);
+$bo_act_common.deleteContact($bac_un, $bac_pwd, $contactName);
+$bo_act_common.deleteIB($bac_un, $bac_pwd, $orgnamespace,$IBName);
+$bo_act_common.deleteProduct($bac_un, $bac_pwd,$productName);
+$bo_act_common.deleteWorkOrder($bac_un, $bac_pwd, $orgnamespace,$WONumber);
+$bo_act_common.deleteWarranty($bac_un, $bac_pwd, $orgnamespace,$warrantyName);
+
+//var $datacreated = [$WONumber,$caseNumber,$IBName,$productName,$contactName,$accountName,$warrantyName];
+//for (var i = 0; i < $datacreated.length; i++) {
+//$bo_act_common.cleanUpfunction($datacreated[i]);
+//}
+
+$bo_act_login.logOut(); 
+
+$RS_5308.end();
+

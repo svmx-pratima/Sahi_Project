@@ -1,0 +1,87 @@
+var $user_credentials = $excel.readFromCustomExcel("../op_excleData/automation.xlsx", "User_Details","","");
+
+
+//var $nArr;
+//Calling the sforce API
+for(var $i=0;$i<$user_credentials.length;$i++)
+{
+var $g_un = $user_credentials[$i][0];
+var $g_pwd = $user_credentials[$i][1];
+var $g_url = $user_credentials[$i][2];
+}
+
+var $RS_9550 = _testcase("RS_9550", "Validating Overnight policy SFM screen");
+
+$RS_9550.start();
+
+/*var $g_url = "https://test.salesforce.com/";
+var $g_un = "govendhan@svmx-cct5.org.cct5part1";
+var $g_pwd = "maxpl0re2";*/
+
+$bo_act_login.login($g_url, $g_un, $g_pwd);
+		
+_click(_link("ServiceMax Setup"));
+_wait(20000,_isVisible(_div("Service Organization")));
+_click(_div("Service Organization"));
+_wait(20000,_isVisible(_div("Overnight Policy Set up")));
+_click(_div("Overnight Policy Set up"));
+_wait(20000,_isVisible(_button("New Overnight Stay Policy")));
+_click(_button("New Overnight Stay Policy"));
+
+_wait(30000,_isVisible(_label("Overnight Stay Policy")));
+
+_assertExists(_label("Total Overnight Stays:"));
+_assertVisible(_label("Total Overnight Stays:"));
+_assertEqual("Total Overnight Stays:", _getText(_label("Total Overnight Stays:")));
+
+_assertExists(_label("Consecutive Overnight Stays:"));
+_assertVisible(_label("Consecutive Overnight Stays:"));
+_assertEqual("Consecutive Overnight Stays:", _getText(_label("Consecutive Overnight Stays:")));
+
+_assertExists(_label("Drive Distance Threshold (miles or kms):"));
+_assertVisible(_label("Drive Distance Threshold (miles or kms):"));
+_assertEqual("Drive Distance Threshold (miles or kms):", _getText(_label("Drive Distance Threshold (miles or kms):")));
+
+_assertExists(_label("Drive Time Threshold (in minutes):"));
+_assertVisible(_label("Drive Time Threshold (in minutes):"));
+_assertEqual("Drive Time Threshold (in minutes):", _getText(_label("Drive Time Threshold (in minutes):")));
+
+_assertExists(_cell("Policy Override:"));
+_assertVisible(_cell("Policy Override:"));
+_assertEqual("Policy Override:", _getText(_cell("Policy Override:")));
+
+_assertExists(_span("Repeat On"));
+_assertVisible(_span("Repeat On"));
+_assertEqual("Repeat On", _getText(_span("Repeat On")));
+
+_assertExists(_label("Allow Sunday Overnight Stay:"));
+_assertVisible(_label("Allow Sunday Overnight Stay:"));
+_assertEqual("Allow Sunday Overnight Stay:", _getText(_label("Allow Sunday Overnight Stay:")));
+
+_assertExists(_label("Allow Monday Overnight Stay:"));
+_assertVisible(_label("Allow Monday Overnight Stay:"));
+_assertEqual("Allow Monday Overnight Stay:", _getText(_label("Allow Monday Overnight Stay:")));
+
+_assertExists(_label("Allow Tuesday Overnight Stay:"));
+_assertVisible(_label("Allow Tuesday Overnight Stay:"));
+_assertEqual("Allow Tuesday Overnight Stay:", _getText(_label("Allow Tuesday Overnight Stay:")));
+
+_assertExists(_label("Allow Wednesday Overnight Stay:"));
+_assertVisible(_label("Allow Wednesday Overnight Stay:"));
+_assertEqual("Allow Wednesday Overnight Stay:", _getText(_label("Allow Wednesday Overnight Stay:")));
+
+_assertExists(_label("Allow Thursday Overnight Stay:"));
+_assertVisible(_label("Allow Thursday Overnight Stay:"));
+_assertEqual("Allow Thursday Overnight Stay:", _getText(_label("Allow Thursday Overnight Stay:")));
+
+_assertExists(_label("Allow Friday Overnight Stay:"));
+_assertVisible(_label("Allow Friday Overnight Stay:"));
+_assertEqual("Allow Friday Overnight Stay:", _getText(_label("Allow Friday Overnight Stay:")));
+
+_assertExists(_label("Allow Saturday Overnight Stay:"));
+_assertVisible(_label("Allow Saturday Overnight Stay:"));
+_assertEqual("Allow Saturday Overnight Stay:", _getText(_label("Allow Saturday Overnight Stay:")));
+
+$bo_act_login.logOut();
+
+$RS_9550.end();

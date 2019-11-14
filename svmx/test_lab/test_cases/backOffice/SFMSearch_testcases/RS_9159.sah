@@ -1,0 +1,33 @@
+//Tests are to be written here [Srinivasa Murthy S]
+// Creating variable for the printing the test case number and name
+
+var $RS_9159 = _testcase("RS_9159","SFM Search - Designer - General Info and Search Configuration");
+$RS_9159.start();
+
+//Login to the Sandbox using the credentials from 
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+
+//Pre-requisite for this test case to check if Standard Account Search is cloned and available
+$bo_act_navigation.navigateToSfmSearchInDesigner();
+
+//Check if the SFM is present, if not create it.
+if(_exists(_span("Cln - SVMXSTD: Account Search")))
+	{
+		$bo_act_sfmsearch.editCaseSearch("Cln - SVMXSTD: Account Search" ,"Case","");
+	}
+else
+	{
+		$bo_act_sfmsearch.clonesfmsearch_nochanges("SVMXSTD: Account Search","Cln - SVMXSTD: Account Search", "Cln - SRCH-ACCT-002",true);
+	}
+$bo_act_sfmsearch.viewCaseSearch("Cln - SVMXSTD: Account Search" ,"Case","");
+_assertExists(_select("page1:form1:mainpblock:tab2pblock1:j_id161:j_id264:table5:0:j_id269"));
+_assertExists(_select("page1:form1:mainpblock:tab2pblock1:j_id161:j_id264:table5:0:j_id273"));
+_assertExists(_select("page1:form1:mainpblock:tab2pblock1:j_id161:j_id264:table5:0:j_id277"));
+
+_click($swat_pg_sfmSearch.btn_delete4);
+_wait(300);
+_click($swat_pg_sfmSearch.btn_save);
+_click($swat_pg_sfmSearch.btn_quicksave);
+_click($swat_pg_sfmSearch.btn_save_and_close);
+
+$RS_9159.end();

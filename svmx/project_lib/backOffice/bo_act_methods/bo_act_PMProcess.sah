@@ -1,0 +1,162 @@
+/**
+ * Functions for the Accounts Object
+ */
+var $bo_act_PMProcess = new function bo_act_PMProcess() {
+	var $DEFAULT_PMProcessType = ["Time Based Preventive Maintenance","Condition Based Preventive Maintenance"];
+	
+	/**
+	 * Create a PM Process
+	 * 
+	 * @param $processType
+	 * @param $creationOfWO
+	 * @param $PMPlan
+	 */
+	
+
+	this.createPMProcess = function($processType,$creationOfWO,$PMPlan,$numberOfWorkOrders){
+		var $PMProcessNameID = $bo_act_common.generateRandomName("PMProName");
+		var $expressionNameID = $bo_act_common.generateRandomName("ExpName");
+		$bo_act_navigation.navigateToPMProcess();
+		_click($bo_pg_PMProcess.btn_new);
+		_setSelected($bo_pg_PMProcess.txt_processType,$processType);
+		_setValue($bo_pg_PMProcess.txt_processName,$PMProcessNameID);
+		_setValue($bo_pg_PMProcess.txt_processId,$PMProcessNameID);
+		_check($bo_pg_PMProcess.chk_active);
+		_setValue($bo_pg_PMProcess.txt_createWorkOrderNDaysBeforeScheduledDate,$creationOfWO);
+		_click($bo_pg_PMProcess.btn_createNewExpression);
+		_setSelected($bo_pg_PMProcess.txt_fieldName,"PM Plan Name");
+		_setSelected($bo_pg_PMProcess.txt_operator,"Equals");
+		_setValue($bo_pg_PMProcess.txt_value,$PMPlan);
+		_setValue($bo_pg_PMProcess.txt_expressionName,$expressionNameID);
+		_setValue($bo_pg_PMProcess.txt_expressionId,$expressionNameID);
+		_click($bo_pg_PMProcess.tab_workOrderRules);
+		_setSelected($bo_pg_PMProcess.txt_numberOfWorkOrder,$numberOfWorkOrders);
+		_setSelected($bo_pg_PMProcess.txt_coverageType,"/SVMXSTD/");
+		if(_condition($bo_pg_PMProcess.txt_coverageTypeLocation!=null))
+		_setSelected($bo_pg_PMProcess.txt_coverageTypeLocation,"/SVMXSTD/");
+		_click($bo_pg_PMProcess.tab_scheduleAndNotifications);
+		_setValue($bo_pg_PMProcess.txt_sendErrorNotificationsToThisEmailAddress,"noor.sharieff@servicemax.com");
+		_click($bo_pg_PMProcess.btn_quickSave);
+		_wait(6000);
+		return $PMProcessNameID;
+		//return $callBack.returnResult([_isVisible("success"), "Error in PM Processd",$accountName] );
+	};
+	
+	
+	// Owner Meghana Rao P
+	
+	this.verifyUIfieldsonPMProcess = function($processheader, $isstandard, $isstdchanged)
+	
+	{
+		$bo_act_navigation.navigateToPMProcess();
+		
+		_wait(6000, _isVisible(_heading2($processheader)));
+		
+		_assertEqual(true,_isVisible(_heading2($processheader)));
+		if($isstandard == true && $isstdchanged == false)
+			{
+			
+			_assertEqual(true,_isVisible($bo_pg_PMProcess.btn_std_view));
+			_assertEqual(true,_isVisible($bo_pg_PMProcess.btn_std_clone));
+			__assertEqual(true,_isVisible($bo_pg_PMProcess.btn_std_backtosetuphome));
+			
+			};
+			
+			
+			if($isstandard == false && $isstdchanged == false)
+			{
+			
+			_assertEqual(true,_isVisible($bo_pg_PMProcess.btn_custom_backtosetuphome));
+			_assertEqual(true,_isVisible($bo_pg_PMProcess.btn_custom_delete));
+			_assertEqual(true,_isVisible($bo_pg_PMProcess.btn_custom_clone));
+			_assertEqual(true,_isVisible($bo_pg_PMProcess.btn_custom_edit));
+			_assertEqual(true,_isVisible($bo_pg_PMProcess.btn_custom_new));
+	
+			
+			};	
+		
+			
+			if($isstdchanged == true)
+				
+				{
+				_call(top.location.reload());
+				_assertEqual(true,_isVisible(_heading2($processheader)));
+				_assertEqual(false,_isVisible($bo_pg_PMProcess.btn_std_view));
+				_assertEqual(false,_isVisible($bo_pg_PMProcess.btn_std_clone));
+				
+				}
+	};
+	
+	
+	
+	
+	this.clonePMProcess  = function($creationOfWO,$PMPlan,$numberOfWorkOrders){
+		var $PMProcessName = $bo_act_common.generateRandomName("PMProName");
+		var $pmProcessId = $bo_act_common.generateRandomName("PMProId");
+		var $expressionName = $bo_act_common.generateRandomName("ExpName");
+		var $expressionId = $bo_act_common.generateRandomName("ExpId");
+		$bo_act_navigation.navigateToPMProcess();
+		_check(_checkbox(0,_leftOf(_span("PREV001_SamplePMProcess"))));
+		_click(_submit("Clone"));
+		_setValue($bo_pg_PMProcess.txt_processName,$PMProcessName);
+		_setValue($bo_pg_PMProcess.txt_processId,$pmProcessId);
+		_check($bo_pg_PMProcess.chk_active);
+		_setValue($bo_pg_PMProcess.txt_createWorkOrderNDaysBeforeScheduledDate,$creationOfWO);
+		_click($bo_pg_PMProcess.btn_createNewExpression);
+		_setSelected($bo_pg_PMProcess.txt_fieldName,"PM Plan Name");
+		_setSelected($bo_pg_PMProcess.txt_operator,"Equals");
+		_setValue($bo_pg_PMProcess.txt_value,$PMPlan);
+		_setValue($bo_pg_PMProcess.txt_expressionName,$expressionName);
+		_setValue($bo_pg_PMProcess.txt_expressionId,$expressionId);
+		_click($bo_pg_PMProcess.tab_workOrderRules);
+		_setSelected($bo_pg_PMProcess.txt_numberOfWorkOrder,$numberOfWorkOrders);
+		_setSelected($bo_pg_PMProcess.txt_coverageType,"/SVMXSTD/");
+		if(_condition($bo_pg_PMProcess.txt_coverageTypeLocation!=null))
+		_setSelected($bo_pg_PMProcess.txt_coverageTypeLocation,"/SVMXSTD/");
+		_click($bo_pg_PMProcess.tab_scheduleAndNotifications);
+		_setValue($bo_pg_PMProcess.txt_sendErrorNotificationsToThisEmailAddress,"noor.sharieff@servicemax.com");
+		_click($bo_pg_PMProcess.btn_quickSave);
+		return $pmProcessId;
+		//return $callBack.returnResult([_isVisible("success"), "Error in PM Processd",$accountName] );
+	};
+	this.deletePMProcess = function($PMProcessId){
+		$bo_act_navigation.navigateToPMProcess();
+		_check(_checkbox(0,_leftOf(_span($PMProcessId))));
+		_click($bo_pg_PMProcess.btn_delete);
+		
+	};
+	
+	this.addNewPMProcess = function($processType,$PMProcessName,$pmProcessId,$creationOfWO){
+		_click($bo_pg_PMProcess.btn_new);
+		_setSelected($bo_pg_PMProcess.txt_processType,$processType);
+		_setValue($bo_pg_PMProcess.txt_processName,$PMProcessName);
+		_setValue($bo_pg_PMProcess.txt_processId,$pmProcessId);
+		_setValue($bo_pg_PMProcess.txt_createWorkOrderNDaysBeforeScheduledDate,$creationOfWO);
+		_click($bo_pg_PMProcess.tab_workOrderRules);
+		_setSelected($bo_pg_PMProcess.txt_coverageType,"/SVMXSTD/");
+		if(_condition($bo_pg_PMProcess.txt_coverageTypeLocation!=null))
+		_setSelected($bo_pg_PMProcess.txt_coverageTypeLocation,"/SVMXSTD/");
+		_setSelected(_select("/CONF_SetupPMProcess:SVMX/",_rightOf(_span("Select task object"))),"Task");
+		_setSelected(_select("/CONF_SetupPMProcess:SVMX/",_rightOf(_label("Task map to use"))),"/SVMXSTD/");
+		_setSelected(_select("/CONF_SetupPMProcess:SVMX/",_rightOf(_label("Required Parts map to use"))),"/SVMXSTD/");
+		_click($bo_pg_PMProcess.tab_scheduleAndNotifications);
+		_setValue($bo_pg_PMProcess.txt_sendErrorNotificationsToThisEmailAddress,"harish.cs@ge.com");
+		_click($bo_pg_PMProcess.btn_quickSave);
+	};
+	this.fetchRecordId = function($pmProcessId){
+		_click(_checkbox(0,_leftOf((_span($pmProcessId)))));
+		_click(_button("Edit"));
+		var $url="";
+		_set($url, window.location.href);
+		$recordId = $url.slice($url.lastIndexOf("=")+1);
+		return $recordId;
+	};
+	
+	this.editPMProcess = function($processId){
+		$bo_act_navigation.navigateToPMProcess();
+		 _check(_checkbox(0,_leftOf(_span($processId))));
+		 _click(_button("Edit"));
+		
+	};
+
+};

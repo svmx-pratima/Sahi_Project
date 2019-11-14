@@ -1,0 +1,78 @@
+//Tests are to be written here [Bhupendra Singh Chouhan]
+//==============
+
+var $RS_12492 = _testcase("$RS_12492","SFA:- Verify the Service Flow Automation Configuration UI for WO object on Salesforce Event Service");
+$RS_12492.start();
+_setSpeed($g_stepSpeed);
+/**
+* Login to the Sandbox Org
+*/
+
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+
+//Create SFA Process with Record Field Update Event type on Work order object
+
+var $eventType = "Record Field Updated";
+var $object = "Work Order";
+var $filterCriteria = "SVMXSTD: Open Work Orders";
+var $updatedFieldName = "Order Type";
+var $recipientsField = "Technician";
+var $notificationTitle = "SFA Notification Text for Work Order";
+var $pushNotificationText = "Hi [$OwnerId], Work Order [$Name] is update with Order Type as [$SVMXC__Order_Type__c]. Please check the Status is ";
+var $inserField = "Order Status";
+var $sfmName = "Manage Work Order Lines - Usage";
+
+var $sfaProcessName = $bo_act_serviceFlowAutomation.createServiceFlowAutomationProcess_SalesforceEvent($eventType, $object, $filterCriteria, $updatedFieldName, $recipientsField, $notificationTitle, $pushNotificationText,$inserField,$sfmName);
+_log($sfaProcessName);
+/**
+ * Verify the SFA Process is created 
+ */
+var $actMsg = _getText(_heading2("slds-text-heading--small"));
+var $expMsg = "Automation created successfully";
+
+_assertEqual($expMsg,$actMsg,"Actual and expected SFA Success message are not same");
+_wait(30000, _isVisible($bo_pg_serviceFlowAutomation.btn_newAutomation));
+_assertExists(_link($sfaProcessName));
+
+// Delete the created SFA process
+$bo_act_serviceFlowAutomation.deleteSFAProcess($sfaProcessName);
+
+/**
+ * Verify the SFA Process is deleted 
+ */
+var $actdltMsg = _getText(_heading2("slds-text-heading--small"));
+var $expdltMsg = "Automation deleted successfully.";
+_assertEqual($expdltMsg,$actdltMsg,"Actual and expected SFA Success message are not same");
+
+//Create SFA Process with Record Updated Event type on Work order object
+
+var $eventType1 = "Record Updated";
+var $recipientsField1 = "Preferred Technician";
+
+var $sfaProcessName1 = $bo_act_serviceFlowAutomation.createServiceFlowAutomationProcess_SalesforceEvent($eventType1, $object, $filterCriteria, $updatedFieldName, $recipientsField1, $notificationTitle, $pushNotificationText,$inserField,$sfmName);
+_log($sfaProcessName1);
+/**
+ * Verify the SFA Process is created 
+ */
+var $actMsg = _getText(_heading2("slds-text-heading--small"));
+var $expMsg = "Automation created successfully";
+
+_assertEqual($expMsg,$actMsg,"Actual and expected SFA Success message are not same");
+_wait(30000, _isVisible($bo_pg_serviceFlowAutomation.btn_newAutomation));
+_assertExists(_link($sfaProcessName1));
+
+// Delete the created SFA process
+$bo_act_serviceFlowAutomation.deleteSFAProcess($sfaProcessName1);
+
+/**
+ * Verify the SFA Process is deleted 
+ */
+var $actdltMsg = _getText(_heading2("slds-text-heading--small"));
+var $expdltMsg = "Automation deleted successfully.";
+_assertEqual($expdltMsg,$actdltMsg,"Actual and expected SFA Success message are not same");
+
+
+$bo_act_login.logOut(); 
+
+$RS_12492.end();
+

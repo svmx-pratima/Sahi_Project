@@ -1,0 +1,79 @@
+//Tests are to be written here  [Bhupendra Singh Chouhan]
+//============== 
+
+//Pre - Condition Test Data
+var $recordType = ["Depot","Depot Child","Depot Parent","Standard Location"];
+var $productFamily = ["--None--","GeneralSolution","AdvSolution","Accessory", "Storage"];
+var $productCode = "";
+var $exchangeType = ["--None--","Advance Exchange","Return Exchange"];
+var $unitOfTimeForCoverage = ["--None--","Days","Weeks","Months","Years"];
+var $coverageEffectiveFrom = ["--None--","Date Installed","Date Ordered","Date Shipped","Last Activity Date","Last Date Shipped","Warranty Start Date","Warranty End Date"];
+var $materialPercentCovered = 10;
+var $laborPercentCovered = 20;
+var $expensesPercentCovered = 30;
+var $durationOfCoverage = 5;
+var $seperator = "/";
+
+var $RS_7288 = _testcase("$RS_7288","Creation of a Warranty Term and association of a Warranty to an Installed Product");
+$RS_7288.start();
+_setSpeed(100);
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+
+/**
+ * Create Account, Contact, Location, Product and Installed Product
+ */
+var $accountName = $bo_act_accounts.createAccount();
+var $contactName = $bo_act_contacts.createContact($accountName);
+var $locationName = $bo_act_locations.createLocation($recordType[3],$accountName,"#007","India","560001");
+var $productName = $bo_act_products.createProduct($productCode, $productFamily[0]);
+var $IBName = $bo_act_installedProduct.createInstalledProduct($productName, $accountName, $contactName);
+
+var $warrantyName = $bo_act_warrantyTerms.createWarrantyTerms($exchangeType[2],"10","5",$unitOfTimeForCoverage[4],"20","5",$unitOfTimeForCoverage[4],"30","5",$unitOfTimeForCoverage[4],$coverageEffectiveFrom[1]);
+
+$bo_act_warrantyTerms.createApplicableProducts($productName, $warrantyName); //Create Applicable product for warranty Terms
+
+$bo_act_navigation.navigateToCreatedRecordUsingGlobalSearch($IBName); 	//Navigate to Installed Product Page using global search
+
+$bo_act_warrantyTerms.createWarranty($warrantyName);
+
+$bo_act_navigation.navigateToCreatedRecordUsingGlobalSearch($IBName);	//Navigate to Installed Product Page using global search
+
+var $materialPercentCoveredActulOn_IB = _getText(_cell(0,_under(_tableHeader("Material % Covered"))));
+var $timePercentCoveredActulOn_IB = _getText(_cell(0,_under(_tableHeader("Time % Covered"))));
+var $expensesPercentCoveredActulOn_IB = _getText(_cell(0,_under(_tableHeader("Expenses % Covered"))));
+
+//validation
+//Validating the Material Labor and Expenses Percent
+_assertEqual($materialPercentCovered,$materialPercentCoveredActulOn_IB,"Actual and expected Material % covered are not same");
+_assertEqual($laborPercentCovered,$timePercentCoveredActulOn_IB,"Actual and expected Time % covered are not same");
+_assertEqual($expensesPercentCovered,$expensesPercentCoveredActulOn_IB,"Actual and expected Expenses % covered are not same");
+
+var $startDateExpectedOn_IB = _getText(_div(0,_rightOf(_cell("/Date Installed/"))));
+
+var $endDateExpectedOn_IB =  $bo_act_common.endDateCalculationForIB($startDateExpectedOn_IB, $durationOfCoverage, $seperator);
+_logOutput($endDateExpectedOn_IB);
+
+var $startDateActulOn_IB = _getText(_cell(0,_under(_tableHeader("Start Date"))));
+var $endDateActulOn_IB = _getText(_cell(0,_under(_tableHeader("End Date"))));
+
+//Validating the Actual and expected Start/End Dates on IB
+_assertEqual($startDateExpectedOn_IB,$startDateActulOn_IB,"Actual and expected Start Dates are not same");
+_assertEqual($endDateExpectedOn_IB,$endDateActulOn_IB,"Actual and expected End Dates are not same");
+
+//Clean up function
+
+$bo_act_common.deleteAccount($bac_un, $bac_pwd, $accountName);
+$bo_act_common.deleteContact($bac_un, $bac_pwd, $contactName);
+$bo_act_common.deleteIB($bac_un, $bac_pwd, $orgnamespace,$IBName);
+$bo_act_common.deleteProduct($bac_un, $bac_pwd,$productName);
+$bo_act_common.deleteLocation($bac_un, $bac_pwd, $orgnamespace,$locationName);
+$bo_act_common.deleteWarranty($bac_un, $bac_pwd, $orgnamespace,$warrantyName);
+
+//var $datacreated = [$warrantyName,$IBName,$locationName,$productName,$contactName,$accountName,];
+//for (var i = 0; i < $datacreated.length; i++) {
+//	$bo_act_common.cleanUpfunction($datacreated[i]);
+//}
+$bo_act_login.logOut();
+
+$RS_7288.end();
+

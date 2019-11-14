@@ -1,0 +1,150 @@
+/**
+ * Functions for the Accounts Object
+ */
+var $bo_act_salesforcePageSetUp = new function bo_act_$bo_act_salesforcePageSetUp() {
+
+
+	this.createApexClasses = function($code) {
+		$bo_act_navigation.navigateToSetUpAndSearch("Apex Classes");
+		 _click(_submit("New"));
+		 _setValue($bo_pg_salesforcePageSetUp.txt_apexClasscode,$code);
+		 _click($bo_pg_salesforcePageSetUp.btn_quickSave);
+		 _wait(10000);
+		 _click($bo_pg_salesforcePageSetUp.btn_save);
+		 _wait(10000);
+	};
+	
+	this.deleteapexClasses = function($className){
+		$bo_act_navigation.navigateToSetUpAndSearch("Apex Classes");
+		 var $firstLetter = $className.charAt(0);
+		 var $upperCase = $firstLetter.toUpperCase();
+		 _click(_span($upperCase));
+		 _click(_link($className));
+		 _click($bo_pg_salesforcePageSetUp.btn_delete);
+	};
+	this.createUser = function($UserLicense,$profile){
+		var $lastName = $bo_act_common.generateRandomName("TS");
+		var $alias = $bo_act_common.generateRandomName("a");
+		var $email = $bo_act_common.generateRandomName("TS")+"@test.com";
+		$bo_act_navigation.navigateToSetUpAndSearch("Manage Users");
+		_click(_link("/Add or edit users and set user quotas/"));
+		_click($bo_pg_salesforcePageSetUp.btn_newUser);
+		_setValue($bo_pg_salesforcePageSetUp.txt_lastName,$lastName);
+		_setValue($bo_pg_salesforcePageSetUp.txt_alias,$alias);
+		_setValue($bo_pg_salesforcePageSetUp.txt_email,$email);
+		_setValue($bo_pg_salesforcePageSetUp.txt_userName,$email);
+		_setValue($bo_pg_salesforcePageSetUp.txt_nickName,$lastName);
+		_setSelected(_select("user_license_id"),$UserLicense);
+		_setSelected(_select("Profile"),$profile);
+		_setSelected(_select("TimeZoneSidKey"), "(GMT+05:30) India Standard Time (Asia/Kolkata)");
+		_click($bo_pg_salesforcePageSetUp.btn_submitSave);
+		var $userName = _getText($bo_pg_salesforcePageSetUp.txt_Name);
+		return $userName;
+	};
+	
+
+	this.createTabs = function($object,$color){
+		_click(_button(" New "));
+		_setSelected(_select(0,_rightOf(_label("/Object/"))),$object);
+		_click(_image("Lookup (New Window)"));
+		_popup("p2MotifPickerWindow")._click(_link(5));
+		$color= $color+1;
+		_selectWindow();
+		_click(_submit(" Next "));
+		_click(_submit(" Next "));
+		_click(_submit(" Save "));
+		_assertExists(_link(_link("/Activity Products/")));
+	};
+
+//Drag and Drop
+	this.dragAndDropSection = function($sectionName,$NoOfColumn){
+		_click(_link("Edit Layout"));
+		_dragDrop(_div("Section"),_span("/section-header/"));
+		_setValue(_textbox("sectionName"),$sectionName);
+		if($NoOfColumn == 1)
+		_click(_radio("column_1"));
+		_click(_cell("OK"));
+	};
+	this.dragAndDropVisualForcePage = function($object,$sectionName){
+		//_click(_link("Edit Layout"));
+		_click(_div("Visualforce Pages[1]"));
+		_dragDrop($object,_span($sectionName));
+	};
+		this.dragAndDropFields = function($object,$sectionName){
+			_dragDrop($object,$sectionName);
+		};
+	this.saveEditLayout = function(){
+		_click(_button(" x-btn-text[1]"));
+	};
+	
+	this.readNameSpace = function(){
+		$bo_act_navigation.navigateToSetUpAndSearch("Installed Packages");
+		if(_getText(_cell("SVMXC"))!="SVMXDEV")
+			var $nameSpace = "SVMXC";
+		else
+			var $nameSpace = "SVMXDEV";
+		return $nameSpace;
+	};
+this.createBusinessHours = function($businessHoursName,$timeZone){
+	$bo_act_navigation.navigateToSetUpAndSearch("Business Hours");
+	_click(_button("New Business Hours"));
+	_setValue(_textbox(0,_rightOf(_label("/Business Hours Name/"))),$businessHoursName);
+	_check(_checkbox("IsActive"));
+	_setSelected(_select("TimeZoneSidKey"),$timeZone);
+	_uncheck(_checkbox(0,_rightOf(_textbox("/SundayEndTime/"))));
+	_setValue(_textbox("tpie_i_SundayStartTime"),"");
+	_setValue(_textbox("tpie_i_SundayEndTime"),"");
+	_uncheck(_checkbox(0,_rightOf(_textbox("/MondayEndTime/"))));
+	_setValue(_textbox("tpie_i_MondayStartTime"),"08:00");
+	_setValue(_textbox("tpie_i_MondayEndTime"),"17:00");
+	_uncheck(_checkbox(0,_rightOf(_textbox("/TuesdayEndTime/"))));
+	_setValue(_textbox("tpie_i_TuesdayStartTime"),"08:00");
+	_setValue(_textbox("tpie_i_TuesdayEndTime"),"17:00");
+	_uncheck(_checkbox(0,_rightOf(_textbox("/WednesdayEndTime/"))));
+	_setValue(_textbox("tpie_i_WednesdayStartTime"),"08:00");
+	_setValue(_textbox("tpie_i_WednesdayEndTime"),"17:00");
+	_uncheck(_checkbox(0,_rightOf(_textbox("/ThursdayEndTime/"))));
+	_setValue(_textbox("tpie_i_ThursdayStartTime"),"08:00");
+	_setValue(_textbox("tpie_i_ThursdayEndTime"),"17:00");
+	_uncheck(_checkbox(0,_rightOf(_textbox("/FridayEndTime/"))));
+	_setValue(_textbox("tpie_i_FridayStartTime"),"08:00");
+	_setValue(_textbox("tpie_i_FridayEndTime"),"17:00");
+	_uncheck(_checkbox(0,_rightOf(_textbox("/SaturdayEndTime/"))));
+	_setValue(_textbox("tpie_i_SaturdayStartTime"),"");
+	_setValue(_textbox("tpie_i_SaturdayEndTime"),"");	
+	_click(_submit(" Save "));
+
+};
+this.editUsercheckboxForCheck = function(a){
+	_click(_button(" Edit "));
+	_assertVisible(_label("ServiceMax User"));
+	if(a == _isChecked(_checkbox("ServiceMax User"))){
+		_check(_checkbox("ServiceMax User"));
+	_logOutput("ServiceMax User is checked");
+	}
+	else{
+		_check(_checkbox("ServiceMax User"));
+	}	
+	_click(_submit(" Save "));
+	_wait(5000);
+};
+this.editUsercheckboxForUnCheck = function(a){
+	_click(_button(" Edit "));
+	_assertVisible(_label("ServiceMax User"));
+	if(a == _isChecked(_checkbox("ServiceMax User"))){
+		_uncheck(_checkbox("ServiceMax User"));
+	_logOutput("ServiceMax User is unchecked");
+	}
+	else{
+		_uncheck(_checkbox("ServiceMax User"));
+	}	
+	_click(_submit(" Save "));
+	_wait(5000);
+};
+
+this.createTechnician = function(){
+	$bo_act_navigation.navigateToTechnicianEquipmentPage();
+	_click($bo_pg_salesforcePages.btn_new);
+};
+};
+

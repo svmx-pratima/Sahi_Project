@@ -1,0 +1,28 @@
+// Author Meghana Rao P
+/*
+ * To verify that an Untagged question comes under the group "Untagged"
+ */
+var $RS_9840 = _testcase("RS_9840", "o verify that an Untagged question comes under the group Untagged");
+$RS_9840.start();
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+
+$bo_act_navigation.navigateToSfmTransactionDesigner();
+_wait(60000, _isVisible($bo_pg_sfmTransactionAndDesigner.btn_newSFM));
+_wait(1000);
+
+// To verify the new Question type Attachment
+//To verify the Boundary value of HELP URL text
+
+
+var $QuestionName = $bo_act_common.generateRandomName("A RS_9840");
+var $Process1 = $bo_act_common.generateRandomName("A_RS_9840_Pro1");
+$bo_act_checklistdesigner.newChecklistTypeSFM($Process1,"to generate a Checklist/Survey type of Process", "Work Order");
+
+$bo_act_checklistdesigner.addQuestionToChecklist1($QuestionName, "");
+$bo_act_checklistdesigner.re_openChecklistTypeSFM($Process1, true);
+$bo_act_checklistdesigner.verifyquestion_undertags($QuestionName, "Untagged");
+_wait(10000);
+
+
+
+$RS_9840.end();

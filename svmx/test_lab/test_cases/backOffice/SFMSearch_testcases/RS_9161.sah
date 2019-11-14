@@ -1,0 +1,101 @@
+//Tests are to be written here [Srinivasa Murthy S]
+// Creating variable for the printing the test case number and name
+var $RS_9161 = _testcase("RS_9161","SFM Search - Delivery - Results Page");
+$RS_9161.start();
+//var $orgnamespace = "SVMXC";
+var $restAccName = $bo_act_common.generateRandomName("RS_9161_");
+
+
+
+//Pre-requisite for this test case to check if Standard Account Search is cloned and available. RS_9159 test case needs to be executed before running this test.
+
+//Create WO with Open Status
+$objName= "SVMXC__Service_Order__c";
+$obJson = "{\"SVMXC__Order_Status__c\":\"Open\",\"SVMXC__Order_Type__c\":\"Field Service\"}";     
+$columnName = "Name";
+$filter="id";
+ 
+$workorderid=$sfm_act_restApiMethods.postRestApi($bac_un,$bac_pwd,$bac_client_id,$bac_client_secret,$bac_orginstance,$objName,$obJson,"POST");
+_log($workorderid);
+//get the wo
+$WOname =$sfm_act_restApiMethods.getRestApi($bac_un,$bac_pwd,$bac_client_id,$bac_client_secret,$bac_orginstance,"GET", $objName, $columnName, $filter, $workorderid);
+_log($WOname);
+
+var $objName= "Account";
+var $obJson = "{\"Name\":\""+$restAccName+"\"}"; 
+var $columnName = "Name";
+var $filter="id";
+//create an account
+var $account=$sfm_act_restApiMethods.postRestApi($bac_un,$bac_pwd,$bac_client_id,$bac_client_secret,$bac_orginstance,$objName,$obJson,"POST");
+_log($account);
+$accountName =$sfm_act_restApiMethods.getRestApi($bac_un,$bac_pwd,$bac_client_id,$bac_client_secret,$bac_orginstance,"GET", $objName, $columnName, $filter, $account);
+_log($accountName);
+//get the caseNumber
+
+
+var $objName1= "Case";
+var $obJson1 = "{\"AccountId\":\""+$account+"\",\""+$orgnamespace+"__Billing_Type__c\":\"Loan\",\""+$orgnamespace+"__Scheduled_Date__c\":\"2018-08-23\",\""+$orgnamespace+"__Actual_Initial_Response__c\":\"2018-08-23T00:00:00.000Z\",\"Status\":\"Open\"}";
+var $columnName1 = "CaseNumber";
+var $filter1="id";
+//create  case with above created account and other parameters
+var $filterValue1=$sfm_act_restApiMethods.postRestApi($bac_un,$bac_pwd,$bac_client_id,$bac_client_secret,$bac_orginstance,$objName1,$obJson1,"POST");
+//get the caseNumber
+var $caseNumber1 =$sfm_act_restApiMethods.getRestApi($bac_un,$bac_pwd,$bac_client_id,$bac_client_secret,$bac_orginstance,"GET", $objName1, $columnName1, $filter1, $filterValue1);
+
+var $objName1= "Case";
+var $obJson1 = "{\"AccountId\":\""+$account+"\",\""+$orgnamespace+"__Billing_Type__c\":\"Loan\",\""+$orgnamespace+"__Scheduled_Date__c\":\"2018-08-23\",\""+$orgnamespace+"__Actual_Initial_Response__c\":\"2018-08-23T00:00:00.000Z\",\"Status\":\"Closed\"}";
+var $columnName1 = "CaseNumber";
+var $filter1="id";
+var $filterValue2=$sfm_act_restApiMethods.postRestApi($bac_un,$bac_pwd,$bac_client_id,$bac_client_secret,$bac_orginstance,$objName1,$obJson1,"POST");
+//get the caseNumber
+var $caseNumber2 =$sfm_act_restApiMethods.getRestApi($bac_un,$bac_pwd,$bac_client_id,$bac_client_secret,$bac_orginstance,"GET", $objName1, $columnName1, $filter1, $filterValue2);
+
+
+//Login to the Sandbox using the credentials from 
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+
+
+/*
+ * Use it for later reference. DO NOT DELETE!
+//Create Case with Open Status
+$objName= "Case";
+$obJson = "{\"Status\":\"Open\"}";     
+$columnName = "CaseNumber";
+$filter="id";
+ 
+$caseid=$sfm_act_restApiMethods.postRestApi($bac_un,$bac_pwd,$bac_client_id,$bac_client_secret,$bac_orginstance,$objName,$obJson,"POST");
+_log($caseid);
+//get the Case
+$caseNumber1 =$sfm_act_restApiMethods.getRestApi($bac_un,$bac_pwd,$bac_client_id,$bac_client_secret,$bac_orginstance,"GET", $objName, $columnName, $filter, $caseid);
+_log($caseNumber1);
+
+//Create Case with Closed Status
+$objName= "Case";
+$obJson = "{\"Status\":\"Open\"}";     
+$columnName = "CaseNumber";
+$filter="id";
+ 
+$caseid2=$sfm_act_restApiMethods.postRestApi($bac_un,$bac_pwd,$bac_client_id,$bac_client_secret,$bac_orginstance,$objName,$obJson,"POST");
+_log($caseid2);
+//get the Case
+$caseNumber2 =$sfm_act_restApiMethods.getRestApi($bac_un,$bac_pwd,$bac_client_id,$bac_client_secret,$bac_orginstance,"GET", $objName, $columnName, $filter, $caseid2);
+_log($caseNumber2);
+*/
+
+
+
+//Launch the SFM Search
+$sfm_act_search.launchGivenSearch("Cln - SVMXSTD: Account Search","");
+_wait(5000);
+_click(_span("Open Work Orders (10)"));
+//_setValue(_textbox(3), $WOname);
+//_click(_span("Go"));
+_assertExists(_link($WOname));
+_click(_span("Open Cases (10)"));
+_setValue(_textbox(3), $accountName);
+_click(_span("Go"));
+_wait(2000);
+_assertExists(_link($caseNumber1));
+_assertNotExists(_link($caseNumber2));
+
+$RS_9161.end();

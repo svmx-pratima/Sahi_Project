@@ -1,0 +1,60 @@
+var $swat_act_sfmWizard = new function $swat_act_sfmWizard() {
+	
+
+
+	/**
+	 * Author		:	Ashwini Holagi
+	 * Function		:	Create SFM Wizard , Add Step of Type SFM
+	 */
+	this.createSfmWizardWithStepSFM = function($wizardObjectName,$wizardTitleName, $wizardIDName,$wizardStepType,$wizardStepName, $executionMode, $handOver){		
+		$bo_act_navigation.navigateToSfmWizard();
+		$bo_act_SFW.createWizardGeneralInfo($wizardObjectName,$wizardTitleName, $wizardIDName);
+		$bo_act_SFW.createSFMWizardStepwithHandOver($wizardStepType, $wizardStepName, $executionMode, $handOver);
+		$bo_act_SFW.quickSaveSFWizard();
+		_wait(5000);
+		$bo_act_SFW.saveAndClose();
+		_wait(5000, _isVisible(_heading2("mainTitle")));	
+	};
+	
+	/**
+	 * Author		:	Ashwini Holagi
+	 * Function		:	Create SFM Wizard , Add Step of Type SFM and Others
+	 */
+	this.createSfmWizardMutipleStep = function ($wizardObjectName,$wizardTitleName, $wizardIDName,$wizardStepType,$wizardStepName, $executionMode, $handOver){
+		$bo_act_navigation.navigateToSfmWizard();
+		$bo_act_SFW.createWizardGeneralInfo($wizardObjectName,$wizardTitleName, $wizardIDName);
+		$bo_act_SFW.createSFMWizardStepwithHandOver($wizardStepType, $wizardStepName, $executionMode, $handOver);
+		_wait(2000);
+		var $StepType = "Others";
+		var $StepName = "Check Entitlement WO";
+		$bo_act_SFW.addCustomActionToWizard($StepType, $StepName);
+		$bo_act_SFW.quickSaveSFWizard();
+		_wait(5000);
+		$bo_act_SFW.saveAndClose();
+		_wait(5000, _isVisible(_heading2("mainTitle")));		
+	};
+	
+	/**
+	 * Author		:	Ashwini Holagi
+	 * Function		:	Create SFM Wizard , Add Step of Type Output Document with Select Template
+	 */
+	this.createSfmWizardWithStepOutputDoc= function($wizardObjectName,$wizardTitleName, $wizardIDName,$wizardStepType,$wizardStepName,$selectTemplateAtRunTime){
+		$bo_act_navigation.navigateToSfmWizard();
+		$bo_act_SFW.createWizardGeneralInfo($wizardObjectName,$wizardTitleName, $wizardIDName);
+		$bo_act_SFW.createOutputDocumentWizardStepwithSelectTemplate($wizardStepType, $wizardStepName, $selectTemplateAtRunTime);
+		_wait(4000);
+		$bo_act_SFW.quickSaveSFWizard();
+		_wait(5000);
+		$bo_act_SFW.saveAndClose();
+		_wait(5000, _isVisible(_heading2("mainTitle")));	
+	};
+		
+	
+
+};
+
+
+
+
+
+	

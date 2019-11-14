@@ -1,0 +1,83 @@
+var $user_credentials = $excel.readFromCustomExcel("../op_excleData/automation.xlsx", "User_Details","","");
+var $BH = $excel.readFromCustomExcel("../op_excleData/automation.xlsx", "BusinessHours","","");
+
+//var $nArr;
+//Calling the sforce API
+for(var $i=0;$i<$user_credentials.length;$i++)
+{
+var $g_un = $user_credentials[$i][0];
+var $g_pwd = $user_credentials[$i][1];
+var $g_url = $user_credentials[$i][2];
+}
+
+var $RS_6319 = _testcase("RS_6319", "Create a new Territory");
+
+$RS_6319.start();
+
+/*var $g_url = "https://test.salesforce.com/";
+var $g_un = "govendhan@svmx-cct5.org.cct5part1";
+var $g_pwd = "maxpl0re2";*/
+
+var $BH_Name = $BH[0][1];
+
+$bo_act_login.login($g_url, $g_un, $g_pwd);
+		
+
+var $date = "" + new Date();
+var $TerrName = "AutomationTerritory_" + $date;
+var $UserName = _getText(_span("userNavLabel"));
+var $rowIndex = 1;
+
+_click(_link("ServiceMax Setup"));
+_click(_div("Service Organization"));
+_click(_div("Territories"));
+_click(_button("Add Territory"));
+_setValue(_textbox("Territory:POPUPS:TerritoryBlock:j_id30:j_id31:TTname"), $TerrName);
+
+
+_setValue(_textbox("Territory:POPUPS:TerritoryBlock:j_id43:j_id44:TTBussHrs"), $BH_Name);
+_click(_image("Territory's Business Hours Lookup (New Window)"));
+_selectWindow("lookup");
+_click(_link($BH_Name));
+_selectWindow();
+_setValue(_textbox("Territory:POPUPS:TerritoryBlock:j_id43:j_id44:TTBussHrs"), $BH_Name);
+_click(_submit("Submit"));
+_click(_button("Add Coverage"));
+_setSelected(_select("Territory:selected_ID:ListTTAttribute:j_id222:j_id223:0:j_id230"), "State");
+_setValue(_textbox("Territory:selected_ID:ListTTAttribute:j_id222:j_id223:0:j_id235"), "CA");
+_click(_button("Quick Add Zip Coverage"));
+_setValue(_textbox("Territory:POPUPS:j_id64:j_id91:j_id94:ZipStart"), "93704");
+_setValue(_textbox("Territory:POPUPS:j_id64:j_id91:j_id96:ZipEnd"), "93706");
+_click(_button("Submit"));
+_click(_button("Quick Add Country Coverage"));
+_setSelected(_select("Territory:POPUPS:j_id101:CountryLIst:j_id132:Country"), ["United States"]);
+_click(_image("Add"));
+_click(_button("Submit"));
+_click(_button("Save"));
+_click(_cell("Dispatcher"));
+_click(_button("Add Dispatcher"));
+_click(_image("Dispatcher Lookup (New Window)"));
+_selectWindow("lookup");
+_setValue(_textbox("lksrch"), $UserName);
+_click(_submit(" Go! "));
+_click(_link($UserName));
+_selectWindow();
+_setValue(_textbox("Territory:selected_ID:PbDispatch:DsptchrLst:0:j_id272"), $UserName);
+_click(_button("Save"));
+
+
+
+if(_exists($TerrName))
+	{
+	_log("Territory Created Successfully");
+	//$excel.writeToExcel("insertAtIndex", "../optimax/op_excleData/automation.xlsx", "Territory", $TerrName, $rowIndex);
+	$excel.insertUnderColumn("../op_excleData/automation.xlsx", "Rules", "Territory", $TerrName, $rowIndex);
+	}
+else
+	{
+	_fail("Error in Creating Territory");
+	}
+
+$bo_act_login.logOut();
+
+$RS_6319.end();

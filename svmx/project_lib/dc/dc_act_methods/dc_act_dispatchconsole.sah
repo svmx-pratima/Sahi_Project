@@ -1,0 +1,8 @@
+/*
+ * object repository
+ */
+var $dc_act_dispatchconsole = new function dc_act_dispatchconsole() {
+
+	
+
+}

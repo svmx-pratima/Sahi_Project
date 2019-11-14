@@ -1,0 +1,28 @@
+../../../test_lab/test_cases/optimax/RS-10192.sah
+../../../test_lab/test_cases/optimax/RS-10193.sah
+../../../test_lab/test_cases/optimax/RS-10194.sah
+../../../test_lab/test_cases/optimax/RS-10195.sah
+../../../test_lab/test_cases/optimax/RS-10196.js
+../../../test_lab/test_cases/optimax/RS-10197.js
+../../../test_lab/test_cases/optimax/RS-10198.js
+../../../test_lab/test_cases/optimax/RS-10199.sah
+../../../test_lab/test_cases/optimax/RS-10200.sah
+../../../test_lab/test_cases/optimax/RS-10201.sah
+../../../test_lab/test_cases/optimax/RS-10203.js
+../../../test_lab/test_cases/optimax/RS-10205.js
+../../../test_lab/test_cases/optimax/RS-10206.js
+../../../test_lab/test_cases/optimax/RS-10207.js
+../../../test_lab/test_cases/optimax/RS-10208.js
+../../../test_lab/test_cases/optimax/RS-10209.sah
+../../../test_lab/test_cases/optimax/RS-10210.js
+../../../test_lab/test_cases/optimax/RS-10211.js
+../../../test_lab/test_cases/optimax/RS-10214.js
+../../../test_lab/test_cases/optimax/RS-10223.sah
+../../../test_lab/test_cases/optimax/RS-10227.sah
+../../../test_lab/test_cases/optimax/RS-10254.js
+../../../test_lab/test_cases/optimax/RS-10411-E2E_AB with default value coinciding with PST and PET.sah
+../../../test_lab/test_cases/optimax/RS-10412-E2E_Appointment assignment to WO.sah
+../../../test_lab/test_cases/optimax/RS-10413-E2E_Appointment Booking Window default to scheduling horizon value if the WO has no PST and PET.js
+../../../test_lab/test_cases/optimax/RS-10414-E2E_Promised Start Date not Null on selecting Slot in AB.sah
+../../../test_lab/test_cases/optimax/RS-10415-E2E_RTO trigger on Appointment Assignment.js
+../../../test_lab/test_cases/optimax/RS-10416-E2E_Time Slots availability for Appointment Type.sah

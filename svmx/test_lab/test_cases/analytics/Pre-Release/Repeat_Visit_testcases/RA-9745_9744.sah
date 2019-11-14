@@ -1,0 +1,134 @@
+/**
+ * This Test-cases verified the multiple calculation method for Repeat visit when Top-level tracker is Case
+ * Owner : Meghana
+ *
+ */var $an_rv_1050 = _testcase("RS-9745","Case Multiple calculation method check for Repeat visit");
+$an_rv_1050.start();
+var $data = _readExcelFile("../../../analytics/Pre-Release/Data_Meghana.xlsx","Sheet1",true);
+var $un = $data[1]["Username"];
+var $pwd = $data[1]["pwd"];
+var $url = "https://test.salesforce.com";
+var $insert_case = $data[1]["InsertCase"];
+var $Account = $data[1]["Account"];
+var $Technician = $data[1]["Technician"];
+var $Product = $data[1]["Product"];
+var $OrderStatus = $data[1]["OrderStatus"];
+var $Closedon = $data[1]["ClosedOn"];
+var $Site = $data[1]["Site"];
+var $Component = $data[1]["Component"];
+var $WO_new_1 ;
+var $WO_Account_1;
+var $RV_WO_1;
+var $RV_config_1;
+var $RV_case_1;
+var $Is_Repeat_visit_1;
+var $WO_new_2 ;
+var $WO_Account_2;
+var $RV_WO_2;
+var $RV_config_2;
+var $RV_case_2;
+var $Is_Repeat_visit_2;
+var $arr_value_1;
+var $arr_value_2;
+var $customcheckbox1;
+var $customcheckbox2;
+$bo_act_login.login($url, $un, $pwd);
+var $user_meghana = $data[1]["user_meghana"];
+
+var $createcase = $op_act_sForceApiCall.sForceQuery($un, $pwd, $insert_case, "create");
+
+
+var $Case ;
+var $casedummy;
+_log($createcase);
+var $query_case = "Select Id from Case  where Createdby.Id = '"+$user_meghana+"' Order by CreatedDate DESC Limit 1";
+var $fetchcasequery = $op_act_sForceApiCall.sForceQuery($un, $pwd, $query_case,"query");
+
+
+	$Case = $fetchcasequery[0].Id;
+		
+
+
+var $insert_wo_first = "SVMXC__Service_Order__c  WO = new SVMXC__Service_Order__c (SVMXC__Company__c ='"+ $Account +"', SVMXC__Product__c = '"+$Product+"' , SVMXC__Group_Member__c = '"+$Technician+"' ,SVMXC__Component__c = '"+$Component+"',SVMXC__Order_Status__c = '"+$OrderStatus+"' , SVMXC__Closed_On__c = "+$Closedon+", SVMXC__Case__c = '"+ $Case +"',SVMXC__Country__c = 'United States', SVMXC__Sub_Status__c = 'Resolved', SVMXC__Priority__c = 'High', SVMXC__Site__c = '"+$Site+"');insert WO;";
+var $query_wo_first = "Select Name , Id  , SVMXC__Company__c , SVMXC__Component__c , SVMXC__Closed_On__c from SVMXC__Service_Order__c  where Createdby.Id = '"+$user_meghana+"' Order by CreatedDate DESC Limit 1";
+var $fetchwoquery = $op_act_sForceApiCall.sForceQuery($un, $pwd, $insert_wo_first , "create");
+
+
+var $store_first_wo = $op_act_sForceApiCall.sForceQuery($un, $pwd, $query_wo_first,"query");
+
+
+_log($store_first_wo);
+var $wo1;
+var $wo2;
+
+	
+	  $WO_new_1 = $store_first_wo[0].Id;
+
+
+_log($WO_new_1);
+
+var $insert_wo_second = "SVMXC__Service_Order__c  WO = new SVMXC__Service_Order__c (SVMXC__Company__c ='"+ $Account +"', SVMXC__Product__c = '"+$Product+"' , SVMXC__Group_Member__c = '"+$Technician+"' ,SVMXC__Component__c = '"+$Component+"', SVMXC__Order_Status__c = '"+$OrderStatus+"' , SVMXC__Closed_On__c = "+$Closedon+", SVMXC__Case__c = '"+ $Case +"',SVMXC__Country__c = 'United Kingdom', SVMXC__Sub_Status__c = 'Resolved', SVMXC__Priority__c = 'High', SVMXC__Site__c = '"+$Site+"' );insert WO;";
+var $query_wo_second = "Select Name , Id  , SVMXC__Company__c , SVMXC__Component__c , SVMXC__Closed_On__c from SVMXC__Service_Order__c  where Createdby.Id = '"+$user_meghana+"' Order by CreatedDate DESC Limit 1";
+var $fetchwo2query = $op_act_sForceApiCall.sForceQuery($un, $pwd, $insert_wo_second , "create");
+
+
+
+var $store_sec_wo = $op_act_sForceApiCall.sForceQuery($un, $pwd, $query_wo_second,"query");
+
+
+
+	
+	  $WO_new_2 = $store_sec_wo[0].Id;
+
+
+_log($WO_new_2);
+
+$TopLevelCase.an_toplevelcase();
+
+$an_act_Repeat_Visit_SR.rv_runEngine("meghana.rao@servicemax.com");
+
+var $ana_1050_1048_wo1= null;
+var $arr_value_rv_1;;
+
+var $ana_1050_query_RV1 = "Select SVMXC__Work_Order__c ,Custom_Checkbox__c , SVMXC__Account__c, SVMXC__Configuration_Name__c ,SVMXC__Is_Repeat_Visit__c ,SVMXC__Case__c from SVMXC__SPM_Repeat_Visit__c where SVMXC__Work_Order__c ='"+ $WO_new_1 +"'";
+var $store_rv1 = $op_act_sForceApiCall.sForceQuery($un, $pwd, $ana_1050_query_RV1,"query");
+
+$store_rv1.forEach(function($arr_value_rv_1) {
+	
+	$ana_1050_1048_wo1 = $arr_value_rv_1.SVMXC__Work_Order__c;
+	$WO_Account_1 = $arr_value_rv_1.SVMXC__Account__c;
+	$RV_case_1 = $arr_value_rv_1.SVMXC__Case__c;
+	$RV_config_1 = $arr_value_rv_1.SVMXC__Configuration_Name__c;
+	$Is_Repeat_visit_1 = $arr_value_rv_1.SVMXC__Is_Repeat_Visit__c;
+	$customcheckbox1 = $arr_value_rv_1.Custom_Checkbox__c;
+	
+});
+
+
+_log($RV_config_1);
+
+var $ana_1050_1048_wo2= null;
+var $arr_value_rv_2;
+for(var $i=0 ; $ana_1050_1048_wo2 ==null ; $i++){
+var $ana_1050_query_RV2 = "Select SVMXC__Work_Order__c ,Custom_Checkbox__c, SVMXC__Account__c, SVMXC__Configuration_Name__c ,SVMXC__Is_Repeat_Visit__c ,SVMXC__Case__c from SVMXC__SPM_Repeat_Visit__c where SVMXC__Work_Order__c ='"+ $WO_new_2 +"'";
+var $store_rv2 = $op_act_sForceApiCall.sForceQuery($un, $pwd, $ana_1050_query_RV2,"query");
+
+$store_rv2.forEach(function($arr_value_rv_2) {
+	
+	$ana_1050_1048_wo2 = $arr_value_rv_2.SVMXC__Work_Order__c;
+	$WO_Account_2 = $arr_value_rv_2.SVMXC__Account__c;
+	$RV_case_2 = $arr_value_rv_2.SVMXC__Case__c;
+	$RV_config_2 = $arr_value_rv_2.SVMXC__Configuration_Name__c;
+	$Is_Repeat_visit_2 = $arr_value_rv_2.SVMXC__Is_Repeat_Visit__c;
+	$customcheckbox2 = $arr_value_rv_2.Custom_Checkbox__c;
+	
+});
+}
+_log($RV_config_2);
+
+_assertNotEqual($RV_config_1, $RV_config_2);
+_assertEqual("true", $customcheckbox1);
+_assertEqual("false", $customcheckbox2);
+
+
+$an_rv_1050.end();

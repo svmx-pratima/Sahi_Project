@@ -1,0 +1,187 @@
+//Author: Anand Kakhandaki
+var $rs_6923 = _testcase("RS_6923","Verify Lookup prefilter using data types - Date Literal, Picklist and Record Type");
+$rs_6923.start();
+
+		//delete[SELECT Name FROM SVMXC__RMA_Shipment_Order__c limit 10000];
+		//pre-req
+		var RecordTypeId=new Array;
+		var $recTypeName=["Shipment","RMA"];
+		
+		for (var $n = 0; $n < $recTypeName.length; $n++) {
+			$objName="RecordType";
+			$filter=["DeveloperName","SobjectType"];
+			_log($recTypeName[$n]);
+			$filterValue=[$recTypeName[$n],$orgnamespace+"__RMA_Shipment_Order__c"];
+			$columnName = "id";
+			//create a case
+			$partOrderNumber =$sfm_act_restApiMethods.getRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,"GET", $objName, $columnName, $filter, $filterValue);
+			_log("Record Type ID: "+$partOrderNumber);
+			RecordTypeId[$n]=$partOrderNumber;
+		}
+	
+		//Create Parts Order using below variables
+		var $partOrderNumber=new Array;
+		$objName= ""+$orgnamespace+"__RMA_Shipment_Order__c";
+		for (var $i = 0; $i < 4; $i++) {
+			if ($i==0) {
+				$obJson = "{\""+$orgnamespace+"__Expected_Receive_Date__c\":\""+getToday()+"\",\""+$orgnamespace+"__Billing_Type__c\":\"Loan\",\"RecordTypeId\":\""+RecordTypeId[1]+"\"}";
+			}else if ($i==1) {
+				$obJson = "{\""+$orgnamespace+"__Expected_Receive_Date__c\":\""+getToday()+"\",\""+$orgnamespace+"__Billing_Type__c\":\"Contract\",\"RecordTypeId\":\""+RecordTypeId[0]+"\"}";
+			}else {
+				$obJson = "{\""+$orgnamespace+"__Expected_Receive_Date__c\":\""+getToday()+"\",\""+$orgnamespace+"__Billing_Type__c\":\"Contract\",\"RecordTypeId\":\""+RecordTypeId[1]+"\"}";
+			}
+			$columnName = "Name";
+			$filter="id";
+			//create a case
+			$filterValue=$sfm_act_restApiMethods.postRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,$objName,$obJson,"POST");
+			//get the caseNumber
+			$partOrderNumber[$i] =$sfm_act_restApiMethods.getRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,"GET", $objName, $columnName, $filter, $filterValue);
+			_log("Parts Order number: "+$partOrderNumber[$i]);
+		}
+
+
+		//Create Work order using below variables 
+		$objName= ""+$orgnamespace+"__Service_Order__c";
+		$obJson = "{\""+$orgnamespace+"__Problem_Description__c\":\"Problem Description\",\""+$orgnamespace+"__Priority__c\":\"High\"}";
+		_log("Work Order json: "+$obJson);
+		$columnName = "Name";
+		$filter="id";
+		//create a case
+		$filterValue=$sfm_act_restApiMethods.postRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,$objName,$obJson,"POST");
+		//get the caseNumber
+		$WONumber =$sfm_act_restApiMethods.getRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,"GET", $objName, $columnName, $filter, $filterValue);
+		_log("WO number: "+$WONumber);
+		//login to App
+		$bo_act_login.login($g_url,$sfmdUsn,$sfmdPwd);
+		
+		$sfm_act_common.addCustomFields("Work Order", ["Parts Order"], ["Lookup Relationship"],[],["Parts Order"]); 
+		
+		//clone standard SFM
+		var $sfmNameToBeCloned="Manage Work Order Lines - Usage";
+		var $sfmName=$bo_act_common.generateRandomName("rs_6923_");
+		var $sfmTemplateSaveAsName=$bo_act_common.generateRandomName("SFM_Page_");
+		var $sfmTemplate="SVMXSTD: Manage WO Usage Lines";
+		var $fieldName=["Parts Order",];
+		var $containerName=["Order Status"];
+		$sfm_act_SFM.cloneTDM016($sfmNameToBeCloned, $sfmName, false, $sfmTemplateSaveAsName, $sfmTemplate, $fieldName, $containerName);
+		
+		//Remove multi-add for part childline
+		$sfm_act_SFM.partsMultiAdd("--None--");
+		
+		//create lookup for case object in header
+		$object="Parts Order";
+		var $lookupTempName="";
+		
+		//lookup filter details
+		var $fieldCombo=["Expected Receipt Date","Billing Type","Record Type ID"];
+		var $conditionsCombo=["Equals","Equals","Equals"];
+		var $operandTypeCombo=["Function","Value","Value"];
+		var $operandValue=["Today","Loan","Shipment"];
+		var $lookupAdvExpr="(1 AND 2) OR 3";
+		var $lookupFilterDetails=[$fieldCombo,$conditionsCombo,$operandTypeCombo,$operandValue,$lookupAdvExpr];
+		var $lookUpName=$bo_act_common.generateRandomName("rs_6923_lookup_");
+		
+		//lookup fields to add details
+		var $fieldNameList=["Order Number","Expected Receipt Date","Billing Type","Record Type ID"];
+		var $addToSearchList=[true,false,true,true];
+		var $addToDisplayList=[true, true,true,true];
+		var $addToBubbleList=[true, true,true,true];
+		var $lookupFieldsToAdd=[$fieldNameList,$addToSearchList,$addToDisplayList,$addToBubbleList];
+		
+		$sfm_act_Transactions.createLookUp($object, $lookupTempName, $lookupFieldsToAdd, $lookupFilterDetails, $lookUpName,"","");
+		
+		//Save SFM after adding context lookup
+		RS6923_saveSFM();
+		
+		//Add sfm to lookup wizard
+		var $wizardObject="Work Order";
+		var $sfmd_wizardName1 =$sfmd_wizardName[3];
+		var $sfmd_wizardType="SFM";
+		var $profile="";
+		var $handOver=false;
+		_log("Wizard Name: "+$sfmd_wizardName1);
+		$sfm_act_wizards.addToWizard($wizardObject, $sfmd_wizardName1, $sfmd_wizardType, $sfmName, $handOver, $profile);  
+	
+		//Search WO and launch SFM
+		RS6923_searchWOandLaunchSFM($WONumber,$sfmName);
+		
+		//search and assert the case on work order
+		$sfm_act_SFM.searchHeaderField("Parts Order", "");
+		for (var $i = 0; $i < $partOrderNumber.length; $i++) {
+			RS6923_search($partOrderNumber[$i]);
+			if ($i<$partOrderNumber.length-2) {
+				_assertExists(_cell($partOrderNumber[$i]));
+			}else {
+				_assertExists($sfm_pg_sfmDesigner.btn_noRecordMSG);
+				
+			}
+		}
+		
+		//Logout and login: this is code is added due to limitation of sahi.
+		//Limitation: we cann't perform action on transaction page twice in single login
+		//$bo_act_navigation.navigateToHome();
+		$bo_act_login.logOut();
+		_wait(10000,_isVisible($bo_pg_login.txt_email));
+		$bo_act_login.login($g_url,$sfmdUsn,$sfmdPwd);
+		
+		//Edit custom process
+		$sfm_act_SFM.editCustomProcess($sfmName);
+		_click($bo_pg_sfmTransactionAndDesigner.btn_screenDesigner);
+		_wait(10000,_isVisible($bo_pg_sfmTransactionAndDesigner.txt_contactOnHeader));
+		$sfm_act_Transactions.deleteLookUpFiltersAndSave("Parts Order","",$lookUpName);
+		
+		//Save SFM after adding context lookup
+		RS6923_saveSFM();
+		
+		//Search WO and launch SFM
+		RS6923_searchWOandLaunchSFM($WONumber,$sfmName);
+		
+		//temp fix of not displaying fields in search page
+		_click($sfm_pg_sfmDesigner.btn_cacheClear);
+		_click($sfm_pg_sfmDesigner.btn_proceed);
+		_wait(20000);
+		
+		//search and assert the case on work order
+		$sfm_act_SFM.searchHeaderField("Parts Order", "");
+		for (var $i = 0; $i < $partOrderNumber.length; $i++) {
+			RS6923_search($partOrderNumber[$i]);
+			_assertExists(_cell($partOrderNumber[$i]));
+		}
+		
+
+
+function RS6923_saveSFM(){
+_setStrictVisibilityCheck(true);
+_click($bo_pg_sfmTransactionAndDesigner.btn_pageLayoutSave);
+_wait(5000,_isVisible($bo_pg_sfmTransactionAndDesigner.btn_sfmpageSaveConfirmMsg));
+_click($bo_pg_sfmTransactionAndDesigner.btn_saveAndclose);
+_setStrictVisibilityCheck(false);
+};
+
+function getToday(){
+var $currentTime = new Date();
+var $month = $currentTime.getMonth() + 1;
+var $day = $currentTime.getDate();
+var $year = $currentTime.getFullYear();
+var $ret=$year +"-"+$month +"-" +$day;
+_log("Today date: "+$ret);
+return $ret;
+};
+
+function RS6923_searchWOandLaunchSFM($WONumber,$sfmName){
+$sfm_act_common.globalSearchOnce($WONumber);
+_wait(10000);
+_setStrictVisibilityCheck(true);
+$sfm_act_createCustomWizard.clickWizardBtn($sfmName);
+_wait(5000,_isVisible(_div("/"+$sfmName+"/")));
+}
+
+function RS6923_search($objectName){
+_setValue($sfm_pg_sfmDesigner.btn_searchTextBox,$objectName);
+_click($sfm_pg_sfmDesigner.link_searchLink);
+_wait(5000,_isVisible(_cell($objectName)));
+};
+
+
+
+$rs_6923.end();

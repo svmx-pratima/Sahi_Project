@@ -1,0 +1,50 @@
+
+//author - Meghana Rao
+
+var $RS_7476 = _testcase("$RS_7476","Verify adding a new coverage and saving the pm plan from Account");
+$RS_7476.start();
+_setSpeed($g_stepSpeed);
+var $Workbenchurl = "https://workbench.developerforce.com/login.php";
+//Pre - Condition 
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+
+//Test Data Creation
+
+
+var $accName = $bo_act_accounts.createAccount();
+var $accName2 = $bo_act_accounts.createAccount();
+
+var $contactName = $bo_act_contacts.createContact($accName);
+var $proName = $bo_act_products.createProduct("pro12", "--None--");
+$bo_act_navigation.navigateToAccountsPage();
+_click(_link($accName));
+var $IBName1 = $bo_act_accounts.addIBtoAccounts($proName, $accName, $contactName);
+
+$bo_act_navigation.navigateToAccountsPage();
+_click(_link($accName2));
+var $IBName2 = $bo_act_installedProduct.createInstalledProduct($proName, $accName2, $contactName)
+
+
+var $PMPTemplate = $bo_act_PMPlanTemplate.createUsageBasedConditionPMPTemplateNoSave($proName);
+$bo_act_PMPlanTemplate.updateUsageConditionRulesGridWithAdjFields("Months", "Every", 1, $bo_act_common.currentDate("-"), $bo_act_common.getfutureDate(1,"-"),"Fixed", 1,100, 10,"Days");
+$bo_act_PMPlanTemplate.saveConditionBasedPM();
+
+// To goto the Location and verify PM Plan template
+
+var $PMPlan = $bo_act_PMPlan.createConditionBasedPMPlanFromAccount($accName, $PMPTemplate,$IBName1,$IBName2);
+
+// Search the PM Plan Name
+$bo_act_common.cleanUpfunctionold($PMPlan);
+
+// CleanUp Function
+$bo_act_common.deleteAccount($bac_un, $bac_pwd, $accName);
+$bo_act_common.deleteContact($bac_un, $bac_pwd, $contactName);
+$bo_act_common.deleteIB($bac_un, $bac_pwd, $orgnamespace,$IBName1);
+$bo_act_common.deleteProduct($bac_un, $bac_pwd,$proName);
+$bo_act_common.deletePMPlantemplate($bac_un, $bac_pwd, $orgnamespace,$PMPTemplate);
+
+
+$RS_7476.end();
+
+
+

@@ -1,0 +1,108 @@
+//Author: Anand Kakhandaki
+var $rs_7016 = _testcase("RS_7016","Verify current record header literals in lookup");
+$rs_7016.start();
+
+	//RS_7016,RS_7015.sah
+	//pre-Req
+	//Create Case using below variables  
+	$objName= "Case";
+	$obJson = "{\"Subject\":\"Problem Description\",\"Priority\":\"High\",\""+$orgnamespace+"__Actual_Initial_Response__c\":\"2018-08-22\"}";
+	$columnName = "CaseNumber";
+	$filter="id";
+	$filterValue=$sfm_act_restApiMethods.postRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,$objName,$obJson,"POST");
+	$caseNumber =$sfm_act_restApiMethods.getRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,"GET", $objName, $columnName, $filter, $filterValue);
+	_log("Case number: "+$caseNumber);
+	
+	//Create Work order using below variables 
+	$objName= ""+$orgnamespace+"__Service_Order__c";
+	$obJson = "{\""+$orgnamespace+"__Problem_Description__c\":\"Problem Description\",\""+$orgnamespace+"__Priority__c\":\"High\",\""+$orgnamespace+"__Preferred_Start_Time__c\":\"2018-08-22\",\""+$orgnamespace+"__Invoice_Number__c\":\""+$caseNumber+"\"}";
+	_log("Work Order json: "+$obJson);
+	$columnName = "Name";
+	$filter="id";
+	$filterValue=$sfm_act_restApiMethods.postRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,$objName,$obJson,"POST");
+	$WONumber =$sfm_act_restApiMethods.getRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,"GET", $objName, $columnName, $filter, $filterValue);
+	_log("WO number: "+$WONumber);
+
+	//login to App
+	$bo_act_login.login($g_url,$sfmdUsn, $sfmdPwd);
+
+	//clone standard SFM
+	var $sfmNameToBeCloned="Manage Work Order Lines - Usage";
+	var $sfmName=$bo_act_common.generateRandomName("rs_7016_");
+	var $sfmTemplateSaveAsName=$bo_act_common.generateRandomName("SFM_Page_");
+	var $sfmTemplate="SVMXSTD: Manage WO Usage Lines";
+	var $fieldName=["Problem Description","Priority","Preferred Start Time","Invoice Number","Case","Case"];
+	var $containerName=["Order Status","Order Status","Order Status","Order Status","Order Status","Parts"];
+	$sfm_act_SFM.cloneTDM016($sfmNameToBeCloned, $sfmName, false, $sfmTemplateSaveAsName, $sfmTemplate, $fieldName, $containerName);
+
+	//Remove multi-add for part childline
+	$sfm_act_SFM.partsMultiAdd("--None--");
+	
+	//create lookup for case object in header
+	$object="Case";
+	var $lookupTempName="SVMXSTD: Case Lookup";
+	var $fieldCombo=["Subject","Priority","Actual Initial Response","Case Number"];
+	var $conditionsCombo=["Equals","Equals","Equals","Equals"];
+	var $operandTypeCombo=["Value","Value","Value","Value"];
+	var $operandValue=["SVMX.CURRENTRECORD."+$orgnamespace+"__Problem_Description__c","SVMX.CURRENTRECORD."+$orgnamespace+"__Priority__c","SVMX.CURRENTRECORD."+$orgnamespace+"__Preferred_Start_Time__c","SVMX.CURRENTRECORD."+$orgnamespace+"__Invoice_Number__c"];
+	var $lookupAdvExpr="1 AND 2 AND (3 OR 4)";
+	var $lookupFilterDetails=[$fieldCombo,$conditionsCombo,$operandTypeCombo,$operandValue,$lookupAdvExpr];
+	var $lookUpName=$bo_act_common.generateRandomName("rs_7016_lookup_");
+	$sfm_act_Transactions.createLookUp($object, $lookupTempName, "", $lookupFilterDetails, $lookUpName,"","");
+	
+	
+	//create lookup for case object in Child
+	$object="Case";
+	var $lookupTempName="SVMXSTD: Case Lookup";
+	var $fieldCombo=["Subject","Priority","Actual Initial Response","Case Number"];
+	var $conditionsCombo=["Equals","Equals","Equals","Equals"];
+	var $operandTypeCombo=["Value","Value","Value","Value"];
+	var $operandValue=["SVMX.CURRENTRECORDHEADER."+$orgnamespace+"__Problem_Description__c","SVMX.CURRENTRECORDHEADER."+$orgnamespace+"__Priority__c","SVMX.CURRENTRECORDHEADER."+$orgnamespace+"__Preferred_Start_Time__c","SVMX.CURRENTRECORDHEADER."+$orgnamespace+"__Invoice_Number__c"];
+	var $lookupAdvExpr="1 AND 2 AND (3 OR 4)";
+	var $lookupFilterDetails=[$fieldCombo,$conditionsCombo,$operandTypeCombo,$operandValue,$lookupAdvExpr];
+	var $lookUpName=$bo_act_common.generateRandomName("rs_7016_lookup_");
+	$sfm_act_Transactions.createLookUp($object, $lookupTempName, "", $lookupFilterDetails, $lookUpName,"Parts","");
+	
+	_setStrictVisibilityCheck(true);
+	_click($bo_pg_sfmTransactionAndDesigner.btn_pageLayoutSave);
+	_wait(5000,_isVisible($bo_pg_sfmTransactionAndDesigner.btn_sfmpageSaveConfirmMsg));
+	_click($bo_pg_sfmTransactionAndDesigner.btn_saveAndclose);
+	_setStrictVisibilityCheck(false);
+	
+	//Add sfm to lookup wizard
+	var $wizardObject="Work Order";
+	var $sfmd_wizardName1 =$sfmd_wizardName[3];
+	var $sfmd_wizardType="SFM";
+	var $profile="";
+	var $handOver=false;
+	_log("Wizard Name: "+$sfmd_wizardName1);
+	$sfm_act_wizards.addToWizard($wizardObject, $sfmd_wizardName1, $sfmd_wizardType, $sfmName, $handOver, $profile);  
+	
+	
+	$sfm_act_common.globalSearchOnce($WONumber);
+	_wait(10000);
+	_setStrictVisibilityCheck(true);
+	$sfm_act_createCustomWizard.clickWizardBtn($sfmName);
+	_wait(5000,_isVisible(_div("/"+$sfmName+"/")));
+	
+	
+	//search and assert the case on work order
+	$sfm_act_SFM.searchHeaderField($object, $caseNumber);
+	_assertExists(_cell($caseNumber));
+	_click($sfm_pg_wizards.btn_cancelCaseWindow);
+	
+	//** Adding ChildLine **/
+	$sfm_act_sfmDesigner.addChildLine("Parts");
+	_wait(10000,_isVisible($sfm_pg_sfmDesigner.txt_partTextbox));
+	_click($sfm_pg_sfmDesigner.link_searchCaseIcon);
+	RS7016_searchObject($caseNumber);
+	_assertExists(_cell($caseNumber));
+
+function RS7016_searchObject($object){
+	_wait(5000,_isVisible($sfm_pg_sfmDesigner.btn_searchTextBox));
+	_setValue($sfm_pg_sfmDesigner.btn_searchTextBox,$object);
+	_click($sfm_pg_sfmDesigner.link_searchLink);
+	_wait(5000,_isVisible(_cell($object)));
+};	
+	
+$rs_7016.end();

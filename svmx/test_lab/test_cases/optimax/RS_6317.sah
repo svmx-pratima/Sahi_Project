@@ -1,0 +1,71 @@
+var $user_credentials = $excel.readFromCustomExcel("../optimax/op_excleData/automation.xlsx", "User_Details","","");
+var $work_Orders_Xl = $excel.readFromCustomExcel("../optimax/op_excleData/automation.xlsx", "RS_6299_RS_6300","","");
+var $dispatch_Process_Xl = $excel.readFromCustomExcel("../optimax/op_excleData/automation.xlsx", "Dispatch_Process","","");
+
+//var $nArr;
+//Calling the sforce API
+for(var $i=0;$i<$user_credentials.length;$i++)
+{
+var $g_un = $user_credentials[$i][0];
+var $g_pwd = $user_credentials[$i][1];
+var $g_url = $user_credentials[$i][2];
+}
+
+var $wo_type = $work_Orders_Xl[0][0];
+var $wo_status = $work_Orders_Xl[0][1];
+//var $wo_state = $work_Orders_Xl[0][2];
+var $dp_Terr = $dispatch_Process_Xl[0][2];
+
+
+var $RS_6317 = _testcase("RS_6317", "Validating Skill Set by creating a valid WO");
+
+$RS_6317.start();
+
+$bo_act_login.login($g_url, $g_un, $g_pwd);
+
+_set($login_result, _fetch(login($g_un,$g_pwd)));
+_log($login_result);
+
+_set($create_SkillSet_WO, _fetch(create_WO($wo_type , $wo_status, $dp_Terr)));
+_log($create_SkillSet_WO);
+
+//<browser>
+function login($g_un,$g_pwd){
+	
+	var $login_result = sforce.connection.login($g_un,$g_pwd);
+	return $login_result;
+}
+
+function create_WO ($wo_type , $wo_status, $dp_Terr)
+{
+	var workorder = new sforce.SObject("SVMXC__Service_Order__c");
+	workorder.SVMXC__Order_Type__c = $wo_type;
+	workorder.SVMXC__Order_Status__c = $wo_status;
+	workorder.SVMXC__Primary_Territory__c = $dp_Terr;
+	result = sforce.connection.create([workorder]);
+		
+	var skillset_WO_List = sforce.connection.query("Select Id, SVMXC__Skill_Set__c, SVMXC__Order_Type__c, SVMXC__Order_Status__c From SVMXC__Service_Order__c Where Id = '" +result[0].id+"'");
+	var skillset_WO_arr = skillset_WO_List.getArray("records");
+	_log(skillset_WO_arr.length);
+	for(var $s=0;$s<skillset_WO_arr.length;$s++)
+	{
+		var skillset_WO = skillset_WO_arr[$s];
+		var skillset = skillset_WO.SVMXC__Skill_Set__c;
+			
+		_log("SVMXC__Order_Type__c = "+skillset_WO.SVMXC__Order_Type__c+" , SVMXC__Order_Status__c = "+skillset_WO.SVMXC__Order_Status__c+" , SVMXC__Skill_Set__c = "+ skillset_WO.SVMXC__Skill_Set__c);
+		if(skillset_WO.SVMXC__Order_Type__c === 'Cleaning' & skillset_WO.SVMXC__Order_Status__c === 'Open' & skillset.includes("Repair") || skillset.includes("Installation"))
+		{
+			
+			_log("Skill Set is Calculated. SVMXC__Skill_Set__c = " + skillset_WO.SVMXC__Skill_Set__c);
+		}
+		else
+		{
+			_log("Skill Set is not Calculated for the work order");
+		}
+	
+	}
+	return result;
+}	
+
+//</browser>
+$RS_6317.end();

@@ -1,0 +1,117 @@
+//Tests are to be written here [Bhupendra Singh Chouhan]
+//==============
+
+var $RS_12493 = _testcase("$RS_12493","SFA:- Service Flow Automation Configuration for Geofence");
+$RS_12493.start();
+_setSpeed($g_stepSpeed);
+/**
+* Login to the Sandbox Org
+*/
+
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+
+//Create SFA Process with On Entry Event type on Work order object
+
+var $eventType = "On Entry";
+var $object = "Work Order";
+var $filterCriteria = "SVMXSTD: Open Work Orders";
+var $sortRecordsBy = "Actual Initial Response";
+var $locationField = "Site";
+var $fenceRadius = "100";
+var $notificationTitle = "SFA Notification Text for Work Order_00";
+var $pushNotificationText = "Hi [$OwnerId], Work Order [$Name] is update with Order Type as [$SVMXC__Order_Type__c]. Please check the Status is ";
+var $inserField = "Order Status";
+var $sfmName = "Manage Work Order Lines - Usage";
+
+var $sfaProcessName = $bo_act_serviceFlowAutomation.createServiceFlowAutomationProcess_GeolocationEvent($eventType, $object, $filterCriteria, $sortRecordsBy, $locationField, $fenceRadius, $notificationTitle, $pushNotificationText, $inserField, $sfmName);
+_log($sfaProcessName);
+/**
+ * Verify the SFA Process is created 
+ */
+var $actMsg = _getText(_heading2("slds-text-heading--small"));
+var $expMsg = "Automation created successfully";
+
+_assertEqual($expMsg,$actMsg,"Actual and expected SFA Success message are not same");
+_wait(30000, _isVisible($bo_pg_serviceFlowAutomation.btn_newAutomation));
+_assertExists(_link($sfaProcessName));
+
+// Delete the created SFA process
+$bo_act_serviceFlowAutomation.deleteSFAProcess($sfaProcessName);
+
+/**
+ * Verify the SFA Process is deleted 
+ */
+var $actdltMsg = _getText(_heading2("slds-text-heading--small"));
+var $expdltMsg = "Automation deleted successfully.";
+_assertEqual($expdltMsg,$actdltMsg,"Actual and expected SFA Success message are not same");
+
+//Create SFA Process with On Exit Event type on Work order object
+
+var $eventType1 = "On Exit";
+var $filterCriteria1 = "SVMXSTD: Closed Work Orders";
+var $sortRecordsBy1 = "Completed Date Time";
+var $fenceRadius1 = "250";
+var $notificationTitle1 = "SFA Notification Text for Work Order_01";
+var $pushNotificationText1 = "Hi [$OwnerId], Work Order [$Name] is update with Order Type as [$SVMXC__Order_Type__c]. Please check the Status is of City as ";
+var $inserField1 = "City";
+var $sfmName1 = "View Work Order";
+
+var $sfaProcessName1 = $bo_act_serviceFlowAutomation.createServiceFlowAutomationProcess_GeolocationEvent($eventType1, $object, $filterCriteria1, $sortRecordsBy1, $locationField, $fenceRadius1, $notificationTitle1, $pushNotificationText1, $inserField1, $sfmName1);
+_log($sfaProcessName1);
+/**
+ * Verify the SFA Process is created 
+ */
+var $actMsg = _getText(_heading2("slds-text-heading--small"));
+var $expMsg = "Automation created successfully";
+
+_assertEqual($expMsg,$actMsg,"Actual and expected SFA Success message are not same");
+_wait(30000, _isVisible($bo_pg_serviceFlowAutomation.btn_newAutomation));
+_assertExists(_link($sfaProcessName1));
+
+// Delete the created SFA process
+$bo_act_serviceFlowAutomation.deleteSFAProcess($sfaProcessName1);
+
+/**
+ * Verify the SFA Process is deleted 
+ */
+var $actdltMsg = _getText(_heading2("slds-text-heading--small"));
+var $expdltMsg = "Automation deleted successfully.";
+_assertEqual($expdltMsg,$actdltMsg,"Actual and expected SFA Success message are not same");
+
+//Create SFA Process with On Entry or Exit Event type on Work order object
+
+var $eventType2 = "On Entry or Exit";
+var $sortRecordsBy2 = "Scheduled Date";
+var $fenceRadius2 = "500";
+var $notificationTitle2 = "SFA Notification Text for Work Order_02";
+var $pushNotificationText2 = "Hi [$OwnerId], Work Order [$Name] is update with Order Type as [$SVMXC__Order_Type__c]. Please check the Completed Date Time as ";
+var $inserField2 = "Completed Date Time";
+var $sfmName2 = "Cancel Work Order";
+
+var $sfaProcessName2 = $bo_act_serviceFlowAutomation.createServiceFlowAutomationProcess_GeolocationEvent($eventType2, $object, $filterCriteria, $sortRecordsBy2, $locationField, $fenceRadius2, $notificationTitle2, $pushNotificationText2, $inserField2, $sfmName2);
+_log($sfaProcessName2);
+/**
+ * Verify the SFA Process is created 
+ */
+var $actMsg = _getText(_heading2("slds-text-heading--small"));
+var $expMsg = "Automation created successfully";
+
+_assertEqual($expMsg,$actMsg,"Actual and expected SFA Success message are not same");
+_wait(30000, _isVisible($bo_pg_serviceFlowAutomation.btn_newAutomation));
+_assertExists(_link($sfaProcessName2));
+
+// Delete the created SFA process
+$bo_act_serviceFlowAutomation.deleteSFAProcess($sfaProcessName2);
+
+/**
+ * Verify the SFA Process is deleted 
+ */
+var $actdltMsg = _getText(_heading2("slds-text-heading--small"));
+var $expdltMsg = "Automation deleted successfully.";
+_assertEqual($expdltMsg,$actdltMsg,"Actual and expected SFA Success message are not same");
+
+
+$bo_act_login.logOut(); 
+
+$RS_12493.end();
+

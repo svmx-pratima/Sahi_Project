@@ -1,0 +1,112 @@
+var $an_act_AttachRate = new function an_act_AttachRate(){
+	
+	/**
+	 * Write function 
+	 * @param 
+	 */
+	
+	this.attachrate_installed_IB = function($Calculationmethodname)
+	{
+		
+		_click($an_pg_rv.link_home);
+		_click($an_pg_rv.link_servicemaxSetup);
+		_click($an_pg_rv.btn_serviceperformancemetrics);
+		_click($an_pg_rv.btn_serviceperformancemetricsetup);
+		_click($an_pg_rv.btn_click_metrics);
+		_click($an_pg_attachrate.btn_attachrate_metric);
+		_click($an_pg_attachrate.btn_add);
+		_click($an_pg_attachrate.btn_active);
+		_setValue($an_pg_attachrate.txt_description, $Calculationmethodname);
+		_click($an_pg_attachrate.btn_Settings);
+		_click($an_pg_attachrate.list_select_account);
+		_click($an_pg_attachrate.btn_Account);
+		_click($an_pg_attachrate.btn_Criteria);
+		_click($an_pg_attachrate.list_qualification_IB);
+		_click($an_pg_attachrate.btn_standard_sfmexpression_IB);
+		_click($an_pg_attachrate.list_qualification_coveredproduct);
+		_click($an_pg_attachrate.btn_standard_expression_cp);
+		_click($an_pg_attachrate.btn_save);
+		_click($an_pg_attachrate.btn_OK);
+		
+	};
+	
+	this.ScheduleNotifications = function($emailID)
+	
+	{
+		_click($an_pg_rv.link_home);
+		_click($an_pg_rv.link_servicemaxSetup);
+		_click($an_pg_rv.btn_serviceperformancemetrics);
+		_click($an_pg_rv.btn_serviceperformancemetricsetup);
+		_click($an_pg_rv.btn_click_metrics);
+		_click($an_pg_attachrate.btn_attachrate_metric);
+		_click($an_pg_attachrate.btn_schedulenotifications);
+		_click($an_pg_attachrate.list_timezone);
+		_click($an_pg_attachrate.btn_ist_timezone);
+		_click($an_pg_attachrate.list_period);
+		_click($an_pg_attachrate.btn_daily);
+		_click($an_pg_attachrate.list_time_at);
+		_click($an_pg_attachrate.btn_timechosen);
+		_setValue($an_pg_attachrate.txt_emailOnsuccess,$emailID );
+		_click($an_pg_attachrate.btn_sn_save);
+		_click($an_pg_attachrate.btn_OK);
+		_click($an_pg_attachrate.btn_run_now);
+		_click($an_pg_attachrate.btn_OK);
+		
+		
+	};
+	
+	this.attachrate_custom_IB = function($Calculationmethodname)
+	{
+		_click($an_pg_rv.link_home);
+		_click($an_pg_rv.link_servicemaxSetup);
+		_click($an_pg_rv.btn_serviceperformancemetrics);
+		_click($an_pg_rv.btn_serviceperformancemetricsetup);
+		
+		_click($an_pg_rv.btn_click_metrics);
+		_click($an_pg_attachrate.btn_attachrate_metric);
+		_click($an_pg_attachrate.btn_add);
+		_click($an_pg_attachrate.btn_active);
+		_setValue($an_pg_attachrate.txt_description, $Calculationmethodname);
+		_click($an_pg_attachrate.btn_Settings);
+		_click($an_pg_attachrate.list_select_account);
+		_click($an_pg_attachrate.btn_Account);
+		_click($an_pg_attachrate.btn_Criteria);
+		_click($an_pg_attachrate.list_qualification_IB);
+		_click($an_pg_attachrate.btn_standard_sfmexpression_IB);
+		_click($an_pg_attachrate.list_qualification_coveredproduct);
+		_click($an_pg_attachrate.btn_custom_covered_product);
+		_click($an_pg_attachrate.btn_save);
+		_click($an_pg_attachrate.btn_OK);
+		
+		
+		
+	};
+	
+	this.attachrate_custom_CP2 = function($Calculationmethodname)
+	{
+		
+		_click($an_pg_rv.link_home);
+		_click($an_pg_rv.link_servicemaxSetup);
+		_click($an_pg_rv.btn_serviceperformancemetrics);
+		_click($an_pg_rv.btn_serviceperformancemetricsetup);
+		_click($an_pg_rv.btn_click_metrics);
+		_click($an_pg_attachrate.btn_attachrate_metric);
+		_click($an_pg_attachrate.btn_add);
+		_click($an_pg_attachrate.btn_active);
+		_setValue($an_pg_attachrate.txt_description, $Calculationmethodname);
+		_click($an_pg_attachrate.btn_Settings);
+		_click($an_pg_attachrate.list_select_account);
+		_click($an_pg_attachrate.btn_Account);
+		_click($an_pg_attachrate.btn_Criteria);
+		_click($an_pg_attachrate.list_qualification_IB);
+		_click($an_pg_attachrate.btn_custom_ib_2);
+		_click($an_pg_attachrate.list_qualification_coveredproduct);
+		_click($an_pg_attachrate.btn_custom_covered_product_2);
+		_click($an_pg_attachrate.btn_save);
+		_click($an_pg_attachrate.btn_OK);
+		
+		
+		
+	};
+	
+};

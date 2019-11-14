@@ -1,0 +1,9 @@
+var $bo_pg_stockAdjustment = new function bo_pg_stockAdjustment(){
+	this.txt_stockingProduct = _textbox("/\\*Product|^Product/");
+	this.txt_newQty = _textbox("/\\*New Qty|^New Qty/");
+	this.sel_adjustmentType =  _select(0, _rightOf(_label("/Adjustment Type/")));
+	this.txt_stockingLocation = _textbox("/\\*Location|^Location/");
+	this.btn_save = _submit(" Save ");
+	this.btn_new = _button(" New ");
+	
+};

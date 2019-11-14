@@ -1,0 +1,226 @@
+var $rs_5361 = _testcase("RS_5361","Verify standard SFM Search functionalities.");
+$rs_5361.start();
+
+//Data variables
+var $noOfCases=2;
+var $noofWorkOrders=2;
+var $caseStatus = ["New", "New"];
+var $caseLineStatus = ["Open", "Closed"];
+var $caseOrigin = ["Phone","Email"];
+var $casePriority = ["Medium","Medium"];
+var $caseArray=[];
+var $caseLineArray=[];
+var $workOrderArray=[];
+var $RMAPartsOrderLineArray=[];
+var $partOrderShipmentNumber;
+var $partOrderShipmentNumberArray=[];
+var $ShipmentPartsOrderLineArray=[];
+var $orderStatus=["Open","Closed"];
+var $orderType=["Field Service", "Depot Repair"];
+
+var $priority= ["High","Medium"];
+var $partsOrderShipmentLineStatus = ["New", "Closed"];
+var $partsOrderRMALineStatus = ["New", "Closed"];
+var $partsOrderShipmentLineStatus = ["New", "Closed"];
+
+//SFM Search related variables
+var $standardSearch = "Serial Number Search";
+$button = "Manage Permissions";
+$profile = "Clone Default Group Profile";
+
+//Flow Starts
+$bo_act_login.login($g_url,$sfmdUsn, $sfmdPwd);
+$bo_act_navigation.navigateToSfmSearchDesigner();
+_wait(3000);
+$sfm_act_search.managePermissionSearch($standardSearch, $button,$profile);
+
+//Pre_Requisites: Creation of necessary data for validation on SFM Search delivery
+
+//Create Account
+var $accountName;
+$accountName=$bo_act_common.generateRandomName("Acme_5361_");
+var $accountId;
+ 	$objName= "Account";
+	$obJson = "{\"Name\":\""+$accountName+"\"}";
+	$accountId=$sfm_act_restApiMethods.postRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,$objName,$obJson,"POST");
+ 	_log("Account Created: "+$accountName);
+ 
+//Create Contact for above created account
+var $contactName="Acme_5361_Contact_";
+var $lastName, $userName;
+var $objName= "Contact";
+var	$lastName=$bo_act_common.generateRandomName($contactName);
+$obJson="{\"LastName\":\""+$lastName+"\",\"AccountId\":\""+$accountId+"\"}";
+$contactId=$sfm_act_restApiMethods.postRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,$objName,$obJson,"POST");
+_log($contactId);
+_log($lastName);
+$userName=$lastName;
+_log("Contact created: "+$userName);
+ 
+//Create Product
+$objName= "Product2";
+var	$productName=$bo_act_common.generateRandomName("Acme_5361_Product_");
+$obJson = "{\"Name\":\""+$productName+"\"}";
+var $ProductID = $sfm_act_restApiMethods.postRestApi($sfmdUsn, $sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,$objName,$obJson,"POST");
+_log("Product Name created: "+$productName);
+ 
+//Create Installed Product
+var	$installedProductName=$bo_act_common.generateRandomName("Acme_5361_IB_");
+$objName = ""+$orgnamespace+"__Installed_Product__c";
+$obJson = "{\"Name\":\""+$installedProductName+"\",\""+$orgnamespace+"__Product__c\":\""+$ProductID+"\",\""+$orgnamespace+"__Company__c\":\""+$accountId+"\",\""+$orgnamespace+"__Contact__c\":\""+$contactId+"\",\""+$orgnamespace+"__Serial_Lot_Number__c\":\""+$installedProductName+"\"}";
+$filter="id";
+var $installedProductID = $sfm_act_restApiMethods.postRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,$objName,$obJson,"POST");
+ _log("$InstalledProduct Name created: "+$installedProductName);
+
+//Create Case
+$objName= "Case";
+$filter="id";
+$columnName="CaseNumber";
+for(var $i=0;$i<$noOfCases;$i++){
+$obJson = "{\"Status\":\""+$caseStatus[$i]+"\",\"Priority\":\""+$casePriority[$i]+"\",\"AccountId\":\""+$accountId+"\",\"ContactId\":\""+$contactId+"\",\"Origin\":\""+$caseOrigin[$i]+"\"}";
+$filterValue=$sfm_act_restApiMethods.postRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,$objName,$obJson,"POST");
+_log($filterValue);
+$caseArray.push($filterValue);
+}
+_log("Case(s) created: "+$caseArray);
+
+//Create Case Line
+$objName = ""+$orgnamespace+"__Case_Line__c";
+$filter="id";
+$columnName="Name";
+var $caseLineNumber;
+//Create Case Line
+for(var $i=0;$i<$caseArray.length;$i++){
+	//$obJson = "{\"Status__c\":+$caseStatus,\"Priority\":\"High\",\"Origin\":\"Email\"}";
+	$obJson = "{\""+$orgnamespace+"__Case__c\":\""+$caseArray[$i]+"\",\""+$orgnamespace+"__Line_Status__c\":\""+$caseLineStatus[$i]+"\",\""+$orgnamespace+"__Installed_Product__c\":\""+$installedProductID+"\"}";
+	$filterValue=$sfm_act_restApiMethods.postRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,$objName,$obJson,"POST");
+	$caseLineNumber =$sfm_act_restApiMethods.getRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,"GET", $objName, $columnName, $filter, $filterValue);
+	_log("Case number: "+$caseLineNumber);
+	$caseLineArray.push($caseLineNumber);
+	}
+_log("Case Lines created: "+$caseLineArray);
+
+//Create Work Order
+$objName=""+$orgnamespace+"__Service_Order__c";
+//$obJson = "{\""+$orgnamespace+"__Order_Status__c\":\""+orderStatus[$i]+"\",\""+$orgnamespace+"__Order_Status__c\":\""+priority[$i]+"\",\""+$orgnamespace+"__Order_Type__c\":\""+orderType[$i]+"\",\""+$orgnamespace+"__Installed_Product__c\":\""+$installedProductID+"\"}";
+$columnName = "Name";
+$filter="id";
+for(var $i=0;$i<$noofWorkOrders;$i++){
+$obJson = "{\""+$orgnamespace+"__Order_Status__c\":\""+$orderStatus[$i]+"\",\""+$orgnamespace+"__Priority__c\":\""+$priority[$i]+"\",\""+$orgnamespace+"__Order_Type__c\":\""+$orderType[$i]+"\",\""+$orgnamespace+"__Company__c\":\""+$accountId+"\",\""+$orgnamespace+"__Contact__c\":\""+$contactId+"\",\""+$orgnamespace+"__Component__c\":\""+$installedProductID+"\"}";
+$filterValue=$sfm_act_restApiMethods.postRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,$objName,$obJson,"POST");
+$WONumber =$sfm_act_restApiMethods.getRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,"GET", $objName, $columnName, $filter, $filterValue);
+_log("WO number created: "+$WONumber);
+$workOrderArray.push($WONumber);
+_log("Work Orders created: "+$workOrderArray);
+}
+ 
+var $RecordTypeIdArray=[];
+var $recordTypeId;
+var $recTypeName=["Shipment","RMA"];
+ 
+for (var $n = 0; $n < $recTypeName.length; $n++) {
+	$objName="RecordType";
+	$filter=["DeveloperName","SobjectType"];
+	$filterValue=[$recTypeName[$n],""+$orgnamespace+"__RMA_Shipment_Order__c"];
+	$columnName = "id";
+	$recordTypeId =$sfm_act_restApiMethods.getRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,"GET", $objName, $columnName, $filter, $filterValue);
+	_log("Record Type ID: "+$recordTypeId);
+	$RecordTypeIdArray.push($recordTypeId);
+	}
+ 
+//Create RMA Parts Order  
+var $partOrderRMANumberArray=[];
+var $partOrderRMANumber;
+var $objName= ""+$orgnamespace+"__RMA_Shipment_Order__c";
+$objName= ""+$orgnamespace+"__RMA_Shipment_Order__c";
+for (var $i = 0; $i <=1; $i++) {
+ $obJson = "{\""+$orgnamespace+"__Case__c\":\""+$caseArray[$i]+"\",\""+$orgnamespace+"__Company__c\":\""+$accountId+"\",\""+$orgnamespace+"__Contact__c\":\""+$contactId+"\",\"RecordTypeId\":\""+$RecordTypeIdArray[1]+"\"}";
+ 	$columnName = "id";
+	$filter="id";
+	$filterValue=$sfm_act_restApiMethods.postRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,$objName,$obJson,"POST");
+	$partOrderRMANumber=$sfm_act_restApiMethods.getRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,"GET", $objName, $columnName, $filter, $filterValue);
+ 	$partOrderRMANumberArray.push($partOrderRMANumber);
+}
+_log("RMA Parts Order created: "+$partOrderRMANumberArray);
+
+//Create Shipment Parts Order  
+$objName= ""+$orgnamespace+"__RMA_Shipment_Order__c";
+for (var $i = 0; $i <=1; $i++) {
+ $obJson = "{\""+$orgnamespace+"__Case__c\":\""+$caseArray[$i]+"\",\""+$orgnamespace+"__Company__c\":\""+$accountId+"\",\""+$orgnamespace+"__Contact__c\":\""+$contactId+"\",\"RecordTypeId\":\""+$RecordTypeIdArray[0]+"\"}";
+ 	$columnName = "id";
+	$filter="id";
+	$filterValue=$sfm_act_restApiMethods.postRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,$objName,$obJson,"POST");
+	$partOrderShipmentNumber=$sfm_act_restApiMethods.getRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,"GET", $objName, $columnName, $filter, $filterValue);
+ 	$partOrderShipmentNumberArray.push($partOrderShipmentNumber);
+	}
+ _log("Shipment Parts Order created: "+$partOrderShipmentNumberArray);
+		
+var $RecordTypeIdArray=[];
+var $recordTypeId;
+var $recTypeName=["Shipment","RMA"];
+ 
+for (var $n = 0; $n < $recTypeName.length; $n++) {
+	$objName="RecordType";
+	$filter=["DeveloperName","SobjectType"];
+	$filterValue=[$recTypeName[$n],""+$orgnamespace+"__RMA_Shipment_Line__c"];
+	$columnName = "id";
+	$recordTypeId =$sfm_act_restApiMethods.getRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,"GET", $objName, $columnName, $filter, $filterValue);
+	_log("Record Type ID: "+$recordTypeId);
+	$RecordTypeIdArray.push($recordTypeId);
+	}
+   
+//Create RMA Parts Order Line using below variables
+var $RMALineNumber=[];
+$objName= ""+$orgnamespace+"__RMA_Shipment_Line__c";
+for (var $i = 0; $i <=1; $i++) {
+ $obJson = "{\""+$orgnamespace+"__RMA_Shipment_Order__c\":\""+$partOrderRMANumberArray[$i]+"\",\""+$orgnamespace+"__Line_Status__c\":\""+$partsOrderRMALineStatus[$i]+"\",\""+$orgnamespace+"__Serial_Number__c\":\""+$installedProductID+"\",\"RecordTypeId\":\""+$RecordTypeIdArray[1]+"\",\""+$orgnamespace+"__Product__c\":\""+$ProductID+"\"}";
+ 	$columnName = "Name";
+	$filter="id";
+	$filterValue=$sfm_act_restApiMethods.postRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,$objName,$obJson,"POST");
+	$partOrderNumber=$sfm_act_restApiMethods.getRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,"GET", $objName, $columnName, $filter, $filterValue);
+	_log("RMA Line number: "+$partOrderNumber);
+}
+$RMAPartsOrderLineArray.push($partOrderNumber);
+
+_log("RMA Parts Order Line Array created :"+$RMAPartsOrderLineArray);
+
+//Create Shipment Parts Order Line using below variables
+var $shipmentLineNumber=[];
+$objName= ""+$orgnamespace+"__RMA_Shipment_Line__c";
+for (var $i = 0; $i <=1; $i++) {
+	 $obJson = "{\""+$orgnamespace+"__RMA_Shipment_Order__c\":\""+$partOrderShipmentNumberArray[$i]+"\",\""+$orgnamespace+"__Line_Status__c\":\""+$partsOrderRMALineStatus[$i]+"\",\""+$orgnamespace+"__Serial_Number__c\":\""+$installedProductID+"\",\"RecordTypeId\":\""+$RecordTypeIdArray[0]+"\",\""+$orgnamespace+"__Product__c\":\""+$ProductID+"\"}";
+ 	$columnName = "Name";
+	$filter="id";
+	$filterValue=$sfm_act_restApiMethods.postRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,$objName,$obJson,"POST");
+	$partOrderNumber=$sfm_act_restApiMethods.getRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,"GET", $objName, $columnName, $filter, $filterValue);
+	_log("Shipment Line Number: "+$partOrderNumber[$i]);
+}
+$ShipmentPartsOrderLineArray.push($partOrderNumber);
+_log("Shipment Parts Order Line Array created:"+$ShipmentPartsOrderLineArray);
+ 
+//Verify in SFM Search delivery 
+$bo_act_navigation.navigateToHome();
+var $tabName=[];
+
+//All the tabs available in Serial Number Search
+var $tabName=[$sfm_pg_search.tab_allWo, $sfm_pg_search.tab_openCaseLines,$sfm_pg_search.tab_openRMALines,$sfm_pg_search.tab_openShipmentLines];
+var $searchParameter=[];
+
+//Field used based on which SFM Search is performed on delivery
+//Since in Serial Number Search, search is performed based on IB, following has been added
+var $searchParameter=[$installedProductName,$installedProductName,$installedProductName,$installedProductName];
+
+//Launch Serial Number Search from Home Page
+$sfm_act_search.searchSfmSearches($standardSearch);
+_wait(10000);
+
+//Number of Tabs available in Serial Number Search
+var $noOfTabs=4;
+
+//On SFM Search delivery page,search is performed based on Installed Product Name(Component) on each of the tabs
+for(var $i=0;$i<$noOfTabs;$i++)
+{  
+$sfm_act_search.verifySearchResults($tabName[$i],$searchParameter[$i]);
+}
+$rs_5361.end();
+ 

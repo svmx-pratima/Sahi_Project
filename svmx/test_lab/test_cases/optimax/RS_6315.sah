@@ -1,0 +1,37 @@
+var $user_credentials = $excel.readFromCustomExcel("../optimax/op_excleData/automation.xlsx", "User_Details","","");
+var $SkillRuleData = $excel.readFromCustomExcel("../optimax/op_excleData/automation.xlsx", "Rules","","");
+
+for(var $i=0;$i<$user_credentials.length;$i++)
+{
+var $g_un = $user_credentials[$i][0];
+var $g_pwd = $user_credentials[$i][1];
+var $g_url = $user_credentials[$i][2];
+}
+
+var $RS_6315 = _testcase("RS_6315", "Delete Criteria & Skills");
+
+$RS_6315.start();
+	
+	
+$bo_act_login.login($g_url, $g_un, $g_pwd);
+var $skillRuleName = $SkillRuleData[0][1];
+	
+_click(_link("ServiceMax Setup"));
+_wait(20000,_isVisible(_div("Dispatch Management")));
+_click(_div("Dispatch Management"));
+_wait(20000,_isVisible(_div("Skill Match Rules")));
+_click(_div("Skill Match Rules"));
+_click(_button("Rule Sequence"));
+_setSelected(_select("j_id0:SVMX_FORM:Svmx_PageBlock:list1:j_id38"), [$skillRuleName]);
+_click(_imageSubmitButton("Top"));
+_click(_button("Save"));
+_click(_image("radio_chk0.gif"));
+_click(_imageSubmitButton("Delete Row[2]"));
+_setValue(_textbox("j_id0:SVMX_FORM:SMXC_PageBLOCK1:Pageblck1Sec5:HdrAdvOption"), "1 AND 2");
+_check(_checkbox("j_id0:SVMX_FORM:SMXC_PageBLOCK1:DetailSection:j_id119:j_id145:SVMX_table2:1:stdselected"));
+_check(_checkbox("j_id0:SVMX_FORM:SMXC_PageBLOCK1:DetailSection:j_id119:j_id145:SVMX_table2:1:j_id150"));
+_click(_imageSubmitButton("Remove"));
+_click(_button("Save"));
+
+
+$RS_6315.end();

@@ -1,0 +1,35 @@
+/**
+ * Functions to perform navigation actions
+ */
+var $sfm_act_navigation = new function sfm_act_navigation() {
+	
+	  /**
+     * Navigates to a SFm transaction designer
+     * @returns boolean
+     */
+	this.navigateToSfmCustomActions = function() {
+	 $bo_act_navigation.navigateToSvmxSetup();
+	 _click($bo_pg_servicemaxSetup.btn_serviceFlowManager);
+	 _click($bo_pg_servicemaxSetup.btn_sfmCustomAction);
+
+     };
+     
+		/**
+		 * Author		:	Anand Kakhandaki
+		 * Function		: 	To navigate to checklistQuestion Lib
+		 * Parameter	:	
+		 * 					
+		 * Example		:	Refer RS_7079.sah file for function usage
+		 */
+ 	this.navigateToChecklistQuestionLibrary = function() {
+	 		 $bo_act_navigation.navigateToSvmxSetup();
+	 		 _wait(20000,_isVisible($bo_pg_servicemaxSetup.btn_serviceFlowManager));
+	 		 _click($bo_pg_servicemaxSetup.btn_serviceFlowManager);
+	 		 _wait(20000,_isVisible($bo_pg_servicemaxSetup.btn_checklistQuestionLibrary));
+	 		 _click($bo_pg_servicemaxSetup.btn_checklistQuestionLibrary);
+	 		_wait(10000,(_isVisible($bo_pg_servicemaxSetup.txt_checklistQuestionLibrary)));
+ 	    };
+
+
+ 		 	     
+};

@@ -1,0 +1,69 @@
+//author - Lohitha
+
+var $SWAT_BVT_TC001_SFMdelivery = _testcase("$SWAT_BVT_TC001_SFMdelivery","create quote from work order, save and validate the records");
+$SWAT_BVT_TC001_SFMdelivery.start();
+_setSpeed($g_stepSpeed);
+
+//Pre - Condition 
+$bo_act_login.login($swat_url, $swat_un, $swat_pwd);
+//$bo_act_login.login($g_url, "lohithaadmin@cct4part1.com", "maxpl0re1");
+//$bo_act_navigation.navigateToSfmSearchInDesigner();
+//$bo_act_sfmSearch.createSfmSearch();
+$filePath = "../swat/swat_excelData/data.xlsx";
+
+//$excel.insertUnderColumn($filePath, "Sheet1", "Account", "acc2","");
+
+var $readFile = $excel.readFromCustomExcel($filePath, "Sheet1", true, true)
+
+var $IBno = $readFile[1]["IBno"];
+_log($accName);
+$bo_act_navigation.navigateToHome();
+_setValue(_textbox("str"), "2013");
+_click(_button("Search"));
+_click(_link($IBno));
+_selectDomain("svmxc.cs91.visual.force.com");
+_click(_button("Create WO From IB_SWAT Testing"));
+_selectDomain();
+_click(_button("sfm-checkbox-1070-inputEl"));
+_click(_div("sfm-button-1092"));
+_selectDomain("svmxc.cs91.visual.force.com");
+_click(_button("Debrief WO_Auto"));
+_selectDomain();
+_setValue(_textarea("sfm-textarea-1038-inputEl"), "Test");
+_click(_span("sfm-button-1175-btnIconEl"));
+_click(_span("svmx-button-1093-btnIconEl"));
+_click(_span("sfm-button-1414-btnIconEl"));
+_click(_div("2013 Ferrari FFX"));
+_doubleClick(_div("2013 Ferrari FFX"));
+_click(_div("gridview-1170"));
+_click(_span("Labor"));
+_click(_div("sfm-button-1263"));
+_click(_span("svmx-button-1183-btnIconEl"));
+_click(_div("gridview-1468"));
+_click(_div("svmx-grid-cell-inner [44]"));
+_doubleClick(_div("svmx-grid-cell-inner [44]"));
+_click(_div("svmx-grid-cell-inner [25]"));
+_click(_div("svmx-trigger-index-0 svmx-form-trigger svmx-form-arrow-trigger svmx-form-trigger-last svmx-unselectable svmx-form-trigger-over svmx-form-arrow-trigger-over svmx-form-arrow-trigger-click svmx-form-trigger-click"));
+_click(_listItem("Calibration"));
+_click(_div("svmx-grid-cell-inner [26]"));
+_click(_span("sfm-button-1191-btnIconEl"));
+_click(_div("2013 Ferrari FFXCalibration11/29/2017 2:42 AM"));
+_click(_div("svmx-grid-cell-inner [27]"));
+_click(_span("sfm-button-1198-btnIconEl"));
+_click(_div("11/29/2017 2:42 AM[1]"));
+_click(_div("svmx-trigger-index-0 svmx-form-trigger svmx-form-arrow-trigger svmx-form-trigger-last svmx-unselectable svmx-form-trigger-over svmx-form-arrow-trigger-over svmx-form-arrow-trigger-click svmx-form-trigger-click"));
+_click(_div("svmx-trigger-index-0 svmx-form-trigger svmx-form-arrow-trigger svmx-form-trigger-last svmx-unselectable svmx-form-trigger-over svmx-form-arrow-trigger-over svmx-form-arrow-trigger-click svmx-form-trigger-click"));
+_click(_listItem("03[1]"));
+_click(_div("2013 Ferrari FFXCalibration11/29/2017 2:42 AM"));
+_click(_span("Expenses"));
+_click(_span("sfm-button-1318-btnIconEl"));
+_click(_div("svmx-trigger-index-0 svmx-form-trigger svmx-form-arrow-trigger svmx-form-trigger-last svmx-unselectable svmx-form-trigger-over svmx-form-arrow-trigger-over svmx-form-arrow-trigger-click svmx-form-trigger-click"));
+_click(_listItem("Airfare"));
+_click(_div("svmx-grid-cell-inner [46]"));
+_click(_div("svmx-grid-cell-inner [46]"));
+_setValue(_textbox("sfm-numbercelleditor-1268-inputEl"), "1");
+_click(_div("Airfare 1.0000"));
+_click(_span("Get Price"));
+_click(_div("Airfare 1.0000 10.00% 1.00000.000Expense is covered by warranty."));
+_click(_div("Airfare 1.0000 10.00% 1.00000.000Expense is covered by warranty."));
+_click(_span("sfm-button-1397-btnIconEl"));

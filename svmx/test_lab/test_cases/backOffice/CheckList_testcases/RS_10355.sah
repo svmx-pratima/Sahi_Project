@@ -1,0 +1,32 @@
+// Author Bhupendra Singh Chouhan
+
+/*
+ * checklist Import.
+ */
+var $RS_10355 = _testcase("RS_10355", "Verify the functionality of checklist Import button in the Service flow manager");
+$RS_10355.start();
+
+
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+
+$bo_act_navigation.navigateToServiceFlowManager();
+_wait(1000, _isVisible($bo_pg_servicemaxSetup.btn_ChecklistImport));
+_wait(1000);
+
+// Click on the "Checklist Import" button under Service flow manager and Verify the behavior of the newly launched URL. 
+
+_click($bo_pg_servicemaxSetup.btn_ChecklistImport);
+_selectWindow("ServiceMax Checklist Import");
+_set($urlT, window.location.href);
+	_log("Captured URL : "+ $urlT);
+
+_assertEqual($urlT,"https://migrate.servicemax.com/MigrationTool/ChecklistLogin.jsp","Actual and expected MigrationTool URL are not same");
+_assertEqual(_getText(_cell("labels")),"To sign in with Salesforce, first select the environment you wish to use. On the next screen, provide your username and password.","Actual and expected text are not same");
+
+_setSelected(_select("orgType"),"Sandbox");
+_isVisible(_submit("Next: Salesforce Sign In"));
+_closeWindow();
+
+$bo_act_login.logOut(); 
+
+$RS_10355.end();

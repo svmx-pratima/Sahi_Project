@@ -1,0 +1,126 @@
+// author = Lohitha
+
+var $swat_createPBentries = _testcase("$swat_createPBentries","create price book entries");
+$swat_createPBentries.start();
+_setSpeed($g_stepSpeed);
+
+var $user_credentials_xls = $excel.readFromCustomExcel("../swat/swat_excelData/swatdata.xlsx", "USer_Details","","");
+var $standardpricedata_xls = $excel.readFromCustomExcel("../swat/swat_excelData/swatdata.xlsx", "Standard Price","","");
+
+for(var $i=0; $i<$user_credentials_xls.length; $i++){
+	var $swat_un = $user_credentials_xls[$i][0];
+	var $swat_pwd = $user_credentials_xls[$i][1];
+	var $swat_url = $user_credentials_xls[$i][2];
+}
+
+for(var $i=0;$i<$standardpricedata_xls.length;$i++)
+{
+	var $stndprice_id = $standardpricedata_xls[$i][0];
+	var $stndprice_standradprice = $standardpricedata_xls[$i][1];
+	var $stndprice_active = $standardpricedata_xls[$i][2];
+	var $stndprice_product = $standardpricedata_xls[$i][3];
+	var $stndprice_usestndprice = $standardpricedata_xls[$i][4];
+	_log("$stndprice_standradprice = "+$stndprice_standradprice);
+}
+
+$bo_act_login.login($swat_url, $swat_un, $swat_pwd);
+//$bo_act_login.login("https://test.salesforce.com", "lohithaadmin@dcfull.com", "maxpl0re2");
+
+_set($login_result, _fetch(login($swat_un,$swat_pwd)));
+_log($login_result);
+
+_set($delete_pbent, _fetch(deletePBentries()));
+_log($delete_pbent);
+
+_set($PBentries_creation, _fetch(createpbentries($standardpricedata_xls)));
+_log($PBentries_creation);
+
+if($PBentries_creation.length != null && $PBentries_creation != false && $PBentries_creation != null){
+	//updating PBentries id in standard price excel
+	for(var $i=0; $i<$PBentries_creation.length; $i++){
+		_log("$PBentries_creation[i] ="+$PBentries_creation[$i]);
+		$excel.insertUnderColumn("../swat/swat_excelData/swatdata.xlsx", "Standard Price", "Id", $PBentries_creation[$i],(1+$i));
+		//$excel.insertUnderColumn($filePath, $sheetName, $columnName, $dataToWrite, $rowIndex)
+	}
+}
+	
+//<browser>
+
+function login($swat_un,$swat_pwd)
+{
+	var $login_result = sforce.connection.login($swat_un,$swat_pwd);
+	return $login_result;
+}
+
+//delete and create PB entries
+function deletePBentries(){
+	var delete_pbe = [];
+	//deleting the existing PB entries
+	var pberesult = _call(sforce.connection.query("SELECT Id,Name FROM PricebookEntry WHERE Product2.Name LIKE '%Auto%'"));
+	var del_pbe = pberesult.getArray("records");
+	_log("del pbe = "+del_pbe);
+	if(del_pbe.length > 0 ){
+		for(var $i=0;$i<del_pbe.length;$i++){
+			var pbe = del_pbe[$i];
+			delete_pbe.push(pbe.Id);
+		}
+		var delResult = sforce.connection.deleteIds([delete_pbe]);
+		_log("del result pbe = "+delResult);
+		if(delResult.length < 0){
+			_log(delResult.length +" Existed PB entries are deleted");
+		}
+	}
+	else{
+		_log("No Existed PB entries to delete");
+	}
+}
+
+function createpbentries($standardpricedata_xls){
+	var $isSuccess = false;
+	var createPBentr =[];
+	var pbe_Id = [];
+	//creating PB entries
+	var stnd_pb = '';
+	var stndpbrslt = _call(sforce.connection.query("SELECT Id,Name FROM Pricebook2 WHERE Name = 'Standard Price Book'"));
+	_log("stndpbrslt "+stndpbrslt);
+	var get_stndpb = stndpbrslt.getArray("records");
+	_log("get_stndpb = "+get_stndpb);
+	if(get_stndpb.length > 0){
+		for(var $i=0; $i<get_stndpb.length; $i++){
+			var spb = get_stndpb[$i];
+			stnd_pb = spb.Id;
+			_log("standard price book = "+stnd_pb);
+		}
+	}	
+	for(var $i=0; $i<$standardpricedata_xls.length; $i++){
+		var pbe = new sforce.SObject("PricebookEntry");
+		_log("$PricebookEntry from excel "+$standardpricedata_xls[$i][1]);
+		pbe.UnitPrice = $standardpricedata_xls[$i][1];
+		pbe.IsActive = $standardpricedata_xls[$i][2];
+		pbe.Product2Id = $standardpricedata_xls[$i][3];
+		pbe.UseStandardPrice = $standardpricedata_xls[$i][4];
+		pbe.Pricebook2Id = stnd_pb;
+		createPBentr.push(pbe);
+		_log("createPBentries "+createPBentr);
+	}
+	//fetch PB entries data from standard price excel
+	var $pbe_result = _call(sforce.connection.create(createPBentr));
+	if($pbe_result != 0 && $pbe_result != null){
+		$isSuccess = true;
+		_log("$pbe_result = "+$pbe_result);
+		for(var $x=0; $x<$pbe_result.length; $x++){
+			if($pbe_result[$x].id === null){
+				$isSuccess = false;
+				return $isSuccess;
+			}
+			pbe_Id.push($pbe_result[$x].id);
+			_log("pbe_Id.push = "+pbe_Id);
+		}
+		_log("pbe_Id = "+pbe_Id);
+		return pbe_Id;
+	}
+	return $isSuccess;
+}
+//</browser>
+
+

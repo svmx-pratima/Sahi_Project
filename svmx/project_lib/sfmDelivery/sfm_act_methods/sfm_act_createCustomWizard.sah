@@ -1,0 +1,715 @@
+var $sfm_act_createCustomWizard = new function sfm_act_createCustomWizard() {
+//	var $title = "";
+	this.chooseObject = function($object){
+		_setSelected($sfm_pg_wizards.selectObject,$object);
+		_click($sfm_pg_wizards.btn_customNew);
+	};
+
+	this.addManageWizSteps = function($wizTitle,$wizStepType,$wizStepName,$profile){
+//		$title = $wizTitle;
+//		$wizTitle = $bo_act_common.generateRandomName("Auto Wiz ");
+		var $wizId = $wizTitle.toLowerCase().replace(/ /g, "_");
+//		_log($wizTitle);
+//		_log($wizId);
+//		_log($title);
+		_wait(5000);
+		_setValue($sfm_pg_wizards.txt_wizardTitle,$wizTitle);
+		_setValue($sfm_pg_wizards.txt_wizardID,$wizId);
+		_click($sfm_pg_wizards.txt_manageWizSteps);
+		_click($sfm_pg_wizards.btn_newStep);
+		_setSelected($sfm_pg_wizards.btn_wizStepType,$wizStepType);
+		_setSelected($sfm_pg_wizards.btn_stepName,$wizStepName);
+		_click($sfm_pg_wizards.btn_saveStep);
+		_wait(5000);
+		_click($sfm_pg_wizards.txt_managePermission);
+		_setSelected($sfm_pg_wizards.select_availableGrpProfiles,$profile);
+//		_click($sfm_pg_wizards.btn_add);
+		_click($sfm_pg_wizards.btn_saveClose);
+	};
+
+//	Added by Safi
+	this.addWizStepWithCriteria = function($wizTitle,$wizStepType,$wizStepName,$WizCriteria,$profile){
+//		$title = $wizTitle;
+//		$wizTitle = $bo_act_common.generateRandomName("Auto Wiz ");
+		var $wizId = $wizTitle.toLowerCase().replace(/ /g, "_");
+//		_log($wizTitle);
+//		_log($wizId);
+//		_log($title);
+		_wait(5000);
+		_setValue($sfm_pg_wizards.txt_wizardTitle,$wizTitle);
+		_setValue($sfm_pg_wizards.txt_wizardID,$wizId);
+		_click($sfm_pg_wizards.txt_manageWizSteps);
+		_click($sfm_pg_wizards.btn_newStep);
+		_setSelected($sfm_pg_wizards.btn_wizStepType,$wizStepType);
+		_setSelected($sfm_pg_wizards.btn_stepName,$wizStepName);
+		_setSelected($sfm_pg_wizards.btn_stepCriteria,$WizCriteria);
+		_click($sfm_pg_wizards.btn_saveStep);
+		_click($sfm_pg_wizards.txt_managePermission);
+		_setSelected($sfm_pg_wizards.select_availableGrpProfiles,$profile);
+//		_click($sfm_pg_wizards.btn_add);
+		_click($sfm_pg_wizards.btn_saveClose);		
+
+	};	
+	
+	this.createBlankWoFromRest = function($sfmdUsn, $sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance){
+		var $objName= $orgnamespace+"__Service_Order__c";
+		var $obJson = "{\""+$orgnamespace+"__Zip__c\":\"560001\",\""+$orgnamespace+"__Is_Entitlement_Performed__c\":\"true\"}"; 
+		var $columnName = "Name";
+		var $filter="id";
+		//create an WO through restapi
+		var $WoID = $sfm_act_restApiMethods.postRestApi($sfmdUsn, $sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,$objName,$obJson,"POST");
+		var $WONo =$sfm_act_restApiMethods.getRestApi($sfmdUsn, $sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,"GET", $objName, $columnName, $filter, $WoID);
+		return $WONo;
+	};
+
+
+	this.createBlankWo = function(){
+		$woName="";
+		_wait(5000);
+		_click($sfm_pg_wo.tab_all);
+//		_click($sfm_pg_wo.clickTab("Work Orders"));
+		_wait(3000);
+		_click($sfm_pg_wo.link_wo);
+		_click($sfm_pg_wo.btn_wo_new);
+		if(_exists($sfm_pg_wo.btn_Continue)){
+			_click($sfm_pg_wo.btn_Continue);
+			
+		}
+		_setSelected($bo_pg_workOrders.sel_priority, "High");
+		_click($sfm_pg_wo.btn_wo_save);
+		_wait(3000);
+		$woName= _getText($sfm_pg_wo.label_wo);
+		_selectDomain($g_domain);
+		return $woName;
+//		_wait(10000,_isVisible($sfm_pg_wo.cell_wizard));
+//		var $txt = _isVisible($sfm_pg_wo.cell_wizard);
+//		_selectWindow();
+
+	};
+
+//	Added by Safi
+	this.createWOwithOrderStatus = function($OrdrStatus){		
+		_wait(5000);
+		_click($sfm_pg_wo.tab_all);
+		_wait(3000);
+		_click($sfm_pg_wo.link_wo);
+		_click($sfm_pg_wo.btn_wo_new);
+		_setSelected($sfm_pg_wo.btn_woStaus,$OrdrStatus);
+		_click($sfm_pg_wo.btn_wo_save);
+		_wait(5000);
+
+	};
+
+// Added by Safi	WO with values/ Create Case
+	
+	this.createWOwithFieldValues = function($value){
+		_wait(5000);
+		_click($sfm_pg_wo.tab_all);
+		_wait(3000);
+		_click($sfm_pg_wo.link_wo);
+		_click($sfm_pg_wo.btn_wo_new);
+		_setValue(_textbox("Auto_TextBox_c15122017142520"), $value);
+		_setValue(_textbox("Auto_dateTime_c15122017142520"), "2/1/2018 11:30 PM");
+		_setValue(_textbox("Auto_number_c15122017142520"), "10001");
+		_setSelected(_select(0,_rightOf(_label("Account Picklist"))),"Value1");
+		_click($sfm_pg_wo.btn_wo_save);
+		_wait(6000);
+		_selectDomain($g_domain);
+		
+	};	
+	
+	
+	this.createCasewithFieldValues = function($value){
+		$case="";
+		_wait(5000);
+		_click($sfm_pg_wo.tab_all);
+		_wait(3000);
+		_click(_link("Cases"));
+		_click(_button(" New "));
+		_setValue(_textbox("AutoC_TextBox_c151220171507"), $value);
+		_setValue(_textbox("AutoC_dateTime_c151220171507"), "2/1/2018 11:30 PM");
+		_setValue(_textbox("AutoC_number_c151220171507"), "10001");
+		_setSelected(_select(0,_rightOf(_label("Picklist1"))),"Value1");
+		_setSelected(_select(0,_rightOf(_label("*Case Origin"))),"Email");
+		_click(_submit(" Save "));
+		_wait(6000);
+		if(_isVisible(_span("/efhpCenterValue/"))){
+			$case = _getText(_span("/efhpCenterValue/"));
+		}
+		else{
+			$case = _getText($sfm_pg_wo.label_wo);
+		}
+		return $case;
+	
+	};
+
+	this.newInstalledProduct = function($tabName,$productName,$accountName,$contactName) {
+		var $serialNum = $bo_act_common.generateRandomName("Ser");
+		var $IBName = $bo_act_common.generateRandomName("IB_");
+		_wait(5000);
+//		$bo_act_navigation.navigateToInstalledProductPage();
+		$sfm_pg_wo.clickHomeTabs($tabName);
+		_click($bo_pg_installedProducts.btn_new);
+		if(_isVisible($bo_pg_installedProducts.btn_continue)){
+			_click($bo_pg_installedProducts.btn_continue);
+		}
+		_setValue($bo_pg_installedProducts.txt_productName,$productName);
+		_setValue($bo_pg_installedProducts.txt_serialNumber, $serialNum);
+		_setValue($bo_pg_installedProducts.txt_accountName, $accountName);
+		_setValue($bo_pg_installedProducts.txt_contactName, $contactName);
+		_setValue($bo_pg_installedProducts.txt_installedProductName, $IBName);
+		_setValue($bo_pg_installedProducts.txt_installedDate);
+		_click($bo_pg_installedProducts.btn_save);
+		_assertNotVisible(_div("/Error: Invalid Data/"));
+		_logOutput($IBName+ " IB is created");
+		_wait(15000, _isVisible($IBName));
+		return $IBName;
+	};
+
+	this.clickWizardBtn = function($sfmName) {
+		_selectDomain($g_domain);
+		_call(_button($sfmName).scrollIntoView()); 
+		_click(_button($sfmName));
+		_selectDomain();
+		_wait(25000,_isVisible(_link("/"+$sfmName+"/")));
+
+	};
+	this.addProductServiced = function($part){
+		_wait(3000);
+		_selectDomain();
+		_setStrictVisibilityCheck(true);
+		_click($sfm_pg_wizardWindow.btn_addRow);
+		_click($sfm_pg_wizardWindow.btn_edit);
+		_setValue($sfm_pg_wizardWindow.txt_part,$part);
+		_click(_span("/lookup_icon/",_rightOf(_label("Part:"))));
+		_doubleClick(_cell(0,_under(_div("/Name/"))));
+		_click($sfm_pg_wizardWindow.btn_update);
+		_click($sfm_pg_sfmDesigner.btn_deliveryQuickSave);
+		_wait(10000);
+		_click($sfm_pg_wizardWindow.btn_downArrow);
+		_wait(3000);
+		
+		_click($sfm_pg_wizardWindow.btn_addWorkDetails);
+		_setStrictVisibilityCheck(false);
+	};
+	this.launchlinkSFM = function($part){
+		_wait(3000);
+		_selectDomain();
+		_setStrictVisibilityCheck(true);
+		_click($sfm_pg_wizardWindow.btn_addRow);
+		_click($sfm_pg_wizardWindow.btn_edit);
+		_setValue($sfm_pg_wizardWindow.txt_part,$part);
+		_click(_span("/lookup_icon/",_rightOf(_label("Part:"))));
+		_doubleClick(_cell(0,_under(_div("/Name/"))));
+		_click($sfm_pg_wizardWindow.btn_update);
+		_click($sfm_pg_wizardWindow.btn_downArrow);
+		_wait(3000);
+		if(_isVisible($sfm_pg_wizardWindow.btn_addWorkDetails)==true)
+			{
+			_log("PASS:Linked SFM is ENABLED for newly added line without saving the SFM process");
+			}
+		else
+			{
+			_log("FAIL:Linked SFM is DISABLE for newly added line without saving the SFM process");
+			}
+		_click($sfm_pg_wizardWindow.btn_addWorkDetails);
+		_setStrictVisibilityCheck(false);
+	};
+	this.addParts = function($part) {
+		_wait(5000);
+		_selectDomain();
+		_setStrictVisibilityCheck(true);
+		_click($sfm_pg_wizardWindow.btn_addRow);
+		_click($sfm_pg_wizardWindow.btn_edit);
+		_setValue($sfm_pg_wizardWindow.txt_part1,$part);
+//		_click($sfm_pg_wizardWindow.lookup_Part);
+		_click(_span("/lookup_icon/",_rightOf(_label("Part:[1]"))));
+		_click(_cell(0,_near(_div("/Name/"))));
+		_click(_button("Select"));
+		_click($sfm_pg_wizardWindow.btn_update);
+		_setStrictVisibilityCheck(false);
+	};
+	this.addLabor = function($part) {
+		_click($sfm_pg_wizardWindow.tab_labor);
+		_setStrictVisibilityCheck(true);
+		_wait(3000);
+		_click($sfm_pg_wizardWindow.btn_addRow);
+//		_wait(3000);
+		_click($sfm_pg_wizardWindow.btn_edit);
+//		_wait(3000);
+		_setValue($sfm_pg_wizardWindow.txt_part1,$part);
+//		_click($sfm_pg_wizardWindow.lookup_Part);
+		_click(_span("/lookup_icon/",_rightOf(_label("Part:[1]"))));
+		_click(_cell(0,_near(_div("Product Name"))));
+		_click(_button("Select"));
+		_wait(3000);
+		_click($sfm_pg_wizardWindow.btn_update);
+		_setStrictVisibilityCheck(false);
+	};
+	
+	this.addExpenses = function($expense) {
+		_click($sfm_pg_wizardWindow.tab_expenses);
+		_setStrictVisibilityCheck(true);
+		_wait(3000);
+		_click($sfm_pg_wizardWindow.btn_addRow);
+		_click($sfm_pg_wizardWindow.btn_edit);
+		_setValue($sfm_pg_wizardWindow.txt_expenseType,$expense);
+		_click($sfm_pg_wizardWindow.btn_update);
+		_setStrictVisibilityCheck(false);
+	};
+	this.addTravel = function() {
+		$todayDate = new Date();
+		$date = $todayDate.getDate();
+		$month = $todayDate.getMonth()+1;
+		$year = $todayDate.getFullYear();
+		$currentDate = $date+"/"+$month+"/"+$year;
+//		_log($todayDate);
+//		_log($date);
+//		_log($month);
+//		_log($year);
+		_click($sfm_pg_wizardWindow.tab_travel);
+		_setStrictVisibilityCheck(true);
+		_wait(3000);
+		_click($sfm_pg_wizardWindow.btn_addRow);
+//		_wait(5000);
+		_click($sfm_pg_wizardWindow.btn_edit);
+		_wait(5000);
+		_setValue($sfm_pg_wizardWindow.txt_startDate,$currentDate);
+		_wait(5000);
+		_setValue($sfm_pg_wizardWindow.txt_endDate,$currentDate);
+		_click($sfm_pg_wizardWindow.btn_update);
+		_setStrictVisibilityCheck(false);
+	};
+
+	this.saveWizard = function() {
+		_click($sfm_pg_wizardWindow.btn_save);
+	};
+
+	this.verify6877 = function($value) {
+		var $count=0;
+		_selectDomain();
+		_click($sfm_pg_wizardWindow.lookup_account);
+		_wait(3000);
+		_setStrictVisibilityCheck(true);
+		_setValue($sfm_pg_wizardWindow.lkp_search,$value);
+		_click($sfm_pg_wizardWindow.icon_search);
+		_click($sfm_pg_wizardWindow.account_option);
+		_click($sfm_pg_wizardWindow.btn_select);
+		_click($sfm_pg_wizardWindow.lookup_contact);
+		_wait(3000);
+//		_setStrictVisibilityCheck(true);
+		_click($sfm_pg_wizardWindow.icon_search);
+		var $divs= _collect("_div","/.*/",_under(_div("Account ID")));
+		_log($divs.length);
+//		var $divArray = new Array();
+		for (var $i=1; $i<$divs.length; $i++) {
+			if(_getText($divs[$i])!="Acme"){
+				$count++;
+			}
+
+//			$divArray.push(_getText($divs[$i]));
+		}
+//		_log($divArray);
+		if($count==0){
+			_log("Pass");
+		}
+		else{
+			_fail("Fail");
+		}
+
+	};
+
+	this.verify6905 = function(){
+		var $count=0;
+		_selectDomain();
+		_click($sfm_pg_wizardWindow.lookup_account);
+		_wait(3000);
+		_setStrictVisibilityCheck(true);
+		_setValue($sfm_pg_wizardWindow.lkp_search,"Acme");
+		_click($sfm_pg_wizardWindow.icon_search);
+		_click($sfm_pg_wizardWindow.account_option);
+		_click($sfm_pg_wizardWindow.btn_select);
+		_click($sfm_pg_wizardWindow.btn_addRow);
+		_click($sfm_pg_wizardWindow.btn_edit);
+		_click($sfm_pg_wizardWindow.lookup_autoContact);
+		_wait(3000);
+		_click($sfm_pg_wizardWindow.icon_search);
+		var $divs= _collect("_div","/.*/",_under(_div("Account ID")));
+		_log($divs.length);
+		for (var $i=1; $i<$divs.length; $i++) {
+			if(_getText($divs[$i])!="Acme"){
+				$count++;
+			}
+		}
+		_log($count);
+		if($count==0){
+			_log("Pass");
+		}
+		else{
+			_fail("Fail");
+		}
+	};
+
+	this.verify6906 = function($accountToVerify){
+		_selectDomain();
+		_setStrictVisibilityCheck(true);
+		_click($sfm_pg_wizardWindow.btn_addRow);
+		_click($sfm_pg_wizardWindow.btn_edit);
+		_click($sfm_pg_wizardWindow.lkp_account);
+		_setValue($sfm_pg_wizardWindow.lkp_search,$accountToVerify);
+		_click($sfm_pg_wizardWindow.icon_search);
+		_doubleClick($sfm_pg_wizardWindow.account_option);
+		_click($sfm_pg_wizardWindow.lkp_autoContact);
+		_click($sfm_pg_wizardWindow.icon_search);
+		this.verifyAccountsPresent($accountToVerify);
+	};
+
+	this.verifyAccountsPresent = function($accountToVerify){
+		var $count=0;
+		var $divs= _collect("_div","/.*/",_under(_div("Account ID")));
+		_log($divs.length);
+		for (var $i=1; $i<$divs.length; $i++) {
+			if(_getText($divs[$i])!=$accountToVerify){
+				$count++;
+			}
+		}
+		_log($count);
+		if($count==0){
+			_log("Pass");
+		}
+		else{
+			_fail("Fail");
+		}
+
+	};
+
+	this.verify6904 = function($account){
+		_selectDomain();
+		_setStrictVisibilityCheck(true);
+		$checkboxTxt = "";
+		_setValue($sfm_pg_wizardWindow.txt_accountPicklist,$account);
+		_click($sfm_pg_wizardWindow.lkp_contact);
+		_click($sfm_pg_wizardWindow.icon_search);
+		$checkboxTxt =_getText($sfm_pg_wizardWindow.lbl_contactLookup);
+		$isActivePicklistPresent = $checkboxTxt.search("Account Picklist");
+		_log($isActivePicklistPresent);
+		$isAccountPresent = $checkboxTxt.search($account);
+		_log($isAccountPresent);
+		if($isActivePicklistPresent==-1 || $isAccountPresent==-1){
+			_fail("Fail");
+		}
+		else{
+			_log("Pass");
+		}
+	};
+
+	this.verify7017 = function(){
+		_selectDomain();
+		_setStrictVisibilityCheck(true);
+		$readOnlyAttribute = "";
+		$actualErrorMsg = "Required field is blank: Account";
+		$readOnlyAttribute = _getAttribute($sfm_pg_wizardWindow.sel_billingType, "readonly");
+		$isReadOnlyAttribute = $readOnlyAttribute.search("readonly");
+		$expectedErrorMsg = "";
+		if($isReadOnlyAttribute==-1){
+			_log("Fail :: Billing type is not readonly", "FAILURE");
+		}
+		else{
+			_log("Pass :: Billing type is readonly", "SUCCESS");
+		}
+		_click($sfm_pg_wizardWindow.btn_quickSave);
+		$expectedErrorMsg = _getText($sfm_pg_wizardWindow.errorMsg);
+		_log($expectedErrorMsg);
+		if($actualErrorMsg==$expectedErrorMsg){
+			_log("Pass");
+		}
+		else{
+			_fail("Fail");
+		}
+		_click($sfm_pg_wizardWindow.btn_addAndSearch);
+		_click($sfm_pg_wizardWindow.icon_search);
+		_click($sfm_pg_wizardWindow.chk_multiSelect);
+		var $divs= _collect("_div","/.*/",_under(_div("Product Name")));
+		_log($divs.length);
+		_click($sfm_pg_wizardWindow.btn_select);
+		var $divs1= _collect("_div","/.*/",_under(_div("Part")));
+		_log($divs1.length);
+		if($divs.length==$divs1.length){
+			_log("Pass");
+		}
+		else{
+			_fail("Fail");
+		}
+		var $val = 0;
+		_set($val,_count("_image", "/.*/", _under(_div("/actioncolumn/"))));
+		for(var $i=$val-2;$i<$val;$i++){
+			
+			_click(_image("gif["+$val+"]"));
+		}
+		if(_count("_image", "/.*/", _under(_div("/actioncolumn/")))==0){
+			_log("Pass");
+		}
+		else{
+			_fail("Fail");
+		}
+
+	};
+	
+	this.verify6911 = function(){
+		_selectDomain();
+		_setStrictVisibilityCheck(true);
+		_wait(3000,_isVisible($sfm_pg_wizardWindow.btn_addRow));
+
+		_click($sfm_pg_wizardWindow.btn_addRow);
+		_wait(5000);
+	//	_doubleClick(_div("svmx-grid-cell-inner [1]"));
+		_click(_span("/svmx_lookup_icon/"));
+		_click($sfm_pg_wizardWindow.icon_search);
+		var $divs= _collect("_cell","/.*/",_under(_div("Product Name")));
+//		var $divs= _collect("_div","/[^ ][^ ]*/",_under(_div("Product Name")));
+		_log($divs.length);
+//		for($p=0;$p<$divs.length;$p++){
+//			_alert(_getText($divs[$p]));
+//		}
+		if($divs.length<=10){
+			_log("Pass");
+		}
+		else{
+			_fail("Fail");
+		}
+	};
+	
+	this.validateSearch = function($value,$searchBy){
+		var $count = 0;
+		_setValue($sfm_pg_wizardWindow.lkp_search,$value);
+		_click($sfm_pg_wizardWindow.icon_search);
+		var $result =_collect("_div",$value,_under(_div($searchBy)));
+		for(var $i=0;$i<$result.length;$i++){
+			if(_getText($result[$i])!=$value){
+				$count++;
+			}
+		}
+		if($count==0){
+			_log("Pass");
+		}
+		else{
+			_fail("Fail");
+		}
+		
+	};
+	this.validateBubbleText = function($value){
+		_doubleClick(_div($value));
+		_click($sfm_pg_wizardWindow.btn_bubble);
+		var $productText ="";
+		_set($productText,_getText($sfm_pg_wizardWindow.lbl_product));
+		if($value==$productText){
+			_log("Pass");
+		}
+		else{
+			_fail("Fail");
+		}
+		
+	};
+	
+	this.validateErrorMessage = function($accName,$error,$isChild){
+		_setValue($sfm_pg_wizardWindow.txt_accountField,$accName);
+		if($isChild){
+			_click($sfm_pg_wizardWindow.btn_update);
+		}
+		_click($sfm_pg_wizardWindow.btn_quickSave);
+		var $isVisible;
+		_set($isVisible,_isVisible(_span("Information")));
+		if($isVisible){
+			_click(_span("Ok",_near(_span("Information"))));
+			_wait(5000,_isVisible(_span("Saved Successfully")));
+		}
+		
+		var $errMsg = _getText($sfm_pg_wizardWindow.errorMsg);
+		_log($errMsg);
+		if($errMsg.search($error)!=-1){
+			_log("Pass");
+		}
+		else{
+			_fail("Fail");
+		}
+	};
+	
+	this.validateExactMatch = function($accName,$isChild){
+		_setValue($sfm_pg_wizardWindow.txt_accountField,$accName);
+		if($isChild){
+			_click($sfm_pg_wizardWindow.btn_update);
+		}
+		_click($sfm_pg_wizardWindow.btn_quickSave);
+		var $isVisible;
+		_set($isVisible,_isVisible(_span("Information")));
+		if($isVisible){
+			_click(_span("Ok",_near(_span("Information"))));
+			_wait(5000,_isVisible(_span("Saved Successfully")));
+		}
+		if($isChild){
+			_click($sfm_pg_wizardWindow.btn_edit);
+			_click(_span("/lookup_icon/",_rightOf(_label("AutoContact:"))));
+		}
+		else
+			{
+				_click($sfm_pg_wizardWindow.lkp_contact);
+			}
+		var $limitSearch = _getText($sfm_pg_wizardWindow.txt_limitSearch);
+		if($limitSearch.search($accName)!=-1){
+			_log("Pass");
+		}
+		else{
+			_fail("Fail");
+		}
+		
+	};
+	
+	this.validatePartialMatch = function(){
+//		_setValue($sfm_pg_wizardWindow.txt_accountField,$accName);
+//		_click($sfm_pg_wizardWindow.btn_quickSave);
+		var $isPickListVisible = _isVisible($sfm_pg_wizardWindow.pl_Account);
+		if($isPickListVisible==true){
+			_log("Pass");
+		}
+		else{
+			_fail("Fail");
+		}
+		
+	};
+	this.createWoWithValues = function(){
+		 var $woName="";
+		_click($sfm_pg_wo.tab_all);
+//		_click($sfm_pg_wo.clickTab("Work Orders"));
+		_wait(3000);
+		_click($sfm_pg_wo.link_wo);
+		_click($sfm_pg_wo.btn_wo_new);
+		_click($sfm_pg_wo.txt_actualOnsiteResponse);
+		_click($sfm_pg_wo.cell_today);
+		_click($sfm_pg_wo.txt_actualInitialResponse);
+		_click($sfm_pg_wo.cell_today);
+		_click($sfm_pg_wo.txt_actualRestoration);
+		_click($sfm_pg_wo.cell_tomorrow);
+		_click($sfm_pg_wo.txt_actualResolution);
+//		var $todayDate = _getValue($sfm_pg_wo.cell_today);
+		var $today = _getText($sfm_pg_wo.link_today);
+		var $yesterday = new Date($today);
+//		_log($yesterday);
+		$yesterday.setDate($yesterday.getDate()-1);
+//		_log($yesterday);
+		var $dd = $yesterday.getDate();
+//		_log($dd);
+		_click(_cell("/"+$dd+"/",_leftOf(_cell("/todayDate/"))));
+		_click($sfm_pg_wo.btn_wo_save);
+		_wait(3000);
+		$woName= _getText($sfm_pg_wo.label_wo);
+		return $woName;
+	};
+	this.createWorkDetails = function($lineType,$activityType,$qty){
+		_selectDomain();
+		_click($sfm_pg_wo.btn_newWorkDetail);
+		_setSelected($sfm_pg_wo.sel_recordType,"Usage/Consumption");
+		_click($sfm_pg_wo.btn_Continue);
+		_setSelected($sfm_pg_wo.sel_lineType,$lineType);
+		_setSelected($sfm_pg_wo.sel_activityType,$activityType);
+		_click($sfm_pg_wo.txt_dateCustom);
+		var $today = _getText($sfm_pg_wo.today);
+		var $yesterday = new Date($today);
+		$yesterday.setDate($yesterday.getDate()-1);
+		var $dd = $yesterday.getDate();
+		_click(_cell("/"+$dd+"/",_leftOf(_cell("/todayDate/"))));
+		_click($sfm_pg_wo.txt_dateRequired);
+		_click($sfm_pg_wo.cell_today);
+		_click($sfm_pg_wo.txt_dateReceived);
+		_click($sfm_pg_wo.cell_tomorrow);
+		_setValue($sfm_pg_wo.txt_lineQty,$qty);
+		_click($sfm_pg_wo.btn_wo_save);
+	};
+	this.addMultipleWizSteps = function($wizTitle,$stepTypes,$stepNames,$titles){
+		var $wizId = $wizTitle.toLowerCase().replace(/ /g, "_");
+		_setValue($sfm_pg_wizards.txt_wizardTitle,$wizTitle);
+		_setValue($sfm_pg_wizards.txt_wizardID,$wizId);
+		_click($sfm_pg_wizards.txt_manageWizSteps);
+		for(var $i=0;$i<$stepTypes.length;$i++){
+			_click($sfm_pg_wizards.btn_newStep);
+			_setSelected($sfm_pg_wizards.btn_wizStepType,$stepTypes[$i]);
+			_setSelected($sfm_pg_wizards.btn_stepName,$stepNames[$i]);
+			_setValue($sfm_pg_wizards.txt_title,$titles[$i]);
+			_click($sfm_pg_wizards.btn_saveStep);
+		}
+//		_click($sfm_pg_wizards.txt_managePermission);
+//		_setSelected($sfm_pg_wizards.select_availableGrpProfiles,"Sysadmin01 Group");
+//		_click($sfm_pg_wizards.btn_add);
+		_click($sfm_pg_wizards.btn_saveClose);
+	};
+	
+	this.createWoFor5371 = function(){
+		var $woName="";
+		_click($sfm_pg_wo.tab_all);
+		_wait(3000);
+		_click($sfm_pg_wo.link_wo);
+		_click($sfm_pg_wo.btn_wo_new);
+		var $dd = this.generateYesterday();
+		_log($dd);
+		_click($sfm_pg_wo.txt_actualOnsiteResponse);
+		_click($sfm_pg_wo.cell_today);
+		_click($sfm_pg_wo.txt_actualResolution);
+		_click($sfm_pg_wo.cell_today);
+		_click($sfm_pg_wo.txt_actualInitialResponse);
+		_click(_cell("/"+$dd+"/",_leftOf(_cell("/todayDate/"))));
+		_click($sfm_pg_wo.txt_actualRestoration);
+		_click($sfm_pg_wo.cell_tomorrow);
+		_click($sfm_pg_wo.txt_date1);
+		_click($sfm_pg_wo.cell_today);
+		_click($sfm_pg_wo.txt_date2);
+		_click($sfm_pg_wo.cell_tomorrow);
+		_click($sfm_pg_wo.txt_date3);
+		_click(_cell("/"+$dd+"/",_leftOf(_cell("/todayDate/"))));
+		_click($sfm_pg_wo.btn_wo_save);
+		_wait(3000);
+		$woName= _getText($sfm_pg_wo.label_wo);
+		return $woName;
+	};
+	
+	this.generateYesterday = function(){
+		var $today = _getText($sfm_pg_wo.link_today);
+		var $yesterday = new Date($today);
+//		_log($yesterday);
+		$yesterday.setDate($yesterday.getDate()-1);
+//		_log($yesterday);
+		var $dd = $yesterday.getDate();
+		return $dd;
+	};
+	
+	this.createCase = function(){
+		$bo_act_navigation.navigateToCasesPage();
+		_click($sfm_pg_wo.btn_wo_new);
+		_setSelected($sfm_pg_wo.sel_case, "Email");
+		_click($sfm_pg_wo.link_actualInitialResp);
+		_click($sfm_pg_wo.link_scheduledDate);
+		_click($sfm_pg_wo.btn_wo_save);
+		$case = "";
+		if(_isVisible(_span("/efhpCenterValue/"))){
+			$case = _getText(_span("/efhpCenterValue/"));
+		}
+		else{
+			$case = _getText($sfm_pg_wo.label_wo);
+		}
+		return $case;
+	};
+	
+	this.createWoFor6344 = function($caseId){
+		$bo_act_navigation.navigateToWorkOrdersTab();
+		_click($sfm_pg_wo.btn_wo_new);
+		_setValue($sfm_pg_wo.txt_case,$caseId);
+		_setSelected($sfm_pg_wo.sel_orderStatus,"Canceled");
+		_click($sfm_pg_wo.btn_wo_save);
+		_wait(3000);
+		$woName= _getText($sfm_pg_wo.label_wo);
+		return $woName;
+		
+	};
+};
+
+
+
+

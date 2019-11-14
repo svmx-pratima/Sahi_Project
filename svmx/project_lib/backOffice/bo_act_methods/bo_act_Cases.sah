@@ -1,0 +1,133 @@
+/**
+ * Functions for the Cases Object
+ */
+var $bo_act_Cases = new function bo_act_Cases() {
+
+	/**
+	 * Create an Cases
+	 * 
+	 */
+	this.createCase = function($caseStatus, $casePriority, $caseOrigin ) {
+		var $caseSubject = $bo_act_common.generateRandomName("Case");
+        $bo_act_navigation.navigateToCasesPage();
+		_click($bo_pg_Cases.btn_new);
+		_setValue($bo_pg_Cases.txt_subjectName, $caseSubject);
+		_setSelected($bo_pg_Cases.sel_selectCaseStatus,$caseStatus);
+		_setSelected($bo_pg_Cases.sel_selectCasePriority,$casePriority);
+		_setSelected($bo_pg_Cases.sel_selectCaseOrigin,$caseOrigin);
+		_click($bo_pg_Cases.btn_save);
+		_assertNotVisible(_div("/Error: Invalid Data/"));
+		_wait(15000, _isVisible(_heading2("/Case/")));
+		var $caseNumber = _getText($bo_pg_Cases.txt_caseNumber);
+		_logOutput($caseNumber+ " Case is created");
+    return $caseNumber;
+	};
+	
+	this.createcase_checkentitlement = function($caseStatus, $casePriority, $caseOrigin, $CaseReason, $IBName) {
+		var $caseSubject = $bo_act_common.generateRandomName("Case");
+        $bo_act_navigation.navigateToCasesPage();
+		_click($bo_pg_Cases.btn_new);
+		_setValue($bo_pg_Cases.txt_subjectName, $caseSubject);
+		_setSelected($bo_pg_Cases.sel_selectCaseStatus,$caseStatus);
+		_setSelected($bo_pg_Cases.sel_selectCasePriority,$casePriority);
+		_setSelected($bo_pg_Cases.sel_selectCaseOrigin,$caseOrigin);
+		_setSelected($bo_pg_Cases.sel_casereason, $CaseReason);
+
+		_setValue($bo_pg_Cases.txt_componentSN_Name, $IBName);
+		_click($bo_pg_Cases.sel_checkentitlement);
+		_click($bo_pg_Cases.btn_save);
+		_assertNotVisible(_div("/Error: Invalid Data/"));
+		_wait(15000, _isVisible(_heading2("Case Detail")));
+		var $caseNumber = _getText($bo_pg_Cases.txt_caseNumber);
+		_logOutput($caseNumber+ " Case is created");
+    return $caseNumber;
+	};
+	
+	
+	this.editCase = function($caseNumber, $caseAccount, $caseContact, $caseComponentSN, $caseSite) {
+		 $bo_act_navigation.navigateToCasesPage();
+		 _click(_link($caseNumber));
+		 _wait(10000, _isVisible($caseNumber));
+		 _click($bo_pg_Cases.btn_editCase);
+		 _setValue($bo_pg_Cases.txt_accountName, $caseAccount);
+		 _setValue($bo_pg_Cases.txt_contactName, $caseContact);
+		 _setValue($bo_pg_Cases.txt_componentSN_Name, $caseComponentSN);
+		 _setValue($bo_pg_Cases.txt_siteName, $caseSite);
+		 _click($bo_pg_Cases.btn_save);
+		 _assertNotVisible(_div("/Error: Invalid Data/"));
+		 _wait(15000, _isVisible($caseNumber));
+		 _logOutput($caseNumber+ " Case is Editied");
+	
+		 _log($caseNumber[1]);
+	};
+
+	// added by Bhupendra Singh
+	
+	/**
+	 * Create an case lines
+	 */
+	this.addCaseLines = function($searchValue, $lineQty){
+		//_wait(15000, _isVisible($bo_pg_getPrice.btn_partsLine));
+		 _click($bo_pg_Cases.btn_caseLines);
+		_click($bo_pg_getPrice.btn_addSingleLine);
+		_click($bo_pg_getPrice.btn_editFirstRow);
+		_wait(10000);
+		_setStrictVisibilityCheck(true);
+		$bo_act_common.searchfunction($searchValue);	//Search Values like Parts/Product Name
+		_setValue($bo_pg_Cases.txt_lineQuantity, $lineQty);
+		_wait(2000);
+		_click($bo_pg_getPrice.btn_update);
+		_wait(2000);
+		_setStrictVisibilityCheck();
+	};
+	
+	this.deleteCases = function($caseNumber){
+		  $bo_act_navigation.navigateToCasesPage();
+		  _click(_link($caseNumber));
+		  _wait(10000, _isVisible($caseNumber));
+		  _click($bo_pg_Cases.btn_deleteCase);
+	};
+	
+	this.cloneCases = function($caseNumber){
+		  $bo_act_navigation.navigateToCasesPage();
+		  _click(_link($caseNumber));
+		  _wait(10000, _isVisible($caseNumber));
+		  _click($bo_pg_Cases.btn_cloneCase);
+	};
+	
+	this.editCaseOnly = function($CaseNumber){
+		$bo_act_navigation.navigateToCasesPage();
+		  _click(_link($caseNumber));
+		  _click($bo_pg_Cases.btn_editCase);
+	};
+	this.updateTextBoxFields = function($object,$objectValue){
+		_setValue($object,$objectValue);
+		//return $callBack.returnResult([_isVisible($accountName), "Account not created",$accountName] );
+	};
+	this.updateDropdownFields = function($object,$objectValue){
+		_setSelected($object,$objectValue);
+		//return $callBack.returnResult([_isVisible($accountName), "Account not created",$accountName] );
+	};
+	
+	this.clickLinktoUpdateTextfields = function($object){
+		_click($object);
+		
+	};
+	
+	this.saveCase = function(){
+		 _click($bo_pg_Cases.btn_save);
+		 _assertNotVisible(_div("/Error: Invalid Data/"));
+		 _wait(15000, _isVisible($caseNumber));
+		 _logOutput($caseNumber+ " Case is Editied");
+		
+	};
+	
+	this.checkEntitlementOnCase = function($caseNumber){
+		$bo_act_navigation.navigateToCasesPage();
+		  _click(_link($caseNumber));
+		_selectDomain($g_domain);
+		_click($bo_pg_Cases.btn_SFWCheckEntitlementOnCase);
+		_wait(3000);
+		_selectDomain();
+	};
+};

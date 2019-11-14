@@ -1,0 +1,86 @@
+
+//Author - Shashikala Kamath
+
+var $BVT_TC_004_Linked_SFM = _testcase("BVT_TC_004_Linked_SFM",
+		"Configure the SFW to include standard and custom Linked SFM and launch the same in delivery." +
+		"Add child lines is main process and linked process and save.");
+
+	$BVT_TC_004_Linked_SFM.start();
+		_setSpeed($g_stepSpeed);
+	
+	//Pre - Condition 
+	$bo_act_login.login("https://test.salesforce.com","bc@admin.com.fsapart2", "fsa123456");
+	
+	var $wizardSelectObjectName = "Work Order";
+	var $wizardTitleName = $bo_act_common.generateRandomName("SFWTitle");
+	var $wizardIDName = $bo_act_common.generateRandomName("SFWId");
+	var $wizardStepType = "SFM";
+	var $wizardStepName = "Add/Edit Products Serviced";
+	var $executionMode = "Interactive";
+	var $handOver = false;
+	
+	
+	var $caseNumber = $bo_act_Cases.createCase("New", "High", "Email");
+	//$excel.writeToExcel("write", "../swatdata.xlsx", "readData", $caseNumber, 1)
+	
+	//Uncomment below code while running this script alone
+	var $accountName = $bo_act_accounts.createAccount();
+	var $contactName = $bo_act_contacts.createContact($accountName);
+	var $productName =$bo_act_products.createProduct();
+	var $IBName = $bo_act_installedProduct.createInstalledProduct($productName,$accountName,$contactName);
+	
+	
+	/**
+	 * Read data from swatdata.xlsx - Reading data which are created in testscript1 -BVT_TC_001_SFMSearch.sah
+	 
+	var $runData = $excel.readFromCustomExcel("/Swat_excelData/swatdata.xlsx",  "runData", true, true);
+	var $caseNumber=$runData[1]["Case"];
+	var $accountName=$runData[1]["Account"];
+	var $contactName=$runData[1]["Contact"];
+	var $productName=$runData[1]["Product"];
+	var $IBName=$runData[1]["InstalledProduct"];
+	_log("Case: "+$caseNumber);
+	_log("Account: "+$accountName);
+	_log("Contact: "+$contactName);
+	_log("Product: "+$productName);
+	*/
+	
+	$bo_act_navigation.navigateToSfmWizard();
+	$bo_act_SFW.createWizardGeneralInfo($wizardSelectObjectName, $wizardTitleName, $wizardIDName);
+	$bo_act_SFW.createSFMWizardStepwithHandOver($wizardStepType, $wizardStepName, $executionMode, $handOver);
+	$bo_act_SFW.quickSaveSFWizard();
+	$bo_act_SFW.saveAndClose();
+	
+	//Create a Work Order record
+	$workOrderNo = $swat_act_workOrders.createWorkOrder($caseNumber, $accountName, $contactName, $IBName, "Open", "High", "Field Service");
+	
+	
+	_selectDomain($g_domain); 
+	_wait(15000,_isVisible(_cell({title: $wizardTitleName})));
+	_assertVisible(_cell({title:$wizardTitleName}),"Pass");
+	_click(_button("Add/Edit Products Serviced", _in(_cell($wizardTitleName))));
+	_selectDomain();
+	_wait(10000,_isVisible(_label("Site:")));
+	
+	// Add a Product Serviced Line
+	// The following function adds a part and launches the Linked Process
+	
+	
+	$sfm_act_createCustomWizard.addProductServiced($productName);
+	
+	//Add lines in the linked process and save the linked process followe by the main process
+	_wait(15000);
+	$sfm_act_createCustomWizard.addParts($productName);
+	$sfm_act_createCustomWizard.addLabor($productName);
+	$sfm_act_createCustomWizard.addExpenses("Airfare");
+	$sfm_act_createCustomWizard.addTravel();
+	$sfm_act_createCustomWizard.saveWizard();
+	_wait(10000);
+	$sfm_act_createCustomWizard.saveWizard();
+	_wait(10000);
+
+
+$BVT_TC_004_Linked_SFM.end();
+
+
+

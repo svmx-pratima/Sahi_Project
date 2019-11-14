@@ -1,0 +1,187 @@
+var $RS_5358 = _testcase("RS_5358","Verify custom search with multiple objects and advanced expression.");
+$RS_5358.start();
+//Variables used in this test case
+var $standardSearch = "SVMXSTD: Account Search";
+var $searchName = "RS_5358";
+var $desiredObjSequence = ["Open Work Orders","Open RMA","Open Cases","Open Shipment",];
+var $temp;
+var $woName;
+var $res;
+var $actualSearchTabs = [];
+var $i=0;var $x;
+var $desiredFieldSequence = [];
+var $res = true;
+var $visibleWo = [];
+var $visibleCase = [];
+var $inVisibleWo = [];
+var $inVisibleCase = [];
+
+//Appending current timestamp to process name to make it unique.
+var $timeStamp = $bo_act_navigation.getCurrentTimeStamp();
+$searchName = $searchName + "_" + $timeStamp;
+
+
+//Case
+var $obJson = "{\"Status\":\"New\",\"Priority\":\"High\"}";
+var $objName = "Case";
+var $caseRowId = $sfm_act_restApiMethods.postRestApi($sfmdUsn,$sfmdPwd, $sfmClientId, $sfmConsumerSecret, $sfmOrgInstance, $objName, $obJson,"POST");
+var $filterFieldName = "Id";
+var $filterFieldValue = $caseRowId;
+var $caseNumber = $sfm_act_restApiMethods.getRestApi($sfmdUsn, $sfmdPwd, $sfmClientId, $sfmConsumerSecret, $sfmOrgInstance, "GET", $objName, "CaseNumber", $filterFieldName, $filterFieldValue);
+_log($caseNumber);
+$visibleCase.push($caseNumber);
+
+//Case
+var $obJson = "{\"Status\":\"Closed\",\"Priority\":\"Medium\"}";
+var $objName = "Case";
+var $caseRowId = $sfm_act_restApiMethods.postRestApi($sfmdUsn,$sfmdPwd, $sfmClientId, $sfmConsumerSecret, $sfmOrgInstance, $objName, $obJson,"POST");
+var $filterFieldName = "Id";
+var $filterFieldValue = $caseRowId;
+var $caseNumber = $sfm_act_restApiMethods.getRestApi($sfmdUsn, $sfmdPwd, $sfmClientId, $sfmConsumerSecret, $sfmOrgInstance, "GET", $objName, "CaseNumber", $filterFieldName, $filterFieldValue);
+_log($caseNumber);
+$visibleCase.push($caseNumber);
+
+//Case
+var $obJson = "{\"Origin\":\"Email\",\"Priority\":\"Medium\"}";
+var $objName = "Case";
+var $caseRowId = $sfm_act_restApiMethods.postRestApi($sfmdUsn,$sfmdPwd, $sfmClientId, $sfmConsumerSecret, $sfmOrgInstance, $objName, $obJson,"POST");
+var $filterFieldName = "Id";
+var $filterFieldValue = $caseRowId;
+var $caseNumber = $sfm_act_restApiMethods.getRestApi($sfmdUsn, $sfmdPwd, $sfmClientId, $sfmConsumerSecret, $sfmOrgInstance, "GET", $objName, "CaseNumber", $filterFieldName, $filterFieldValue);
+_log($caseNumber);
+$visibleCase.push($caseNumber);
+
+//Case
+var $obJson = "{\"Origin\":\"Email\",\"Priority\":\"High\"}";
+var $objName = "Case";
+var $caseRowId = $sfm_act_restApiMethods.postRestApi($sfmdUsn,$sfmdPwd, $sfmClientId, $sfmConsumerSecret, $sfmOrgInstance, $objName, $obJson,"POST");
+var $filterFieldName = "Id";
+var $filterFieldValue = $caseRowId;
+var $caseNumber = $sfm_act_restApiMethods.getRestApi($sfmdUsn, $sfmdPwd, $sfmClientId, $sfmConsumerSecret, $sfmOrgInstance, "GET", $objName, "CaseNumber", $filterFieldName, $filterFieldValue);
+_log($caseNumber);
+$inVisibleCase.push($caseNumber);
+
+//Case
+var $obJson = "{\"Origin\":\"Email\",\"Priority\":\"High\",\"Status\":\"Escalated\"}";
+var $objName = "Case";
+var $caseRowId = $sfm_act_restApiMethods.postRestApi($sfmdUsn,$sfmdPwd, $sfmClientId, $sfmConsumerSecret, $sfmOrgInstance, $objName, $obJson,"POST");
+var $filterFieldName = "Id";
+var $filterFieldValue = $caseRowId;
+var $caseNumber = $sfm_act_restApiMethods.getRestApi($sfmdUsn, $sfmdPwd, $sfmClientId, $sfmConsumerSecret, $sfmOrgInstance, "GET", $objName, "CaseNumber", $filterFieldName, $filterFieldValue);
+_log($caseNumber);
+$inVisibleCase.push($caseNumber);
+
+//Work Order
+$objName= $orgnamespace+"__Service_Order__c";
+$obJson = "{\""+$orgnamespace+"__Order_Status__c\":\"Open\",\""+$orgnamespace+"__Priority__c\":\"High\",\""+$orgnamespace+"__City__c\":\"Kashmir\"}";
+$columnName = "Name";
+$filter="id";
+var $filterValue =$sfm_act_restApiMethods.postRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,$objName,$obJson,"POST");
+$woName =$sfm_act_restApiMethods.getRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,"GET", $objName, $columnName, $filter, $filterValue);
+_log("Created Work order is" +$woName);
+$visibleWo.push($woName);
+
+//Work Order
+$objName= $orgnamespace+"__Service_Order__c";
+$obJson = "{\""+$orgnamespace+"__Order_Status__c\":\"Open\",\""+$orgnamespace+"__Priority__c\":\"Medium\",\""+$orgnamespace+"__City__c\":\"Mysuru\"}";
+$columnName = "Name";
+$filter="id";
+var $filterValue =$sfm_act_restApiMethods.postRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,$objName,$obJson,"POST");
+$woName =$sfm_act_restApiMethods.getRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,"GET", $objName, $columnName, $filter, $filterValue);
+_log("Created Work order is" +$woName);
+$visibleWo.push($woName);
+
+//Work Order
+$objName= $orgnamespace+"__Service_Order__c";
+$obJson = "{\""+$orgnamespace+"__Order_Status__c\":\"Closed\",\""+$orgnamespace+"__Priority__c\":\"High\",\""+$orgnamespace+"__City__c\":\"Mysuru\"}";
+$columnName = "Name";
+$filter="id";
+var $filterValue =$sfm_act_restApiMethods.postRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,$objName,$obJson,"POST");
+$woName =$sfm_act_restApiMethods.getRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,"GET", $objName, $columnName, $filter, $filterValue);
+_log("Created Work order is" +$woName);
+$inVisibleWo.push($woName);
+
+//Work Order
+$objName= $orgnamespace+"__Service_Order__c";
+$obJson = "{\""+$orgnamespace+"__Order_Status__c\":\"Closed\",\""+$orgnamespace+"__Priority__c\":\"Medium\",\""+$orgnamespace+"__City__c\":\"Mysuru\"}";
+$columnName = "Name";
+$filter="id";
+var $filterValue =$sfm_act_restApiMethods.postRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,$objName,$obJson,"POST");
+$woName =$sfm_act_restApiMethods.getRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,"GET", $objName, $columnName, $filter, $filterValue);
+_log("Created Work order is" +$woName);
+$inVisibleWo.push($woName);
+
+//Work Order
+$objName= $orgnamespace+"__Service_Order__c";
+$obJson = "{\""+$orgnamespace+"__Order_Status__c\":\"Open\",\""+$orgnamespace+"__Priority__c\":\"Medium\",\""+$orgnamespace+"__City__c\":\"Paris\"}";
+$columnName = "Name";
+$filter="id";
+var $filterValue =$sfm_act_restApiMethods.postRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,$objName,$obJson,"POST");
+$woName =$sfm_act_restApiMethods.getRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,"GET", $objName, $columnName, $filter, $filterValue);
+_log("Created Work order is" +$woName);
+$inVisibleWo.push($woName);
+_log("Visible Work Orders in Search for positive scenarios"+$visibleWo);
+_log("Invisible Work Orders in Search for negative scenarios "+$inVisibleWo);
+_log("Visible cases in search for positive scenarios"+$visibleCase);
+_log("Invisible cases in search for negative scenarios"+$inVisibleCase);
+$inVisibleWo
+//Login and switch to classic
+//**************************************************************************************
+$bo_act_login.login($g_url,$sfmdUsn,$sfmdPwd);
+
+_wait(15000);
+
+//Setting up new custom search
+$bo_act_navigation.navigateToSfmSearchInDesigner();
+$sfm_act_search.createNewCustomSearch($searchName, $searchName);
+var $objectsArray = ["Work Order","Case"];
+var $woFields = ["Order Status","Priority","City"];
+var $woOperators = ["Equals","Equals","Starts With"];
+var $woValues =["Open","High","M"];
+var $woAdvExpr = ["1 AND (2 OR 3)"];
+var $woDisplayObjects = ["Work Order","Work Order","Work Order"];
+var $woDisplayFields = ["Order Status","Priority","City"];
+var $caseFields = ["Status","Priority","Case Origin"];
+var $caseOperators = ["Equals","Equals","Equals"];
+var $caseValues = ["New","Medium","Web"];
+var $caseAdvExpr = ["1 OR 2 OR 3"];
+var $caseDisplayObjects = ["Case","Case","Case"];
+var $caseDisplayFields = ["Status","Priority","Case Origin"];
+var $i=0;
+var $sortingObjects = [];
+var $sortingFields = [];
+var $searchOrders = [];
+var $appliedObjects = [];
+var $appliedValues = [];
+var $fieldNames = [$woFields,$caseFields];
+var $operatorList = [$woOperators,$caseOperators];
+var $valueList = [$woValues,$caseValues];
+var $advExpression = [$woAdvExpr,$caseAdvExpr];
+var $displayObjects = [$woDisplayObjects,$caseDisplayObjects];
+var $displayFields = [$woDisplayFields,$caseDisplayFields];
+//Configuring multiple objects and advanced expressions
+ for($i=0;$i<$objectsArray.length;$i++){
+	 $sfm_act_search.configObjectInSearch($objectsArray[$i], $fieldNames[$i], $operatorList[$i], $valueList[$i], $advExpression[$i], $displayObjects[$i], $displayFields[$i], $sortingObjects, $sortingFields, $searchOrders);
+ }
+//Save the whole search after configs
+ $sfm_act_search.saveAndCloseSearch();
+ //Launch the search and verify results
+ $sfm_act_search.launchGivenSearch($searchName,"");
+ //Verify Search results
+ //Positive scenarios first
+ //CASE
+$res = $sfm_act_search.checkAndReturnSearchResults($visibleCase, "Case");
+_assertTrue($res,"Case Search results are as expected for positive scenarios");
+//WO
+$res = $sfm_act_search.checkAndReturnSearchResults($visibleWo, "Work Order");
+_assertTrue($res,"Work Order Search results are as expected for positive scenarios");
+//Negative scenarios for search ie, search results not appearing
+$res = $sfm_act_search.checkAndReturnSearchResults($inVisibleCase, "Case");
+_assertFalse($res,"Case Search results are as expected for negative scenarios");
+//WO
+$res = $sfm_act_search.checkAndReturnSearchResults($inVisibleWo, "Work Order");
+_assertFalse($res,"Work Order Search results are as expected for negative scenarios");
+
+$sfm_act_common.logoutInClassic();
+
+$RS_5358.end();

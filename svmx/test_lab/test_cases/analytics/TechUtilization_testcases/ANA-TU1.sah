@@ -1,0 +1,112 @@
+var $an_TU1_ts = _testcase("ANA-863","Service Request as Top level object ");
+$an_TU1_ts.start();
+var $data = _readExcelFile("../../analytics/an_excleData/an_Datasheet1.xlsx","Sheet1",true);
+var $un =$bac_un ;
+var $pwd =$bac_pwd;
+var $url = "https://test.salesforce.com";
+var $Account = $data[1]["Account"];
+var $Technician = $data[1]["Technician"];
+var $Product = $data[1]["Product"];
+var $OrderStatus = $data[1]["OrderStatus"];
+var $Closedon = $data[1]["ClosedOn"];
+var $Site = $data[1]["Site"];
+var $Component = $data[1]["Component"];
+var $ScheduledDate = $data[1]["ScheduledDate"];
+var $user_meghana = $user_orgdetails;
+$bo_act_login.login($url, $un, $pwd);
+
+// Create timesheet entry
+
+var $ana_TU1_create_timesheet = "SVMXC__Timesheet__c Timesheet = new SVMXC__Timesheet__c (SVMXC__Start_Date__c  = System.Today() , SVMXC__End_Date__c  = System.Today(), SVMXC__User__c  = '"+$user_meghana+"');insert Timesheet ;";
+var $ana_TU1_create_ts_query = "Select Id, Name from SVMXC__Timesheet__c where CreatedBy.Id = '"+$user_meghana+"' Order by CreatedDate DESC Limit 1";
+var $ana_TU1_result = $op_act_sForceApiCall.sForceQuery($un, $pwd, $ana_TU1_create_timesheet , "create");
+
+var $ana_TU1_fetch = $op_act_sForceApiCall.sForceQuery($un, $pwd, $ana_TU1_create_ts_query,"query");
+
+var $ana_Timesheet_ID = $ana_TU1_fetch[0].Id;
+
+
+
+_log($ana_Timesheet_ID);
+
+
+//Create Timesheet Daily Summary
+
+var $ana_TU1_create_daily_summary = "SVMXC__Timesheet_Day_Entry__c Timesheet_daily = new SVMXC__Timesheet_Day_Entry__c (SVMXC__Timesheet__c = '"+$ana_Timesheet_ID+"', SVMXC__Timsheet_Day__c = System.today(), SVMXC__SM_Working_Minutes__c  = 480);insert Timesheet_daily;";
+
+var $ana_TU1_create_daily_query = "Select Id, Name, SVMXC__SM_Working_Minutes__c from SVMXC__Timesheet_Day_Entry__c where SVMXC__Timesheet__c = '"+$ana_Timesheet_ID+"' Order by CreatedDate DESC Limit 1";
+
+var $ana_TU1_dailysummary_result = $op_act_sForceApiCall.sForceQuery($un, $pwd, $ana_TU1_create_daily_summary , "create");
+
+var $ana_TU1_dailysummary_fetch = $op_act_sForceApiCall.sForceQuery($un, $pwd, $ana_TU1_create_daily_query,"query");
+
+
+var $ana_dailysummary_ID = $ana_TU1_dailysummary_fetch[0].Id;
+var $ana_dailysummery_working_minutes = $ana_TU1_dailysummary_fetch[0].SVMXC__SM_Working_Minutes__c;
+
+_log($ana_dailysummary_ID);
+
+// Create a TimeEntry
+
+var $ana_TU1_time_entry = "SVMXC__Timesheet_Entry__c  time_entry = new SVMXC__Timesheet_Entry__c (SVMXC__Timesheet__c  = '"+ $ana_Timesheet_ID +"', SVMXC__Timesheet_Day__c  = '"+ $ana_dailysummary_ID +"' , SVMXC__SM_Type__c  = 'Meeting', SVMXC__Duration__c  = 2 , SVMXC__Start_Time__c = System.now() , SVMXC__End_Time__c = System.now()+0.166);insert time_entry;";
+var $ana_TU1_time_query = "Select Id, Name, SVMXC__Duration__c  from SVMXC__Timesheet_Entry__c where SVMXC__Timesheet__c = '"+$ana_Timesheet_ID+"'  AND SVMXC__Timesheet_Day__c  = '"+ $ana_dailysummary_ID +"'";
+var $ana_TU1_time_result = $op_act_sForceApiCall.sForceQuery($un, $pwd, $ana_TU1_time_entry , "create");
+
+var $ana_TU1_time_fetch = $op_act_sForceApiCall.sForceQuery($un, $pwd, $ana_TU1_time_query,"query");
+
+
+
+
+var $ana_TU1_time_ID = $ana_TU1_time_fetch[0].Id;
+var $ana_TU1_timeentry_duration = $ana_TU1_time_fetch[0].SVMXC__Duration__c;
+_log($ana_TU1_time_ID);
+
+// Update the Timesheet
+
+var $ana_TU1_update_timesheet = "SVMXC__Timesheet__c Timesheet = new SVMXC__Timesheet__c (Id = '"+$ana_Timesheet_ID+"',SVMXC__Status__c = 'Approved' );update Timesheet ;";
+var $ana_TU1_update_timesheet_result =  $op_act_sForceApiCall.sForceQuery($un, $pwd, $ana_TU1_update_timesheet , "create");
+
+
+// Run the TechUtil Engine.
+
+$an_act_tech_util.tu_schedule_notifications("meghana.rao@servicemax.com");
+
+var $ana_TU1_timesheet_working_mins = null ;
+var $ana_TU1_productive_mins;
+
+
+var $ana_util_data_result = "Select Id ,SVMXC__Working_Minutes__c,SVMXC__Utilization__c,SVMXC__Productive_Time__c from SVMXC__SPM_Utilization__c where SVMXC__Timesheet_Daily_Summary__c = '"+$ana_dailysummary_ID+"'";
+
+var $ana_util_data_query = $op_act_sForceApiCall.sForceQuery($un, $pwd, $ana_util_data_result,"query");
+
+$ana_util_data_query.forEach(function($varRV1) {
+	$ana_TU1_timesheet_working_mins = $varRV1.SVMXC__Working_Minutes__c;
+	$ana_TU1_productive_mins = $varRV1.SVMXC__Productive_Time__c;
+});
+
+_log($ana_TU1_timesheet_working_mins);
+_log($ana_TU1_productive_mins);
+
+_assertEqual(($ana_TU1_timeentry_duration * 60), Math.round($ana_TU1_productive_mins));
+_assertEqual($ana_dailysummery_working_minutes,Math.round($ana_TU1_timesheet_working_mins));
+
+
+// Delete the data from objects
+
+var $delete_time_sheet_daily_summary = "delete [Select Id from SVMXC__Timesheet_Day_Entry__c];";
+var $delete_data = $op_act_sForceApiCall.sForceQuery($un, $pwd, $delete_time_sheet_daily_summary , "create");
+_wait(1000);
+
+var $delete_timesheet = "delete [Select Id from SVMXC__Timesheet__c];";
+var $delete_data = $op_act_sForceApiCall.sForceQuery($un, $pwd, $delete_timesheet , "create");
+
+_wait(1000);
+var $delete_time_entries = "delete [Select Id from SVMXC__Timesheet_Entry__c];";
+var $delete_data = $op_act_sForceApiCall.sForceQuery($un, $pwd, $delete_time_entries , "create");
+
+_wait(1000);
+var $delete_util = "delete [Select Id from SVMXC__SPM_Utilization__c];";
+var $delete_data =  $op_act_sForceApiCall.sForceQuery($un, $pwd, $delete_util , "create");
+
+_wait(1000);
+$an_TU1_ts.end();

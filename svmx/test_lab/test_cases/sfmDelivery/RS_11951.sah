@@ -1,0 +1,100 @@
+//Author:Rubi Agrawal
+var $RS_11951 = _testcase("RS_11951","Verify linked SFM when web service configured in header part of the SFM");
+$RS_11951.start();
+
+//Create Account
+var $AccountName=$bo_act_common.generateRandomName("RS11951_Account_");
+var $objName= "Account";
+var $obJson = "{\"Name\":\""+$AccountName+"\"}";
+$AccountID=$sfm_act_restApiMethods.postRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,$objName,$obJson,"POST");
+_log("Account: "+$AccountName);
+
+//Create Product
+var $objName= "Product2";
+var $WDpartName=new Array;
+var $ProductID=new Array;
+for (var $i = 0; $i < 2; $i++) {
+	$WDpartName[$i]=$bo_act_common.generateRandomName("RS11951_Prod_");
+	var $obJson = "{\"Name\":\""+$WDpartName[$i]+"\",\"ProductCode\":\""+$WDpartName[$i]+"\",\""+$orgnamespace+"__Product_Line__c\":\"Storage\",\""+$orgnamespace+"__Product_Type__c\":\"Consumable\"}";
+	$ProductID[$i]=$sfm_act_restApiMethods.postRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,$objName,$obJson,"POST");
+	_log("Product Name: "+$WDpartName[$i]);	
+}
+
+//Create IB
+var $IBSerialNo=$bo_act_common.generateRandomName("RS_11951_IB_");
+var $objName= $orgnamespace+"__Installed_Product__c";
+var $obJson = "{\"Name\":\""+$IBSerialNo+"\",\""+$orgnamespace+"__Company__c\":\""+$AccountID+"\",\""+$orgnamespace+"__Product__c\":\""+$ProductID[1]+"\",\""+$orgnamespace+"__Serial_Lot_Number__c\":\""+$IBSerialNo+"\"}";
+$IBfilterValue=$sfm_act_restApiMethods.postRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,$objName,$obJson,"POST");
+_log("IB: "+$IBSerialNo);
+
+//Create WO
+var $woNumber = $sfm_act_createCustomWizard.createBlankWoFromRest($sfmdUsn, $sfmdPwd, $sfmClientId, $sfmConsumerSecret, $sfmOrgInstance);
+var $recordToBeSearch=$woNumber;
+_setSpeed($g_stepSpeed);
+
+//Login and switch to classic
+$bo_act_login.login($g_url,$sfmdUsn,$sfmdPwd);
+_wait(15000);
+
+//Variable declarations
+var $sfmNameToBeCloned="Add/Edit Products Serviced";
+var $sfmName=$bo_act_common.generateRandomName("RS_11951LinkedSFM_");
+var $sfmTemplateSaveAsName=$bo_act_common.generateRandomName("RS_11951Page_");
+var $sfmTemplate="SVMXSTD: Add/Edit Products Serviced";
+var $fieldName = "";
+var $containerName="";
+var $wizardObject="Work Order";
+var $childName="Products Serviced";
+var $lineType="Parts";
+var $webServiceObject = "Work Order";
+var $event = "Before Save/Update";
+var $eventType = "Webservice";
+var $methodName = "objWebService.beforeSaveOrUpdate";
+var $isCustom = false;
+//Clone SFM Process & set webservice
+$sfm_act_SFM.cloneTDM016($sfmNameToBeCloned,$sfmName,$isCustom, $sfmTemplateSaveAsName,$sfmTemplate,$fieldName, $containerName);
+$sfm_act_SFM.setWebservice($webServiceObject, $event, $eventType, $methodName);
+_click($sfm_pg_sfmDesigner.btn_saveSFM); 
+//Create SFM wizard and add SFM process
+_wait(3000);
+$sfm_act_wizards.addToWizard($wizardObject, $sfmd_wizardName[2],"SFM",$sfmName);
+_selectDomain(); 
+//Launch SFM process
+_wait(5000);
+$bo_act_navigation.navigateToCreatedRecordUsingGlobalSearch($woNumber);
+$sfm_act_createCustomWizard.clickWizardBtn($sfmName);
+//Add child line
+$sfm_act_createCustomWizard.launchlinkSFM($WDpartName[0]);
+
+//Verify linked SFM contains correct data
+_wait(2000);
+if(_getText( _textbox(0,_in(_row("Part:"))))==$WDpartName[0] && _getText( _textbox(0,_in(_row("Work Order:"))))==$woNumber)
+	{
+	_log("Linked SFM has been populated with correct data");
+	}
+else
+	{
+	_log("ATTENTION:Linked SFM has NOT been populated with correct data");
+	}
+_wait(5000);
+//Add childline in linked SFM Process and save it
+$sfm_act_createCustomWizard.addParts($WDpartName[1]);
+_click($sfm_pg_sfmDesigner.btn_deliverySave);
+_wait(10000,_isVisible($sfm_pg_wizardWindow.tab_productServiced));
+_click($sfm_pg_sfmDesigner.btn_deliverySave);
+_wait(10000,_isVisible(_heading2($woNumber)));
+if(_exists($sfm_pg_sfmDesigner.txt_priceAlert)){
+	_click($sfm_pg_sfmDesigner.btn_priceAlertOk);
+	_wait(10000,_isVisible(_heading2($WONumber)));
+}
+//validate in work order for WL lines 
+_click($sfm_pg_wizardWindow.linkWorkDetail);
+if(_getText(_cell("/Usage/",_under(_tableHeader("Record Type"))))=="Usage/Consumption"
+&& _getText(_cell("/Product/",_under(_tableHeader("Record Type"))))=="Products Serviced")
+	{
+	_log("PASS ::: Linked SFM successful,2 child lines are associated to main process lines ");
+}
+else{
+	_log("FAIL ::: Linked SFM child lines are NOT associated to main process lines","FAILURE");
+}
+$RS_11951.end();

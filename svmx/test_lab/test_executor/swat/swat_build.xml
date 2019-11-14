@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- /** * Copyright Tyto Software Pvt. Ltd. */ -->
+<project name="demo" default="startrun">
+	<taskdef name="sahi" classname="net.sf.sahi.ant.RunSahiTask"
+		classpath="/auto/sahi_pro/lib/ant-sahi.jar" />
+
+	<target name="set_timestamp">
+		<tstamp>
+			<format property="ts" pattern="yyyy_MM_dd__HH_mm_ss" locale="en, IN" />
+		</tstamp>
+	</target>
+
+	<target name="start">
+		<exec dir="C:\auto\sahi_pro\userdata\bin" executable="cmd">
+			<arg line="/c start_dashboard.bat" />
+		</exec>
+	</target>
+
+	<target name="stopsahi" description="stop sahi server">
+		<sahi stop="true" sahihost="localhost" sahiport="9999" />
+	</target>
+
+	<target name="failsahi" if="sahi.failed">
+		<fail message="Sahi tests failed!" />
+	</target>
+
+	<target name="startrun" description="start the server and run sahi tests">
+		<parallel>
+			<antcall target="start" />
+			<sequential>
+				<waitfor maxwait="1" maxwaitunit="minute" checkevery="100">
+					<http url="http://localhost:9999/_s_/spr/blank.htm" />
+				</waitfor>
+				<antcall target="runtestschrome" />
+				<antcall target="stopandfail" />
+			</sequential>
+		</parallel>
+	</target>
+
+	<target name="stopandfail">
+		<sequential>
+			<antcall target="stopsahi" />
+			<antcall target="failsahi" />
+		</sequential>
+	</target>
+
+
+	<target name="set_properties_chrome" depends="set_timestamp">
+		<property name="scriptDir" value="scripts/Sahi_Project/" />
+		<property name="scriptName"
+			value="svmx/test_lab/test_suites/swat/swat_all.suite" />
+		<property name="browser" value="chrome" />
+		<property name="startWith" value="desktopbrowser" />
+		<property name="sendemail" value="false" />
+		<property name="emailtrigger" value="success,failure" />
+		<property name="emailproperties"
+			value="/auto/sahi_pro/userdata/config/email.properties" />
+		<property name="sendemailperiodically" value="false" />
+		<property name="sendemailperiodicallytime" value="" />
+		<property name="emailPasswordHidden" value="true" />
+		<property name="baseURL" value="http://test.salesforce.com" />
+		<property name="host" value="localhost" />
+		<property name="port" value="9999" />
+		<property name="singlesession" value="false" />
+		<property name="threads" value="1" />
+		<property name="showPeriodicSummary" value="true" />
+		<property name="failedSuiteName" value="swat_all_failed_${browser}.suite" />
+		<property name="failedSuite"
+			value="svmx/test_lab/test_suites/swat/${failedSuiteName}" />
+		<property name="jsCodeCoverage" value="false" />
+	</target>
+
+	<target name="runtestschrome" depends="set_properties_chrome">
+		<sahi suite="${scriptName}" browsertype="${browser}" startWith="${startWith}"
+			sendemail="${sendemail}" emailtrigger="${emailtrigger}"
+			emailproperties="${emailproperties}" sendEmailPeriodically="${sendemailperiodically}"
+			sendEmailPeriodicallyTime="${sendemailperiodicallytime}"
+			emailPasswordHidden="${emailPasswordHidden}" baseurl="${baseURL}"
+			sahihost="${host}" sahiport="${port}" scriptsPathMaster="${scriptDir}"
+			failureproperty="sahi.failed.${browser}" failedSuiteName="${failedSuiteName}"
+			haltonfailure="false" singlesession="${singlesession}"
+			showPeriodicSummary="${showPeriodicSummary}" threads="${threads}"
+			jsCodeCoverage="${jsCodeCoverage}">
+			<!-- Offline reports -->
+			<report type="junit"
+				logdir="C://var//lib//jenkins//workspace//sahi_executions//logs//junit" />
+			<report type="html"
+				logdir="C://var//lib//jenkins//workspace//sahi_executions//logs//html" />
+			<report type="excel"
+				logdir="C://var//lib//jenkins//workspace//sahi_executions//logs//excel" />
+		</sahi>
+		<antcall target="retryfailedchrome" />
+	</target>
+
+	<target name="retryfailedchrome" depends="set_properties_chrome"
+		if="sahi.failed.${browser}">
+		<sahi suite="${failedSuite}" browsertype="${browser}" startWith="${startWith}"
+			baseurl="${baseURL}" sahihost="${host}" sahiport="${port}"
+			scriptsPathMaster="${scriptDir}" failureproperty="sahi.retry.failed.${browser}"
+			haltonfailure="false" sendemail="${sendemail}" emailtrigger="${emailtrigger}"
+			emailproperties="${emailproperties}" sendEmailPeriodically="${sendemailperiodically}"
+			sendEmailPeriodicallyTime="${sendemailperiodicallytime}"
+			emailPasswordHidden="${emailPasswordHidden}" singlesession="${singlesession}"
+			showPeriodicSummary="${showPeriodicSummary}" threads="1"
+			jsCodeCoverage="${jsCodeCoverage}">
+			<!-- Offline reports -->
+			<report type="html"
+				logdir="C://var//lib//jenkins//workspace//sahi_executions//logs//html//retry" />
+		</sahi>
+		<antcall target="stopandfail" />
+		<antcall target="failsahichrome" />
+	</target>
+
+	<target name="failsahichrome" depends="set_properties_chrome"
+		if="sahi.retry.failed.${browser}">
+		<fail message="Sahi tests failed on browser ${browser}!" />
+	</target>
+</project>

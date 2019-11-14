@@ -1,0 +1,39 @@
+// Author Meghana Rao P
+/*
+ * This test case verifies the cloning of Standard SFM Search without any changes
+ */
+var $RS_10119 = _testcase("RS_10119", "Clone a standard search, saving it without any changes and verify the output in delivery");
+$RS_10119.start();
+
+
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+
+var $randomnumber = $bo_act_common.generateRandomName("");
+var $searchTitle2 = $bo_act_common.generateRandomName("Search");
+var $searchId2 = $bo_act_common.generateRandomName("SearchId");
+
+// Create Account for the Org
+var $accountcreation = "Account acc1 = New Account(Name ='Acc"+$randomnumber+"', Type = 'Analyst');insert acc1;";
+var $rs_10119_account = $op_act_sForceApiCall.sForceQuery($bac_un, $bac_pwd, $accountcreation ,"create");
+var $rs_10119_query_acc = "Select Id from Account where Name ='Acc"+$randomnumber+"'";
+var $rs_10119_fetch2 = $op_act_sForceApiCall.sForceQuery($bac_un, $bac_pwd, $rs_10119_query_acc ,"query");
+
+var $AccountID = $rs_10119_fetch2[0].Id;
+
+// Create Work Order
+var $createwoquery1 = "SVMXC__Service_Order__c WO = new SVMXC__Service_Order__c ( SVMXC__Company__c = '"+$AccountID+"', SVMXC__Order_Status__c = 'Open' ,SVMXC__Country__c = 'United States', SVMXC__Sub_Status__c = 'Resolved', SVMXC__Priority__c = 'High',SVMXC__Actual_Initial_Response__c = System.Today(),SVMXC__Actual_Onsite_Response__c = System.Today() - 1 );insert WO;";";"
+var $fetchwo1 = "Select Name , Id,FORMAT(SVMXC__Actual_Initial_Response__c), FORMAT(SVMXC__Actual_Onsite_Response__c) from SVMXC__Service_Order__c where Createdby.Id = '"+$user_orgdetails+"' Order by CreatedDate DESC Limit 1";
+// Create a Work Order with reference to standard SFM Search
+var $rs_10119_result2 = $op_act_sForceApiCall.sForceQuery($bac_un, $bac_pwd, $createwoquery1 ,"create");
+var $rs_10119_query_wo2 = $fetchwo1;
+var $rs_10119_fetch2 = $op_act_sForceApiCall.sForceQuery($bac_un, $bac_pwd, $rs_10119_query_wo2 ,"query");
+
+$rs_10119_WO2 = $rs_10119_fetch2[0].Name;
+
+$number1 = Math.floor(Math.random() * 10);
+$bo_act_navigation.navigateToSvmxSetup();
+// Cloning a Standard SFM Search with account search and modify it 
+$bo_act_sfmsearch.clonesfmsearch_nochanges("SVMXSTD: Account Search",$searchTitle2,$searchTitle2,true);
+$bo_act_sfmsearchdelivery.sfmsearch($searchTitle2, $rs_10119_WO2, true);
+// Set to true because it is cloned from Standard SFM Search
+$RS_10119.end();

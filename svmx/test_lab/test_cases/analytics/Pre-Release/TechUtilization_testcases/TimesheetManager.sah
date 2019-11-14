@@ -1,0 +1,13 @@
+var $an_tu = _testcase("ANA-909","When the user selects Work Order as Top-level tracker.");
+$an_tu.start();
+var $un = "vinaya.v@servicemax.com";
+var $pwd = "servicemax12";
+var $url = "https://test.salesforce.com";
+
+$bo_act_login.login($url, $un, $pwd);
+_wait(1000);
+
+
+$an_act_timesheetmanager.an_timesheetmanager_creation("Timesheet1","To create data for Timesheet", "11/02/2017", "12/30/2017", "0", "4", "meghana.rao@servicemax.com");
+
+$an_tu.end();

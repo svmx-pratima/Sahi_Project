@@ -1,0 +1,28 @@
+// Author Meghana Rao P
+/*
+ * This test-case verifies the new Attachment Question , HELP URL Field Limitation
+ * Alphanumeric and special characters in Question text
+ */
+var $RS_9856 = _testcase("RS_9856", "To create a new Checklist SFM Designer");
+$RS_9856.start();
+
+var $helpurltext = "HELPURLVALUEHELPURLVALUEHELPURLVALUEHELPURLVALUEHELPURLVALUEHELPURLVALUEHELPURLVALUEHELPURLVALUEHELPURLVALUEHELPURLVALUEHELPURLVALUEHELPURLVALUEHELPURLVALUEHELPURLVALUEHELPURLVALUEHELPURLVALUEHELPURLVALUEHELPURLVALUEHELPURLVALUEHELPURLVALUEHELPURLVALUEHELPURLVALUEHELPURLVALUEHELPURLVALUEHELPURLVALUEHELPURLVALUEHELPURLVALUEHELPURLVALUEHELPURLVALUEHELPURLVALUE";
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+$number1 = Math.floor(Math.random() * 10);
+
+// To open up SFM transaction designer
+$bo_act_navigation.navigateToSfmTransactionDesigner();
+_wait(60000, _isVisible($bo_pg_sfmTransactionAndDesigner.btn_newSFM));
+_wait(1000);
+
+// To verify the new Question type Attachment
+//To verify the Boundary value of HELP URL text
+
+$bo_act_checklistdesigner.newChecklistTypeSFM("Rs_9856 Checklist Process "+$number1+"","to generate a Checklist/Survey type of Process", "Work Order");
+
+$bo_act_checklistdesigner.findthevaluesinChecklist("Attachment@#%_Question!!!!", "HELPURLVALUEHELPURLVALUEHELPURLVALUEHELPURLVALUEHELPURLVALUEHELPURLVALUEHELPURLVALUEHELPURLVALUEHELPURLVALUEHELPURLVALUEHELPURLVALUEHELPURLVALUEHELPURLVALUEHELPURLVALUEHELPURLVALUEHELPURLVALUEHELPURLVALUEHELPURLVALUEHELPURLVALUEHELPURLVALUEHELPURLVALUEHELPURLVALUEHELPURLVALUEHELPURLVALUEHELPURLVALUEHELPURLVALUEHELPURLVALUEHELPURLVALUEHELPURLVALUEHELPURLVALUE");
+
+
+
+
+$RS_9856.end();

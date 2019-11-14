@@ -1,0 +1,74 @@
+//Author	:- 	Shashikala Kamath
+//Modified By 	:- 	Ashwini Holagi
+	
+var $swat_tc_006_cloned_create_quote_from_work_order = _testcase("swat_tc_006_cloned_create_quote_from_work_order","Verify the functionality of SFM type - from Source Object to create new header and child records");
+	
+	$swat_tc_006_cloned_create_quote_from_work_order.start();
+	
+	_setSpeed($g_stepSpeed);
+	
+	var $wizardObjectName = "Work Order";
+	var $wizardTitleName = $bo_act_common.generateRandomName("SFWTitle");
+	var $wizardIDName = $bo_act_common.generateRandomName("SFWId");
+	var $wizardStepType = "SFM";
+	var $executionMode = "Interactive";
+	var $handOver = false;
+	var $sfmToBeCloned = "Create Quote from Work Order";
+	var $sfmName = $bo_act_common.generateRandomName("Create_Quote_from_Work_Order");
+	var $sfmTemplateSaveAsName = $sfmName;	
+	var $sfmTemplate = "SVMXSTD: Manage Quote Lines";   
+	var $isCustom = false;
+	
+	//Login to App
+	$bo_act_login.login($swat_Url,$swat_un,$swat_pwd);
+	
+	
+	//Create Work Order with Account, Contact, Product and IB, through API
+	var $Account = $swat_act_createDataUsingApi.createAccount($swat_un,$swat_pwd,$swat_ClientId,$swat_ConsumerSecret,$swat_OrgInstance);
+	var $Contact = $swat_act_createDataUsingApi.createContact($swat_un,$swat_pwd,$swat_ClientId,$swat_ConsumerSecret,$swat_OrgInstance);
+	var $Product = $swat_act_createDataUsingApi.createProduct($swat_un, $swat_pwd, $swat_ClientId, $swat_ConsumerSecret, $swat_OrgInstance);
+	var $InstalledPro = $swat_act_createDataUsingApi.createIb($swat_un, $swat_pwd, $swat_ClientId, $swat_ConsumerSecret, $swat_OrgInstance);
+	var $workOrderNo = $swat_act_createDataUsingApi.createWO($swat_un, $swat_pwd, $swat_ClientId, $swat_ConsumerSecret, $swat_OrgInstance);
+	
+	//Clone SFM Process
+	$sfm_act_SFM.cloneTDM016($sfmToBeCloned, $sfmName, $isCustom, $sfmTemplateSaveAsName, $sfmTemplate, "", "");
+	$swat_act_SFM.quickSaveSfmTransaction();
+	
+	//Navigate to Home Page
+	_click(_link("Home"));
+	
+	//Steps to create SFM Wizard and Add Step of type SFM
+	$swat_act_sfmWizard.createSfmWizardWithStepSFM($wizardObjectName,$wizardTitleName, $wizardIDName,$wizardStepType,$sfmName, $executionMode, $handOver);
+	
+	global_clearBrowserCache();
+	
+	//Global Search WorkOrder
+	$sfm_act_common.globalSearch($workOrderNo);
+	_wait(10000);
+	
+	//Click 'Create Quote from Work Order' in SFM Wizard
+	$swat_act_sfmDelivery.launchSfmDelivery($sfmName,$wizardTitleName);
+	
+	//Add Status and Valid Date
+	$swat_act_sfmDelivery.addFieldsCreateQuoteFromWO();
+	
+	//Add Child lines : Parts, Labor, Expense
+	$swat_act_sfmDelivery.addPartsLineCreateQuoteFromWO("Parts",$Product);
+	$swat_act_sfmDelivery.addChildLineCreateQuoteFromWO("Labor");
+	$swat_act_sfmDelivery.addChildLineCreateQuoteFromWO("Expenses");
+	
+	//Click on Save button in SFM Delivery
+	$swat_act_sfmDelivery.saveSfmDelivery();
+	
+	//Verify Service Quote is created
+	$swat_act_sfmDelivery.verifyServiceQuoteIsCreated();
+	
+	//Delete SFM Wizard 
+	$bo_act_SFW.deleteSFMWizard($wizardObjectName, $wizardIDName);
+	
+	//Delete SFM
+	$bo_act_navigation.navigateToSfmTransactionDesigner();
+	$bo_act_SFM.deleteSFM($sfmName);
+	
+	
+	$swat_tc_006_cloned_create_quote_from_work_order.end();

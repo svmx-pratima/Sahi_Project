@@ -1,0 +1,32 @@
+/*
+ * object repository
+ */
+var $dc_pg_dispatchconsole = new function dc_pg_dispatchconsole() {
+
+	// Variables - Global for DC
+	
+
+	// Page Objects - Text Field
+	this.txtfld_SearchText = _f("DispatchConsole").textinput("searchText");
+	// Page Objects - Button
+	
+
+	// Page Objects - Link
+	this.lnk_DispatchConsole= _link("Dispatch Console");
+	
+	// Page Objects - Text
+	
+
+	// Page Objects - CheckBox
+	
+	// page Objects - ListBox
+	
+	// page Objects - ListBox
+	
+	// page Objects - Window
+	
+	// page Objects - flex
+	this.flx_DispatchConsole = _f("DispatchConsole");
+	
+
+}

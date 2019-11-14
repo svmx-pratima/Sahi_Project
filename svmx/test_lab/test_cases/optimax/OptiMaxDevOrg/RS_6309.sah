@@ -1,0 +1,98 @@
+var $user_credentials = $excel.readFromCustomExcel("../op_excleData/automation.xlsx", "User_Details","","");
+
+for(var $i=0;$i<$user_credentials.length;$i++)
+{
+var $g_un = $user_credentials[$i][0];
+var $g_pwd = $user_credentials[$i][1];
+var $g_url = $user_credentials[$i][2];
+}
+
+var $RS_6309 = _testcase("RS_6309", "Adding Expertise to a technician");
+var $team = null;
+
+$RS_6309.start();
+
+$bo_act_login.login($g_url, $g_un, $g_pwd);
+
+_set($login_result, _fetch(login($g_un,$g_pwd)));
+_log($login_result);
+
+
+_set($create_team, _fetch(create_Team()));
+_log($create_team);
+
+
+//<browser>
+function login($g_un,$g_pwd){
+	
+	var $login_result = sforce.connection.login($g_un,$g_pwd);
+	return $login_result;
+}
+
+function create_Team (){
+
+	   
+	//Creating Team,Technician
+	
+		
+	var Team = new sforce.SObject("SVMXDEV__Service_Group__c");
+	Team.RecordTypeId='0123B000000CnBXQA0';
+	Team.Name="TeamTechSkills";
+	Team.SVMXDEV__Active__c='True';
+	Team.SVMXDEV__Country__c="India";
+	var result_Team = sforce.connection.create([Team]);
+
+	$team = result_Team[0].id;
+	
+	_log(" Team = "+$team);
+	var CreateRecords=[];
+	var CreateResRecords=[];
+	for(var $i=1;$i<4;$i++)
+	{
+	var Tech = new sforce.SObject("SVMXDEV__Service_Group_Members__c");
+	Tech.SVMXDEV__Service_Group__c=$team;
+
+	_log(" Team = "+$team);
+	Tech.Name="TechSkills"+$i;
+	Tech.SVMXDEV__Active__c='True';
+	Tech.SVMXDEV__Street__c="MG road";
+	Tech.SVMXDEV__City__c="Bangalore";
+	Tech.SVMXDEV__Enable_Scheduling__c='True';
+	Tech.SVMXDEV__Zip__c='560034';
+	Tech.SVMXDEV__Country__c="India";
+	CreateRecords.push(Tech);
+	}
+	result = sforce.connection.create(CreateRecords);
+	_log("result = "+result);
+	
+	//Mapping Skills to a technician
+	
+	var Skill_list = _call(sforce.connection.query("Select Name,Id from SVMXDEV__Skill__c"));
+	var Tech_skill = Skill_list.getArray("records");
+	
+	_log("Tech_skill.length="+Tech_skill.length);
+	
+	    for(var $x=0;$x<Tech_skill.length;$x++){
+		var $Skill= Tech_skill[$x];
+		_log("result.length="+result.length+" ,$x="+$x);
+		
+			  
+		    for(var $s=0;$s<result.length;$s++){
+			var Expertise = new sforce.SObject("SVMXDEV__Service_Group_Skills__c");
+			Expertise.SVMXDEV__Group_Member__c=result[$s].id;
+            _log("result[$s].id="+result[$s].id+",$s="+$s);
+			Expertise.SVMXDEV__Service_Group__c=$team;
+			Expertise.SVMXDEV__Skill_Level__c=9;
+			Expertise.SVMXDEV__Skill__c=$Skill.Id;
+			CreateResRecords.push(Expertise);
+			_log("CreateResRecords="+CreateResRecords);
+					                           }
+		    
+	                                       }
+	    var result1 = sforce.connection.create(CreateResRecords);
+		_log("result11="+result1);
+}
+
+//</browser>
+
+$RS_6309.end();

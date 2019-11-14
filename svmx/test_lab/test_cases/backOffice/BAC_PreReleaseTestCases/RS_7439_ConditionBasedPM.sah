@@ -1,0 +1,100 @@
+
+//author - Noor Salma Sharieff
+
+var $RS_7439 = _testcase("$RS_7439","Verify adjustments are not performed when SET004(Condition based Adj) is set to False.");
+$RS_7439.start();
+_setSpeed($g_stepSpeed);
+var $Workbenchurl = "https://workbench.developerforce.com/login.php";
+var $PMProcessId = "PMProName2222019111240";
+
+//Pre - Condition 
+$bo_act_login.login($PRT_url, $bac_PRTun, $bac_PRTpwd);
+
+var $Module = "Preventive Maintenance";
+var $SubModule = "PM Actions";
+var $Setting = "SET004";
+var $value = false;
+$bo_act_configurationProfiles.editGlobalProfileForBooleanSettings("Preventive Maintenance", "PM Actions", "SET004", false);
+$bo_act_configurationProfiles.editGlobalProfileForBooleanSettings("Preventive Maintenance", "Manage PM Plan", "SET002", true);
+//Test Data Creation
+var $accName = $bo_act_accounts.createAccount();
+var $proName = $bo_act_products.createProductSimple();
+var $IBName = $bo_act_installedProduct.createInstalledProduct($proName,$accName,"");
+var $contactName = $bo_act_contacts.createContact($accName);
+var $slaterm = $bo_act_slaTerms.createSlaTerms("Default");
+var $caseNumber = $bo_act_installedProduct.createSupportCase("New");
+
+var $PMPTemplate = $bo_act_PMPlanTemplate.createUsageBasedConditionPMPTemplateNoSave($proName);
+$bo_act_PMPlanTemplate.updateUsageConditionRulesGridWithAdjFields("Months", "Every", 1, $bo_act_common.currentDate("-"), $bo_act_common.getfutureDate(1,"-"),"Fixed", 1,100, 10,"Days");
+$bo_act_PMPlanTemplate.saveConditionBasedPM();
+
+var $sconName = $bo_act_serviceMaintenanceContracts.createServiceMaintenanceContract($accName, $slaterm,1,0);
+$bo_act_serviceMaintenanceContracts.AddCoveredProductToSCON($sconName, $IBName);
+var $PMPlan = $bo_act_PMPlan.createUsageOrFrequencyBasedPMPlan($sconName,$PMPTemplate,$IBName);
+
+var $PMProcessId = $bo_act_PMProcess.createPMProcess("Condition Based Preventive Maintenance", 0, $PMPlan,"One Per Product");
+//This code supports name spaces and assigns the variable with correct name spaces script 
+$bo_act_navigation.navigateToSetUpAndSearch("Installed Packages");
+
+if(_isVisible(_link("Predix ServiceMax"))){					// Changed by Bhupendra Singh
+	_click(_link("Predix ServiceMax"));	
+}else{
+	_click(_link("ServiceMax"));	
+}
+if(_getText(_cell(0,_rightOf(_cell("Namespace Prefix"))))!="SVMXDEV")
+var $script = "SVMXC.PREV_Conditional_Engine_Batch batchable = new SVMXC.PREV_Conditional_Engine_Batch();String processId = '"+$PMProcessId+"';SVMXC__ServiceMax_Processes__c condtionprocess = [select id from SVMXC__ServiceMax_Processes__c where SVMXC__ProcessID__c =: processId limit 1];batchable.setProcessIds = new Set<String>{condtionprocess.Id};Database.executeBatch(batchable, 1);";
+else
+$script = "SVMXDEV.PREV_Conditional_Engine_Batch batchable = new SVMXDEV.PREV_Conditional_Engine_Batch();String processId = '"+$PMProcessId+"';SVMXDEV__ServiceMax_Processes__c condtionprocess = [select id from SVMXDEV__ServiceMax_Processes__c where SVMXDEV__ProcessID__c =: processId limit 1];batchable.setProcessIds = new Set<String>{condtionprocess.Id};Database.executeBatch(batchable, 1);";
+
+/*if($g_url.includes("login"))
+	var $environment = "Production";
+else if($g_url.includes("test"))
+	 $environment = "Sandbox";
+else
+	$environment = "Production";*/
+
+$bo_act_login.loginToWorkBench($Workbenchurl,$environment, $bac_PRTun, $bac_PRTpwd);
+//$bo_act_login.loginToWorkBench($Workbenchurl, "Production", $bac_PRTun, $bac_PRTpwd);  // Use for GS0 Org
+
+$bo_act_login.runApexScriptinWB($script);
+
+$bo_act_login.login($PRT_url, $bac_PRTun, $bac_PRTpwd);
+$bo_act_navigation.navigateToPreventiveMaintenancePlans();
+_click(_link($PMPlan));
+
+var $WONumber = _getText($bo_pg_PMPlan.link_firstLinkInWorkOrders);
+_click($bo_pg_PMPlan.link_firstLinkInPMSchedule);
+var $actualPMScheduleStatus = _getText(_div(0,_rightOf(_cell("/Status/"))));
+_assertEqual($actualPMScheduleStatus,"Work Order Created","Status is not equal to Work Order Created");
+
+_click(_link($PMPlan));
+_click($bo_pg_PMPlan.link_firstLinkInWorkOrders);
+$bo_act_workOrders.editWorkOrderOnWOPage();
+$bo_act_workOrders.updateTextBoxFields($bo_pg_workOrders.txt_slaTerms, $slaterm);
+$bo_act_workOrders.updateTextBoxFields($bo_pg_workOrders.txt_case, $caseNumber);
+$bo_act_workOrders.updateTextBoxFields($bo_pg_workOrders.txt_contact, $contactName);
+$bo_act_workOrders.updateDropDownFields($bo_pg_workOrders.sel_priority, "High");
+
+$bo_act_workOrders.clickLinktoUpdateTextfields($bo_pg_workOrders.txt_acknowledgedByTechnicianDateTime);
+$bo_act_workOrders.saveWorkOrder();
+_wait(60000);
+$bo_act_navigation.navigateToPreventiveMaintenancePlans();
+_click(_link($PMPlan));
+
+_click($bo_pg_PMPlan.link_firstLinkInPMSchedule);
+var $actualPMScheduleStatus = _getText(_div(0,_rightOf(_cell("/Status/"))));
+_assertEqual($actualPMScheduleStatus,"Work Order Created","Status is not equal to Work Order Created");
+
+
+//Clean up function
+
+
+$bo_act_PMProcess.deletePMProcess($PMProcessId);
+
+$bo_act_login.logOut(); 
+_closeWindow();
+
+$RS_7439.end();
+
+
+

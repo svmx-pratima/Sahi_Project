@@ -1,0 +1,119 @@
+
+
+/**
+ * Home page object repository
+ */
+
+var $bo_pg_serviceMaintenanceContracts = new function bo_pg_serviceMaintenanceContracts(){
+	this.btn_new = _button(" New ");
+	this.btn_edit = _button(" Edit ");
+	this.txt_sconName = _textbox("Name");
+	this.txt_accountName = _textbox("/\\*Account|^Account/");
+	this.txt_contactName = _textbox("/\\*Contact|^Contact/");
+	this.sel_ZoneName = _select(0,_rightOf(_label("Zone")));
+	this.txt_slaTermName = _textbox("/SLA Terms/");
+	this.link_startDate = _link("/javascript.*/",_rightOf(_label("/.*Start Date/")));
+	this.txt_startDate = _textbox("/Start Date/");
+	this.txt_endDate = _textbox("/End Date/");
+	this.btn_save = _submit(" Save ");
+	this.btn_newCoveredProduct = _button("New Covered Product");
+	this.txt_installedProduct = _textbox("Installed Product");
+	this.txt_backToScon = _link("/lookup/",_rightOf(_cell("/Service/Maintenance Contract/")));
+	this.txt_slaTermsOnCoveredProduct = _textbox("SLA Terms");
+	this.txt_backToScon = _link("/lookup.*/",_rightOf(_cell("Service/Maintenance Contract")));
+	this.txt_backToScon = _link("/lookup/",_rightOf(_cell("/Service/Maintenance Contract/")));
+	this.txt_slaTermsOnCoveredProduct = _textbox("SLA Terms");
+	this.txt_backToScon = _link("/lookup.*/",_rightOf(_cell("Service/Maintenance Contract")));
+	this.btn_newCoveredLocation = _button("New Covered Location");
+	this.txt_location = _textbox("/Location/");
+	this.btn_newEntitledContact = _button("New Entitled Contact");
+	this.txt_contract = _textbox("/Contact/");
+	this.txt_SFMSconName = _textbox(0,_rightOf(_label("Contract Name/Number:")));
+	this.txt_SFMSconEndDate = _textbox(0,_rightOf(_label("/End Date/")));
+	this.head_serviceContract = _heading1("Service/Maintenance Contract:");
+	
+	
+	//Object for Activate Contract on Service/Maintenance Contract
+	this.btn_activateContractSFM = _button("Activate Contract");
+	this.btn_activateContract = _span("Activate Contract");
+	this.chk_activeScon = _checkbox("Active");
+	
+	//Object for Renew Contract on Service/Maintenance Contract
+	this.btn_renewContractSFM = _button("Renew Contract");
+	this.btn_renewContract =_span("Renew Contract");
+	
+	//Object for Cancel Contract SFM
+	this.btn_cancelContractSFM = _button("Cancel Contract");
+	this.btn_cancelContract = _span("Cancel Contract");
+	
+	// Click on the Service Contract Detail Page
+	this.clickServiceContractOn_DetailPage = function($sconName){
+	 _click(_link($sconName,_rightOf(_cell("/Service\\/Maintenance Contract/"))));
+	 };
+			
+	//Objects for Part Pricing in Scon
+	this.btn_newPartsPricing = _button("New Parts Pricing");
+	this.txt_product	= _textbox("Product");
+	this.txt_pricePerUnit	= _textbox("Price Per Unit");
+	this.chk_active	= _checkbox("Active");
+	this.link_ServiceContractOnPartsPricing = _link(0,_rightOf(_cell("Service Contract")));
+	
+	
+	//Objects for Part/Labor Pricing in Scon
+	this.btn_sfmLaborPricing = _button("Labor Pricing");
+	this.btn_sfmPartPricing = _button("New Parts Pricing");
+	this.btn_sfmnewPartsPricing = _button("Parts Pricing");
+	this.btn_sfmPricingRule = _button("Pricing Rule");
+	this.btn_partsDiscountTab = _span("Parts Discount");
+	this.btn_pricingRuleTab = _span("/Pricing Rule/");
+	this.txt_defaultPartsPriceBook = _textbox(0,_rightOf(_label("/Default Parts Price Book/")));
+	this.txt_laborRoundingType = _textbox("Rounding Type (Labor):");
+	this.btn_laborPricingTab = _span("Labor Pricing");
+	this.btn_addLaborPricingLine = _span("/sfmd-add-line-icon/");
+	this.btn_editLaborPricingRow = _image("/svmx-sfmd-edit-icon/");
+	this.btn_editSecondLaborPricingRow = _image("svmx-action-col-icon svmx-action-col-0   svmx-sfmd-edit-icon[1]");
+	this.txt_laborPricingUnit = _textbox("/Unit/");
+	this.txt_partsDiscountPercent = _textbox(0,_rightOf(_label("/Discount/")));
+	this.txt_partsRateType = _textbox("Rate Type:");
+	this.txt_partsRates = _textbox("/svmx/",_rightOf(_label("Rate:",_near(_button("Update")))));
+	this.txt_currencyISOCode = _textbox("Currency ISO Code:");
+	this.txt_minimumLaborMins = _textbox("Minimum Labor (Mins):");
+	//this.txt_regularRateLaborPricing = _textbox(0,_rightOf(_label("Regular Rate:")));
+	this.txt_regularRateLaborPricing = _textbox(0,_rightOf(_label("Regular Rate:",_near(_span("Update")))));
+	this.btn_updateLaborPricing = _span("Update");
+	this.btn_saveLaborPricing = _span("/sfmd-save-icon/");
+	this.btn_quickSaveLaborPricing = _span("/sfmd-quicksave-icon/");
+	
+	//Objects for Expense Pricing and Travel Policy  in Scon
+	this.btn_sfmExpensePricing = _button("Expense Pricing");
+	this.btn_expensePricingTab = _span("Expense Pricing");
+	this.txt_expenseType = _textbox("Expense Type:",_near(_span("Update")));
+	this.txt_expenseRateType = _textbox("Rate Type:",_near(_span("Update")));
+	this.txt_expenseRate = _textbox(0,_rightOf(_label("Rate:",_near(_span("Update")))));
+	//Objects for Travel Policy
+	this.btn_sfmTravelPolicy = _button("Travel Policy");
+	this.btn_travelPolicyTab = _span("Travel Policy");
+	this.txt_travelPolicyUnit = _textbox("Unit:",_near(_span("Update")));
+	this.txt_travelRoundingType = _textbox("Rounding Type (Travel):");
+	this.txt_defaultTravelPrice = _textbox(0,_rightOf(_label("Default Travel Price:")));
+	this.txt_defaultTravelUnit = _textbox("Default Travel Unit:",_rightOf(_label("Default Travel Unit:")));
+	//Object For Mileage Tier
+	this.btn_travelPolicyMileageTierTab = _span("Mileage Tier");
+	this.txt_travelPolicyTierName = _textbox("Tier Name:",_near(_span("Update")));
+	this.txt_travelPolicyMinimum = _textbox("Minimum:",_near(_span("Update")));
+	this.txt_travelPolicyMaximum = _textbox("Maximum:",_near(_span("Update")));
+	this.txt_travelPolicyMaximum = _textbox("Maximum:",_near(_span("Update")));
+	this.btn_travelPolicyZonePricingTab = _span("Zone Pricing");
+	this.txt_travelPolicyZone = _textbox("Zone:",_near(_span("Update")));
+
+//Page object on Edit page
+ this.chkActiveEdit = _checkbox(0,_rightOf(_label("Active")));
+ 
+ //Covered Location
+ this.cell_startDate = _cell("Start Date");
+ this.cell_endDate = _cell("End Date");
+
+};
+
+
+

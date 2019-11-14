@@ -1,0 +1,628 @@
+/**
+ * Function to perform SFM work flows
+ */
+var $bo_act_SFM = new function bo_act_SFM() {
+
+	/**
+	 * Function to Clone SFM
+	 * @param $sfmNameToBeCloned
+	 * @param $sfmName
+	 * @param $isCustom
+	 * @param $sfmTemplate
+	 * @param $sfmTemplateSaveAsName
+	 * @param $fieldName
+	 * @param $containerName
+	 */
+
+	this.cloneSFM = function($sfmNameToBeCloned, $sfmName, $isCustom, $sfmTemplate, $sfmTemplateSaveAsName, $fieldName, $containerName) {
+
+		$sfm_act_SFM.selectSFM($sfmNameToBeCloned, $isCustom);
+		_click($bo_pg_sfmTransactionAndDesigner.btn_clone);
+		_wait(3000);
+		_wait(60000, _isVisible($bo_pg_sfmTransactionAndDesigner.txt_name));
+		_setValue($bo_pg_sfmTransactionAndDesigner.txt_name, $sfmName);
+		_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmTransactionId, "");
+		_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmTransactionId, $sfmName);
+
+		_click($bo_pg_sfmTransactionAndDesigner.btn_qualifyingCriteriaAndFieldMapping);
+		_click($bo_pg_sfmTransactionAndDesigner.btn_screenDesigner);
+		_wait(60000, _isVisible($bo_pg_sfmTransactionAndDesigner.lbl_workOrder));	
+
+		_setSelected($bo_pg_sfmTransactionAndDesigner.sel_sfmTemplate, $sfmTemplate);
+		_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmSavePageLayoutAs, $sfmTemplateSaveAsName);
+		_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmSavePageLayoutAsId, $sfmTemplateSaveAsName);
+		_wait(3000);
+		$bo_pg_sfmTransactionAndDesigner.addField($fieldName, $containerName);
+
+		_click($bo_pg_sfmTransactionAndDesigner.btn_quickSave);
+
+		if (_exists($bo_pg_sfmTransactionAndDesigner.alert_sfm)) {
+			_focusWindow();
+			_takeScreenShot();
+			_click($bo_pg_sfmTransactionAndDesigner.btn_ok);
+			_logExceptionAsFailure("Page not saved, refer screenshot for error");
+			_click($bo_pg_sfmTransactionAndDesigner.btn_backToList);
+			_click($bo_pg_sfmTransactionAndDesigner.btn_yes);
+			$result = false;
+		} else {
+			_click($bo_pg_sfmTransactionAndDesigner.btn_saveAndclose);
+			$result = true;
+		}
+
+		return $callBack.returnResult($result, "","cloneSfm");
+
+		_setSpeed($g_stepSpeed);
+	};
+	
+	//By Mamta
+	this.newChecklistTypeSFM=function($checklistName,$sfmType,$objName){
+		_wait(60000, _isVisible($bo_pg_sfmTransactionAndDesigner.btn_newSFM));
+		_click($bo_pg_sfmTransactionAndDesigner.btn_newSFM);  // 	changed By Bhupendra Singh
+		$bo_pg_sfmTransactionAndDesigner.setSfmName($checklistName);
+		_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmTransactionId, "");
+		_setSelected($bo_pg_sfmTransactionAndDesigner.lbl_checklistOb,$sfmType);
+		_wait(60000, _isVisible($bo_pg_sfmTransactionAndDesigner.lbl_checklistOb));
+		_setValue($bo_pg_sfmTransactionAndDesigner.selectSourceObj,"");
+		_wait(10000);
+		_setValue($bo_pg_sfmTransactionAndDesigner.selectSourceObj,$objName);
+		_wait(20000);
+		
+		_setSelected($bo_pg_sfmTransactionAndDesigner.sourceComboBox, $objName);
+		_wait(5000);
+		
+		_click($bo_pg_sfmTransactionAndDesigner.btn_popUpOK);		
+		_wait(6000);
+				
+	};
+		
+	this.addQuestionToChecklist=function($questionText){
+		_click($bo_pg_formDesigner.tab_clickFormDesigner);
+		_click($bo_pg_formDesigner.btn_addNewQuestion);
+		_click($bo_pg_formDesigner.btn_selectQuestionDataType);		//  changed By Bhupendra Singh
+		_setValue($bo_pg_formDesigner.lbl_questionText, $questionText);
+		_click($bo_pg_formDesigner.btn_addQuestionToLibraryAndForm);
+		_click($bo_pg_formDesigner.btn_closeQuestionPopUp);
+		_click($bo_pg_formDesigner.btn_quickSave);		
+	};
+	/**
+	 * Function to create New SFM Transaction from Source Object to Create New Header and Child Record
+	 * @param $sfmName
+	 * @param$sourceName
+	 * @param$targetName
+	 * @param $QualCriteriaName 
+	 * @param $sfmPageLayoutName
+	 */
+		this.createNewSourceAndHeaderChildSFM = function($sfmName,$sourceName,$targetName,$QualCriteriaName,$sfmPageLayoutName){
+			
+		_click($bo_pg_sfmTransactionAndDesigner.btn_newSFM);
+		$bo_pg_sfmTransactionAndDesigner.setSfmName($sfmName);
+		
+		
+			_setSelected($bo_pg_sfmTransactionAndDesigner.sourceComboBox,"");
+			_setSelected($bo_pg_sfmTransactionAndDesigner.sourceComboBox, $sourceName);			
+		_wait(6000,_isVisible($bo_pg_sfmTransactionAndDesigner.childSource_chkBox));
+			_click($bo_pg_sfmTransactionAndDesigner.btn_popUpOK);
+		_click($bo_pg_sfmTransactionAndDesigner.childSource_chkBox);
+		_setSelected($bo_pg_sfmTransactionAndDesigner.combo_CTRecord,"");
+		_setSelected($bo_pg_sfmTransactionAndDesigner.combo_CTRecord, $targetName);
+		_wait(6000,_isVisible($bo_pg_sfmTransactionAndDesigner.childCTRecord_chkBox));
+		_click($bo_pg_sfmTransactionAndDesigner.childCTRecord_chkBox );
+		
+		_click($bo_pg_sfmTransactionAndDesigner.btn_qualifyingCriteriaAndFieldMapping);
+		_setSelected($bo_pg_sfmTransactionAndDesigner.dropDownList, $QualCriteriaName);
+			
+		_click($bo_pg_sfmTransactionAndDesigner.btn_screenDesigner);
+			
+		_setSelected($bo_pg_sfmTransactionAndDesigner.selectExistingPageLayout,$sfmPageLayoutName);
+		//_click(_f("main").fieldrenderer("[object Object]"));
+		//_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmSavePageLayoutAs,$sfmPageLayoutName );
+			_wait(6000,_isVisible($bo_pg_sfmTransactionAndDesigner.txt_sfmSavePageLayoutAs));
+			
+		_click($bo_pg_sfmTransactionAndDesigner.btn_quickSave);
+		_click($bo_pg_sfmTransactionAndDesigner.btn_finalQuickSave);		
+		};
+		
+		this.createIncompleteSFM=function($NewSFMName){
+		_click(_f("main").s_checkbox("/CheckBox/").near(_f("main").s_label("Activate Preventive Maintenance Plan"))); // Added By Bhupendra Singh
+		//_click(_f("main").s_checkbox("chk[1]"));
+		_wait(2000);
+		_click($bo_pg_sfmTransactionAndDesigner.btn_clone);	
+		_wait(60000, _isVisible($bo_pg_sfmTransactionAndDesigner.txt_name));
+		_setValue($bo_pg_sfmTransactionAndDesigner.txt_name, $sfmName);
+		_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmTransactionId, "");
+		_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmTransactionId, $sfmName);
+		
+		_click($bo_pg_sfmTransactionAndDesigner.btn_screenDesigner);
+		_wait(6000,_isVisible(_f("main").tab("Screen Designer")));
+		_click($bo_pg_sfmTransactionAndDesigner.btn_finalQuickSave);
+		_wait(6000);
+		_click($bo_pg_sfmTransactionAndDesigner.alert_proceedAnyway);
+		_click($bo_pg_sfmTransactionAndDesigner.btn_propoties);
+		_wait(6000,_isVisible(_f("main").s_label("Incomplete")));
+		};
+		
+	this.renameClonesfm=function($sfmName,$SFMToBeCloned,$isCustom){
+		//_click(_f("main").s_checkbox("chk[2]"));
+		$bo_pg_sfmTransactionAndDesigner.selectSFMOnSFMDesignerPage($SFMToBeCloned, $isCustom);
+		_click($bo_pg_sfmTransactionAndDesigner.btn_clone);	
+		_wait(60000, _isVisible($bo_pg_sfmTransactionAndDesigner.txt_name));
+		_setValue($bo_pg_sfmTransactionAndDesigner.txt_name, "");
+		_setValue($bo_pg_sfmTransactionAndDesigner.txt_name, $sfmName);
+		_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmTransactionId, "");
+		_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmTransactionId, $sfmName);
+		
+		_click($bo_pg_sfmTransactionAndDesigner.btn_screenDesigner);
+		_wait(6000,_isVisible(_f("main").tab("Screen Designer")));
+		//_setSelected($bo_pg_sfmTransactionAndDesigner.selectExistingPageLayout,$pageLayout);  // Removed By Bhupendra Singh
+		_setSelected(_f("main").s_combobox("searchCombo[3]"), "PAG_CR_PM_FromLocatin");
+		_wait(3000);
+		_wait(6000,_isVisible($bo_pg_sfmTransactionAndDesigner.btn_finalQuickSave));
+		_click($bo_pg_sfmTransactionAndDesigner.btn_finalQuickSave);
+		_wait(60000, _isVisible($bo_pg_sfmTransactionAndDesigner.lbl_sfmTransactionSavedMessage));
+	};
+	
+		this.clnStandardSFM=function($sfmToBeCloned,$sfmName,$sfmTemplateSaveAsName){
+			_click($bo_pg_sfmTransactionAndDesigner.txt_standardSfmTransactionQuickFind);
+			_setValue($bo_pg_sfmTransactionAndDesigner.txt_standardSfmTransactionQuickFind,$sfmToBeCloned);
+			_click(_f("main").s_checkbox("chk").leftOf(_f("main").s_label($sfmToBeCloned), 10, 10));
+			_click($bo_pg_sfmTransactionAndDesigner.btn_clone);	
+			_wait(60000, _isVisible($bo_pg_sfmTransactionAndDesigner.txt_name));
+			_setValue($bo_pg_sfmTransactionAndDesigner.txt_name, $sfmName);
+			_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmTransactionId, "");
+			_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmTransactionId, $sfmName);
+		
+			_click($bo_pg_sfmTransactionAndDesigner.btn_screenDesigner);
+			_wait(6000,_isVisible(_f("main").tab("Screen Designer")));
+			_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmSavePageLayoutAs, $sfmTemplateSaveAsName);
+			_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmSavePageLayoutAsId, $sfmTemplateSaveAsName);
+			_wait(3000);
+			_click($bo_pg_sfmTransactionAndDesigner.btn_pageLayoutSave);
+			_wait(10000);
+			_click($bo_pg_sfmTransactionAndDesigner.btn_saveAndclose);
+			_wait(6000);
+			_setSpeed($g_stepSpeed);	
+		};
+		
+		this.deleteSFM=function($sfmName){
+			$bo_act_navigation.navigateToSfmTransactionDesigner();
+			_click($bo_pg_sfmTransactionAndDesigner.btn_yourCustomSfmTransactions);
+			_setValue(_f("main").s_textinput("searchText[3]"),$sfmName);
+			_wait(3000);
+			_setStrictVisibilityCheck(true);
+			$sfm_act_SFM.selectSFM($sfmName,true);
+			_takePageScreenShot();
+			_click($bo_pg_sfmTransactionAndDesigner.btn_clickDeleteButton);
+			_wait(1000);
+			_click($bo_pg_sfmTransactionAndDesigner.PopUpMessageConformationForDelete);
+			_setStrictVisibilityCheck(false);
+
+		};
+			this.backToSfmList=function(){
+				_click($bo_pg_sfmTransactionAndDesigner.btn_backToList);
+					_click($bo_pg_sfmTransactionAndDesigner.btn_yes);
+			};
+				
+	this.advanceOptionSorting=function(){
+		_click($bo_pg_sfmTransactionAndDesigner.lbl_sorting);
+		_click($bo_pg_sfmTransactionAndDesigner.lbl_partObj);
+		_click($bo_pg_sfmTransactionAndDesigner.lbl_partField);
+		_click($bo_pg_sfmTransactionAndDesigner.img_add);
+		_wait(2000);
+		_click($bo_pg_sfmTransactionAndDesigner.lbl_laborObj);
+		_click($bo_pg_sfmTransactionAndDesigner.lbl_activityTypeField);
+		_click($bo_pg_sfmTransactionAndDesigner.img_add);
+		_wait(2000);
+		_click($bo_pg_sfmTransactionAndDesigner.lbl_expenseObj);
+		_click($bo_pg_sfmTransactionAndDesigner.lbl_lineQtyField);
+		_click($bo_pg_sfmTransactionAndDesigner.img_add);
+		_wait(2000);
+		_click($bo_pg_sfmTransactionAndDesigner.lbl_travelObj);
+		_click($bo_pg_sfmTransactionAndDesigner.lbl_statDateField);
+		_click($bo_pg_sfmTransactionAndDesigner.lbl_endDateField);
+		_click($bo_pg_sfmTransactionAndDesigner.img_add);
+		_wait(2000);
+		_click($bo_pg_sfmTransactionAndDesigner.btn_saveAndclose);
+		
+	};
+		this.selectTypeOfSfmTranToBeCreated=function($nameOfTranType){
+			_setSelected($bo_pg_sfmTransactionAndDesigner.lbl_checklistOb,$nameOfTranType);
+		};
+		this.createNewSFM=function($sfmName){
+			_wait(60000,_isVisible($bo_pg_sfmTransactionAndDesigner.btn_newSFMTransaction));
+			_click($bo_pg_sfmTransactionAndDesigner.btn_newSFMTransaction);
+			_wait(30000,_isVisible($bo_pg_sfmTransactionAndDesigner.txt_name));
+			_setValue($bo_pg_sfmTransactionAndDesigner.txt_name,$sfmName);
+			_click($bo_pg_sfmTransactionAndDesigner.txt_sfmTransactionId);
+		};
+			this.enterSourceDetail=function($sourceObjName){
+			_click($bo_pg_sfmTransactionAndDesigner.selectSourceObj);
+			_setValue($bo_pg_sfmTransactionAndDesigner.selectSourceObj,"");
+			_wait(3000);
+			_setValue($bo_pg_sfmTransactionAndDesigner.selectSourceObj,$sourceObjName);
+			_setSelected($bo_pg_sfmTransactionAndDesigner.sourceComboBox,$sourceObjName);
+			_wait(3000);
+			_click($bo_pg_sfmTransactionAndDesigner.btn_popUpOK);
+			_wait(2000);
+			_click($bo_pg_sfmTransactionAndDesigner.childSource_chkBox);				
+			_wait(2000);
+			};
+				
+				
+				this.enterTargetDetail=function($targetObjName){
+					_click($bo_pg_sfmTransactionAndDesigner.sel_targetObjFld);
+					_setValue($bo_pg_sfmTransactionAndDesigner.sel_targetObjFld,"");
+					_setSelected($bo_pg_sfmTransactionAndDesigner.combo_CTRecord,$targetObjName);
+					_click($bo_pg_sfmTransactionAndDesigner.childCTRecord_chkBox);
+					_click(_f("main").s_textinput("aliasName[58]"));
+					_setValue(_f("main").s_textinput("aliasName[58]"),"parts");
+					_wait(2000);					
+				};
+			
+					this.qualifyingCriteriaHeaderFieldMap=function($mapName){
+						_click($bo_pg_sfmTransactionAndDesigner.dropDownList);
+						_setStrictVisibilityCheck(true);
+						_setSelected($bo_pg_sfmTransactionAndDesigner.dropDownList,"Work Detail (Work Order)");
+						_setStrictVisibilityCheck(false);
+						_click($bo_pg_sfmTransactionAndDesigner.btn_mappings);
+						_wait(1000);
+						_click($bo_pg_sfmTransactionAndDesigner.lbl_clkHeaderInQcPage);
+						_click($bo_pg_sfmTransactionAndDesigner.clkNewMap);	
+						_wait(2000);
+						_click($bo_pg_sfmTransactionAndDesigner.saveTheMap);
+						_setValue($bo_pg_sfmTransactionAndDesigner.saveTheMap,$mapName);
+						_click($bo_pg_sfmTransactionAndDesigner.clkNewMapID);
+						_click($bo_pg_sfmTransactionAndDesigner.clkMapSave);
+						_wait(3000);			  
+					};
+					
+						this.qualifyinCriteriaChildValueMap=function($selectExistingValueMap){
+							_click($bo_pg_sfmTransactionAndDesigner.dropDownList);
+							_setStrictVisibilityCheck(true);
+							_setSelected($bo_pg_sfmTransactionAndDesigner.dropDownList,"Work Detail (Work Order)");
+							_setStrictVisibilityCheck(false);
+							_click(_f("main").tab("Mapping(s)"));
+							_click(_f("main").tab("Value Map For New Records"));
+							_setSelected(_f("main").s_combobox("searchCombo[2]"), $selectExistingValueMap);
+							_wait(6000);
+						};
+						
+							this.qualifyinCriteriaChildFieldMap=function($mapName){
+							_click($bo_pg_sfmTransactionAndDesigner.dropDownList);
+							_setStrictVisibilityCheck(true);
+							_setSelected($bo_pg_sfmTransactionAndDesigner.dropDownList,"Work Detail (Work Order)");
+							_setStrictVisibilityCheck(false);
+							_click(_f("main").tab("Mapping(s)"));
+							_click(_f("main").s_button("New[1]"));
+								_wait(6000);
+								_setValue(_f("main").s_textinput("Save this map as"),"$mapName")
+							_click(_f("main").s_textinput("Input ID Here[1]"));
+							_click(_f("main").s_button("Save[1]"));
+							_wait(5000);
+							};
+							
+							this.addHeaderFromLookupInDelivery=function(){
+								_click(_span("svmx-btn-icon svmx_lookup_icon"));
+								_wait(2000);
+								_click(_span("svmx-btn-icon svmx-sfmd-search-icon "));
+								_wait(3000);
+								_click(_div("svmx-grid-cell-inner [1]"));
+								_click(_span("Select"));
+								
+							};
+								
+								this.toCreateTheserecordDetails=function(){
+									_click(_f("main").s_textinput("textInput[1]"));
+									_setValue(_f("main").s_textinput("textInput[1]"),"");
+									_setValue(_f("main").s_textinput("textInput[1]"),$objName);			
+									_setSelected(_f("main").s_combobox("objCombo1[1]"), $objName);
+									_wait(3000);
+									_click($bo_pg_sfmTransactionAndDesigner.btn_popUpOK);
+									_wait(2000);
+									_click(_f("main").s_checkbox("Work Detail (Work Order)"));
+									_click(_f("main").s_textinput("aliasName[27]"));
+									_setValue(_f("main").s_textinput("aliasName[27]"),"parts");
+								};
+							this.addFieldToChildSection=function(){
+							_click(_f("main").s_datagroup("dataGroup[3]"));
+							_click(_f("main").s_textinput("Quick Find"));
+							_setValue(_f("main").s_textinput("Quick Find"),"Billable Qty");
+							_doubleClick(_f("main").s_label("Billable Qty[1]"));
+
+							_click(_f("main").s_datagroup("dataGroup[3]"));
+							_click(_f("main").s_textinput("Quick Find"));
+							_setValue(_f("main").s_textinput("Quick Find"),"Activity Type");
+							_doubleClick(_f("main").s_label("Activity Type"));
+
+							_click(_f("main").s_datagroup("dataGroup[3]"));
+							_click(_f("main").s_textinput("Quick Find"));
+							_setValue(_f("main").s_textinput("Quick Find"),"Billable Line Price");
+							_doubleClick(_f("main").s_label("Billable Line Price[1]"));
+
+							_click(_f("main").s_datagroup("dataGroup[3]"));
+							_click(_f("main").s_textinput("Quick Find"));
+							_setValue(_f("main").s_textinput("Quick Find"),"Covered");
+							//_doubleClick(_f("main").s_label("Covered %[1]"));	
+							_click(_f("main").s_label("Covered %[1]"));
+							_click(_f("main").s_button("Add Field"));
+
+							_click(_f("main").s_datagroup("dataGroup[3]"));
+							_click(_f("main").s_textinput("Quick Find"));
+							_setValue(_f("main").s_textinput("Quick Find"),"Date Received");
+							_doubleClick(_f("main").s_label("Date Received"));
+							};
+						
+						this.qcExistingValueMap=function($mapName){
+							_click($bo_pg_sfmTransactionAndDesigner.dropDownList);
+						_setStrictVisibilityCheck(true);
+						_setSelected($bo_pg_sfmTransactionAndDesigner.dropDownList,"Work Detail (Work Order)");
+						_setStrictVisibilityCheck(false);
+						_click($bo_pg_sfmTransactionAndDesigner.btn_mappings);
+						_wait(1000);
+						_click($bo_pg_sfmTransactionAndDesigner.lbl_clkHeaderInQcPage)
+							_click(_f("main").s_combobox("searchCombo[1]"));
+							_setSelected(_f("main").s_combobox("searchCombo[1]"), "5026Mapping");
+							_wait(5000);
+						};
+							
+							this.addChildLineToScreenDesigner=function($fldName){
+							_click(_f("main").s_datagroup("dataGroup[3]"));
+							_click(_f("main").s_textinput("Quick Find"));
+							_setValue(_f("main").s_textinput("Quick Find"),$fldName);
+							_doubleClick(_f("main").s_label($fldName));
+							};
+						
+						this.editCustomWizard=function($sfmName){
+							_click($bo_pg_sfmTransactionAndDesigner.btn_yourCustomSfmTransactions);
+							_setValue(_f("main").s_textinput("searchText[3]"),$sfmName);
+							_click(_f("main").s_label($sfmName));
+							_click($bo_pg_sfmTransactionAndDesigner.btn_screenDesigner);
+							_wait(6000,_isVisible(_f("main").tab("Screen Designer")));			
+						};
+							this.addFieldToHeaderOfScreenDesigner=function($fldName){
+								_click($bo_pg_manageWOLineUsageForSorting.sel_selHeaderOption);
+								_click($bo_pg_manageWOLineUsageForSorting.txt_searchItem);
+								_setValue($bo_pg_manageWOLineUsageForSorting.txt_searchItem,$fldName);
+								_doubleClick(_f("main").s_label($fldName));
+								_wait(1000);
+							};
+								
+								this.qualifyingCriteriaHeaderValueMapTypeTextBox=function($srchFld,$srchValue){
+									_setValue(_f("main").s_textinput("filterInput"), $srchFld);
+									if(_isVisible(_f("main").s_togglebutton(54))){
+									   _click(_f("main").s_togglebutton(54));
+									_wait(5000);
+									_setValue(_f("main").s_textinput(130),$srchValue)
+									}else if(_isVisible(_f("main").s_togglebutton(3))){
+									   _click(_f("main").s_togglebutton(3));
+									_setValue(_f("main").s_textinput(130),$srchValue)
+									}else{
+										_click(_f("main").s_togglebutton(56));
+										_setValue(_f("main").s_textinput(130),$srchValue)
+											_click($bo_pg_sfmTransactionAndDesigner.clkMapSave);
+											_wait(3000);
+										}	
+								};
+									
+									
+									
+							this.qualifyingCriteriaHeaderValueMapTypeDropdown=function($srchFld,$srchValue){
+								_setValue(_f("main").s_textinput("filterInput"), $srchFld);
+									if(_isVisible(_f("main").s_togglebutton(54))){
+									   _click(_f("main").s_togglebutton(54));
+									_wait(5000);
+									_setSelected(_f("main").s_combobox("valuesCombo[53]"), $srchValue);
+									}else if(_isVisible(_f("main").s_togglebutton(3))){
+									   _click(_f("main").s_togglebutton(3));
+									_setSelected(_f("main").s_combobox("valuesCombo[53]"), $srchValue);
+									}else{
+									_click(_f("main").s_togglebutton(56));
+									_setSelected(_f("main").s_combobox("valuesCombo[53]"), $srchValue);
+										_click($bo_pg_sfmTransactionAndDesigner.clkMapSave);
+										_wait(3000);
+									}
+								
+							};
+							
+								this.selectOpenWOInQC=function($qualificationCriteria){
+									_click(_f("main").tab("Qualifying Criteria and Field Mappings"));
+									_setSelected(_f("main").s_combobox("searchCombo"), $qualificationCriteria);
+								};
+								
+									this.selectMappingINQC=function($fldMap){
+									_click(_f("main").tab("Mapping(s)"));
+									_setSelected(_f("main").s_combobox("searchCombo[1]"), $fldMap);
+									};
+										this.sourceObjUpdate=function($srchTxt,$srchValue){
+											_click(_f("main").tab("Source Object Update"));
+											_wait(3000);
+											_setStrictVisibilityCheck(true);
+											_click(_f("main").s_label("Work Order[1]"));
+											_click(_f("main").s_button("Add a row[1]"));
+											_setStrictVisibilityCheck(false);
+											if(_isVisible(_f("main").s_label("Field updates required for Work Order")))
+											_setStrictVisibilityCheck(true);
+											_click(_f("main").s_togglebutton("/I want to enter a specific value for this field/"));											
+											_click(_f("main").s_label("Click to add field[2]"));
+											_click(_f("main").s_textinput("searchText[5]"))
+											_setValue(_f("main").s_textinput("searchText[5]"), $srchTxt);
+											_click(_f("main").s_button("Add Field"));
+											_doubleClick(_f("main").s_label("Priority"));
+											_click(_f("main").s_togglebutton("/I want to enter a specific value for this field/"));
+											_wait(2000);
+											_setSelected(_f("main").s_combobox("valuesCombo[2]"), $srchValue);
+											_setStrictVisibilityCheck(false);						
+								};
+											this.addQuestion=function(){
+												_click(_f("main").tab("Form Designer"));
+												_click(_f("main").s_button("Add new question"));
+												_click(_f("main").listbasecontentholder(12));
+												
+											};
+												this.addAttachment=function($txtQsn,$qsndataType,$urlName){
+													_setSelected(_f("main").s_dropdownlist("ansType"), $qsndataType);
+													_click(_f("main").s_textinput("questionText"));
+													_setValue(_f("main").s_textinput("questionText"),$txtQsn);													
+													_setValue(_f("main").s_textinput("helpUrl"),$urlName);
+													//_f("main").s_button("Add to Library Only")
+													_click(_f("main").s_button("Add to Library and Form"));
+												};
+												
+													this.addTextOrNumber=function($qsndataType,$isPrefillEnabled,$defaultAns,$urlName){
+														_setSelected(_f("main").s_dropdownlist("ansType"), $qsndataType);
+														_click(_f("main").s_textinput("questionText"));
+														if($isPrefillEnabled="true"){
+															_click(_f("main").s_checkbox("Prefill with value from Work Order"));
+														}
+														_setValue(_f("main").s_textinput("defaultResponseIdTxtInp"),$defaultAns);
+														_setValue(_f("main").s_textinput("helpUrl"),$urlName);
+														_click(_f("main").s_button("Add to Library and Form"));
+													};
+													
+													this.addDateOrDateTimeQsn=function($qsndataType,$isPrefillEnabled,$isLiteral, $literalName,$urlName){
+														_setSelected(_f("main").s_dropdownlist("ansType"), $qsndataType);
+														_click(_f("main").s_textinput("questionText"));
+														if($isPrefillEnabled="true"){
+															_click(_f("main").s_checkbox("Prefill with value from Work Order"));
+														}
+														if($isLiteral="true"){
+															_setSelected(_f("main").s_dropdownlist("operandTypeCombo"), "Function");
+															_setSelected(_f("main").s_combobox("picklist"), $literalName);
+														}else{
+															_setSelected(_f("main").s_dropdownlist("operandTypeCombo"), "Value");
+															//somecode should be here to select the constanct date
+															
+														}
+														_setValue(_f("main").s_textinput("helpUrl"),$urlName);
+														_click(_f("main").s_button("Add to Library and Form"));
+													};
+													//Added by Srinivas for OPDOC cloning using the _check function. This is copied from stdCloneSFM function from above
+													//Also adding Qualifying Criteria to access only for Open Work Orders - RS-9144 test case
+													this.cloneStandardOPDOCProcess=function($sfmToBeCloned,$sfmName,$sfmTemplateSaveAsName){
+														_click($bo_pg_sfmTransactionAndDesigner.txt_standardSfmTransactionQuickFind);
+														_setValue($bo_pg_sfmTransactionAndDesigner.txt_standardSfmTransactionQuickFind,$sfmToBeCloned);
+														if(_isVisible(_f("main").s_checkbox("chk[16]")))
+															{
+																_check (_f("main").s_checkbox("chk[16]"));
+															}
+														else
+															{
+																_click(_f("main").s_checkbox("chk").leftOf(_f("main").s_label($sfmToBeCloned), 10, 10));
+															}
+																												_click($bo_pg_sfmTransactionAndDesigner.btn_clone);	
+														_wait(60000, _isVisible($bo_pg_sfmTransactionAndDesigner.txt_name));
+														_setValue($bo_pg_sfmTransactionAndDesigner.txt_name, $sfmName);
+														_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmTransactionId, "");
+														_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmTransactionId, $sfmName);
+													
+														_click($bo_pg_sfmTransactionAndDesigner.btn_templateDesigner);
+														_wait(6000,_isVisible(_f("main").tab("Template Designer")));
+														_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmSaveTemplateAs, $sfmTemplateSaveAsName);
+														_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmSaveTemplateLayoutID, $sfmTemplateSaveAsName);
+														_wait(3000);
+														_click($bo_pg_sfmTransactionAndDesigner.btn_saveTempDesignPage);
+														_wait(10000);
+														_click(_f("main").tab("Qualifying Criteria and Field Mappings"));
+														_click(_f("main").s_label("Work Order"));
+														_setSelected(_f("main").s_combobox("searchCombo"), "SVMXSTD: Open Work Orders");
+														
+														_click(_f("main").s_label("Parts"));
+														_setSelected(_f("main").s_combobox("searchCombo"), "SVMXSTD: Parts Lines Only");
+														
+														_click(_f("main").s_label("Labor"));
+														_setSelected(_f("main").s_combobox("searchCombo"), "SVMXSTD: Labor Lines Only");
+														
+														_click(_f("main").s_label("Expense"));
+														_setSelected(_f("main").s_combobox("searchCombo"), "SVMXSTD: Expense Lines Only");
+														
+														_click(_f("main").s_label("Travel"));
+														_setSelected(_f("main").s_combobox("searchCombo"), "SVMXSTD: Travel Lines Only");
+														
+														_click($bo_pg_sfmTransactionAndDesigner.btn_saveAndclose);
+														_wait(6000);
+														_setSpeed($g_stepSpeed);	
+													};
+					//Copied from SFM Designer functions for editing a SFM process. Using this to edit OPDOC process to enable and disable Version Control option
+													this.editOPDOCProcessEnableVersionControl=function($sfmName){
+														$bo_act_navigation.navigateToSfmTransactionDesigner();
+														_wait(20000,_isVisible($bo_pg_sfmTransactionAndDesigner.btn_yourCustomSfmTransactions));
+														_click($bo_pg_sfmTransactionAndDesigner.btn_yourCustomSfmTransactions);
+														_setValue($bo_pg_sfmTransactionAndDesigner.lbl_searchSFM, $sfmName);
+														_wait(10000);
+														_click(_f("main").s_label($sfmName).near(_f("main").processlistitemrenderer($sfmName)));
+														_wait(20000,_isVisible($sfm_pg_screenDesigner.btn_propoties));
+														_click(_f("main").tab("Advanced Options"));
+														_click(_f("main").tab("File Properties"));
+														if(_getValue(_f("main").s_checkbox("Enable Version Control")))
+														{
+															
+														}
+														else
+															{
+															_check(_f("main").s_checkbox("Enable Version Control"));
+															}
+														_wait(2000);
+														_click($bo_pg_sfmTransactionAndDesigner.btn_saveAndclose);
+														_wait(6000);
+														_setSpeed($g_stepSpeed);
+													};
+														
+														this.editOPDOCProcessDisableVersionControl=function($sfmName){
+															$bo_act_navigation.navigateToSfmTransactionDesigner();
+															_wait(20000,_isVisible($bo_pg_sfmTransactionAndDesigner.btn_yourCustomSfmTransactions));
+															_click($bo_pg_sfmTransactionAndDesigner.btn_yourCustomSfmTransactions);
+															_setValue($bo_pg_sfmTransactionAndDesigner.lbl_searchSFM, $sfmName);
+															_wait(10000);
+															_click(_f("main").s_label($sfmName).near(_f("main").processlistitemrenderer($sfmName)));
+															_wait(20000,_isVisible($sfm_pg_screenDesigner.btn_propoties));
+															_click(_f("main").tab("Advanced Options"));
+															_click(_f("main").tab("File Properties"));
+															if(_getValue(_f("main").s_checkbox("Enable Version Control"))) 
+															{
+																_click(_f("main").s_checkbox("Enable Version Control"));
+															}
+															else
+																{
+																
+																}
+															_wait(2000);
+															_click($bo_pg_sfmTransactionAndDesigner.btn_saveAndclose);
+															_wait(6000);
+															_setSpeed($g_stepSpeed);
+														
+													};
+			//Reusing the above function to clone SFM but not save it for checking Geo Literals - Srinivasa Murthy 14/June/2019
+													this.clnStandardSFM1=function($sfmToBeCloned,$sfmName,$sfmTemplateSaveAsName){
+														_click($bo_pg_sfmTransactionAndDesigner.txt_standardSfmTransactionQuickFind);
+														_setValue($bo_pg_sfmTransactionAndDesigner.txt_standardSfmTransactionQuickFind,$sfmToBeCloned);
+														
+														if (_isVisible(_f("main").s_checkbox("/chk/i").leftOf(_f("main").s_label($sfmToBeCloned), 10, 10))) {
+															_wait(3000);
+															_click(_f("main").s_checkbox("/chk/i").leftOf(_f("main").s_label($sfmToBeCloned), 10, 10));
+
+														} else if (_isVisible(_f("main").s_checkbox(2).leftOf(_f("main").s_label($sfmToBeCloned), 10, 10))) {
+															_wait(3000);
+															_click(_f("main").s_checkbox(2).leftOf(_f("main").s_label($sfmToBeCloned), 10, 10));
+
+														} else {
+															_click(_f("main").s_checkbox("/CheckBox/").leftOf(_f("main").s_label($sfmToBeCloned), 10, 10));
+														}
+														
+														//_click(_f("main").s_checkbox("chk").leftOf(_f("main").s_label($sfmToBeCloned), 10, 10));
+														_click($bo_pg_sfmTransactionAndDesigner.btn_clone);	
+														_wait(60000, _isVisible($bo_pg_sfmTransactionAndDesigner.txt_name));
+														_setValue($bo_pg_sfmTransactionAndDesigner.txt_name, $sfmName);
+														_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmTransactionId, "");
+														_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmTransactionId, $sfmName);
+													
+														_click($bo_pg_sfmTransactionAndDesigner.btn_screenDesigner);
+														_wait(6000,_isVisible(_f("main").tab("Screen Designer")));
+														_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmSavePageLayoutAs, $sfmTemplateSaveAsName);
+														_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmSavePageLayoutAsId, $sfmTemplateSaveAsName);
+														_wait(3000);
+														_click($bo_pg_sfmTransactionAndDesigner.btn_pageLayoutSave);
+														_wait(10000);
+														
+														_setSpeed($g_stepSpeed);	
+													};
+													
+};

@@ -1,0 +1,170 @@
+/**
+ * Functions for the Search Configurations
+ */
+var $swat_act_sfmSearch = new function swat_act_sfmSearch() {
+
+	/**
+	 * Create a SFM Search Configurations
+	 * @param $objectName
+	 * @param $fieldName
+	 *
+	 * The following function creates Search Configuration
+	 */
+	this.createSfmSearch = function($objectName,$fieldName,$operator,$fieldName1)
+	{
+		var $searchTitle = $bo_act_common.generateRandomName("Search");
+		var $searchId = $bo_act_common.generateRandomName("SearchId");
+        $bo_act_navigation.navigateToSfmSearchInDesigner();
+		_click($swat_pg_sfmSearch.btn_new);
+		
+		//General Info		
+		_wait(10000);
+		_setValue($swat_pg_sfmSearch.txt_searchTitle,$searchTitle);
+		_setValue($swat_pg_sfmSearch.txt_searchId,$searchId);
+		
+		//Search Configuration
+		_click($swat_pg_sfmSearch.tab_searchConfiguration);
+		_click($swat_pg_sfmSearch.btn_sub_new);
+		
+		//Include one or more objects to be included in the scope of this search
+		_setSelected($swat_pg_sfmSearch.picklist_searchObject,$objectName);
+		
+		/* Using the expression builder below, define a filter criteria to 
+		   always apply on this object's records */
+		_setSelected($swat_pg_sfmSearch.picklist_fieldName,$fieldName);
+		_setSelected($swat_pg_sfmSearch.picklist_operator,$operator);
+		_setValue($swat_pg_sfmSearch.txt_value,"Open");
+		
+		_click($swat_pg_sfmSearch.btn_add);
+		_setSelected($swat_pg_sfmSearch.picklist_fieldName1,$fieldName1);
+		_setSelected($swat_pg_sfmSearch.picklist_operator1,$operator);
+		_setValue($swat_pg_sfmSearch.txt_value1,"Field Service");
+		
+		//Advanced Expression
+		_setValue($swat_pg_sfmSearch.txt_advanced_expression,"1 AND 2");
+		
+		// Choose one or more fields to be displayed in the search result
+		_click($swat_pg_sfmSearch.btn_add2);
+		_setSelected($swat_pg_sfmSearch.picklist_searchObject2,$objectName);
+		_setSelected($swat_pg_sfmSearch.picklist_fieldName2,$fieldName);
+		_click($swat_pg_sfmSearch.btn_add2);
+		_setSelected($swat_pg_sfmSearch.picklist_searchObject3,$objectName);
+		_setSelected($swat_pg_sfmSearch.picklist_fieldName3,$fieldName1);
+		_click($swat_pg_sfmSearch.btn_add2);
+		_setSelected($swat_pg_sfmSearch.picklist_searchObject4,"Work Order - Account");
+		_setSelected($swat_pg_sfmSearch.picklist_fieldName4,"Account Type");
+		
+		// Choose one or more fields on which search is applied
+		_click($swat_pg_sfmSearch.btn_add3);
+		_setSelected($swat_pg_sfmSearch.picklist_searchObject5,$objectName);
+		_setSelected($swat_pg_sfmSearch.picklist_fieldName5,$fieldName);
+		_click($swat_pg_sfmSearch.btn_add3);
+		_setSelected($swat_pg_sfmSearch.picklist_searchObject6,$objectName);
+		_setSelected($swat_pg_sfmSearch.picklist_fieldName6,$fieldName1);
+	
+		//Choose fields on which sorting should be applied
+		_click($swat_pg_sfmSearch.btn_add4);
+		_setSelected($swat_pg_sfmSearch.picklist_searchObject7,$objectName);
+		_setSelected($swat_pg_sfmSearch.picklist_fieldName7,"Work Order Number");
+		_setSelected($swat_pg_sfmSearch.picklist_searchOrder,"Ascending");
+		
+		//Click on Save button
+		_click($swat_pg_sfmSearch.btn_save);
+		_wait(10000);
+		
+		//Click on save and close
+		_click($swat_pg_sfmSearch.btn_save_and_close);
+		_wait(10000);
+		
+		//Verify SFM Search is created
+		if(_isVisible(_span($searchTitle))== true){
+			 _log("SFM Search :"+$searchTitle+ "is created");
+		 }else{
+			 _log("SFM Search :"+$searchTitle+ "is NOT created");
+		 }
+		
+		return($searchTitle);
+	};
+
+	/**
+	 * The following function launches Servicemax SFM Search followed by
+	 * selecting a record and checking if corresponding SFW is listed below
+	 * Launching a record and checking if launches in new tab successfully
+	 * and then closing the launched record.
+	 * The following function creates Search Configuration
+	 */
+	
+	this.launchSfmSearch = function($searchItem,$workOrderNo)
+	{
+		_click($bo_pg_home.link_home);
+		_wait(5000);
+		
+		if(_condition($bo_pg_home.label_serviceMaxSFMSearch == null))
+			{
+			$bo_act_navigation.navigateToSetUpAndSearchfromUserNavlabel("Home Page Layouts");
+			_click($bo_pg_salesforcePages.link_dashboardHomePageDefault);
+			_click($bo_pg_salesforcePages.btn_edit);
+			_check($bo_pg_salesforcePages.chk_ServiceMaxSFMSearch);
+			_click($bo_pg_salesforcePages.btn_next);
+			_click($bo_pg_salesforcePages.btn_save);
+			_click($bo_pg_home.link_home);
+			}
+		_selectDomain($g_domain);
+		_setSelected($swat_pg_sfmSearch.picklist_searchItem,$searchItem);
+		_click($swat_pg_sfmSearch.link_go);
+		_wait(2000);
+		_selectDomain();
+		_wait(15000,_isVisible($swat_pg_sfmSearch.txt_SearchArea));
+		_setValue($swat_pg_sfmSearch.txt_SearchArea,$workOrderNo);
+		_click($swat_pg_sfmSearch.btn_go);
+		_wait(10000);
+		 _click($swat_pg_sfmSearch.radio_button);
+		 //_wait(6000);
+		 //_assertExists(_div("sfmsearch-resultsviewpanel-1444-body"));
+		 _setStrictVisibilityCheck(true);
+		// In the listed SFM Search , click on a record link. Ex: WO-00000009
+	_click(_link($workOrderNo,_near(_div("Work Order Number"))));
+	_selectWindow("/Work Order: "+$workOrderNo+"/");
+	_highlight(_heading2($workOrderNo));
+	_wait(6000,_isVisible(_heading2($workOrderNo)));
+	 _setStrictVisibilityCheck(false);
+
+	_assertExists(_heading2($workOrderNo));
+	_closeWindow();
+	
+	};
+	
+		this.isSFMSearchAvailableonHomePage = function()
+		{
+		    _click($bo_pg_home.link_home);
+			if(_condition($bo_pg_home.label_serviceMaxSFMSearch == null))
+			{
+			$bo_act_navigation.navigateToSetUpAndSearchfromUserNavlabel("Home Page Layouts");
+			_click($bo_pg_salesforcePages.link_dashboardHomePageDefault);
+			_click($bo_pg_salesforcePages.btn_edit);
+			_check($bo_pg_salesforcePages.chk_ServiceMaxSFMSearch);
+			_click($bo_pg_salesforcePages.btn_next);
+			_click($bo_pg_salesforcePages.btn_save);
+			_click($bo_pg_home.link_home);
+			}
+		};
+		
+	
+	/**
+	 * Author		:	Ashwini Holagi
+	 * Function		:	Delete SFM Search
+	*/			
+	this.deleteSfmSearch = function($searchItem){
+		$bo_act_navigation.navigateToSfmSearchInDesigner();
+		 _click(_checkbox(0,_leftOf(_span($searchItem))));
+		 _click(_submit("Delete"));
+		 _wait(15000);
+		 if(_isVisible(_span($searchItem))==false){
+			 _log("SFM Search is deleted");
+		 }else{
+			 _log("SFM Search is Not deleted");
+		 }
+		 
+	};	
+	
+};

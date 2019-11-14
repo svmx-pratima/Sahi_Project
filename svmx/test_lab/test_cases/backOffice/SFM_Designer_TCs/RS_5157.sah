@@ -1,0 +1,103 @@
+//author - Mamata Rout
+
+
+var $RS_5157 = _testcase("RS_5157", "Batching : Run Now when there are requests in queue");
+$RS_5157.start();
+_setSpeed($g_stepSpeed);
+var $sfmName1 = $bo_act_common.generateRandomName("5157SFM1");
+var $sfmName2 = $bo_act_common.generateRandomName("5157SFM2");
+var $d1="Sunday";var $d2="Monday";var $d3="Tuesday";var $d4="Wednesday";var $d5="Thursday";var $d6="Friday";var $d7="Saturday";
+var $scheduleTime="12:00 AM";
+
+
+//Login to the Servicemax Application	
+	$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+
+var $user=_getText(_span("menuButtonLabel"));
+
+//-----------------CREATE SFM1----------------------------------------------
+//_includeOnce("../../../references/references.js");
+var $SFMToBeCloned = "Activate Preventive Maintenance Plan";
+var $isCustom = false;
+
+$bo_act_navigation.navigateToSfmTransactionDesigner();
+_wait(60000, _isVisible($bo_pg_sfmTransactionAndDesigner.btn_newSFM));
+$bo_act_SFM.renameClonesfm($sfmName1,$SFMToBeCloned,$isCustom);
+	
+/*if (_assertExists($bo_pg_sfmTransactionAndDesigner.lbl_sfmTransactionSavedMessage)){
+	
+	_log("SFm created successfully");
+} else {
+	_fail("SFM creation is unsuccessfull");
+	_stopTestCase();
+};*/
+//-----------------CREATE SFM2----------------------------------------------
+$bo_act_navigation.navigateToSfmTransactionDesigner();
+_wait(60000, _isVisible($bo_pg_sfmTransactionAndDesigner.btn_newSFM));
+$bo_act_SFM.renameClonesfm($sfmName2,$SFMToBeCloned,$isCustom);
+	
+/*if (_assertExists($bo_pg_sfmTransactionAndDesigner.lbl_sfmTransactionSavedMessage)){
+	
+	_log("SFm created successfully");
+} else {
+	_fail("SFM creation is unsuccessfull");
+	_stopTestCase();
+};*/
+//******************Add SFM1 to Schedule SFM1****************
+var $ProcessName1= $bo_act_common.generateRandomName("sfm1");
+//var $ProcessId1=$bo_act_common.generateRandomName("sfm1");
+
+$bo_act_navigation.navigateToScheduledSFM();
+$bo_act_scheduledSFM.newProcessNameID($ProcessName1,$ProcessName1);
+ $bo_act_scheduledSFM.selectSFMTransactionToSchedule($sfmName1);
+ $bo_act_scheduledSFM.chooseTimeAndDateToRunTheProcess($scheduleTime,$d1,$d2,$d3,$d4,$d5,$d6,$d7);
+ $bo_act_scheduledSFM.setUserForNotification($user);
+ _click($bo_pg_scheduledSFM.btn_saveAndClose);
+_wait(3000,_isVisible($bo_pg_scheduledSFM.lbl_scheduledSFMHomePage));
+_log("Scheduled SFM Created successfully");
+
+//*****************Add SFM1 to Schedule SFM2*************
+var $ProcessName2 = $bo_act_common.generateRandomName("sfm2");
+//var $ProcessId2 = $bo_act_common.generateRandomName("sfm2");
+
+$bo_act_scheduledSFM.newProcessNameID($ProcessName2,$ProcessName2);
+ $bo_act_scheduledSFM.selectSFMTransactionToSchedule($sfmName2);
+ $bo_act_scheduledSFM.chooseTimeAndDateToRunTheProcess($scheduleTime,$d1,$d2,$d3,$d4,$d5,$d6,$d7);
+ $bo_act_scheduledSFM.setUserForNotification($user);
+ _click($bo_pg_scheduledSFM.btn_saveAndClose);
+_wait(3000,_isVisible($bo_pg_scheduledSFM.lbl_scheduledSFMHomePage));
+//_log("Scheduled SFM successful");
+
+$bo_act_scheduledSFM.clickRunNow($ProcessName1,$ProcessName2);
+$bo_act_scheduledSFM.navigateApexJobsPage();
+
+
+	var	$status1=_getText($bo_pg_salesforcePageSetUp.lbl_status1);
+if ($status1!="Completed"){
+	_navigateTo(document.location.href, true);}
+else{
+	var $status2=_getText($bo_pg_salesforcePageSetUp.lbl_status2);
+		}
+if($status2 !="Completed"){
+	_log("The SFM initiated 1st was completed 1st");
+		}
+$bo_act_navigation.navigateToScheduledSFM();
+$bo_act_scheduledSFM.deleteScheduledSFM($ProcessName1);
+$bo_act_scheduledSFM.deleteScheduledSFM($ProcessName2);
+//*****************Deleteing testdata************
+/*
+$bo_act_navigation.navigateToSfmTransactionDesigner();
+_wait(60000, _isVisible($bo_pg_sfmTransactionAndDesigner.btn_newSFM));
+$bo_act_SFM.deleteSFM($sfmName1);
+$bo_act_SFM.deleteSFM($sfmName2);*/
+_setSpeed($g_stepSpeed);
+
+
+$RS_5157.end();
+
+
+
+
+
+
+

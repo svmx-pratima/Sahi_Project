@@ -1,0 +1,213 @@
+var $RS_5339=_testcase("$RS-5339","Verify Cloning of OPDOC SFM,QC met/not met ,Target Object Update, Finalise & Delete functionalities");
+$RS_5339.start();
+	
+		//pre-Req:
+		//Create Case using below variables  
+		$objName= "Case";
+		$obJson = "{\"Subject\":\"Problem Description\",\"Priority\":\"High\"}";
+		$columnName = "CaseNumber";
+		$filter="id";
+		$casefilterValue=$sfm_act_restApiMethods.postRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,$objName,$obJson,"POST");
+		$caseNumber =$sfm_act_restApiMethods.getRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,"GET", $objName, $columnName, $filter, $casefilterValue);
+		_log("Case number: "+$caseNumber);
+		
+		//Create Product
+		$objName= "Product2";
+		$productName=$bo_act_common.generateRandomName("Prod_RS5339_");
+		$obJson = "{\"Name\":\""+$productName+"\",\"ProductCode\":\""+$productName+"\",\"IsActive\":\"true\"}";
+		$proID=$sfm_act_restApiMethods.postRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,$objName,$obJson,"POST");
+		_log($productName);
+		
+		//create Work order
+		$objName= $orgnamespace+"__Service_Order__c";
+		$obJson = "{\""+$orgnamespace+"__Order_Status__c\":\"Open\",\""+$orgnamespace+"__Product__c\":\""+$proID+"\",\""+$orgnamespace+"__Case__c\":\""+$casefilterValue+"\",\""+$orgnamespace+"__Is_Entitlement_Performed__c\":\"true\",\""+$orgnamespace+"__Order_Type__c\":\"Field Service\",\""+$orgnamespace+"__Priority__c\":\"High\",\""+$orgnamespace+"__Billing_Type__c\":\"Paid\"}";
+		$columnName = "Name";
+		$filter="id";
+		$filterValue=$sfm_act_restApiMethods.postRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,$objName,$obJson,"POST");
+		$WONumber =$sfm_act_restApiMethods.getRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,"GET", $objName, $columnName, $filter, $filterValue);
+		_log("WO number: "+$WONumber);
+		
+		//create Work order with order status= canceled for checking criteria not matching 
+		$objName1= $orgnamespace+"__Service_Order__c";
+		$obJson1 = "{\""+$orgnamespace+"__Order_Status__c\":\"Canceled\",\""+$orgnamespace+"__Product__c\":\""+$proID+"\",\""+$orgnamespace+"__Case__c\":\""+$casefilterValue+"\",\""+$orgnamespace+"__Is_Entitlement_Performed__c\":\"true\",\""+$orgnamespace+"__Order_Type__c\":\"Field Service\",\""+$orgnamespace+"__Priority__c\":\"High\",\""+$orgnamespace+"__Billing_Type__c\":\"Paid\"}";
+		$columnName1 = "Name";
+		$filter1="id";
+		$filterValue1=$sfm_act_restApiMethods.postRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,$objName1,$obJson1,"POST");
+		$WONumber1 =$sfm_act_restApiMethods.getRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,"GET", $objName1, $columnName1, $filter1, $filterValue1);
+		_log("WO number: "+$WONumber1);
+		
+		var $today=$bo_act_common.currentDateWithoutAppendingZero("/");
+		
+		//Login to app
+		$bo_act_login.login($g_url,$sfmdUsn,$sfmdPwd); 
+		$bo_act_configurationProfiles.editGlobalProfileForBooleanSettings("Common", "Global Settings", "GBL037", false);
+		
+		//clone standard SFM
+		var $sfmNameToBeCloned="Work Order Service Report";
+		var $sfmName=$bo_act_common.generateRandomName("RS_5339_");
+		var $object="Checklist (Work Order)";
+		$sfm_act_SFM.cloneTDM016($sfmNameToBeCloned, $sfmName, false, "", "", [], []);
+		_click($bo_pg_sfmTransactionAndDesigner.btn_templateDesigner);
+		_setSelected($bo_pg_sfmTransactionAndDesigner.sel_sfmTemplateforOpDoc, "Work Order Service Report");
+		_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmSaveTemplateAs,$sfmName);
+		_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmSaveTemplateLayoutID,$sfmName);
+		_click($bo_pg_sfmTransactionAndDesigner.btn_saveAsTempDesignPage);
+		_wait(10000);
+		
+		//TOU Variables
+		var $fieldsList = ["Is Exported","Billing Type","Scheduled Date","Preferred Start Time","Work Performed","No Of Times Assigned"];
+		var $operatorList= ["Set","Set","Set","Set","Set","Increase"];
+		var $valueList = ["true","Courtesy","Today","12/06/2018 10:12",$WONumber,"1"];
+		$sfm_act_targetObjectUpdate.createTOU("Work Order", $fieldsList, $operatorList, $valueList);
+		
+		//qualification criteria on header and child object
+		$sfm_act_Transactions.sfmQualifyingCriteriaieldMappings("Work Order", [], [], "SVMXSTD: Open Work Orders", "");
+		$sfm_act_Transactions.sfmQualifyingCriteriaieldMappings("Parts", [], [], "SVMXSTD: Parts Usage Lines Only", "");
+		$sfm_act_Transactions.sfmQualifyingCriteriaieldMappings("Labor", [], [], "SVMXSTD: Labor Usage Lines Only", "");
+		$sfm_act_Transactions.sfmQualifyingCriteriaieldMappings("Expense", [], [], "SVMXSTD: Expense Usage Lines Only", "");
+		$sfm_act_Transactions.sfmQualifyingCriteriaieldMappings("Travel", [], [], "SVMXSTD: Travel Usage Lines Only", "");
+		
+		_setStrictVisibilityCheck(true);
+		_click($bo_pg_sfmTransactionAndDesigner.btn_quickSave1);
+		_wait(10000);
+		_click($bo_pg_sfmTransactionAndDesigner.btn_saveAndclose);
+		_setStrictVisibilityCheck(false);
+		
+		var $wizardObject="Work Order";
+		var $sfmd_wizardName1 =$sfmd_wizardName[7];
+		var $sfmd_wizardType="Output Document";
+		var $profile="";
+		var $handOver=false;
+		$sfm_act_wizards.addToWizard($wizardObject, $sfmd_wizardName1, $sfmd_wizardType, $sfmName, $handOver, $profile); 
+		
+		//Open the WO and launch opdoc process when criteria is not met -RS-5341
+		_clearLastAlert();
+		$sfm_act_common.searchWOandLaunchSFM($WONumber1, $sfmName);
+		//$bo_act_navigation.navigateToCreatedRecordUsingGlobalSearch($woNumber);
+		_wait(10000); 
+		var $alertCatch = _lastAlert();
+		_log($alertCatch);
+		_assertNotNull($alertCatch,"QC not met alert is not shown");
+		
+		//Open the WO and launch opdoc process when criteria is met -RS-5342
+		//Add product under part
+		$sfm_act_common.searchWOandLaunchSFM($WONumber, "Record T&M");
+		
+		$sfm_act_sfmDesigner.addChildLine("Parts");
+		_wait(10000,_isVisible($sfm_pg_sfmDesigner.txt_partTextbox));
+		_click($sfm_pg_sfmDesigner.searchPartIcon);
+		_setValue($sfm_pg_sfmDesigner.btn_searchTextBox,$productName);
+		_click($sfm_pg_sfmDesigner.link_searchLink);
+		_wait(5000,_isVisible(_cell($productName)));
+		_click(_cell($productName));
+		_click($sfm_pg_sfmDesigner.btn_select);
+		_click($sfm_pg_sfmDesigner.btn_usePriceFromPricebook);
+		_setValue($sfm_pg_sfmDesigner.txt_eeLineQty,3);
+		_setValue($sfm_pg_sfmDesigner.txt_eeLinePricePerUnit,300);
+		_click($sfm_pg_sfmDesigner.btn_eeUpdate);
+		_wait(3000);
+		_click($sfm_pg_sfmDesigner.btn_deliveryGetPrice);
+		_wait(15000);
+		_click($sfm_pg_sfmDesigner.btn_deliveryExtendedEdit);
+		var $partsBlp1 = parseInt(_getText($sfm_pg_sfmDesigner.txt_billingLinePrice));
+		_log($partsBlp1);
+		_wait(3000);
+		_click($sfm_pg_sfmDesigner.btn_eeCancel);
+		_wait(3000);
+		/*
+		//Add labor childline
+		$sfm_act_sfmDesigner.addChildLine("Labor");
+		_wait(10000,_isVisible($sfm_pg_sfmDesigner.txt_partTextbox));
+		_click($sfm_pg_sfmDesigner.searchPartIcon);
+		_setValue($sfm_pg_sfmDesigner.btn_searchTextBox,$productName);
+		_click($sfm_pg_sfmDesigner.link_searchLink);
+		_click(_cell($productName,_near($sfm_pg_sfmDesigner.btn_select)));
+		_click($sfm_pg_sfmDesigner.btn_select);
+		//_click($sfm_pg_sfmDesigner.txt_eeActivityType);
+		//_click(_listItem("Repair"));
+		_click($sfm_pg_sfmDesigner.btn_usePriceFromPricebook);
+		var $today=$bo_act_common.getfutureDate(0,"/",0);
+		_setValue($sfm_pg_sfmDesigner.txt_eeStartDateTime,$today);
+		var $endDate=$bo_act_common.getfutureDate(0,"/",3);
+		_setValue($sfm_pg_sfmDesigner.txt_eeEndDateTime,$endDate);
+		_setValue($sfm_pg_sfmDesigner.txt_eeActivityType,"Repair");
+		_setValue($sfm_pg_sfmDesigner.txt_eeLinePricePerUnit,200);
+		_click($sfm_pg_sfmDesigner.link_Update);			
+			
+		
+		//Add Expense childline
+		$sfm_act_sfmDesigner.addChildLine("Expenses");
+		_wait(10000,_isVisible($sfm_pg_sfmDesigner.txt_eeExpenseType));
+		_click($sfm_pg_sfmDesigner.btn_usePriceFromPricebook);
+		_setValue($sfm_pg_sfmDesigner.txt_eeExpenseType,"Lodging");
+		_setValue($sfm_pg_sfmDesigner.txt_eeLineQty,2);
+		_setValue($sfm_pg_sfmDesigner.txt_eeLinePricePerUnit,300);
+		_click($sfm_pg_sfmDesigner.link_Update);
+		
+		//Add Travel childline
+		$sfm_act_sfmDesigner.addChildLine("Travel");
+		_wait(10000,_isVisible($sfm_pg_sfmDesigner.txt_eeExpenseType));
+		_click($sfm_pg_sfmDesigner.btn_usePriceFromPricebook);
+		var $today=$bo_act_common.getfutureDate(0,"/",0);
+		_setValue($sfm_pg_sfmDesigner.txt_eeStartDateTime,$today);
+		var $endDate=$bo_act_common.getfutureDate(0,"/",4);
+		_setValue($sfm_pg_sfmDesigner.txt_eeEndDateTime,$endDate);
+		_setValue($sfm_pg_sfmDesigner.txt_eeLineQty,4);
+		_setValue($sfm_pg_sfmDesigner.txt_eeLinePricePerUnit,150);
+		_click($sfm_pg_sfmDesigner.link_Update); */
+		
+		_click($sfm_pg_sfmDesigner.btn_deliverySave);
+		_wait(15000,_isVisible($bo_pg_workOrders.btn_editWorkOrder));
+		
+		//Validate delete functionality after finalizing opdoc RS-5339
+		$sfm_act_createCustomWizard.clickWizardBtn($sfmName);
+		_wait(10000,_isVisible($bo_pg_sfmTransactionAndDesigner.btn_finalize));
+		
+		_click($bo_pg_sfmTransactionAndDesigner.btn_finalize);
+		_wait(10000,_isVisible($sfm_pg_opdoc.btn_deleteOpdoc));
+		_click($sfm_pg_opdoc.btn_deleteOpdoc);
+		_wait(15000);
+		_assertNotExists(_link("/"+$sfmName+"/",_near($bo_pg_workOrders.btn_notessAndAttachementSection)));
+		
+		
+		//validation on opdoc pdf format RS-5338
+		$sfm_act_createCustomWizard.clickWizardBtn($sfmName);
+		_wait(10000,_isVisible($bo_pg_sfmTransactionAndDesigner.btn_finalize));
+		//_assertContainsText($today,$sfm_pg_opdoc.btn_dateOnOPDoc);
+		_assertContainsText($WONumber,$sfm_pg_opdoc.btn_woNumber);
+		_assertContainsText($caseNumber,$sfm_pg_opdoc.btn_caseNumber);
+		_assertExists($sfm_pg_opdoc.img_svmxLogo);
+		_assertEqual(_getText($sfm_pg_opdoc.btn_totalBillableAmount),$partsBlp1);
+		_assertContainsText($productName,$sfm_pg_opdoc.btn_productName);
+		_assertContainsText("Field Service",$sfm_pg_opdoc.btn_orderType);
+		_assertContainsText("Courtesy",$sfm_pg_opdoc.btn_billingType);
+		_assertContainsText("No",$sfm_pg_opdoc.btn_customerDown);
+		
+		var $partUnderPartsSection=_cell($productName,_near($sfm_pg_opdoc.btn_partChildSection));
+		//var $partUnderLaborsSection=_cell($productName,_near($sfm_pg_opdoc.btn_laborChildSection));
+		_assertExists($partUnderPartsSection);
+		//_assertExists($partUnderLaborsSection);
+		_assertContainsText($partsBlp1,_cell(1,_near(_cell("Total",_near($partUnderPartsSection)))));
+		//_assertContainsText("14400",_cell(1,_near(_cell("Total",_near($partUnderLaborsSection)))));
+		//_assertContainsText("14400",$sfm_pg_opdoc.btn_travelTotal);
+		//_assertContainsText("600",$sfm_pg_opdoc.btn_otherExpenses);
+	
+		
+		//Validate Finalize button in opdoc RS-5339
+		_click($bo_pg_sfmTransactionAndDesigner.btn_finalize);
+		_wait(10000,_isVisible($sfm_pg_opdoc.btn_deleteOpdoc));
+		_click(_link($WONumber));
+		_wait(10000,_isVisible($bo_pg_workOrders.btn_editWorkOrder));
+		_assertNotExists(_link("/"+$sfmName+"/",_near($bo_pg_workOrders.btn_fileSection)));
+		_assertExists(_link("/"+$sfmName+"/",_near($bo_pg_workOrders.btn_notessAndAttachementSection)));
+		
+		//Target Object(Work Order) Update validation RS-5339 
+		_assertEqual(_getAttribute($bo_pg_workOrders.isExported,"alt"),"Checked");
+		_assertExists(_div("Courtesy",_rightOf($bo_pg_workOrders.lbl_billingType)));
+		_assertContainsText($today,$bo_pg_workOrders.btn_scheduleDate);
+		_assertContainsText($today,$bo_pg_workOrders.btn_scheduleDate);
+		_assertEqual($WONumber,_getText($bo_pg_workOrders.btn_workPerformed));
+		_assertEqual("2",_getText($bo_pg_workOrders.btn_noOfAssigned));
+
+
+$RS_5339.end();

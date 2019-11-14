@@ -1,0 +1,49 @@
+var $bo_pg_sfmWizard= new function bo_pg_sfmWizard() {
+	
+	this.wizardLabel = _heading2("SFM Wizard");
+	this.tab_generalInfo = _cell("General Information");
+	 this.tab_manageWizardSteps =_cell("Manage Wizard Steps");
+	this.cmbo_generalInfoObject = _select("page1:form1:mainPblock:tab1:pblocksectionmain:j_id42:j_id45:j_id48");	
+	this.combo_executionMode = _select("page1:form1:mainPblock:tab2mainpblock:j_id149:j_id153:j_id198:Mode");
+												
+	this.btn_sfmWizardSaveClose = _button("Save & Close");
+	this.bckButton_sfwSetupHome = _submit("Back To Setup Home");
+	this.sel_wizardStatus=_select("page1:form1:j_id1:j_id2:j_id7:ActiveSelect");
+	this.chk_wizardName=_checkbox("page1:form1:j_id1:pblock2:j_id88:j_id89:pblocktable:0:j_id91");
+	this.btn_clickEdit=_submit("Edit");
+	
+	//this.sel_objPrevMaintPlan=_select("page1:form1:j_id1:j_id2:j_id3:ObjectSelect");
+	this.sel_objPrevMaintPlan= _select(0);
+	this.lbl_verifyCustWizardSection=_heading2("Custom SFM Wizards");
+	this.btn_clickNewCustomWizard=_submit("New");
+//	this.txt_wizardName=_textbox("page1:form1:mainPblock:tab1:pblocksectionmain:j_id50:j_id54:hdrname");
+	this.txt_wizardName=_textbox(0,_rightOf(_span("Wizard Title")));
+//	this.txt_wizardID=_textbox("page1:form1:mainPblock:tab1:pblocksectionmain:j_id58:j_id61:hdrprocessid");
+	this.txt_wizardID= _textbox(0,_rightOf(_label("Wizard ID")));
+	this.tab_wizardStep=_cell("Manage Wizard Steps");
+	this.btn_newWizardStep=_button("New Step");
+	this.lbl_verifyNewWizardSection=_label("Wizard Step Type[1]");
+//	this.sel_wizardFieldType=_select("page1:form1:mainPblock:tab2mainpblock:j_id149:j_id153:j_id154:actnFieldtype");
+	this.sel_wizardFieldType= _select(0,_rightOf(_label("Wizard Step Type[1]")));
+//	this.sel_wizardObjectType=_select("page1:form1:mainPblock:tab2mainpblock:j_id149:j_id153:j_id159:actntype");
+	this.sel_wizardObjectType= _select(0,_rightOf(_label("Step Name[1]")));
+	this.btn_saveWizardStep=_button("Save");
+	this.chk_selectCustomWizard=_checkbox(13);
+	this.btn_deleteWizard=_button("Delete");
+	this.lbl_deleteSuccessfulMsg=_div("Success:Successfully deleted the selected wizard.");
+	this.chk_activeCheckboxInGeneralInfo=_checkbox("page1:form1:mainPblock:tab1:pblocksectionmain:pblocksectionitm3:sellstsecitem:isActive:hdractive");
+	this.txt_checklistStepIDTitle= _textbox("page1:form1:mainPblock:tab2mainpblock:j_id149:j_id153:j_id181:actntitle");//added by Shruthi Shanthappa
+//	this.selectWizard= _checkbox(0,_leftOf (_cell($wizardname)));
+   this.selectsfmWizard = function($SFMWizardsName){
+		
+		_click(_checkbox(0,_leftOf(_span($SFMWizardsName,_heading2("Custom SFM Wizards")))));
+			
+		};
+	this.chk_handover = _checkbox("/handover/");
+	
+	this.chk_selectTemplateAtRunTime = _checkbox(0, _rightOf(_label("Select Template At Runtime")));
+	
+	
+};
+
+

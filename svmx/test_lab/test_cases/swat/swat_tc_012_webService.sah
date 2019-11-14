@@ -1,0 +1,68 @@
+//Author: Shashikala Kamath
+	
+var $swat_tc_012_webService = _testcase("swat_tc_012_webService","Configure standard and custom webservice and launch in delivery");
+	
+	$swat_tc_012_webService.start();
+	
+	_setSpeed($g_stepSpeed);
+	
+	// Pre-requsite: Create a custom webservice in the org: TestWebServices
+	
+	var $customActionObject = "Work Order";
+	var $wizardTitleName = $bo_act_common.generateRandomName("SFWTitle");
+	var $wizardIDName = $bo_act_common.generateRandomName("SFWId");
+	var $actionType="Web Service";
+	var $actionId = $bo_act_common.generateRandomName("RS-5486WebServices_CA");
+	var $actionId1 = "Generate Invoice"; 
+	var $className = "TestWebServices";
+	var $methodName = "test_WS";
+	var $paramName="Name";
+	var $paramValueType="Value";
+	var $paramValue=$actionId;
+	var $processingMessage = "Account creation under process";
+	var $successMessage = "Accounts inserted sucessfully";
+	var $wizardType="Others";
+	var $orderStatus= "Closed";
+	
+	//var $wizardName_swat = "SFM Delivery Auto";
+	
+	
+	//Login to App
+	$bo_act_login.login($swat_Url,$swat_un,$swat_pwd);
+	
+	//Create Custom Action 
+	$sfm_act_navigation.navigateToSfmCustomActions();
+	
+	//Create Webservice based custom action
+	$sfm_act_customActions.webServiceCustomAction($customActionObject, $actionType, $actionId, $className, $methodName, $processingMessage, $paramName, $paramValueType, $paramValue);
+	
+	//Create SFM Wizard and Add Steps
+	$bo_act_navigation.navigateToSfmWizard();
+	$bo_act_SFW.createWizardGeneralInfo($customActionObject,$wizardTitleName, $wizardIDName);
+	$sfm_act_wizards.addToWizard($customActionObject, $wizardTitleName, $wizardType, $actionId);
+	$sfm_act_wizards.addToWizard($customActionObject, $wizardTitleName, $wizardType, $actionId1);
+	
+	//Create WO through UI for the validatiion
+	$sfm_act_createCustomWizard.createBlankWo();
+	_wait(10000);
+	
+	//Launch Custom Action
+	$swat_act_sfmDelivery.launchCutomAction($actionId,$wizardTitleName);
+	
+	//Verify Account in inserted
+	$swat_act_workOrders.verifyAccountInserted($successMessage);
+	
+	
+	//Set the Work Order Status to Closed
+	_doubleClick(_div("Open"));
+	_setSelected(_select(0), $orderStatus);
+	_click(_button(" Save "));
+	_wait(15000);
+	
+	//Launch Custom Action
+	$swat_act_sfmDelivery.launchCutomAction($actionId1,$wizardTitleName);
+	
+	//Verify Invoice Number Generated
+	$swat_act_workOrders.verifyInvoiceNumber();
+	
+	$swat_tc_012_webService.end();

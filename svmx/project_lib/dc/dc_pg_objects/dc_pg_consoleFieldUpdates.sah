@@ -1,0 +1,13 @@
+//vanditha
+var $dc_pg_consoleFieldUpdates = new function dc_pg_consoleFieldUpdates() {
+	this.link_home = _link("Home");
+	this.link_servicemaxSetup = _link("ServiceMax Setup");
+	this.link_DispatchManagement=_div("Dispatch Management");
+	this.link_DispatchConsoleFieldUpdates=_div("Dispatch Console Field Updates");
+	this.btn_Reset= _button("Reset");
+	this.btn_save=_submit("Save");
+    this.sel_updateField1=_select(0);
+    this.sel_updateField2=_select(5);
+    this.sel_updateField2Value=_select("SetupDCWorkOrderFields:FORM:blockIPAD:blocksec:tab3block1sec2:j_id64:j_id67:UpdateField2");
+    this.sel_updateField2Value=_select(5);
+}

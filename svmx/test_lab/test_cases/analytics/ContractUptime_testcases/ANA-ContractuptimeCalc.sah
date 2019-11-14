@@ -1,0 +1,8 @@
+var $data = _readExcelFile("../../analytics/an_excleData/an_Datasheet1.xlsx","Sheet1",true);
+var $un =$bac_un ;
+var $pwd =$bac_pwd;
+var $url = "https://test.salesforce.com";
+$bo_act_login.login($url, $un, $pwd);
+$an_act_Contract_Uptime.contract_uptime_wo("Contract Uptime for WO");
+$an_act_Contract_Uptime.contract_uptime_downtime("Contract Uptime with Downtime");
+$an_act_Contract_Uptime.contract_uptime_advanced_downtime("Advanced Custom Expression");

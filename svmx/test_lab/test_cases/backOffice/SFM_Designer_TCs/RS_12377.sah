@@ -1,0 +1,67 @@
+/* Manual Pre-condition:
+ * Accuracy field should be defined in the Work Order Object in Salesforce Setup
+ * 
+ * 
+ */
+
+var $RS_12377 = _testcase("RS_12377","Geolocation: New literals saved as data model in SFM Maps");
+$RS_12377.start();
+
+//Declare variables used in the script
+var $sfmNameToBeCloned = "Manage Work Order Lines - Usage";
+var $sfmName = $bo_act_common.generateRandomName("RS_12377_");
+var $isCustom = false;
+var $sfmTemplate = "SVMXSTD: Manage WO Usage Lines";
+var $sfmTemplateSaveAsName = $sfmName;
+
+
+//Creating local variables to login to DEV Sandbox
+var $bac_dev_un = "murthy@tools2.com";
+var $bac_dev_pw = "bac123456";
+
+//Login to the Sandbox
+$bo_act_login.login($bac_g_url,$bac_dev_un,$bac_dev_pw);
+//$bo_act_login.login($bac_g_url,$bac_g_un,$bac_g_pwd);
+
+//clone tmd016 and add Mapping for the literals
+$sfm_act_SFM.cloneTDM016($sfmNameToBeCloned,$sfmName,$isCustom,$sfmTemplateSaveAsName, $sfmTemplate, "", "");
+_click(_f("main").tab("Qualifying Criteria and Field Mappings"));
+_click(_f("main").s_label("Work Order"));
+_click(_f("main").tab("Mapping(s)"));
+_click(_f("main").s_button("New[2]"));
+_wait(2000);
+_click(_f("main").s_togglebutton("I want to choose a field from the list").rightOf(_f("main").ftedatagriditemrenderer("Latitude")));
+_setSelected(_f("main").s_combobox("valuesCombo").rightOf(_f("main").ftedatagriditemrenderer("Latitude")),"Geolocation.Latitude");
+_click(_f("main").s_togglebutton("I want to choose a field from the list").rightOf(_f("main").ftedatagriditemrenderer("Longitude")));
+_setSelected(_f("main").s_combobox("valuesCombo").rightOf(_f("main").ftedatagriditemrenderer("Longitude")),"Geolocation.Longitude");
+_click(_f("main").s_togglebutton("I want to choose a field from the list").rightOf(_f("main").ftedatagriditemrenderer("Accuracy")));
+_setSelected(_f("main").s_combobox("valuesCombo").rightOf(_f("main").ftedatagriditemrenderer("Accuracy")),"Geolocation.Accuracy");
+
+//Save the Mapping
+_click(_f("main").s_textinput("Save this map as"));
+_setValue(_f("main").s_textinput("Save this map as"), $sfmName);
+_click(_f("main").s_textinput("Input ID Here"));
+_setValue(_f("main").s_textinput("Input ID Here"), $sfmName);
+_click(_f("main").s_button("Save[2]"));
+_wait(2000);
+//Save the SFM
+_click(_f("main").s_button("Quick Save"));
+_wait(2000);
+_click(_f("main").s_button("Save & Close"));
+_wait(2000);
+
+//Search the process in the Salesforce search
+_setValue(_textbox("str"), $sfmName);
+_click(_button("Search"));
+_click(_link("/PN-/"));
+
+//Assert the data model save
+_call(_heading3("ServiceMax Field Mappings").scrollIntoView());
+_assertEqual("SVMX.GEOLOCATION.COORDS.ACCURACY", "SVMX.GEOLOCATION.COORDS.ACCURACY","Accuracy co-ordinates exists");
+_assertEqual("SVMX.GEOLOCATION.COORDS.LATITUDE", "SVMX.GEOLOCATION.COORDS.LATITUDE","Latitude co-ordinates exists");
+_assertEqual("SVMX.GEOLOCATION.COORDS.LONGITUDE", "SVMX.GEOLOCATION.COORDS.LONGITUDE","Longitude co-ordinates exists");
+
+//Delete the SFM
+$bo_act_SFM.deleteSFM($sfmName);
+
+$RS_12377.end();

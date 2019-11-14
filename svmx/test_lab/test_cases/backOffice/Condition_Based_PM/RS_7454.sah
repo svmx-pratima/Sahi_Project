@@ -1,0 +1,56 @@
+
+//author - Meghana Rao
+
+var $RS_7454 = _testcase("$RS_7454","Verify the mapping from IB to PM Plan with PM Template mapping");
+$RS_7454.start();
+_setSpeed($g_stepSpeed);
+//Pre - Condition 
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+
+var $MapName = $bo_act_common.generateRandomName("SPMMap");
+
+// To create SFM Mapping
+
+$bo_act_SFM_mappings.createSFMMaps_AccounttoPMPlan($MapName,$MapName , "Installed Product", "Preventive Maintenance Plan", "Distributor Account");
+
+//Test Data Creation
+var $distributoraccountName =  $bo_act_accounts.createAccount();
+var $accountName = $bo_act_accounts.createAccount();
+var $contactName = $bo_act_contacts.createContact($accountName);
+var $proName = $bo_act_products.createProduct("pro12", "--None--");
+$bo_act_navigation.navigateToAccountsPage();
+_click(_link($accountName));
+var $IBName1 = $bo_act_installedProduct.createIB_DistributorAccount($proName, $distributoraccountName, $contactName, $accountName);
+
+// To set The SET006 to The given Map Name
+
+$bo_act_configurationProfiles.editGroupProfileForTextSettings($groupProfileName, "Preventive Maintenance", "Manage PM Plan", "SET006", $MapName);
+
+var $PMPTemplate = $bo_act_PMPlanTemplate.createUsageBasedConditionPMPTemplateNoSave($proName);
+$bo_act_PMPlanTemplate.updateUsageConditionRulesGridWithAdjFields("Months", "Every", 1, $bo_act_common.currentDate("-"), $bo_act_common.getfutureDate(1,"-"),"Fixed", 1,100, 10,"Days");
+$bo_act_PMPlanTemplate.saveConditionBasedPM();
+
+// To goto the IB and create PM Plan and verify if the Maps are working fine
+
+var $PMPlan = $bo_act_PMPlan.verifyMaps_IB($IBName1, $PMPTemplate, $distributoraccountName);
+
+// Search the PM Plan Name
+$bo_act_common.cleanUpfunctionold($PMPlan);
+
+// CleanUp Function
+$bo_act_common.deleteAccount($bac_un, $bac_pwd, $accountName);
+$bo_act_common.deleteAccount($bac_un, $bac_pwd, $distributoraccountName);
+$bo_act_common.deleteContact($bac_un, $bac_pwd, $contactName);
+$bo_act_common.deleteProduct($bac_un, $bac_pwd,$proName);
+$bo_act_common.deleteIB($bac_un, $bac_pwd, $orgnamespace, $IBName1);
+$bo_act_common.deletePMPlantemplate($bac_un, $bac_pwd, $orgnamespace,$PMPTemplate);
+
+
+/*
+ * Delete SFM Mapping
+ */
+$bo_act_SFM_mappings.deleteSFMMappings($MapName, "Installed Product", "Preventive Maintenance Plan");
+$RS_7454.end();
+
+
+

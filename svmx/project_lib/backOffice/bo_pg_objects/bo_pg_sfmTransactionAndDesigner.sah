@@ -1,0 +1,312 @@
+
+/**
+ * SFM transaction & designer page object repository
+ */
+var $bo_pg_sfmTransactionAndDesigner = new function bo_pg_sfmTransactionAndDesigner() {
+	
+	
+	/**
+	 Added by Safi
+	 */
+	this.btn_mappings = _f("main").tab("Mapping(s)");
+	this.btn_addMappings = _f("main").s_button("New[2]");
+	this.btn_toggle = _f("main").s_togglebutton("I want to choose a field from the list[4]");
+	
+	this.selMapping = _f("main").s_combobox("searchCombo[2]");
+	
+	
+	//this.txt_comboBox = _f("main").s_combobox("valuesCombo[1]");
+	
+	
+	//this.btn_dropdown = _f("main").s_combobox("valuesCombo[1]");
+	//this.lbl_tmrw = _f("main").s_label("Tomorrow");
+	
+	//this.btn_searchSelect = _f("main").s_button("Search and Select");
+	//this.txt_accountSearch = _f("main").s_textinput("lookUpSearchField");
+	//this.btn_accountSearch = _f("main").s_button("Button17181");
+	//this.lbl_select = _f("main").listbasecontentholder(11);
+	//this.btn_select = _f("main").s_button("Select");
+	this.txt_mappingName = _f("main").s_textinput("Save this map as[1]");
+	this.txt_mapID = _f("main").s_textinput("Input ID Here[2]");
+	this.btn_saveMap = _f("main").s_button("Save[2]");
+
+	 this.txt_standardSfmTransactionQuickFind = _f("main").s_textinput("searchText[2]");
+    this.btn_standardSfmTransaction= _f("main").tab("Standard SFM Transactions");
+    this.btn_yourCustomSfmTransactions = _f("main").tab("Your Custom Sjavascript:void(0)FM Transactions");
+    this.btn_yourCustomSfmTransactions = _f("main").tab("Your Custom SFM Transactions");
+    this.txt_yourCustomSfmTransactionsQuickFind = _f("main").s_textinput("searchText[1]").near(_f("main").tab("Your Custom SFM Transactions"));
+    this.btn_clone = _f("main").s_button("Clone");
+    this.txt_name = _f("main").s_textinput("pName");
+    this.txt_sfmTransactionId = _f("main").s_textinput("pId");
+    this.btn_qualifyingCriteriaAndFieldMapping = _f("main").tab("Qualifying Criteria and Field Mappings");
+    this.btn_screenDesigner = _f("main").tab("Screen Designer");
+    this.btn_templateDesigner =  _f("main").tab("Template Designer");
+    this.lbl_workOrder = _f("main").s_richtext("Work Order");
+    this.sel_sfmTemplate = _f("main").s_combobox("searchCombo[3]");
+    this.sel_sfmTemplateforOpDoc = _f("main").s_combobox("searchCombo[4]");//for OPDoc Template
+    this.txt_sfmSavePageLayoutAs = _f("main").s_textinput("Save page layout as");
+    this.txt_sfmSaveTemplateAs = _f("main").s_textinput("Save template as"); //for OP Doc Template
+	this.txt_sfmSavePageLayoutID=_f("main").s_textinput("Input ID Here[3]");
+	this.txt_sfmSaveTemplateLayoutID=_f("main").s_textinput("Input ID Here[4]");//for OPDoc Template
+	this.btn_sourceOPDocTemp=_span("Source");
+    this.txt_sfmSavePageLayoutAsId = _f("main").s_textinput("advTxt");
+    this.btn_addFieldToPage = _f("main").s_button("/Add Field/");
+    //this.txt_quickFindField = _f("main").s_textinput("searchText").near(_f("main").s_button("/Add Field/"));
+    this.txt_quickFindField = _f("main").s_textinput("Quick Find").near(this.btn_addFieldToPage);
+    this.btn_quickSave = _f("main").s_button("Save As[3]");
+    this.btn_quickSave1 = _f("main").s_button("Quick Save");
+    this.btn_saveAndclose = _f("main").s_button("Save & Close");
+    this.alert_sfm = _f("main").alert("Please enter a unique Page Name The page ID you have entered already exists. Please enter a unique ID");
+    this.btn_ok = _f("main").button("OK");
+    this.btn_backToList = _f("main").s_button("Back To List");
+    this.btn_yes = _f("main").button("Yes");
+    this.btn_newSFM = _f("main").s_button("New SFM Transaction");
+    this.msg_sfmSaved = _f("main").uiftetextfield("SFM Transaction saved");
+	this.btn_finalQuickSave = _f("main").s_button("Quick Save");
+	this.alert_proceedAnyway=_f("main").button("Proceed Anyway");
+	this.btn_propoties=_f("main").tab("Properties");	
+	this.lbl_searchSFM=_f("main").s_textinput("searchText[3]");
+	this.btn_clickDeleteButton=_f("main").s_button("Delete[4]");
+	this.PopUpMessageConformationForDelete=_f("main").button("Yes");
+	this.lbl_sfmTransactionSavedMessage = _f("main").label("SFM Transaction saved");	
+	this.btn_pageLayoutSave=_f("main").s_button("Save[3]");
+	this.btn_moveToRight=_f("main").s_button("moveRightBtn");
+	this.chk_readOnly = _f("main").s_checkbox("Read Only").near(_f("main").s_label("/Properties for Field/"));
+	this.chk_required= _f("main").s_checkbox("Required").near(_f("main").s_label("/Properties for Field/"));
+	this.lbl_pageLayoutSaved = _f("main").label("Page saved");
+	this.chkbx_allowNew = _f("main").s_checkbox("Allow New");
+	this.chkbx_allowDelete = _f("main").s_checkbox("Allow Delete");
+	this.btn_savePage = _f("main").s_button("Save[3]");
+	this.txt_opdocContext=_textarea("cke_source cke_enable_context_menu");
+	this.btn_finalize=_button("Finalize");
+	this.btn_next=_label("Next");
+	this.btn_savePicklistQueAlert=_button("Save");
+	this.btn_previous=_label("Previous");
+	//This code is to click on new button on custom SFM transaction
+	this.btn_checklistTransactionsTab = _f("main").tab("Checklist Transactions");
+	this.btn_newSFMTransaction = _f("main").s_button("New Checklist Transaction");//duplicate	
+	this.txt_searchChecklistProcess = _f("main").s_textinput("/searchText/").near(_f("main").tab("Checklist Transactions"));
+	this.tab_formDesigner = _f("main").tab("Form Designer");
+	this.btn_editSectionInChecklist = _f("main").s_button("editBtn");
+	this.txt_checklistSectionTitle = _f("main").s_textinput("informationName");
+	this.btn_applyChecklistSection = _f("main").s_button("Apply");
+	this.btn_closeSectionEdit = _f("main").s_button("closeButton");
+	this.btn_addSection = _f("main").s_button("Add a section");
+	this.list_answerType = _f("main").s_dropdownlist("ansType");
+	this.checkBox_preFillFromWo = _f("main").s_checkbox("Prefill with value from Work Order");
+	this.list_preFillList = _f("main").s_combobox("sourceObjPickList");
+	this.txt_defaultResponse = _f("main").s_textinput("defaultResponseIdTxtInp");
+	this.txt_helpUrl = _f("main").s_textinput("helpUrl");
+	this.txt_tagForChklistQues = _f("main").uitextfield("/UITextField/").inside(_f("main").s_navigatorcontent("Question Details"));
+	this.txt_dateValue = _f("main").s_richeditabletext("textDisplay").inside(_f("main").datefield("defaultResponseIdDate"));
+	this.chk_includeInOpdoc = _f("main").s_checkbox("attachemntShowOutDocCheckId");
+	this.chk_descReq = _f("main").s_checkbox("Description required");
+	this.btn_addToFormnLib = _f("main").s_button("Add to Library and Form");
+	this.btn_addToLibOnly = _f("main").s_button("Add to Library Only");
+	this.btn_closeQuestionWindow = _f("main").s_button("closeButton");
+	this.list_dateCombo = _f("main").s_dropdownlist("operandTypeCombo");
+	this.list_dateFunctionsCheklist = _f("main").s_combobox("picklist");
+	//This function is to select a checklist SFM time from drop down
+	this.lbl_checklistOb=_f("main").s_dropdownlist("purposeCombo");
+	//This function is to select workorder object from drop down
+	this.sourceComboBox=_f("main").s_combobox("objCombo1");
+	this.selectSourceObj=_f("main").s_textinput("textInput");	
+	//click on Ok on pop up appear after selecting work object in Propoties tab of SFm designer
+	this.btn_popUpOK=_f("main").s_button("OK");	
+	this.combo_CTRecord = _f("main").s_combobox("objCombo1[1]");	
+	this.childSource_chkBox = _f("main").s_checkbox("Work Detail (Work Order)");		
+	this.childCTRecord_chkBox = _f("main").s_checkbox("Work Detail (Work Order)[1]");	
+	//Drop Down List in Qualifying Criteria and Field Mappings
+	this.dropDownList = _f("main").s_dropdownlist("objCombo");
+	this.selectExistingPageLayout=_f("main").s_combobox("searchCombo[3]");
+	this.tab_advancedOptions=_f("main").tab("Advanced Options");
+	this.lbl_sorting=_f("main").tab("Sorting");
+	this.lbl_partObj=_f("main").s_label("Parts[4]");
+	this.lbl_partField=_f("main").s_label("Part");
+	this.img_add=_f("main").s_button(">[1]");
+
+	this.lbl_laborObj=_f("main").s_label("Labor[4]");
+	this.lbl_activityTypeField=_f("main").s_label("Activity Type");
+	this.lbl_expenseObj=_f("main").s_label("Expense[3]");
+	this.lbl_lineQtyField=_f("main").s_label("Line Qty");
+	this.lbl_travelObj=_f("main").s_label("Travel[1]");
+	this.lbl_statDateField=_f("main").s_label("Start Date and Time");
+	this.lbl_endDateField=_f("main").s_label("End Date and Time[1]");	
+	this.sel_targetObjFld=_f("main").s_textinput(3);
+	this.lbl_clkHeaderInQcPage=_f("main").s_label("Work Order");
+	this.saveTheMap=_f("main").s_textinput("Save this map as");
+	this.clkNewMap=_f("main").s_button("New[1]");
+	this.clkNewMapID=_f("main").s_textinput("Input ID Here[1]");
+	this.clkMapSave=_f("main").s_button("Save[1]");
+	this.QCFieldMapQuickFind=_f("main").s_textinput("filterInput").rightOf(_f("main").s_label("Quick Find"),10,10);
+	//Added by Janaki for new dependent picklist and mapping test cases
+	this.btn_newLineForQc = _f("main").s_button("+");
+	this.btn_saveAsExpr = _f("main").s_button("Save As").inside(_f("main").s_navigatorcontent("Qualification Criteria"));
+	this.page_saved = _f("main").label("Page saved");
+    this.btn_proceed_anyways = _f("main").button("Proceed Anyway");
+    this.btn_newLineForQc = _f("main").s_button("+");
+    this.btn_editExprSave = _f("main").s_button("Save");
+    this.label_exprSaved = _f("main").label("Expression saved");
+    this.label_sfmTxnSaved = _f("main").label("SFM Transaction saved");
+    this.txt_saveExprAs = _f("main").s_textinput("Save this filter as");
+    this.btn_editExprSaveAs = _f("main").s_button("Save As"); // This button is in SFM "Qualifying Criteria and Field Mappings" tab
+    this.txt_inputIdAs = _f("main").s_textinput("Input ID Here").inside(_f("main").s_navigatorcontent("Qualification Criteria"));
+    this.btn_addFieldToPage = _f("main").s_button("/Add Field/");
+    this.label_pageSaved = _f("main").label("Page saved");
+    this.button_saveAsQcTab = _f("main").s_button("Save As").inside(_f("main").s_navigatorcontent("Qualification Criteria"));
+    this.btn_newPageLayout = _f("main").s_button("New[3]");
+    this.label_activityType = _f("main").s_label("Activity Type[4]");
+    this.label_automationChildDate2 = _f("main").s_label("Automation ChildDate2[2]");
+    this.label_account = _f("main").s_label("Account[1]");
+    this.list_sourceChild = _f("main").s_checkbox("Work Detail (Work Order)").inside(_f("main").s_panel("Use data from..."));
+    this.list_targetChild = _f("main").s_checkbox("Work Detail (Work Order)").inside(_f("main").s_panel("...to create these records"));
+    this.text_targetChildAlias = _f("main").s_textinput("aliasName").rightOf(_f("main").s_checkbox("Work Detail (Work Order)").inside(_f("main").s_panel("...to create these records")));
+    this.list_childMappingCombo = _f("main").s_dropdownlist("objCombo").near(_f("main").s_label("Parts"));
+    this.list_sourceHeaderList = _f("main").s_combobox("objCombo1").inside(_f("main").s_panel("Use data from..."));
+    this.chkbx_targetChild2 = _f("main").s_checkbox("Work Detail (Work Order)[2]");//index used as _count logic does not work in flex.written to Sahi Support.
+    this.btn_saveTempDesignPage=_f("main").s_button("Save[4]");
+    this.btn_saveAsTempDesignPage=_f("main").s_button("Save As[4]");
+    
+	this.btn_scrollbar=_f("main").s_hscrollbar("horizontalScrollBar");
+	this.txt_partOnChild=_f("main").s_textinput("lblData").near(_f("main").s_richtext("Part"));
+	this.txt_contactOnHeader=_f("main").s_textinput(0).near(_f("main").uiftetextfield("Contact"));
+	this.txt_autoContactChild=_f("main").s_richtext("AutoContact").near(_f("main").s_richtext("Parts"));
+	this.list_objComboBox = _f("main").s_combobox("objCombo1").inside(_f("main").s_panel("...to create these records"));
+	this.list_targetHeaderList = _f("main").s_combobox("objCombo1").inside(_f("main").s_panel("...to create these records"));
+	this.txt_firstChildSection =  _f("main").s_richtext("titleDisplay").near(_f("main").s_datagroup("dataGroup[3]"));
+	this.txt_sectionName = _f("main").s_textinput(0).inside(_f("main").form("User Actions"));
+	this.list_checklistObjCombo = _f("main").s_combobox("objCombo1").inside(_f("main").s_panel("Make Checklist Available On:"));
+	this.list_mappingCombo = _f("main").s_combobox("searchCombo").inside(_f("main").s_navigatorcontent("Field Map For Existing Records"));
+	this.btn_submitCheckList = _span("Submit");
+	this.btn_closeChecklist = _span("svmx-btn-icon svmx-sfmd-cancel-icon");
+	this.btn_addNewQuestion = _f("main").s_button("Add new question");
+	this.txt_questionText = _f("main").s_textinput("questionText");
+	this.txt_helpUrl = _f("main").s_textinput("helpUrl");
+	//Advance option
+	this.tab_advancedOptions = _f("main").tab("Advanced Options");
+	this.tab_checklistAdvancedOptions = _f("main").tab("Checklists");
+	this.chk_selectAll = _f("main").s_checkbox("Select All");
+	this.chk_includeskippedsection = _f("main").s_checkbox("checklistCheckBox");
+	this.chk_checklistcheckbox =_f("main").s_checkbox("/CheckBox/");
+	this.sel_checklistVersionCombo=_f("main").s_combobox("/Combo/");
+	this.scroll_advcheclist = _f("main").vscrollbar("/VScrollBar/");
+	this.scroll_btn = _f("main").button(2);
+	
+	this.btn_applyEntryCriteria=_f("main").s_button("saveBtnEntry").near(_f("main").tab("Entry Criteria"));
+	this.div_pickListResponseSetAlert=_f("main").alert("/Are you sure you want to continue/");
+	
+	
+	this.btn_proceed=_button("Proceed");
+	
+	//Lookup fields values
+	this.scroll_filedScroll=_f("main").s_vscrollbar(0).near(_f("main").s_label("Fields"));
+	
+	this.selectComboBox = function($elementName,$elementItemName){
+	_setSelected(_f("main").s_combobox($elementName), $elementItemName);
+	
+	};
+	
+	//Added by Bhupendra Singh
+	
+	this.sel_spcecificChecklistProcess = function($checklistProcess){
+		_click(_f("main").s_label($checklistProcess));
+	};
+		
+		//Enter the name of checklist type SFM transaction
+	this.setSfmName=function($sfmName){
+		_setValue(_f("main").s_textinput("pName"), ($sfmName));
+	};
+		
+	this.child_checkBox =function($orderTypeName){
+			_f("main").s_checkbox($orderTypeName);
+	};
+		
+	this.source_ctRecord_comboBox = function($comboName){
+			_f("main").s_combobox($comboName);	
+	};	
+	//	_f("main").s_combobox($comboName);
+    /**
+     * Select a SFM from the SFM list, set $isCustom to select from custom SFM list elements.
+     *@param $sfmName
+     *@param $isCustom
+     */
+	
+	// Owner : Meghana Rao P
+	
+	this.clickSFM = function($sfmName , $isCustom) {
+		if ($isCustom) {
+			_wait(30000);
+			 _click($bo_pg_sfmTransactionAndDesigner.btn_yourCustomSfmTransactions);
+			 
+		}
+		_setValue($bo_pg_sfmTransactionAndDesigner.txt_yourCustomSfmTransactionsQuickFind, $sfmName); // Owner Meghana 
+		
+		_click(_f("main").s_label($sfmName));
+	};
+	
+	// Done
+
+	this.selectSFM = function($sfmName, $isCustom) {
+	if ($isCustom) {
+		_wait(3000);
+	 _click($bo_pg_sfmTransactionAndDesigner.btn_yourCustomSfmTransactions);
+	}
+	_click(_f("main").s_checkbox(2).leftOf(_f("main").s_label($sfmName), 10, 10));
+	_takePageScreenShot();
+    };
+
+    /**
+     * Add a field in the SFM Designer page
+     * @param $fieldName
+     * @param $containerName
+     */
+  this.addField = function($fieldName, $containerName) {
+	_click(_f("main").fieldrenderer("[object Object]").near(_f("main").formitemlabel($containerName)));
+	_setValue($bo_pg_sfmTransactionAndDesigner.txt_quickFindField, $fieldName);
+	_click(_f("main").s_label($fieldName));
+	_click($bo_pg_sfmTransactionAndDesigner.btn_addFieldToPage);
+    };
+
+    /**
+     * Delete a field  from the SFM Designer page
+     * @param $fieldName
+     */
+    this.deleteField = function($fieldName) {
+    	_click(_f("main").s_button("Remove this field").near(_f("main").uiftetextfield($fieldName)));
+
+    };
+    
+    // Added by Harish
+    this.chk_override = _f("main").s_checkbox("Override Context");
+    this.sel_context = _f("main").s_combobox("/ComboBox/").rightOf(_f("main").formitemlabel("Context"));
+    this.sel_matchingField = _f("main").s_combobox("/ComboBox/").rightOf(_f("main").formitemlabel("Matching Field"));
+	
+    // Added By Bhupendra Singh
+    this.selectSFMOnSFMDesignerPage = function($SFMToBeCloned, $isCustom) {
+        if ($isCustom) {
+               _setStrictVisibilityCheck(true);
+               _wait(15000,_isVisible($bo_pg_sfmTransactionAndDesigner.btn_yourCustomSfmTransactions));
+               _click($bo_pg_sfmTransactionAndDesigner.btn_yourCustomSfmTransactions);
+               _setValue($bo_pg_sfmTransactionAndDesigner.txt_yourCustomSfmTransactionsQuickFind,$SFMToBeCloned);
+
+        } else {
+               _wait(15000,_isVisible($bo_pg_sfmTransactionAndDesigner.txt_standardSfmTransactionQuickFind));
+               _setValue($bo_pg_sfmTransactionAndDesigner.txt_standardSfmTransactionQuickFind,$SFMToBeCloned);
+        }
+         
+        if (_isVisible(_f("main").s_checkbox("/chk/i").leftOf(_f("main").s_label($SFMToBeCloned), 10, 10))) {
+               _wait(3000);
+               _click(_f("main").s_checkbox("/chk/i").leftOf(_f("main").s_label($SFMToBeCloned), 10, 10));
+
+        } else if (_isVisible(_f("main").s_checkbox(2).leftOf(_f("main").s_label($SFMToBeCloned), 10, 10))) {
+               _wait(3000);
+               _click(_f("main").s_checkbox(2).leftOf(_f("main").s_label($SFMToBeCloned), 10, 10));
+
+        } else {
+               _click(_f("main").s_checkbox("/CheckBox/").leftOf(_f("main").s_label($SFMToBeCloned), 10, 10));
+        }
+        _setStrictVisibilityCheck(false);
+ };
+
+	
+};

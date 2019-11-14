@@ -1,0 +1,248 @@
+//Tests are to be written here [Bhupendra Singh Chouhan]
+
+var $RS_12436 = _testcase("$RS_12436","Verify the auto Entitlement behavior when 2 or more SCONs from IB, Top-level IB and Parent IB found and new Entitlement setting (Do nothing) is set Yes");
+$RS_12436.start();
+_setSpeed($g_stepSpeed);
+/**
+* Login to the Sandbox Org
+*/
+
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+
+/**
+ * Create Account, Contact, Location, Product and Installed Product
+ */
+
+//Create Account with Rest API
+var $accountName = $bo_act_common.generateRandomName("Acc");
+$objName_A= "Account";
+$obJson_A = "{\"Name\":\""+ $accountName + "\"}";     
+ 
+$workorderid_A=$sfm_act_restApiMethods.postRestApi($bac_un,$bac_pwd,$bac_client_id,$bac_client_secret,$bac_orginstance,$objName_A,$obJson_A,"POST");
+_log($workorderid_A);
+
+
+//Create Contact with above Account
+var $contactName = $bo_act_common.generateRandomName("Con");
+$objName_C= "Contact";
+$obJson_C = "{\"LastName\":\""+ $contactName + "\",\"AccountId\":\""+$workorderid_A+"\"}";     
+ 
+$workorderid_C=$sfm_act_restApiMethods.postRestApi($bac_un,$bac_pwd,$bac_client_id,$bac_client_secret,$bac_orginstance,$objName_C,$obJson_C,"POST");
+_log($workorderid_C);
+
+
+//Create Product with Rest API
+// Product 01
+var $productName = $bo_act_common.generateRandomName("Pro");
+$objName_P= "Product2";
+$obJson_P = "{\"Name\":\""+ $productName + "\",\"IsActive\":\"true\",\"ProductCode\":\"loc68\"}"; 
+ 
+$workorderid_P=$sfm_act_restApiMethods.postRestApi($bac_un,$bac_pwd,$bac_client_id,$bac_client_secret,$bac_orginstance,$objName_P,$obJson_P,"POST");
+_log($workorderid_P);
+
+//Create IB with above Product, account and contact
+
+var $IBName = $bo_act_common.generateRandomName("IB_");
+var $currentDate = $bo_act_common.currentDate_GMT("-");
+$objName_IB= $nameSpace_Org + "__Installed_Product__c";
+$obJson_IB = "{\"Name\":\""+ $IBName + "\",\""+$nameSpace_Org + "__Serial_Lot_Number__c\":\""+$IBName + "\",\""+$nameSpace_Org + "__Date_Installed__c\":\""+ $currentDate + "\",\""+$nameSpace_Org + "__Product__c\":\""+ $workorderid_P + "\",\""+$nameSpace_Org + "__Company__c\":\""+ $workorderid_A + "\",\""+$nameSpace_Org + "__Contact__c\":\""+ $workorderid_C + "\"}"; 
+ 
+$workorderid_IB=$sfm_act_restApiMethods.postRestApi($bac_un,$bac_pwd,$bac_client_id,$bac_client_secret,$bac_orginstance,$objName_IB,$obJson_IB,"POST");
+_log($workorderid_IB);
+
+//Create Product with Rest API
+//Product 02
+var $productName2 = $bo_act_common.generateRandomName("Pro2");
+$objName_P= "Product2";
+$obJson_P2 = "{\"Name\":\""+ $productName2 + "\",\"IsActive\":\"true\",\"ProductCode\":\"loc2\"}"; 
+
+$workorderid_P2 = $sfm_act_restApiMethods.postRestApi($bac_un,$bac_pwd,$bac_client_id,$bac_client_secret,$bac_orginstance,$objName_P,$obJson_P2,"POST");
+_log($workorderid_P2);
+
+//Create IB with above Product, account and contact
+// IB02
+var $IBName2 = $bo_act_common.generateRandomName("IB2_");
+var $currentDate = $bo_act_common.currentDate_GMT("-");
+$objName_IB= $nameSpace_Org + "__Installed_Product__c";
+$obJson_IB2 = "{\"Name\":\""+ $IBName2 + "\",\""+$nameSpace_Org + "__Serial_Lot_Number__c\":\""+$IBName2 + "\",\""+$nameSpace_Org + "__Date_Installed__c\":\""+ $currentDate + "\",\""+$nameSpace_Org + "__Product__c\":\""+ $workorderid_P2 + "\",\""+$nameSpace_Org + "__Company__c\":\""+ $workorderid_A + "\",\""+$nameSpace_Org + "__Contact__c\":\""+ $workorderid_C + "\"}"; 
+
+$workorderid_IB2 = $sfm_act_restApiMethods.postRestApi($bac_un,$bac_pwd,$bac_client_id,$bac_client_secret,$bac_orginstance,$objName_IB,$obJson_IB2,"POST");
+_log($workorderid_IB2);
+
+//Create Product with Rest API
+//Product 03
+var $productName3 = $bo_act_common.generateRandomName("Pro3");
+$objName_P= "Product2";
+$obJson_P3 = "{\"Name\":\""+ $productName3 + "\",\"IsActive\":\"true\",\"ProductCode\":\"loc3\"}"; 
+
+$workorderid_P3 = $sfm_act_restApiMethods.postRestApi($bac_un,$bac_pwd,$bac_client_id,$bac_client_secret,$bac_orginstance,$objName_P,$obJson_P3,"POST");
+_log($workorderid_P3);
+
+//Create IB with above Product, account and contact
+//IB03 with Top-level IB and Parent IB
+var $IBName3 = $bo_act_common.generateRandomName("IB3_");
+var $currentDate = $bo_act_common.currentDate_GMT("-");
+$objName_IB= $nameSpace_Org + "__Installed_Product__c";
+$obJson_IB3 = "{\"Name\":\""+ $IBName3 + "\",\""+$nameSpace_Org + "__Serial_Lot_Number__c\":\""+$IBName3 + "\",\""+$nameSpace_Org + "__Date_Installed__c\":\""+ $currentDate + "\",\""+$nameSpace_Org + "__Product__c\":\""+ $workorderid_P3 + "\",\""+$nameSpace_Org + "__Company__c\":\""+ $workorderid_A + "\",\""+$nameSpace_Org + "__Contact__c\":\""+ $workorderid_C+"\",\""+$nameSpace_Org + "__Parent__c\":\""+ $workorderid_IB+"\",\""+$nameSpace_Org + "__Top_Level__c\":\""+ $workorderid_IB2+"\"}"; 
+
+$workorderid_IB3 = $sfm_act_restApiMethods.postRestApi($bac_un,$bac_pwd,$bac_client_id,$bac_client_secret,$bac_orginstance,$objName_IB,$obJson_IB3,"POST");
+_log($workorderid_IB3);
+
+
+//Create SLA with REST API
+
+var $slaName = $bo_act_common.generateRandomName("SLA_");
+$objName_SLA= $nameSpace_Org + "__Service_Level__c";
+$obJson_SLA = "{\"Name\":\""+ $slaName + "\",\""+$nameSpace_Org + "__Description__c\":\""+$slaName + "\",\""+$nameSpace_Org + "__Active__c\":\"true\",\""+$nameSpace_Org + "__Business_Hours__c\":\""+$defaultBHours_Org+"\"}"; // Need to chnage BH base on the Org.
+ 
+$workorderid_SLA=$sfm_act_restApiMethods.postRestApi($bac_un,$bac_pwd,$bac_client_id,$bac_client_secret,$bac_orginstance,$objName_SLA,$obJson_SLA,"POST");
+_log($workorderid_SLA);
+
+//Create a Activate Service Contract(With child lines) with above data using REST API
+
+// Service Contract 01
+
+var $sconName01 = $bo_act_common.generateRandomName("SCON1_");
+var $startDate = $bo_act_common.currentDate_GMT("-");
+var $endDate01 = $bo_act_common.futureDate_GMT(2,"-");
+$objName_scon= $nameSpace_Org + "__Service_Contract__c";
+$obJson_scon01 = "{\"Name\":\""+ $sconName01 + "\",\""+$nameSpace_Org + "__Company__c\":\""+$workorderid_A + "\",\""+$nameSpace_Org + "__Service_Level__c\":\""+$workorderid_SLA + "\",\""+$nameSpace_Org + "__Start_Date__c\":\""+ $startDate + "\",\""+$nameSpace_Org + "__End_Date__c\":\""+ $endDate01 + "\",\""+$nameSpace_Org + "__Active__c\":\"true\"}"; 
+ 
+$workorderid_scon01=$sfm_act_restApiMethods.postRestApi($bac_un,$bac_pwd,$bac_client_id,$bac_client_secret,$bac_orginstance,$objName_scon,$obJson_scon01,"POST");
+_log($workorderid_scon01);
+
+//Create a Covered Product for above Service Contract using REST API
+
+$objName_sconprod= $nameSpace_Org + "__Service_Contract_Products__c";
+$obJson_sconProd01 = "{\""+$nameSpace_Org + "__Service_Contract__c\":\""+ $workorderid_scon01 + "\",\""+$nameSpace_Org + "__Installed_Product__c\":\""+$workorderid_IB + "\"}"; 
+ 
+$workorderid_sconProd01 = $sfm_act_restApiMethods.postRestApi($bac_un,$bac_pwd,$bac_client_id,$bac_client_secret,$bac_orginstance,$objName_sconprod,$obJson_sconProd01,"POST");
+_log($workorderid_sconProd01);
+
+//Service Contract 02
+
+var $sconName02 = $bo_act_common.generateRandomName("SCON2_");
+var $endDate02 = $bo_act_common.futureDate_GMT(3,"-");
+$objName_scon= $nameSpace_Org + "__Service_Contract__c";
+$obJson_scon02 = "{\"Name\":\""+ $sconName02 + "\",\""+$nameSpace_Org + "__Company__c\":\""+$workorderid_A + "\",\""+$nameSpace_Org + "__Service_Level__c\":\""+$workorderid_SLA + "\",\""+$nameSpace_Org + "__Start_Date__c\":\""+ $startDate + "\",\""+$nameSpace_Org + "__End_Date__c\":\""+ $endDate02 + "\",\""+$nameSpace_Org + "__Active__c\":\"true\"}"; 
+ 
+$workorderid_scon02 = $sfm_act_restApiMethods.postRestApi($bac_un,$bac_pwd,$bac_client_id,$bac_client_secret,$bac_orginstance,$objName_scon,$obJson_scon02,"POST");
+_log($workorderid_scon02);
+
+//Create a Covered Product for above Service Contract using REST API
+
+$obJson_sconProd02 = "{\""+$nameSpace_Org + "__Service_Contract__c\":\""+ $workorderid_scon02 + "\",\""+$nameSpace_Org + "__Installed_Product__c\":\""+$workorderid_IB2 + "\"}"; 
+ 
+$workorderid_sconProd02 = $sfm_act_restApiMethods.postRestApi($bac_un,$bac_pwd,$bac_client_id,$bac_client_secret,$bac_orginstance,$objName_sconprod,$obJson_sconProd02,"POST");
+_log($workorderid_sconProd02);
+
+//Service Contract 03
+
+var $sconName03 = $bo_act_common.generateRandomName("SCON3_");
+var $endDate03 = $bo_act_common.futureDate_GMT(3,"-");
+$objName_scon= $nameSpace_Org + "__Service_Contract__c";
+$obJson_scon03 = "{\"Name\":\""+ $sconName03 + "\",\""+$nameSpace_Org + "__Company__c\":\""+$workorderid_A + "\",\""+$nameSpace_Org + "__Service_Level__c\":\""+$workorderid_SLA + "\",\""+$nameSpace_Org + "__Start_Date__c\":\""+ $startDate + "\",\""+$nameSpace_Org + "__End_Date__c\":\""+ $endDate03 + "\",\""+$nameSpace_Org + "__Active__c\":\"true\"}"; 
+ 
+$workorderid_scon03 = $sfm_act_restApiMethods.postRestApi($bac_un,$bac_pwd,$bac_client_id,$bac_client_secret,$bac_orginstance,$objName_scon,$obJson_scon03,"POST");
+_log($workorderid_scon03);
+
+//Create a Covered Product for above Service Contract using REST API
+
+$obJson_sconProd03 = "{\""+$nameSpace_Org + "__Service_Contract__c\":\""+ $workorderid_scon03 + "\",\""+$nameSpace_Org + "__Installed_Product__c\":\""+$workorderid_IB3 + "\"}"; 
+ 
+$workorderid_sconProd03 = $sfm_act_restApiMethods.postRestApi($bac_un,$bac_pwd,$bac_client_id,$bac_client_secret,$bac_orginstance,$objName_sconprod,$obJson_sconProd03,"POST");
+_log($workorderid_sconProd03);
+
+//Create Case with above Product, account and contact
+
+$objName_case= "Case";
+$obJson_case = "{\"AccountId\":\""+ $workorderid_A + "\",\"Status\":\"Escalated\",\"Priority\":\"High\",\"Origin\":\"Email\"}"; 
+$columnName = "CaseNumber";
+$filter="id";
+
+$workorderid_case=$sfm_act_restApiMethods.postRestApi($bac_un,$bac_pwd,$bac_client_id,$bac_client_secret,$bac_orginstance,$objName_case,$obJson_case,"POST");
+_log($workorderid_case);
+
+//get the case number
+$caseNumber =$sfm_act_restApiMethods.getRestApi($bac_un,$bac_pwd,$bac_client_id,$bac_client_secret,$bac_orginstance,"GET", $objName_case, $columnName, $filter, $workorderid_case);
+_log($caseNumber);
+
+//Create WO with Open Status
+$objName= $nameSpace_Org + "__Service_Order__c";
+$obJson = "{\""+$nameSpace_Org + "__Order_Status__c\":\"Open\",\""+$nameSpace_Org + "__Order_Type__c\":\"Depot Repair\",\""+$nameSpace_Org + "__Component__c\":\""+$workorderid_IB3+"\",\""+$nameSpace_Org + "__Company__c\":\""+$workorderid_A+"\",\""+$nameSpace_Org + "__Contact__c\":\""+$workorderid_C+"\",\""+$nameSpace_Org + "__Case__c\":\""+$workorderid_case+"\"}";     
+$columnName = "Name";
+$filter="id";
+ 
+$workorderid=$sfm_act_restApiMethods.postRestApi($bac_un,$bac_pwd,$bac_client_id,$bac_client_secret,$bac_orginstance,$objName,$obJson,"POST");
+_log($workorderid);
+//get the wo
+$WOname =$sfm_act_restApiMethods.getRestApi($bac_un,$bac_pwd,$bac_client_id,$bac_client_secret,$bac_orginstance,"GET", $objName, $columnName, $filter, $workorderid);
+_log($WOname);
+
+/**
+ * Create Auto Entitlement Rules for Work Order
+ */
+
+var $WOField = "Order Type";
+var $Operator = "Equals";
+var $Value = "Depot Repair";
+var $EntitSetting = "Product";
+var	$p1 = "No";		        	// $p1 = Yes/No for Select should Entitlement Be Performed On Products Serviced?
+var	$p2 = "Yes";			    	// $p2 = Yes/No for Select should Parent IB Of Component Be Included for Entitlement check?
+var	$p3 = "Yes";					// $p3 = Yes/No for Select should Top-Level IB Of Component Be Included for Entitlement check?
+var	$p4 = "Service Contracts";	// $p4 = Warranties/Scon/Both for Entitlement check?
+var	$p5 = "No";					// $p5 = Yes/No Account on WO matched to Scon			
+var	$p6 = "No";					// $p6 = Yes/No Contact on WO matched to Scon
+var	$p7 = "No";					// $p7 = Yes/No Location included for Entitlement
+var	$p8 = "Validity dates";     // $p8 = Validity dates/Counters/Both
+var	$p9 = "No";					// $p9 = Yes/No SLA Coverage for Entitlement
+var	$p10 = "Yes";				// $p10 = Yes/No Disable Auto Entitlement On Multiple Entitlements
+
+//Navigate to Auto Entitlement Rules - Work Order
+$autoEntitlementRuleName = $bo_act_autoEntitlementRule_WO.createAutoEntitlementRuleWithSCON_WO($WOField, $Operator, $Value, $EntitSetting, $p1, $p2, $p3, $p4, $p5, $p6, $p7, $p8, $p9,$p10);
+_wait(3000);
+
+//Changing the Rule Sequence
+$bo_act_autoEntitlementRule_WO.changingAutoEntitlementRule_SequenceTop($autoEntitlementRuleName);
+
+/**
+ * Configure the Global Profile SET001
+ */
+// Global Setting SET001 - Enable Auto Entitlement For Work Order is set to True for Auto Entitlement process to trigger 
+//(This is a Global Setting and is available under Module "Entitlement Verification" and Submodule "Auto-Entitlement - Work Order") 
+
+var $Module = "Entitlement Verification";
+var $SubModule = "Auto-Entitlement-Work Order";
+var $Setting = "SET001";
+var $value = true;
+$bo_act_configurationProfiles.editGlobalProfileForBooleanSettings($Module, $SubModule, $Setting, $value);
+
+
+//Go to Work Order tab
+$bo_act_workOrders.navigateToWorkOrder($WOname);
+
+
+//Perform Auto Entitlement on Work Order
+$bo_act_autoEntitlementRule_WO.performAutoEntitlement_WO($WOname);
+
+//validate the Auto Entitlement Parameters 
+var $actual_AutoEntitlementStatus = _getText(_div(0,_rightOf(_cell("Auto Entitlement Status"))));
+//var $actual_IsEntitlementPerformed = "";
+var $actual_EntitlementNotes = _getText(_div(0,_rightOf(_cell("Entitlement Notes"))));
+
+var $actual_EntitlementType = _getText(_div(0,_rightOf(_cell("Entitlement Type"))));
+var $actual_BillingType = _getText(_div(0,_rightOf(_cell("/Billing Type/"))));
+
+
+_assertEqual($actual_EntitlementType,"AUTO","Actual and expected Entitlement Type are not same");
+_assertEqual($actual_BillingType,"","Actual and expected Billing Type are not same");
+_assertEqual("Failed",$actual_AutoEntitlementStatus,"Auto Entitlement is failed");
+_assertEqual($actual_EntitlementNotes, "Work Order has Multiple Valid Entitlements");
+
+// Delete the Auto Entitlemet Rule created on WO
+$bo_act_autoEntitlementRule_WO.deleteAutoEntitlementRule_WO($autoEntitlementRuleName);
+
+$bo_act_login.logOut(); 
+
+$RS_12436.end();
+

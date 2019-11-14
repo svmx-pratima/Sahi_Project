@@ -1,0 +1,7 @@
+/*SFM Delivery page Objects */
+
+var $swat_pg_deleteData = new function swat_pg_deleteData(){
+	
+	this.lbl_Home = _heading2("Home");
+	
+};

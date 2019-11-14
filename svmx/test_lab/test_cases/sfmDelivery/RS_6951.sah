@@ -1,0 +1,86 @@
+var $rs_6951 = _testcase("RS-6951","Verify form fill functionality on header");
+$rs_6951.start();
+
+var $sfmNameToBeCloned = "Manage Work Order Lines - Usage";
+var $sfmName = $bo_act_common.generateRandomName("RS_6951_");
+var $isCustom = false;
+var $sfmTemplate = "SVMXSTD: Manage WO Usage Lines";
+var $sfmTemplateSaveAsName = $sfmName;
+var $containerName = ["Order Status","Order Status","Order Status"];
+var $fieldName = ["Case","Priority","Problem Description"];
+var $objMapping = "SVMXSTD: Case To Work Order";
+var $wizardObject ="Work Order";
+var $restAccName = "Acc_"+$sfmName;
+
+//variables for rest call
+$objName= "Account";
+$obJson = "{\"Name\":\""+$restAccName+"\"}"; 
+$columnName = "Name";
+$filter="id";
+//create an account
+$account=$sfm_act_restApiMethods.postRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,$objName,$obJson,"POST");
+$accountName =$sfm_act_restApiMethods.getRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,"GET", $objName, $columnName, $filter, $account);
+
+
+//get the caseNumber
+$objName1= "Case";
+$obJson1 = "{\"AccountId\":\""+$account+"\",\""+$orgnamespace+"__Billing_Type__c\":\"Loan\",\"Priority\":\"High\",\"Description\":\"CaseCreatedfromRest\"}";
+$columnName1 = "CaseNumber";
+$filter1="id";
+//create a case
+$filterValue=$sfm_act_restApiMethods.postRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,$objName1,$obJson1,"POST");
+//get the caseNumber
+$caseNumber =$sfm_act_restApiMethods.getRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,"GET", $objName1, $columnName1, $filter1, $filterValue);
+
+//Create WO through REST API
+var $woNumber = $sfm_act_createCustomWizard.createBlankWoFromRest($sfmdUsn, $sfmdPwd, $sfmClientId, $sfmConsumerSecret, $sfmOrgInstance);
+
+//login to the org
+$bo_act_login.login($g_url, $sfmdUsn, $sfmdPwd);
+
+//clone tmd016
+$sfm_act_SFM.cloneTDM016($sfmNameToBeCloned,$sfmName,$isCustom, $sfmTemplateSaveAsName, $sfmTemplate, $fieldName, $containerName);
+$sfm_act_SFM.setFormFill($fieldName[0], $objMapping);
+
+_click($sfm_pg_sfmDesigner.btn_saveSFM); 
+
+//add the process to wizard
+$sfm_act_wizards.addToWizard($wizardObject, $sfmd_wizardName[3], $sfmd_wizardType[1], $sfmName); 
+
+//Navigate to the WO for validation
+$bo_act_navigation.navigateToCreatedRecordUsingGlobalSearch($woNumber);
+
+$sfm_act_createCustomWizard.clickWizardBtn($sfmName);
+
+//select a case to validate form fill
+_setValue($sfm_pg_sfmDesigner.txt_caseInHeader,$caseNumber);
+_click($sfm_pg_sfmDesigner.btn_caseLookUpInWO);
+_wait(10000,_isVisible(_span("Case search")));
+_click(_cell($caseNumber));
+_click($sfm_pg_sfmDesigner.btn_select);
+_wait(3000);
+
+//Validate form fill on billing type/problem description/priority fields
+$obj= JSON.parse($obJson1);
+_assertEqual($obj["Priority"], _getText($sfm_pg_sfmDesigner.txt_priority));
+var $billingType = $orgnamespace+"__Billing_Type__c";
+_assertEqual($obj[$billingType],_getText($sfm_pg_sfmDesigner.txt_billingType));
+_assertEqual($obj["Description"],_getText($sfm_pg_sfmDesigner.txt_problemDescription));
+
+//save the process and validate for formfill for fields which are not in screen designer -- RS-10281
+_setValue($sfm_pg_sfmDesigner.txt_caseInHeader,$caseNumber);
+_click($sfm_pg_sfmDesigner.btn_deliverySave);
+if(_exists($sfm_pg_sfmDesigner.txt_priceAlert)){
+	_click($sfm_pg_sfmDesigner.btn_priceAlertOk);
+	_log("Pass ::: Saved successfully");
+	_wait(10000,_isVisible(_heading2($woNumber)));
+}
+_selectDomain();
+_click($sfm_pg_sfmDesigner.btn_edit);
+_wait(10000);
+_assertEqual($accountName,_getText(_textbox("Account",_rightOf(_label("Account")))),"Formfill for field that was not in screen has not happened");
+$rs_6951.end();
+		
+		
+
+

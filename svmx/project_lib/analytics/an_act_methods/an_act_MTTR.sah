@@ -1,0 +1,134 @@
+var $an_act_MTTR = new function an_act_MTTR(){
+	
+	
+	this.mttr_usa_calc = function($Calculationmethodname)
+	{
+		_click($an_pg_rv.link_home);
+		_click($an_pg_rv.link_servicemaxSetup);
+		_click($an_pg_rv.btn_serviceperformancemetrics);
+		_click($an_pg_rv.btn_serviceperformancemetricsetup);
+		_click($an_pg_rv.btn_click_metrics);
+		_click($an_pg_mttr.btn_meantime_to_repair);
+		_click($an_pg_mttr.btn_addmttr);
+		_click($an_pg_mttr.btn_activecheckbox);
+		_setValue($an_pg_mttr.txt_mttr_description, $Calculationmethodname);
+		_click($an_pg_mttr.btn_settings);
+		_click($an_pg_mttr.list_deadtime_select);
+		_click($an_pg_mttr.btn_custom_deadtime);
+		_click($an_pg_mttr.list_mttr_technician);
+		_click($an_pg_mttr.btn_technician);
+		_click($an_pg_mttr.list_mttr_product);
+		_click($an_pg_mttr.btn_product);
+		_click($an_pg_mttr.list_account_selection);
+		_click($an_pg_mttr.btn_account);
+		_click($an_pg_mttr.list_scheduled_date);
+		_click($an_pg_mttr.btn_scheduled_date);
+		_click($an_pg_mttr.btn_criteria);
+		_click($an_pg_mttr.list_choose_qualification_wo);
+		_click($an_pg_mttr.btn_usa_closed_wo);
+		_click($an_pg_mttr.list_workdetail_qualification);
+		_click($an_pg_mttr.btn_labor_line_only);
+		_click($an_pg_mttr.btn_save);
+		_click($an_pg_mttr.btn_ok);		
+		
+	};
+	
+	
+	
+	this.mttr_uk_calc = function($Calculationmethodname)
+	{
+		_click($an_pg_rv.link_home);
+		_click($an_pg_rv.link_servicemaxSetup);
+		_click($an_pg_rv.btn_serviceperformancemetrics);
+		_click($an_pg_rv.btn_serviceperformancemetricsetup);
+		_click($an_pg_rv.btn_click_metrics);
+		_click($an_pg_mttr.btn_meantime_to_repair);
+		_click($an_pg_mttr.btn_addmttr);
+		_click($an_pg_mttr.btn_activecheckbox);
+		_setValue($an_pg_mttr.txt_mttr_description, $Calculationmethodname);
+		_click($an_pg_mttr.btn_settings);
+		_click($an_pg_mttr.list_deadtime_select);
+		_click($an_pg_mttr.list_deadtime);
+		_click($an_pg_mttr.list_mttr_technician);
+		_click($an_pg_mttr.btn_technician);
+		_click($an_pg_mttr.list_mttr_product);
+		_click($an_pg_mttr.btn_product);
+		_click($an_pg_mttr.list_account_selection);
+		_click($an_pg_mttr.btn_account);
+		_click($an_pg_mttr.list_scheduled_date);
+		_click($an_pg_mttr.btn_scheduled_date);
+		_click($an_pg_mttr.list_custom_maps);
+		_click($an_pg_mttr.btn_map_choose);
+		_click($an_pg_mttr.btn_criteria);
+		_click($an_pg_mttr.list_choose_qualification_wo);
+		_click($an_pg_mttr.btn_uk_closed_wo);
+		_click($an_pg_mttr.list_workdetail_qualification);
+		_click($an_pg_mttr.btn_parts_line_only);
+		_click($an_pg_mttr.btn_save);
+		_click($an_pg_mttr.btn_ok);		
+		
+		
+	};
+	
+	this.mttr_custom_expr = function($Calculationmethodname)
+	{
+		_click($an_pg_rv.link_home);
+		_click($an_pg_rv.link_servicemaxSetup);
+		_click($an_pg_rv.btn_serviceperformancemetrics);
+		_click($an_pg_rv.btn_serviceperformancemetricsetup);
+		_click($an_pg_rv.btn_click_metrics);
+		_click($an_pg_mttr.btn_meantime_to_repair);
+		_click($an_pg_mttr.btn_addmttr);
+		_click($an_pg_mttr.btn_activecheckbox);
+		_setValue($an_pg_mttr.txt_mttr_description, $Calculationmethodname);
+		_click($an_pg_mttr.btn_settings);
+		_click($an_pg_mttr.list_deadtime_select);
+		_click($an_pg_mttr.list_deadtime);
+		_click($an_pg_mttr.list_mttr_technician);
+		_click($an_pg_mttr.btn_technician);
+		_click($an_pg_mttr.list_mttr_product);
+		_click($an_pg_mttr.btn_product);
+		_click($an_pg_mttr.list_account_selection);
+		_click($an_pg_mttr.btn_account);
+		_click($an_pg_mttr.list_scheduled_date);
+		_click($an_pg_mttr.btn_scheduled_date);
+		_click($an_pg_mttr.btn_criteria);
+		_click($an_pg_mttr.list_choose_qualification_wo);
+		_click($an_pg_mttr.btn_custom_wo_expr);
+		_click($an_pg_mttr.list_workdetail_qualification);
+		_click($an_pg_mttr.btn_custom_wd_expr);
+		_click($an_pg_mttr.btn_save);
+		_click($an_pg_mttr.btn_ok);		
+		
+		
+		
+	};
+	
+	this.mttr_runEngine = function($emailID)
+	{
+		_click($an_pg_rv.link_home);
+		_click($an_pg_rv.link_servicemaxSetup);
+		_click($an_pg_rv.btn_serviceperformancemetrics);
+		_click($an_pg_rv.btn_serviceperformancemetricsetup);
+		_click($an_pg_rv.btn_click_metrics);
+		_click($an_pg_mttr.btn_meantime_to_repair);
+	    _click($an_pg_mttr.btn_schedule_notification);	
+	    _click($an_pg_mttr.list_timezone);
+	    _click($an_pg_mttr.btn_ist_timezone);
+	    _click($an_pg_mttr.btn_period);
+	    _click($an_pg_mttr.btn_daily);
+	    _click($an_pg_mttr.list_time);
+	    _click($an_pg_mttr.btn_time);
+	    _click($an_pg_mttr.txt_emailonsuccess);
+	    _setValue($an_pg_mttr.txt_emailonsuccess,$emailID);
+	    _click($an_pg_mttr.btn_save_sn);
+	    _wait(1000);
+	    _click($an_pg_mttr.btn_click_run);
+	    _wait(1000);
+	    _click($an_pg_mttr.btn_ok_sn);
+	    
+	};
+	
+	
+	
+};

@@ -1,0 +1,33 @@
+
+var $dc_pg_eventSubjectRule = new function dc_pg_eventSubjectRule() {
+	this.link_home = _link("Home");
+	this.link_servicemaxSetup = _link("ServiceMax Setup");
+	this.link_DispatchManagement=_div("Dispatch Management");
+	this.link_EventSubjectRule=_div("Event Subject Rules");
+	this.btn_newRule= _button("New Rule");
+	this.btn_editRule=_button("Edit Rule");
+	this.btn_deleteRule=_button("Delete Rule");
+	this.btn_save=_button("Save");
+	this.txt_eventSubjectRuleName=_textbox(1);
+	this.txt_eventSubjectRuleDescription=_textarea(0);
+	this.sel_eventSubjectRuleWorkOrderField1=_select(0);
+	this.sel_eventSubjectRuleOperatorField1=_select(1);
+	this.txt_eventSubjectRuleCriteriaValue1=_textbox(2);
+	this.sel_eventSubjectRuleWorkOrderField2=_select(2);
+	this.sel_eventSubjectRuleOperatorField2=_select(3);
+	this.txt_eventSubjectRuleCriteriaValue2=_textbox(3);
+	this.sel_eventSubjectRuleWorkOrderField3=_select(4);
+	this.sel_eventSubjectRuleOperatorField3=_select(5);
+	this.txt_eventSubjectRuleCriteriaValue3=_textbox(4);	
+	this.txt_eventSubjectRuleCriteriaAdvancedExpression=_textbox(5);	
+	this.btn_Add=_imageSubmitButton("Add");
+	this.btn_save=_button("Save");
+    this.sel_eventSubjectRuleFieldSelection=_select("page1:form1:block1:WOflds:j_id147:j_id151");
+    this.sel_eventSubjectRuleFieldSelected=_imageSubmitButton("page1:form1:block1:WOflds:j_id147:j_id156");
+    this.sel_eventSubjectRuleFieldOption =_select("page1:form1:block1:WOflds:j_id147:j_id160");
+    this.sel_eventSubjectRuleFieldUpArrow=_imageSubmitButton("Up");
+    this.sel_eventSubjectRuleFieldDownArrow=_imageSubmitButton("Down");
+    this.sel_eventSubjectRuleFieldBottomArrow=_imageSubmitButton("Bottom");
+
+    this.btn_backToSetupHome=_submit("Back To Setup Home");
+};

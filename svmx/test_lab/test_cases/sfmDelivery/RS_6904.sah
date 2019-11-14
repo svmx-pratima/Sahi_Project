@@ -1,0 +1,19 @@
+var $rs_6904 = _testcase("RS_6904","Verify Lookup Context on Picklist and text fields.");
+$rs_6904.start();
+
+$sfmName = $bo_act_common.generateRandomName("SFM_Auto_");
+//$sfmName = "SFM_Auto_4122017181215";
+$sfmPgLayoutName =	$bo_act_common.generateRandomName("SFM_Auto_Page");
+$wizTitle = $bo_act_common.generateRandomName("SFM Wiz");
+$headersToAdd = ["Account Picklist","City","Contact"];
+$account = "Acme";
+$bo_act_login.login($g_url,$sfmdUsn, $sfmdPwd);
+$bo_act_navigation.navigateToSfmTransactionDesigner();
+$sfm_act_Transactions.newsfm6877($sfmName,$sfmPgLayoutName,$headersToAdd,"Account Picklist","Contact Picklist");
+$bo_act_navigation.navigateToSfmWizard();
+$sfm_act_createCustomWizard.chooseObject("Work Order");
+$sfm_act_createCustomWizard.addManageWizSteps($wizTitle,"SFM",$sfmName);
+$sfm_act_createCustomWizard.createBlankWo();
+$sfm_act_createCustomWizard.clickWizardBtn($sfmName);
+$sfm_act_createCustomWizard.verify6904($account);
+$rs_6904.end();
