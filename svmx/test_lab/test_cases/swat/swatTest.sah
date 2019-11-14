@@ -1,0 +1,99 @@
+var $swat_act_childLinesAddition = new function swat_act_childLinesAddition() {
+	
+	this.createQuoteFromWOChildLines = function($wizardTitleName,$productName){
+//SFM - Create Quote from Work Order 
+	 _click(_button("/Create Quote from Work Order/", _in(_cell($wizardTitleName))));
+	 _selectDomain();
+	 _wait(20000,_isVisible(_label("Status:")));
+	 _setValue(_textbox("Status:"), "Presented");
+	 _click(_div("/sfm-button-/", _near(_label("Valid Until:"))));
+
+	 // Add a Parts Line
+	 _click(_span("/svmx-sfmd-add-line-icon/"));
+	 _click(_image("/svmx-sfmd-edit-icon/"));
+	 _wait(10000,_isVisible(_span("/svmx_lookup_icon/")));
+	 _click(_span("/svmx_lookup_icon/", _near(_label("Product:"))));
+	 $bo_act_common.searchfunction($productName);
+	 _setValue(_textbox("Qty:"), "2");
+	 _setValue(_textbox("svmx-form-field svmx-form-required-field svmx-form-text svmx-form-invalid-field"), "4000");
+	 _click(_span("Update"));
+
+	//Add a Labor Line
+	_click(_span("Labor"));
+	_setStrictVisibilityCheck(true);
+	_click(_span("/svmx-sfmd-add-line-icon/"));
+	_click(_image("/svmx-sfmd-edit-icon/"));
+	_setStrictVisibilityCheck(false);
+	_setValue(_textbox("Qty:"), "3");
+	_setValue(_textbox("/svmx-form-required-field/", _rightOf(_label("/Unit Price/"))),"6000");
+	_click(_span("Update"));
+
+	//Add a Expense Line
+	_click(_span("Expense"));
+	_setStrictVisibilityCheck(true);
+	_click(_span("/svmx-sfmd-add-line-icon/"));
+	_click(_image("/svmx-sfmd-edit-icon/"));
+	_setStrictVisibilityCheck(false);
+	_setValue(_textbox("Qty:"), "4");
+	_setValue(_textbox("/svmx-form-required-field/", _near(_label("/Unit Price/"))),"8500");
+	_click(_span("Update"));
+	_wait(5000);
+	_click(_span("svmx-btn-icon svmx-sfmd-save-icon"));
+	_wait(15000);
+	};
+	
+	this.createUsageLinesFromEstimates = function($productName){
+
+		var $lineQty=10;
+		var $searchValue=$productName;
+		
+		// Add a Parts Line
+		$bo_act_getPrice.addPartsLineToSFMDelivery($searchValue, $lineQty);
+		_wait(15000);
+		
+		//isBillable check box selection validation. 
+		_setStrictVisibilityCheck(true);
+		var $isBillableCheckBoxStatus = _isVisible(_div("/svmx-grid-checkheader-unchecked/",_under(_span("Is Billable"))));
+			if ($isBillableCheckBoxStatus==true) {
+				_log("inside If isBillableCheckBoxStatus loop");
+				_check(_div("/svmx-grid-checkheader-unchecked/",_under(_span("Is Billable"))));
+			}
+		_setStrictVisibilityCheck(false);	
+		
+		//Add a Labor Line
+		$bo_act_getPrice.addLaborLineToSFMDelivery($searchValue, "service", "03", "05");
+		_wait(15000);
+		_setStrictVisibilityCheck(true);
+		_click(_div("/svmx-grid-checkheader-checked/", _near(_span("/Use Price From Pricebook/"))));
+		_click(_div("/svmx-grid-cell-inner/",_under(_div("/Line Price Per Unit/"))));
+		_setValue(_textbox("/svmx-form-field svmx-form-text/",_under(_div("/Line Price Per Unit/"))),"1200");
+		
+		//isBillable check box selection validation. 
+		var $isBillableCheckBoxStatus = _isVisible(_div("/svmx-grid-checkheader-unchecked/",_under(_span("Is Billable"))));
+			if ($isBillableCheckBoxStatus==true) {
+				_check(_div("/svmx-grid-checkheader-unchecked/",_under(_span("Is Billable"))));
+			}
+		_setStrictVisibilityCheck(false);
+		
+		//Add a Expense Line
+		$bo_act_getPrice.addExpensesLineToSFMDelivery("Phone", "03", "3000");
+		_wait(15000);		
+		
+		//Add a Travel Line
+		$bo_act_getPrice.addTravelLineToSFMDeliveryUsingStartEndDate("01", "03");
+		_wait(15000);
+		
+		//assert on get Price Calculation 
+		_click($bo_pg_getPrice.btn_getPrice);
+		_wait(5000);
+		_click($bo_pg_getPrice.btn_partsLine);
+		_setStrictVisibilityCheck(true);
+		var $actualPartPrice=_getCellText(_div("/svmx-grid-cell-inner/",_under(_div("/svmx-column-header-inner/",_near(_div("Billable Line Price"))))));
+		_assertEqual("1,500.000",$actualPartPrice,"Assertion Passl");
+		_click($bo_pg_getPrice.btn_laborLine);
+		var $actualLaborPrice=_getCellText(_div("/svmx-grid-cell-inner/",_under(_div("/svmx-column-header-inner/",_near(_div("Billable Line Price"))))));
+		_assertEqual("2,400.000",$actualLaborPrice,"Assertion Pass");
+		_click($bo_pg_getPrice.btn_save);
+	
+	};
+};

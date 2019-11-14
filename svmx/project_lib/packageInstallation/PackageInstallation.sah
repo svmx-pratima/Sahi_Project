@@ -1,0 +1,47 @@
+var $packageInstallation = new function packageInstallation() {
+	
+	/*This function will install package based on the package id that is passed through jenkins
+	 * Calling function should pass username, password and package id to this function. 
+	 * It keeps on checking the deployment status every 2mins until status is changed from deployment in progress
+	 */
+	this.installPackage = function($runPackageId,$un, $pwd){
+		var  $packageInstallationLink = "https://test.salesforce.com/packaging/installPackage.apexp?p0="+$runPackageId;
+		_call(top.location.reload(true));
+		_call(top.localStorage.clear());
+		_navigateTo($packageInstallationLink);
+		_call(top.localStorage.clear());
+		_call(top.location.reload(true));
+		_wait(5000, _isVisible($bo_pg_login.txt_email));
+		_setValue($bo_pg_login.txt_email, $un);
+		_setValue($bo_pg_login.txt_password, $pwd);
+		_click($bo_pg_login.btn_login);	
+		_wait(50000, _isVisible(_button("Upgrade")));//wait until upgrade button is visible
+		_click(_radio("profileMappingAll"));
+		if(_isVisible(_checkbox("I acknowledge that I'm installing a Non-Salesforce Application that is not authorized for distribution as part of Salesforce’s AppExchange Partner Program."))){
+			_check(_checkbox("I acknowledge that I'm installing a Non-Salesforce Application that is not authorized for distribution as part of Salesforce’s AppExchange Partner Program."));
+		}
+		_click(_button("Upgrade"));
+		_wait(90000,_isVisible(_button("Done")));
+		_click(_button("Done"));
+		_log("Package installation initiated");
+		_wait(10000);
+		//navigate to deployment status tab to check the status based on classic or lightning mode
+		if(_isVisible(_searchbox("Quick Find"))){
+			_click(_searchbox("Quick Find")); //navigate to deployment status tab to check the status
+			_setValue(_searchbox("Quick Find"), "Deployment Status");
+		}else{
+			_click(_textbox("setupSearch"));
+			_setValue(_textbox("setupSearch"), "Deployment Status");
+		}
+		_click(_link("Deployment Status"));
+		_wait(25000,_isVisible(_heading1("Deployment Status")));
+		while(_isVisible(_heading2("Deployment In Progress"))==true){
+			_call(top.location.reload(true));
+			_wait(120000);
+		}
+		var $deployStatus= _isVisible(_heading2("Deployment Succeeded"));
+		return $deployStatus;
+	};
+	
+};
+

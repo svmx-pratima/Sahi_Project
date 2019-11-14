@@ -1,0 +1,64 @@
+//Author - Noor Salma Sharieff
+
+var $RS_12030_SD_MobileOptions = _testcase("$RS_7426","Verify adding a new covered IB on a pm plan without using a template");
+$RS_12030_SD_MobileOptions.start();
+_setSpeed($g_stepSpeed);
+
+//Pre - Condition
+var $sfmName = $bo_act_common.generateRandomName("SFM");
+var $containerName = ["Order Status","Order Status","Order Status","Order Status"];
+var $fieldName=["Order Type","Zip","Is Entitlement Performed","Driving Time (in Minutes)"];
+
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+		
+
+//Navigate to SFm Designer and create new SFM of "as Standalone for the purpose of editing an existing record" type on WO object.
+$bo_act_navigation.navigateToSfmTransactionDesigner();
+_wait(20000,_isVisible($bo_pg_sfmTransactionAndDesigner.btn_newSFM));
+_click($bo_pg_sfmTransactionAndDesigner.btn_newSFM);
+$bo_pg_sfmTransactionAndDesigner.setSfmName($sfmName);
+_setSelected($bo_pg_sfmTransactionAndDesigner.lbl_checklistOb,"as Standalone for the purpose of editing an existing record");
+_wait(60000, _isVisible($bo_pg_sfmTransactionAndDesigner.lbl_checklistOb));
+
+_setSelected($bo_pg_sfmTransactionAndDesigner.combo_CTRecord, "Work Order");
+
+//_setValue($bo_pg_sfmTransactionAndDesigner.selectSourceObj,"");
+//_wait(10000);
+//_setSelected(_f("main").s_combobox("objCombo1[1]"), "Work Order");
+//_setValue($bo_pg_sfmTransactionAndDesigner.selectSourceObj,"Work Order");
+_wait(20000);
+_click($bo_pg_sfmTransactionAndDesigner.btn_popUpOK);
+//Navigate to Screen Designer
+_click($bo_pg_sfmTransactionAndDesigner.btn_screenDesigner);
+_wait(6000,_isVisible(_f("main").tab("Screen Designer")));
+_click($bo_pg_manageWOLineUsageForSorting.btn_screenDesignerNew);
+$sfm_act_SFM.addFieldToScreen($fieldName, $containerName);
+
+//_click($bo_pg_manageWOLineUsageForSorting.sel_selHeaderOption);
+//_click($bo_pg_manageWOLineUsageForSorting.txt_searchItem);
+//_setValue($bo_pg_manageWOLineUsageForSorting.txt_searchItem,"Driving Time");
+//_doubleClick($bo_pg_manageWOLineUsageForSorting.lbl_drivingTime);
+//_wait(1000);
+/*
+$bo_act_WebServices.enableBeforeSave();
+
+$bo_act_WebServices.saveAndClose();
+//*******Nagigate to SFM Wizard and Create Wizard and Add Above Transaction to it**********
+$bo_act_navigation.navigateToSfmWizard();
+$bo_act_SFW.createWizardGeneralInfo($objName,$wizardname,$wizardID);
+$bo_act_SFW.createWizardStep($fieldActnType,$actnName,$executionMode);
+
+//******Launch the SFM in delivery for WO object**************
+
+$bo_act_sfmVerifyWorkOrder.verifyWizardOnWOObj($stndSFMName);
+$bo_act_sfmVerifyWorkOrder.clkOnWizard($wizardButtonName);
+_wait(30000);
+$bo_act_WebServices.verifyBeforeSaveUpdate($enteredMinBS,$enteredOTBS,$enteredZipBS);
+
+//********Deleting test Data***************
+$bo_act_SFW.deleteWizards($objName,$wizardID);
+_wait(3000);
+$bo_act_navigation.navigateToSfmTransactionDesigner();
+$bo_act_SFM.deleteSFM($sfmName);
+*/
+$RS_12030_SD_MobileOptions.end();

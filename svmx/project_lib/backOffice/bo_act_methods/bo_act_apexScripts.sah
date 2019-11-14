@@ -1,0 +1,55 @@
+/**
+ * Functions for the Apex
+ */
+var $bo_act_apexScripts = new function bo_act_apexScripts() {
+
+	/**
+	 * Create an Account
+	 * 
+	 * @param $accountName
+	 */
+	this.createAccountApexScript = function($accName) {
+		var $script = "Account Acc = new Account (Name = '"+$accName+"', Type = 'Customer');insert Acc;";
+		$bo_act_login.runApexScriptinWB($script);
+	};
+	
+	this.createProductApexScript = function($proName) {
+		var $script = "Product2 pro = new Product2 (Name = '"+$proName+"',IsActive = true);insert pro;";
+		$bo_act_login.runApexScriptinWB($script);
+	};
+	
+	this.createInstalledProductApexScript = function($nameSpace,$IBName,$proId,$accId){
+		var $script = $nameSpace+"__Installed_Product__c ib01 = new "+$nameSpace+"__Installed_Product__c(\n"+
+		 "Name = '"+$IBName+"',\n"+
+		 $nameSpace+"__Product__c = '"+$proId+"',\n"+
+		 $nameSpace+"__Company__c = '"+$accId+"',\n"+
+		 $nameSpace+"__Serial_Lot_Number__c = '"+$IBName+"',\n"+
+		 $nameSpace+"__Status__c = 'Shipped' );\n"+
+		"insert ib01;\n";
+		$bo_act_login.runApexScriptinWB($script);
+	};
+	
+	this.createContactApexScript= function($contact, $accId){
+		var $script = "Contact con = new Contact(\n" +
+		"AccountId = '"+$accId+"');\n"+
+		"insert con;";
+		$bo_act_login.runApexScriptinWB($script);
+	};
+	this.createCaseApexScript= function(){
+		var $script = "Case cas = new Case(\n" +
+				"Status = 'New');\n"+
+				"insert cas;";
+		$bo_act_login.runApexScriptinWB($script);
+	};
+	
+	this.getIdOfRecord = function($objectName,$recordName){
+		_click(_span("queries"));
+		_click(_link("SOQL Query"));
+		_setSelected(_select("QB_object_sel"),$objectName);
+		_setValue(_textarea("soql_query"),"SELECT Id FROM "+$objectName+" Where Name = '"+$recordName+"'");
+		_click(_submit("Query"));
+		var $recordId = _getText(_link(0,_in(_table("query_results"))));
+		return $recordId;
+	}; 
+};
+		

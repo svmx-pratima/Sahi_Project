@@ -1,0 +1,30 @@
+var $dc_act_consoleFieldUpdates = new function dc_act_consoleFieldUpdates(){
+	
+	this.setDispatchConsoleFields = function($check){
+		$dc_act_navigation.navigateToDispatchConsoleFieldUpdates();
+		_log("Setting up of Dispatch Console Fields")
+	    _setSelected($dc_pg_consoleFieldUpdates.sel_updateField1, "Billing Type");
+	    _click($dc_pg_consoleFieldUpdates.btn_save);
+   	    
+	};
+	
+	
+	this.verifyDispatchConsoleFields = function($check){
+		//$dc_act_navigation.navigateToDispatchConsoleFieldUpdates();
+		// Check if there exists any field having Billing Type, if so then reset since there can't be any there should not be any duplicates
+			for (var $i=0;$i<10;$i++)
+		{
+		var $FieldValue=_getSelectedText(_select($i));
+		if ($FieldValue=="Billing Type")
+		{
+		 //Reset to "None"
+		  _setSelected(_select($i),"--None--");	
+		  _log("Billing Type field resetting it to None");
+		  _wait(1000);
+		}
+	}
+	    _click($dc_pg_consoleFieldUpdates.btn_save);
+	
+	};
+		
+};

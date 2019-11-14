@@ -1,0 +1,24 @@
+
+
+
+
+/**
+ * Home page object repository
+ */
+
+var $bo_pg_servicesTypes = new function bo_pg_servicesTypes(){
+	this.btn_newAvailableService = 	_button("New Available Service");
+	this.link_createService = _link("Create Service");
+	this.txt_serviceName = _textbox("/Service Name/");
+	this.txt_trackedOn  = _textbox("Tracked On:");
+	this.txt_dataType = _textbox("Data Type:");
+	this.btn_activeServiceType = _button("Active:");
+	this.txt_qualifyingCriteria = _textbox(0,_rightOf(_label("Qualifying Criteria:")));
+	this.btn_saveServiceType = _span("svmx-btn-icon svmx-sfmd-save-icon");
+	this.txt_availableServiceDetail = _heading2("Available Service Detail");
+	this.btn_deleteServiceType = _button("Delete");
+	
+};
+
+
+

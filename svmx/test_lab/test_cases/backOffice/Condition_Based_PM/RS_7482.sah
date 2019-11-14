@@ -1,0 +1,39 @@
+
+//author - Meghana Rao
+
+var $RS_7482 = _testcase("$RS_7482","Validate Advanced expression builder of PM Plan Template and PM Plan when a row is inserted or deleted from grids.");
+$RS_7482.start();
+_setSpeed($g_stepSpeed);
+var $Workbenchurl = "https://workbench.developerforce.com/login.php";
+//Pre - Condition 
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+
+//Test Data Creation
+
+
+var $accName = $bo_act_accounts.createAccount();
+
+var $contactName = $bo_act_contacts.createContact($accName);
+var $proName = $bo_act_products.createProduct("pro12", "--None--");
+$bo_act_navigation.navigateToAccountsPage();
+_click(_link($accName));
+var $IBName1 = $bo_act_accounts.addIBtoAccounts($proName, $accName, $contactName);
+
+
+
+var $PMPTemplate = $bo_act_PMPlanTemplate.createCriteriaBasedPMTemplate($proName);
+$bo_act_PMPlanTemplate.firstCriteriaBasedCondition("Country", "Equals", "India");
+$bo_act_PMPlanTemplate.verifytheadvancedexpression("1 OR 2 OR 3");
+
+
+// CleanUp Function
+$bo_act_common.deleteAccount($bac_un, $bac_pwd, $accName);
+$bo_act_common.deleteContact($bac_un, $bac_pwd, $contactName);
+$bo_act_common.deleteIB($bac_un, $bac_pwd, $orgnamespace,$IBName1);
+$bo_act_common.deleteProduct($bac_un, $bac_pwd,$proName);
+$bo_act_common.deletePMPlantemplate($bac_un, $bac_pwd, $orgnamespace,$PMPTemplate);
+
+$RS_7482.end();
+
+
+

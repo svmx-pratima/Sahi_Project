@@ -1,0 +1,364 @@
+/**
+ * Functions for Search Delivery scenarios
+ */
+var $bo_act_sfmsearchdelivery = new function $bo_act_sfmsearchdelivery() {
+
+this.sfmsearch = function($standardsfmsearchname, $recordname, $isstandardtrue){
+	
+	_click($bo_pg_home.link_home);
+	_selectDomain($g_domain);
+	_wait(10000,_isVisible($swat_pg_sfmSearch.picklist_searchItem,$standardsfmsearchname));
+	_setSelected($swat_pg_sfmSearch.picklist_searchItem,$standardsfmsearchname);
+	_click($swat_pg_sfmSearch.link_go);
+	
+	_selectDomain();
+	
+	// To reload a page if the field is not visible
+	
+	for (var $i = 0; $i < 50; $i++) {
+		if (_isVisible($swat_pg_sfmSearch.txt_search)) {
+			break;
+
+		} else {
+			_call(top.location.reload());
+
+			_wait(10000, _isVisible($swat_pg_sfmSearch.txt_search));
+		}
+	}
+	_setValue($swat_pg_sfmSearch.txt_search, $standardsfmsearchname);
+	_click(_div($standardsfmsearchname));
+	_wait(10000);
+	
+	if($isstandardtrue == true)
+	{
+	_click($swat_pg_sfmSearch.workorder_search);
+	_setValue($swat_pg_sfmSearch.txt_SearchArea,$recordname);
+	_click($swat_pg_sfmSearch.btn_go);
+	_wait(10000);
+	_click($swat_pg_sfmSearch.radio_button);
+	_setStrictVisibilityCheck(true);
+		
+	
+	
+	}
+	else if ($isstandardtrue == false)
+	{
+	_setValue($swat_pg_sfmSearch.txt_SearchArea,$recordname);
+	_click($swat_pg_sfmSearch.btn_go);
+	_wait(10000);
+	_click($swat_pg_sfmSearch.radio_button);
+	_setStrictVisibilityCheck(true);
+	
+	}
+		
+};
+
+this.sfmsearch_clickwizards = function($sfmsearchname, $recordname, $wizardname1, $wizardboxname1,$wizardboxname2, $wizardname2)
+
+{
+	_click($bo_pg_home.link_home);
+	_selectDomain($g_domain);
+	_setSelected($swat_pg_sfmSearch.picklist_searchItem,$sfmsearchname);
+	_click($swat_pg_sfmSearch.link_go);
+	
+	_selectDomain();
+	
+	// To reload a page if the field is not visible
+	
+	for (var $i = 0; $i < 50; $i++) {
+		if (_isVisible($swat_pg_sfmSearch.txt_search)) {
+			break;
+
+		} else {
+			_call(top.location.reload());
+
+			_wait(10000, _isVisible($swat_pg_sfmSearch.txt_search));
+		}
+	}
+	_setValue($swat_pg_sfmSearch.txt_search, $sfmsearchname);
+	_click(_div($sfmsearchname));
+	_wait(10000);
+	
+
+
+	_setValue($swat_pg_sfmSearch.txt_SearchArea,$recordname);
+	_click($swat_pg_sfmSearch.btn_go);
+	_wait(10000);
+	_click($swat_pg_sfmSearch.radio_button);
+	_setStrictVisibilityCheck(true);
+	
+	// To verify "Close Work Order" by clicking on them
+	_click(_span($wizardboxname1));
+	_click(_span($wizardname1));
+	_title();
+	_selectWindow($swat_pg_sfmSearch.newtab);
+	_assertEqual(true, _isVisible($swat_pg_sfmSearch.savebutton));
+	_closeWindow();
+	
+	
+	// To verify "Checklists" Standard Wizard by clicking on it
+	_selectWindow();
+	_click(_span($wizardboxname2));
+	_click(_span($wizardname2));
+	_title();
+	_selectWindow($swat_pg_sfmSearch.newtab);
+	_assertEqual(true, _isVisible($swat_pg_sfmSearch.checklist_closebutton));
+	_closeWindow();
+	
+	
+
+};
+this.sfmsearch_multipleobjects = function($sfmsearchname ,$object1, $object2,$recordname1 , $recordname2)
+
+{
+	_click($bo_pg_home.link_home);
+	_selectDomain($g_domain);
+	_setSelected($swat_pg_sfmSearch.picklist_searchItem,$sfmsearchname);
+	_click($swat_pg_sfmSearch.link_go);
+	
+	_selectDomain();
+	
+	// To reload a page if the field is not visible
+	
+	for (var $i = 0; $i < 50; $i++) {
+		if (_isVisible($swat_pg_sfmSearch.txt_search)) {
+			break;
+
+		} else {
+			_call(top.location.reload());
+
+			_wait(10000, _isVisible($swat_pg_sfmSearch.txt_search));
+		}
+	}
+	_setValue($swat_pg_sfmSearch.txt_search, $sfmsearchname);
+	_click(_div($sfmsearchname));
+	_wait(10000);
+	// To verify the value in Object1
+	_setStrictVisibilityCheck(true);
+	_click(_span("/"+$object1+"/"));
+	_setValue($swat_pg_sfmSearch.txt_SearchArea,$recordname1);
+	_click($swat_pg_sfmSearch.btn_go);
+	_wait(10000);
+	_click($swat_pg_sfmSearch.radio_button);
+	_setStrictVisibilityCheck(true);
+	
+	
+	// To verify the value in Object2
+	_setValue($swat_pg_sfmSearch.txt_SearchArea,"");
+	_setStrictVisibilityCheck(true);
+	_click(_span("/"+ $object2 +"/"));
+	_setValue($swat_pg_sfmSearch.txt_SearchArea,$recordname2);
+	_click($swat_pg_sfmSearch.btn_go);
+	_wait(10000);
+	_click($swat_pg_sfmSearch.radio_button);
+	_setStrictVisibilityCheck(true);
+	
+
+};
+
+this.sfmsearchvaluenotfound = function($standardsfmsearchname, $recordname, $isstandardtrue){
+	
+	_click($bo_pg_home.link_home);
+	_selectDomain($g_domain);
+	_setSelected($swat_pg_sfmSearch.picklist_searchItem,$standardsfmsearchname);
+	_click($swat_pg_sfmSearch.link_go);
+	
+	_selectDomain();
+	
+	
+	for (var $i = 0; $i < 50; $i++) {
+		if (_isVisible($swat_pg_sfmSearch.txt_search)) {
+			break;
+
+		} else {
+			_call(top.location.reload());
+
+			_wait(10000, _isVisible($swat_pg_sfmSearch.txt_search));
+		}
+	}
+	_wait(10000,_isVisible($swat_pg_sfmSearch.txt_search));
+	_setValue($swat_pg_sfmSearch.txt_search, $standardsfmsearchname);
+	_click(_div($standardsfmsearchname));
+	_wait(10000);
+	
+	if($isstandardtrue == true)
+	{
+	_click($swat_pg_sfmSearch.workorder_search);
+	_setValue($swat_pg_sfmSearch.txt_SearchArea,$recordname);
+	_click($swat_pg_sfmSearch.btn_go);
+	_wait(10000);
+	_assertEqual(false ,_isVisible(_link($recordname)));
+	}
+	
+	else if ($isstandardtrue == false)
+	{
+	_setValue($swat_pg_sfmSearch.txt_SearchArea,$recordname);
+	_click($swat_pg_sfmSearch.btn_go);
+	_wait(10000);
+	_assertEqual(false ,_isVisible(_link($recordname)));
+	}
+	
+	
+}
+
+this.sfmsearch_verify_sequence= function($sfmsearchname, $objectname, $valuesearch)
+{
+	
+	_click($bo_pg_home.link_home);
+	_selectDomain($g_domain);
+	_setSelected($swat_pg_sfmSearch.picklist_searchItem,$sfmsearchname);
+	_click($swat_pg_sfmSearch.link_go);
+	
+	_selectDomain();
+	
+	// To reload a page if the field is not visible
+	
+	for (var $i = 0; $i < 50; $i++) {
+		if (_isVisible($swat_pg_sfmSearch.txt_search)) {
+			break;
+
+		} else {
+			_call(top.location.reload());
+
+			_wait(10000, _isVisible($swat_pg_sfmSearch.txt_search));
+		}
+	}
+	_setValue($swat_pg_sfmSearch.txt_search, $sfmsearchname);
+	_click(_div($sfmsearchname));
+	_wait(10000);
+	
+	_assertEqual(true, _containsText($swat_pg_sfmSearch.link_span1,$valuesearch));
+	
+	
+	
+
+};
+
+
+this.sfmsearchdelivery_dateformat = function($sfmsearchname ,$recordname,$fieldname, $value)
+
+{
+	
+	_click($bo_pg_home.link_home);
+	_selectDomain($g_domain);
+	_setSelected($swat_pg_sfmSearch.picklist_searchItem,$sfmsearchname);
+	_click($swat_pg_sfmSearch.link_go);
+	
+	_selectDomain();
+	
+	// To reload a page if the field is not visible
+	
+	for (var $i = 0; $i < 50; $i++) {
+		if (_isVisible($swat_pg_sfmSearch.txt_search)) {
+			break;
+
+		} else {
+			_call(top.location.reload());
+
+			_wait(10000, _isVisible($swat_pg_sfmSearch.txt_search));
+		}
+	}
+	_setValue($swat_pg_sfmSearch.txt_search, $sfmsearchname);
+	_click(_div($sfmsearchname));
+	
+	_wait(10000);	
+	_setValue($swat_pg_sfmSearch.txt_SearchArea,$recordname);
+	_click($swat_pg_sfmSearch.btn_go);
+	_wait(10000);
+	_assertEqual(true, _isVisible(_div($value)));
+	var $datevalue = _getText(_div($value));
+	var $setvalue;
+	if ($datevalue.match("AM") || $datevalue.match("PM"))
+	{
+		
+	$setvalue = true;
+		
+	}
+	else
+	{
+	$setvalue = false;
+	}
+	
+	
+	// To check if it is in 24 hour format , for 24 hour format AM or PM is not Present
+	_assertEqual(true, _isVisible(_span($fieldname)));
+	_assertEqual(false,$setvalue);
+
+};
+
+
+this.verifyfieldspresent_withrecord = function($sfmsearchname ,$recordname,$fieldname, $value , $delimitor)
+{
+	
+	_click($bo_pg_home.link_home);
+	_selectDomain($g_domain);
+	_setSelected($swat_pg_sfmSearch.picklist_searchItem,$sfmsearchname);
+	_click($swat_pg_sfmSearch.link_go);
+	
+	_selectDomain();
+	
+	// To reload a page if the field is not visible
+	
+	for (var $i = 0; $i < 50; $i++) {
+		if (_isVisible($swat_pg_sfmSearch.txt_search)) {
+			break;
+
+		} else {
+			_call(top.location.reload());
+
+			_wait(10000, _isVisible($swat_pg_sfmSearch.txt_search));
+		}
+	}
+	_setValue($swat_pg_sfmSearch.txt_search, $sfmsearchname);
+	_click(_div($sfmsearchname));
+	
+	_wait(10000);	
+	_setValue($swat_pg_sfmSearch.txt_SearchArea,$recordname);
+	_click($swat_pg_sfmSearch.btn_go);
+	_wait(10000);
+	
+	if ($delimitor == "/")
+	{
+		var $datenew = $value;
+		var $da = $datenew.split("/");
+			for(var $i=0;$i<2;$i++){
+				if($da[$i].length<=1){
+					$da[$i] = 0+""+$da[$i];
+				
+		}
+		}
+		
+	// After the Date field has been converted
+			var $final = $da[0]+"/"+$da[1]+"/"+$da[2];
+			_assertEqual(true, _isVisible(_div($final))); // $final is the $value
+			_assertEqual(true, _isVisible(_span($fieldname)));
+			_click($swat_pg_sfmSearch.radio_button);
+			_setStrictVisibilityCheck(true);
+	
+	}
+	if ($delimitor == ".")
+	{
+		
+		var $datenew = $value;
+		var $da = $datenew.split(".");
+			for(var $i=0;$i<2;$i++){
+				if($da[$i].length<=1){
+					$da[$i] = 0+""+$da[$i];
+				
+		}
+		}
+		
+	// After the Date field has been converted
+			var $final = $da[0]+"."+$da[1]+"."+$da[2];
+			_assertEqual(true, _isVisible(_div($final))); // $final is the $value
+			_assertEqual(true, _isVisible(_span($fieldname)));
+			_click($swat_pg_sfmSearch.radio_button);
+			_setStrictVisibilityCheck(true);
+		
+		
+	}
+		
+};
+
+
+};

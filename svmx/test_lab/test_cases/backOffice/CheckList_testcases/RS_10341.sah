@@ -1,0 +1,101 @@
+// Author Bhupendra Singh Chouhan
+
+/*
+ * SOU For upgrade Scenario.
+ */
+var $RS_10341 = _testcase("RS_10341", "SOU For upgrade Scenario:- Verify SOU fields in SFD when SOU with values are configured in checklist designer");
+$RS_10341.start();
+
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+
+var $QuestionName1 = $bo_act_common.generateRandomName("Number Question_");
+var $QuestionName2 = $bo_act_common.generateRandomName("Text Question_");
+
+var $checklistProcessName = $bo_act_common.generateRandomName("ChecklistProcess_");
+
+var $AnswerType1 = "Number";
+var $AnswerType2 = "Text";
+
+var $operandType = "Value"; 
+
+var $fieldName1 = "Scheduled Duration";
+var $fieldName2 = "Entitlement Notes";
+var $fieldName3 = "Scheduled Date";
+var $fieldName4 = "Actual Initial Response";
+var $fieldName5 = "Order Type";
+
+var $operandValue1 = 963.00;
+var $operandValue2 = "Testing Checklist Text Question answer is given in SFD";
+var $operandValue3 = "2018-05-21";
+var $operandValue4 = "2018-05-21 10:11:12";
+var $operandValue5 = "Depot Repair";
+
+// To create a Checkbox Question with default checklist number 1
+
+$bo_act_navigation.navigateToSfmTransactionDesigner();
+_wait(60000, _isVisible($bo_pg_sfmTransactionAndDesigner.btn_newSFM));
+_wait(1000);
+
+// To create Checklist Process 
+$bo_act_checklistdesigner.newChecklistTypeSFM($checklistProcessName,"to generate a Checklist/Survey type of Process", "Work Order");
+
+$bo_act_checklistdesigner.addQuestionToChecklistProcess($QuestionName1, $AnswerType1);
+$bo_act_checklistdesigner.addQuestionToChecklistProcess($QuestionName2, $AnswerType2);
+
+
+//To create SOU configuration for Checklist Process
+//	SOU Row 1st
+$bo_act_checklistdesigner.configureSOUToChecklistProcess($fieldName1, $operandType, $operandValue1);
+//SOU Row 2nd
+$bo_act_checklistdesigner.configureSOUToChecklistProcess($fieldName2, $operandType, $operandValue2);
+//SOU Row 3rd
+$bo_act_checklistdesigner.configureSOUToChecklistProcess($fieldName3, $operandType, $operandValue3);
+//SOU Row 4th
+$bo_act_checklistdesigner.configureSOUToChecklistProcess($fieldName4, $operandType, $operandValue4);
+//SOU Row 5th
+$bo_act_checklistdesigner.configureSOUToChecklistProcessWithPicklistValues($fieldName5, $operandType, $operandValue5);
+
+//Save Checklist Process
+$bo_act_checklistdesigner.saveAndCloseChecklistProcess();
+
+// Create WO record
+var $WONumber = $bo_act_workOrders.createWorkOrder("", "", "", "", "Open", "High", "Field Service");
+
+/**
+*Invoke "Default title for Checklist" SFM from WO record
+*/
+$bo_act_workOrders.invokeDefaultTitleForChecklistSFM($WONumber);
+
+// Invoke Specific Checklist process
+$bo_act_checklistdesigner.invokeSpecificChecklistProcess($checklistProcessName);
+
+//Answer Checklist Question in Checklist delivery page
+
+//Answer Number Question 1
+var $answerNumber = 1243;
+$bo_act_checklistdesigner.answerNumberQuestionInSFD($answerNumber, $QuestionName1);
+
+var $answerText = "Checklist Text Question answer is given in SFD";
+$bo_act_checklistdesigner.answerTextQuestionInSFD($answerText, $QuestionName2);
+
+
+//Submit checklist process in SFD
+$bo_act_checklistdesigner.submitChecklistProcessInSFD();
+
+//Navigate to WO record
+$bo_act_workOrders.navigateToWorkOrder($WONumber);
+var $actualScheduleDuration = _getText(_div(0,_rightOf(_cell("/Scheduled Duration/"))));
+var $actualOrderType = _getText(_div(0,_rightOf(_cell("/Order Type/"))));
+var $actualEntitlementNotes = _getText(_div(0,_rightOf(_cell("/Entitlement Notes/"))));
+var $acualScheduledDate = _getText(_div(0,_rightOf(_cell("Scheduled Date"))));
+var $actualInitialResponse = _getText(_div(0,_rightOf(_cell("/Actual Initial Response/"))));
+
+_assertEqual($actualScheduleDuration,$operandValue1,"Actual and expected Scheduled Duration on Work Order are not same");
+_assertEqual($actualEntitlementNotes,$operandValue2,"Actual and expected Entitlement Notes on Work Order are not same");
+_assertNotNull($acualScheduledDate,"Actual and expected Scheduled Date on Work Order are not same");
+_assertNotNull($actualInitialResponse,"Actual and expected Actual Initial Response on Work Order are not same");
+_assertEqual($actualOrderType,$operandValue5,"Actual and expected Order Type on Work Order are not same");
+
+$bo_act_login.logOut(); 
+
+$RS_10341.end();

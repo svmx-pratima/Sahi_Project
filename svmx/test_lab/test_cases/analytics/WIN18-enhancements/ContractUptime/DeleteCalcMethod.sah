@@ -1,0 +1,15 @@
+var $data = _readExcelFile("../../../analytics/an_excleData/an_Datasheet1.xlsx","Sheet1",true);
+var $un = $data[1]["Username"];
+var $pwd = $data[1]["pwd"];
+var $url = "https://test.salesforce.com";
+$bo_act_login.login($url, $un, $pwd);
+
+// Delete ContractUptime methods
+var $contractuptime = "Select Id from SVMXC__ServiceMax_Processes__c where SVMXC__ProcessID__c = 'UpDownTime'";
+var $fetchuptime = $op_act_sForceApiCall.sForceQuery($un, $pwd, $contractuptime,"query");
+
+var $uptime_process = $fetchuptime[0].Id;
+
+$uptime_delete = "delete [Select Id from SVMXC__ServiceMax_Config_Data__c where SVMXC__Dispatch_Process__c = '"+$uptime_process+"' ];";
+var $delete_data = $op_act_sForceApiCall.sForceQuery($un, $pwd, $uptime_delete , "create");
+

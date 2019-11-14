@@ -1,0 +1,64 @@
+var $dc_act_consoleViews = new function dc_act_consoleViews(){
+	
+	this.setDispatchConsoleFields = function($check){
+		$dc_act_navigation.navigateToDispatchConsoleFieldUpdates();
+		_log("Setting up of Dispatch Console Fields")
+	    _setSelected($dc_pg_consoleFieldUpdates.sel_updateField1, "Billing Type");
+	    _click($dc_pg_consoleFieldUpdates.btn_save);
+   	    
+	};
+	
+	
+	this.verifyDispatchConsoleViewPageLoad = function(){
+		
+		_click($dc_pg_consoleViews.link_home);
+		_click($dc_pg_consoleViews.link_servicemaxSetup);
+		_wait(60000,_isVisible($dc_pg_consoleViews.link_DispatchManagement));
+		_click($dc_pg_consoleViews.link_DispatchManagement);
+		_wait(60000,_isVisible($dc_pg_consoleViews.link_DispatchConsoleViews));
+		_click($dc_pg_consoleViews.link_DispatchConsoleViews);
+
+		_wait(5000, _isVisible(_heading2("mainTitle")));
+		_log("Dspatch Console View Page is loaded successfully");
+		_assertExists($dc_pg_consoleViews.txt_manageViewHeading,"DC Console Views Page could not be loaded");
+		_assertExists($dc_pg_consoleViews.txt_standardViewHeading,"DC Console Views Page could not be loaded");
+		_assertExists($dc_pg_consoleViews.txt_customViewHeading,"DC Console Views Page could not be loaded");
+	
+	};
+	
+	this.createDispatchConsoleViewForWorkOrder = function($consoleViewName, $consoleViewId){
+		
+		_click($dc_pg_consoleViews.btn_new);
+		_wait(60000,_isVisible($dc_pg_consoleViews.txt_configureView));
+
+
+		_setSelected($dc_pg_consoleViews.sel_object, "Work Order");
+		_setValue($dc_pg_consoleViews.txtViewName,$consoleViewName);
+		_setValue($dc_pg_consoleViews.txtViewId, $consoleViewId);
+		_setSelected($dc_pg_consoleViews.selViewFor, "Grid And Map");
+
+
+		_setSelected($dc_pg_consoleViews.sel_woFieldName1, "Order Status"); 
+		_setSelected($dc_pg_consoleViews.sel_woOperator1, "Equals"); 
+		_setValue($dc_pg_consoleViews.txt_woFieldValue1, "Open");
+
+		_click($dc_pg_consoleViews.btn_add);
+		_wait(3000);
+
+		_setSelected($dc_pg_consoleViews.sel_woFieldName2, "Priority"); 
+		_setSelected($dc_pg_consoleViews.sel_woOperator2, "Not Equal"); 
+		_setValue($dc_pg_consoleViews.txt_woFieldValue2, "Low");
+
+		_setValue($dc_pg_consoleViews.txtAdvancedExpression, "1 AND 2");
+
+		_setSelected($dc_pg_consoleViews.sel_fieldSelection, "Account"); 
+		_click($dc_pg_consoleViews.submitButton);
+		_setSelected($dc_pg_consoleViews.sel_fieldSelection, "City"); 
+		_click($dc_pg_consoleViews.submitButton);
+		_setSelected($dc_pg_consoleViews.sel_fieldSelection, "Priority"); 
+		_click($dc_pg_consoleViews.submitButton);
+		_click($dc_pg_consoleViews.btn_QuickSave);
+
+	
+	};		
+};

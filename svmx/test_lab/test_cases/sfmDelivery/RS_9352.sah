@@ -1,0 +1,284 @@
+//Author: Anand Kakhandaki
+var $RS_9352=_testcase("$RS_9352","Verify display of dynamic response in DateTime checklist question");
+$RS_9352.start();
+
+		var $Today=$bo_act_common.getfutureDate(0, "/", 0);
+		var $Tomarrow= $bo_act_common.getfutureDate(0, "/", 1);
+		var $Yesterday= $bo_act_common.getfutureDate(0, "/", -1);
+	
+		var $forToday=formateDate($Today, "/", "-");
+		var $forTomarrow=formateDate($Tomarrow, "/", "-");
+		var $forYesterday=formateDate($Yesterday, "/", "-");
+		
+		//pre_Req: Create Work orders
+		var $objName= $orgnamespace+"__Service_Order__c";
+		var $obJson = "{\""+$orgnamespace+"__Billing_Type__c\":\"Empowerment\",\""+$orgnamespace+"__SM_Estimated_Duration__c\":\"7200\",\""+$orgnamespace+"__Scheduled_Date__c\":\""+$forTomarrow+"\",\""+$orgnamespace+"__Preferred_Start_Time__c\":\""+$forToday+"\",\""+$orgnamespace+"__Preferred_End_Time__c\":\""+$forTomarrow+"\",\""+$orgnamespace+"__Scheduled_Date_Time__c\":\""+$forYesterday+"\",\""+$orgnamespace+"__Order_Type__c\":\"Field Service\"}";	
+		var $columnName = "Name";
+		var $filter="id";
+		var $filterValue=$sfm_act_restApiMethods.postRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,$objName,$obJson,"POST");
+		var $WONumber =$sfm_act_restApiMethods.getRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,"GET", $objName, $columnName, $filter, $filterValue);
+		_log("WO number: "+$WONumber);
+
+		//Login to app
+		$bo_act_login.login($g_url,$sfmdUsn,$sfmdPwd);
+		$bo_act_configurationProfiles.editGlobalProfileForBooleanSettings("Common", "Global Settings", "GBL037", false);
+
+		//Checklsit Process (SFM) creation
+		var $chkListsfmName=$bo_act_common.generateRandomName("RS9352_cklist_");
+		var $sfmType="to generate a Checklist/Survey type of Process";
+		var $object="Work Order";
+		$sfm_act_Transactions.sfmPropertiesPage($chkListsfmName, $chkListsfmName, $chkListsfmName, $sfmType, "", [], $object, []);
+
+		//Section1: Dynamic response on date/Time
+		//Rename: Default section to DateTime Section
+		var $sectionName="Checklist Section Title";
+		var $dateTimeSeaction="Date Time que Section";
+		var $dateTimeSectionURL="http://google.com";
+		_click($sfm_pg_formDesigner.tab_formDesigner);
+		$sfm_act_formDesigner.editAndSaveSectionDetails($sectionName, $dateTimeSeaction, $dateTimeSeaction, $dateTimeSectionURL);
+		
+		//Adding Dynamic Date Time Questions
+		var $dynDateQName=["dynRepToday","dynRepfuture","dynRepPast","dvrDTToday","dvrDToday"];
+		var $defaultVal=["Preferred Start Time","Preferred End Time","Scheduled Date Time","Preferred End Time","Scheduled Date"];
+		var $queType="Date Time";
+		var $dynDateQueNameList=new Array();
+		for (var $i = 0; $i < $dynDateQName.length; $i++) {
+			var $dynDate_Que=$bo_act_common.generateRandomName($dynDateQName[$i]+"_");
+			var $queCommonDetails=[$queType,$dynDate_Que,"","",true];
+			var $preFillFromWO=true;
+			var $defaultAnsType="";
+			var $dateQueDetails=[$preFillFromWO,$defaultAnsType,$defaultVal[$i]];
+			$sfm_act_formDesigner.createCheckListQuestion($dateTimeSeaction, $queCommonDetails, $dateQueDetails);
+			$dynDateQueNameList[$i]=$dynDate_Que;
+		}
+		
+		//adding DVR on dvrDTToday & dvrDToday questions
+		var $errorMsgListonDate=new Array();
+		for (var $i = $dynDateQName.length-2; $i < $dynDateQName.length; $i++) {
+			var $scollElement=_f("main").s_vscrollbar("verticalScrollBar");
+			$sfm_act_Transactions.lookUpScrollIntoView($dynDateQueNameList[$i], $scollElement);
+			_click($sfm_pg_formDesigner.btn_editQuestion.near(_f("main").s_label($dynDateQueNameList[$i])));
+			$comboField=["Equals"];
+			$operandType=["Function"];
+			$answer=["Tomorrow"];
+			$advExpr="";
+			$msfType="Error";
+			$errorMsg=$dynDateQueNameList[$i]+" is having Tomorrow date: "+$Tomarrow+". Please change this to Todays date: "+$Today;
+			$questionType=$queType;
+			$dvrExpressionDetails=[$comboField,$operandType,$answer,$advExpr,$msfType,$errorMsg,$questionType];
+			$sfm_act_formDesigner.dataValidationOnCheckListQuestion($dynDateQueNameList[$i], $dynDateQueNameList[$i], $dvrExpressionDetails);
+			_click($sfm_pg_formDesigner.tab_questionDetails);
+			_click($sfm_pg_formDesigner.btn_dvrSave);
+			_wait(5000);
+			var $index=$i;
+			var $indexList=$index-3;
+			$errorMsgListonDate[$indexList]=$errorMsg;
+		}
+		
+		//Section 2: Picklist Function 
+		//Rename: Default section to Picklist Section
+		$sfm_act_formDesigner.createNewSection();
+		var $PicklistSeaction="Picklist que Section";
+		$sfm_act_formDesigner.editAndSaveSectionDetails($sectionName, $PicklistSeaction, $PicklistSeaction, $dateTimeSectionURL);
+		
+		//Adding Dynamic picklist Questions
+		var $queType=["Picklist","Radio Button"];
+		var $defaultVal=["Order Type","Billing Type"];
+		var $dynPicklistQList= new Array();
+		for (var $i = 0; $i < $queType.length; $i++) {
+			var $dynPickL_Que=$bo_act_common.generateRandomName($queType[$i]+"_");
+			var $queCommonDetails=[$queType[$i],$dynPickL_Que,"","",true];
+
+			var $preFillFromWO=true;
+			var $responseSet="";
+			var $responseSetName=$dynPickL_Que;
+			var $ansValueSet="";
+			var $default="";
+			var $picklistQueDetails=[$preFillFromWO,$defaultVal[$i],$responseSet,$responseSetName,$ansValueSet,$default];
+			$sfm_act_formDesigner.createCheckListQuestion($PicklistSeaction, $queCommonDetails, $picklistQueDetails);
+			$dynPicklistQList[$i]=$dynPickL_Que;
+		}
+
+		//Section 3: Number Function 
+		//Rename: Default section to Number Section
+		$sfm_act_formDesigner.createNewSection();
+		var $NumberSeaction="Number que Section";
+		$sfm_act_formDesigner.editAndSaveSectionDetails($sectionName, $NumberSeaction, $NumberSeaction, $dateTimeSectionURL);
+		
+		var $dynNumQList=new Array();
+		var $defaultVal=["Estimated Duration","Scheduled Duration"];
+		//Adding Dynamic number Questions
+		var $ansValueSet;
+		for (var $i = 0; $i < 3; $i++) {
+			var $dynNum_Que=$bo_act_common.generateRandomName("Num_");
+			var $QueDetails;
+			if ($i<2) {
+				var $queType="Number";
+				var $queCommonDetails=[$queType,$dynNum_Que,"","",true];
+				$QueDetails=[true, $defaultVal[$i]];
+			}else{
+				var $queType="Multi-select Picklist";
+				var $queCommonDetails=[$queType,$dynNum_Que,"","",true];
+				
+				var $responseSet="Create New";
+				var $responseSetName=$dynNum_Que;
+				$ansValueSet=["test1","test2"];
+				var $default=false;
+				$QueDetails=[$responseSet,$responseSetName,$ansValueSet,$default];
+			}
+			$sfm_act_formDesigner.createCheckListQuestion($NumberSeaction, $queCommonDetails, $QueDetails);
+			$dynNumQList[$i]=$dynNum_Que;
+		}
+		_wait(5000);
+		_click(_f("main").s_checkbox("Required").near(_f("main").s_label($dynNumQList[1])));
+		
+	
+		//adding DVR on $dynNum_Que questions
+		$sfm_act_Transactions.lookUpScrollIntoView($dynNumQList[1], $scollElement);
+		_click($sfm_pg_formDesigner.btn_editQuestion.near(_f("main").s_label($dynNumQList[1])));
+		$comboField=["Equals"];
+		$operandType=["Value"];
+		$answer=["3000"];
+		$advExpr="";
+		$msfType="Confirmation";
+		$errorMsgonNo=$dynNumQList[1]+" is having 3000. Please change this to other value";
+		$questionType="Number";;
+		$dvrExpressionDetailsOnNo=[$comboField,$operandType,$answer,$advExpr,$msfType,$errorMsgonNo,$questionType];
+		$sfm_act_formDesigner.dataValidationOnCheckListQuestion($dynNumQList[1], $dynNumQList[1], $dvrExpressionDetailsOnNo);
+		_click($sfm_pg_formDesigner.tab_questionDetails);
+		_click($sfm_pg_formDesigner.btn_dvrSave);
+		_wait(5000);
+		
+		//map WO to Checklist
+		$sfm_act_Transactions.sfmQualifyingCriteriaieldMappings($object, [], [], "", "SVMXSTD: Map Work Order to Checklist");
+		
+		_setStrictVisibilityCheck(true);
+		_click($bo_pg_sfmTransactionAndDesigner.btn_quickSave1);
+		_wait(10000);
+		_click($bo_pg_sfmTransactionAndDesigner.btn_saveAndclose);
+		_setStrictVisibilityCheck(false);
+		
+		//opDoc SFM creation
+		var $sfmName=$bo_act_common.generateRandomName("rs_9352_");
+		var $sfmType="to generate an Output Document for a header record with/without its child records";
+		$sfm_act_Transactions.sfmPropertiesPage($sfmName, $sfmName, $sfmName, $sfmType, "", [], "Work Order",["Checklist (Work Order)"]);		
+		var $filePath="../../../../checklistOPDocFormat.txt";
+		$sfm_act_Transactions.saveOPDOCTempDesigner("",$sfmName, $sfmName, $filePath);
+		$sfm_act_Transactions.AdvancedOptionsChecklist(false, true, [$chkListsfmName], ["All Versions"]);
+		
+		_setStrictVisibilityCheck(true);
+		_click($bo_pg_sfmTransactionAndDesigner.btn_quickSave1);
+		_wait(10000);
+		_click($bo_pg_sfmTransactionAndDesigner.btn_saveAndclose);
+		_setStrictVisibilityCheck(false);
+		
+		//add sfm to wizard
+		var $wizardObject="Work Order";
+		var $sfmd_wizardName1 =$sfmd_wizardName[7];
+		var $sfmd_wizardType="Checklist";
+		var $profile="";
+		var $handOver=false;
+		$sfm_act_wizards.addToWizard($wizardObject, $sfmd_wizardName1, $sfmd_wizardType, "", $handOver, $profile); 
+		
+		//add sfm to wizard
+		var $sfmd_wizardName1 =$sfmd_wizardName[7];
+		var $sfmd_wizardType="Output Document";
+		var $profile="";
+		var $handOver=false;
+		$sfm_act_wizards.addToWizard($wizardObject, $sfmd_wizardName1, $sfmd_wizardType,$sfmName , $handOver, $profile);
+		
+		$sfm_act_common.globalSearchOnce($WONumber);
+		_wait(10000);
+		_setStrictVisibilityCheck(true);
+		$sfm_act_createCustomWizard.clickWizardBtn("Default title for Checklist");
+		_wait(30000,_isVisible(_link("/Checklists/")));
+		
+		//Assertion on checklist default values and dvr's
+		_click(_div("/"+$chkListsfmName+"/"));
+		_wait(10000,_isVisible(_link($chkListsfmName)));
+		_assertEqual($Today,_getValue(_textbox(0,_near(_label($dynDateQueNameList[0]+":")))));
+		_assertEqual($Tomarrow,_getValue(_textbox(0,_near(_label($dynDateQueNameList[1]+":")))));
+		_assertEqual($Yesterday,_getValue(_textbox(0,_near(_label($dynDateQueNameList[2]+":")))));
+		_click($bo_pg_sfmTransactionAndDesigner.btn_next);
+		_wait(8000,_isVisible(_label("/"+$PicklistSeaction+"/")));
+		_assertEqual("Field Service",_getValue(_textbox(0,_near(_label($dynPicklistQList[0]+":")))));
+		//_assertEqual("",_getValue(_textbox(0,_near(_label($dynPicklistQList[0]+":")))));
+		_click($bo_pg_sfmTransactionAndDesigner.btn_next);
+		_wait(8000,_isVisible(_label("/"+$NumberSeaction+"/")));
+		_assertEqual("7200",_getValue(_textbox(0,_near(_label($dynNumQList[0]+":")))));
+		_setValue(_textbox(0,_near(_label($dynNumQList[1]+":"))),"");
+		_click(_textbox(0,_near(_label($dynNumQList[2]+":"))));
+		_click(_span("/svmx-column-header/",_in(_div("/column-header-inner/",_leftOf(_div($dynNumQList[2]))))));
+		_click($bo_pg_sfmTransactionAndDesigner.btn_submitCheckList);
+		
+		
+		//DVR assertion Section
+		_assertEqual($errorMsgListonDate[0],_getText(_div("/dvrDTToday/")));
+		_assertEqual($errorMsgListonDate[1],_getText(_div("/dvrDToday/")));
+		_log($dynNumQList[1]);
+		_assertExists(_div("Required field is blank: "+$dynNumQList[1]));
+		
+		_click(_span("/hide-icon/"));
+		_setValue(_textbox(0,_near(_label($dynNumQList[1]+":"))),"3000");
+		
+		_click($bo_pg_sfmTransactionAndDesigner.btn_previous);
+		_wait(8000,_isVisible(_label("/"+$PicklistSeaction+"/")));
+		_click($bo_pg_sfmTransactionAndDesigner.btn_previous);
+		_wait(8000,_isVisible(_label("/"+$chkListsfmName+"/")));
+		_click(_span("/current-datetime-icon/",_near(_label($dynDateQueNameList[3]+":"))));
+		_click(_span("/current-datetime-icon/",_near(_label($dynDateQueNameList[4]+":"))));
+		_click($bo_pg_sfmTransactionAndDesigner.btn_next);
+		_wait(8000,_isVisible(_label("/"+$PicklistSeaction+"/")));
+		_click($bo_pg_sfmTransactionAndDesigner.btn_next);
+		_wait(8000,_isVisible(_label("/"+$NumberSeaction+"/")));
+		_click($bo_pg_sfmTransactionAndDesigner.btn_submitCheckList);
+		_assertContainsText($errorMsgonNo,_div("/confirmationwindow/"));
+		_click($bo_pg_sfmTransactionAndDesigner.btn_savePicklistQueAlert);
+		
+		_wait(5000,_isVisible(_link("/Checklists/")));
+		_click(_label("/Completed/",_near(_label($chkListsfmName))));
+		
+		//assertion on the submitted checklsit
+		_assertContainsText($Today,_div("/datetime/[1]",_near(_label($dynDateQueNameList[0]+":"))));
+		_assertContainsText($Tomarrow,_div("/datetime/[1]",_near(_label($dynDateQueNameList[1]+":"))));
+		_assertContainsText($Yesterday,_div("/datetime/[1]",_near(_label($dynDateQueNameList[2]+":"))));
+		_click($bo_pg_sfmTransactionAndDesigner.btn_next);
+		_assertContainsText("Field Service",_label(1,_near(_div($dynPicklistQList[0]+":"))));
+		_assertContainsText("Empowerment",_label(1,_near(_div($dynPicklistQList[1]+":"))));		
+		_click($bo_pg_sfmTransactionAndDesigner.btn_next);
+		_assertContainsText("7,200",_label(1,_near(_div($dynNumQList[0]+":"))));
+		_assertEqual($ansValueSet[0]+";"+$ansValueSet[1],_getText(_label(1,_near(_label($dynNumQList[2]+":")))));
+		
+		
+		//validation on opdoc
+		$sfm_act_common.globalSearchOnce($WONumber);
+		_wait(10000);
+		_setStrictVisibilityCheck(true);
+		$sfm_act_createCustomWizard.clickWizardBtn($sfmName);
+		_wait(5000,_isVisible($bo_pg_sfmTransactionAndDesigner.btn_finalize));
+		
+		var $dates=[$Today,$Tomarrow,$Yesterday];
+		_assertEqual($chkListsfmName,_getText(_cell(0,_under(_tableHeader("Checklist")))));
+		for (var $i = 0; $i < $dynDateQName.length-2; $i++) {
+			_assertContainsText ($dates[$i], _cell(0,_rightOf(_cell($dynDateQueNameList[$i]))));
+		}		
+		_assertEqual("Field Service",_getText(_cell(0,_rightOf(_cell($dynPicklistQList[0])))));
+		_assertEqual("Empowerment",_getText(_cell(0,_rightOf(_cell($dynPicklistQList[1])))));
+		_assertEqual("7200",_getText(_cell(0,_rightOf(_cell($dynNumQList[0])))));
+		
+
+		_click($bo_pg_sfmTransactionAndDesigner.btn_finalize);
+		_wait(15000);
+		_click(_link($WONumber));
+		_wait(10000,_isVisible($sfm_pg_sfmDesigner.btn_edit));
+		_assertExists(_link("/"+$sfmName+".*pdf/",_near(_heading3("Notes & Attachments"))));
+
+function formateDate($date,$currentSeperator,$SeperatorToBe){
+	var $dateSplit=$date.split($currentSeperator);
+	var $formatedDate=$dateSplit[2]+$SeperatorToBe+$dateSplit[0]+$SeperatorToBe+$dateSplit[1];
+	_log($formatedDate);
+	return $formatedDate;
+};
+		
+
+$RS_9352.end();

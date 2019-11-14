@@ -1,0 +1,41 @@
+//author - Srinivasa Murthy S
+
+var $RS_12400 = _testcase("RS_12400","Custom Action Enhancement - UI");
+$RS_12400.start();
+_setSpeed($g_stepSpeed);
+
+
+
+
+//Pre - Condition 
+/*
+ * Create a tab for "View ServiceMax Configuration Changes" to view the logged messages
+ * A Salesforce Profile is available that is not used in any ServiceMax Profiles
+ * Create a Custom Setting for Org-wide and Group-wide configurations
+ * 
+ */
+//Generate a random number for the Custom Action Name
+var $sfmName=$bo_act_common.generateRandomName("RS_12400_");
+
+//Login to the org
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+
+//Navigate to the Custom Action configuration page
+$bo_act_navigation.navigateToSfmCustomAction();
+
+//Create URL based custom action
+$bo_act_customAction.createNewCustomActionURL($sfmName, $sfmName, "https://www.google.co.in", "Work Order", "URL");
+_wait(1000);
+//Add parameters to the custom action
+$bo_act_customAction.addParametersForURL($sfmName, "Field Source", "Work Order - Case", "Case Reason");
+
+//Assert if Parameter Source and Value fields are Visible
+_assertVisible(_select("j_id0:j_id1:BLOCK1:BLOCK2:j_id144:TABLE:0:parameterSource"), "Parameter Source available");
+_assertVisible(_select("j_id0:j_id1:BLOCK1:BLOCK2:j_id144:TABLE:0:j_id172"), "Parameter Value available");
+
+_click($bo_pg_customAction.btn_saveAndClose);
+_wait(1000);
+//Delete the custom action
+$bo_act_customAction.quickdeleteCustomAction($sfmName);
+
+$RS_12400.end();

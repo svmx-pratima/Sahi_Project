@@ -1,0 +1,63 @@
+var $rs_5353 = _testcase("RS_5353","Verify Data Validation Rule for Standalone Edit - Advanced Expression with Error Message");
+$rs_5353.start();
+/**
+* Cloning TDM016/Manage Work Order Lines - Usage process and adding fields to screen
+*/
+
+var $sfmNameToBeCloned = "Manage Work Order Lines - Usage";
+var $sfmName = $bo_act_common.generateRandomName("RS_5353_");
+var $isCustom = false;
+var $sfmTemplate = "SVMXSTD: Manage WO Usage Lines";
+var $sfmTemplateSaveAsName = $sfmName;
+var $containerName = ["Order Status","Order Status"];
+var $rulename = $sfmName;
+var $targetObject ="Work Order";
+var $ruleDescription = "Actual Initial Response Not Equal Function Today, City Starts with Value M";
+var $fieldArray = ["City","Actual Initial Response"];
+var $conditionArray = ["Starts With","Not Equal"];
+var $operandArray =["Value", "Function", "Field"];
+var $valueArray =["M", "Today"];
+var $advExpr= "1 AND 2";
+var $fieldName =["City","Actual Initial Response"];
+var $fieldName1="Actual Initial Response";
+var $wizardObject ="Work Order";
+var $messageType="Error";
+var $wizardObject ="Work Order";
+
+//Create WO through REST API
+var $woNumber = $sfm_act_createCustomWizard.createBlankWoFromRest($sfmdUsn, $sfmdPwd, $sfmClientId, $sfmConsumerSecret, $sfmOrgInstance);
+//login
+$bo_act_login.login($g_url, $sfmdUsn, $sfmdPwd);
+
+//clone tdm016 and add dvr
+$sfm_act_SFM.cloneTDM016($sfmNameToBeCloned, $sfmName, $isCustom, $sfmTemplateSaveAsName,$sfmTemplate, $fieldName, $containerName);
+$sfm_pg_dvr.newRule($targetObject, $rulename, $ruleDescription, $fieldArray, $conditionArray, $operandArray, $valueArray, $advExpr, $messageType);
+_click($sfm_pg_sfmDesigner.btn_saveSFM); 
+
+//add the step to wizard
+$sfm_act_wizards.addToWizard($wizardObject, $sfmd_wizardName[0], $sfmd_wizardType[1], $sfmName);  
+
+//Navigate to the WO for validation
+$bo_act_navigation.navigateToCreatedRecordUsingGlobalSearch($woNumber);
+
+$sfm_act_createCustomWizard.clickWizardBtn($sfmName);
+//Validate DVR when condition is met
+_selectDomain();
+_setValue(_textbox("City:"),"M");
+var $pastDate=$bo_act_common.getPastDate("1", "/");
+_setValue(_textbox("/svmx-date/",_rightOf(_label("Actual Initial Response:"))), $pastDate);
+_click($sfm_pg_sfmDesigner.btn_deliveryQuickSave);
+_assertExists(_div($ruleDescription),"DVR on header is working");
+
+//validate DVR when condition is not met
+_click(_span("svmx-btn-icon svmx-sfmd-current-datetime-icon"));
+_click($sfm_pg_sfmDesigner.btn_deliveryQuickSave);
+//_assertNotExists(_div($ruleDescription),"DVR is thrown when not supposed to be");
+_assertNotVisible(_div($ruleDescription),"DVR is thrown when not supposed to be");
+if(_exists($sfm_pg_sfmDesigner.txt_priceAlert)){
+	_click($sfm_pg_sfmDesigner.btn_priceAlertOk);
+}
+$rs_5353.end();
+ 
+
+

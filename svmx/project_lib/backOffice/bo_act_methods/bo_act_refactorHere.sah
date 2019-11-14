@@ -1,0 +1,66 @@
+//Common Functions
+
+var $bo_act_refactorHere = new function bo_act_refactorHere(){
+var $DEFAULT_SVMXDEV_UserName = "noor.sharieff@Tools2.com";
+var $DEFAULT_SVMXDEV_Password = "welcome-02";
+var $DEFAULT_SandboxOrg = "https://test.salesforce.com"
+var $DEFAULT_ProdOrg = "https://login.salesforce.com"
+
+
+///LIBRARY
+
+
+
+var $PMPlanSource_SCON;
+
+// Create an Account
+
+
+
+
+
+
+
+
+
+
+
+
+
+function createPMProcess($dd_processType,$creationOfWO,$pmPlan){
+	var $PMProcessName = generateRandomString(8);
+	var $pmProcessId = generateRandomString(8);
+	var $expressionName = generateRandomString(8);
+	var $expressionId = generateRandomString(8);
+	navigatetopmprocess();
+	_click(_button("New"));
+	_setSelected(_select("/CONF_SetupPMProcess/"),$dd_processType);
+	$PMProcessName
+	_setValue(_textbox("/CONF_SetupPMProcess:SVMX_/",_rightOf(_span("Process Name"))),$PMProcessName);
+_setValue(_textbox("/CONF_SetupPMProcess:SVMX_/",_rightOf(_span("Process Id"))),$pmProcessId);
+_check(_checkbox("/CONF_SetupPMProcess:SVMX_/",_rightOf(_span("Active"))));
+	_setValue(_textbox("/CONF_SetupPMProcess:SVMX_/",_rightOf(_span("Create Work Order 'n' days before scheduled date"))),$creationOfWO);
+	_click(_span("Create New"));
+	_setSelected(_select("/CONF_SetupPMProcess:SVMX/",_under(_tableHeader("Field Name"))),"PM Plan Name");
+	_setSelected(_select("/CONF_SetupPMProcess:SVMX/",_under(_tableHeader("Operator"))),"Equals");
+	_setValue(_textbox("/CONF_SetupPMProcess:SVMX/",_under(_tableHeader("Value"))),$pmPlan);
+	_setValue(_textbox("/CONF_SetupPMProcess:SVMX/",_rightOf(_label("Expression Name"))),$expressionName);
+_setValue(_textbox("/CONF_SetupPMProcess:SVMX/",_rightOf(_label("Expression Id"))),$expressionId);
+	_click(_cell("Work Order Rules"));
+	_setSelected(_select("/CONF_SetupPMProcess:SVMX/",_rightOf(_span("Number of Work Orders"))),"One Per Plan");
+_setSelected(_select("/CONF_SetupPMProcess:SVMX/",_rightOf(_span("Field Map (Coverage Type: Product or Account)"))),"SVMXSTD: Service Contract To Work Order");
+	
+	_click(_cell("Schedule & Notifications"));
+	_setValue(_textbox("/CONF_SetupPMProcess:SVMX/",_rightOf(_span("Send error notifications to this email address"))),"noor.sharieff@servicemax.com");
+	_click(_button("Quick Save"));
+}
+
+function RunScriptInDevConsole($script){
+	navigateToDevConsole();
+	_click(_span("Debug"));
+_click(_div("Open Execute Anonymous Window"));
+	
+}
+
+}
+	

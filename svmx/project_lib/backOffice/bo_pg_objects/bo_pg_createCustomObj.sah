@@ -1,0 +1,14 @@
+
+var $bo_pg_createCustomObj = new function bo_pg_createCustomObj(){
+this.lnk_salesforceSetUp=_link("Setup");
+	this.txt_seachTxt=_textbox("setupSearch");
+	this.lnk_clkObj=_link("Objects");
+	this.btn_newCustomObj=_button("New Custom Object");
+	this.txt_nameOfCustObj=_textbox("MasterLabel");
+	this.txt_pluralLabel=_textbox("PluralLabel");
+	this.btn_submit=_submit(" Save [1]");
+	this.lnk_delete=_link("Del");
+		this.chk_confirmationChkbox=_checkbox("confirmed");
+	
+	this.button_clickDeleteButton=_submit("Delete")
+}

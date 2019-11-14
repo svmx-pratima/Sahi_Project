@@ -1,0 +1,61 @@
+//Tests are to be written here [Bhupendra Singh Chouhan]
+//==============
+
+//Pre - Condition Test Data
+
+var $RS_7304 = _testcase("$RS_7304","Creation of auto Entitlement rule for Case with multiple fields and rule sequence");
+$RS_7304.start();
+_setSpeed($g_stepSpeed);
+/**
+* Login to the Sandbox Org
+*/
+
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+
+
+/**
+ * Configure the Global Profile SET001
+ * Global Setting SET001 - Enable Auto Entitlement For Work Order is set to True for Auto Entitlement process to trigger 
+ * (This is a Global Setting and is available under Module "Entitlement Verification" and Submodule "Auto-Entitlement - Work Order") 
+ */
+var $Module = "Entitlement Verification";
+var $SubModule = "Auto-Entitlement-Case";
+var $Setting = "SET001";
+var $value = true;
+$bo_act_configurationProfiles.editGlobalProfileForBooleanSettings($Module, $SubModule, $Setting, $value);
+
+/**
+ * Create Auto Entitlement Rules for Work Order
+ */
+
+var $CaseField1 = "Case Origin";
+var $Operator = "Equals";
+var $Value1 = "Email";
+var $CaseField2 = "Case Reason";
+var $Value2 = "New Problem";
+var	$p1 = "Service Contracts";		// $p4 = Warranties/Scon/Both for Entitlement check?
+var	$p2 = "Both";     				// $p8 = Validity dates/Counters/Both
+var	$p3 = "Warranties";				// $p4 = Warranties/Scon/Both for Entitlement check?
+
+//Navigate to Auto Entitlement Rules - Case Rule1
+$autoEntitlementRuleName_Case1 = $bo_act_autoEntitlementRule_Case.createAutoEntitlementRule_Case($CaseField1, $Operator, $Value1, $CaseField2, $Value2, $p1, $p2);
+_assertExists(_span($autoEntitlementRuleName_Case1));
+
+//Navigate to Auto Entitlement Rules - Case Rule2
+$autoEntitlementRuleName_Case2 = $bo_act_autoEntitlementRule_Case.createAutoEntitlementRule_Case($CaseField1, $Operator, $Value1, $CaseField2, $Value2, $p3, $p2);
+_assertExists(_span($autoEntitlementRuleName_Case2));
+
+//Changing the Rule Sequence
+$bo_act_autoEntitlementRule_WO.changingAutoEntitlementRule_Sequence($autoEntitlementRuleName_Case1);
+
+//Clean up function
+
+var $datacreated = [$autoEntitlementRuleName_Case1,$autoEntitlementRuleName_Case2];
+for (var i = 0; i < $datacreated.length; i++) {
+	$bo_act_autoEntitlementRule_Case.deleteAutoEntitlementRule_Case($datacreated[i]);
+}
+
+$bo_act_login.logOut(); 
+
+$RS_7304.end();
+

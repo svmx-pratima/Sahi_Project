@@ -1,0 +1,224 @@
+var $RS_5028 = _testcase("RS_5028","Verify Field Map for existing records - Child");
+$RS_5028.start();
+//Variables used
+var $objectName = "Work Order";
+var $childObject = "Work Detail";
+var $processName = "RS_5028";
+var $process_to_clone = "Create Quote from Work Order";
+var $sfmTemplate = "SVMXSTD: Create Depot Repair Work Order";
+var $isCustom = false;
+var $lineType = "Parts";
+var $fieldsAbsentInPage = [];
+var $lookupValues = [,,,,,,,"Account"];
+var $ctr = 0;
+var $i = 0;
+var $currentWizardName = $sfmd_wizardName[4];
+var $pageLayoutForProfile = "SVMXSTD: Create Depot Repair Work Order";
+var $myDomain = "/lightning/";
+var $tempFields = ["Age"];
+var $lineType = "Parts";
+var $mapType = "Field Map For Existing Records";
+var $multiPicklistValues = ["Multipicklist1","Multipicklist2","Multipicklist3"];
+var $initialChildFields = ["Line Type","Record Type ID","Line Number"];
+var $initalChildContainers = [$lineType,$lineType,$lineType];
+var $initialChildValues = [$lineType,"Usage/Consumption"];
+var $missingStdDataTypes = ["URL","Picklist (Multi-Select)","Percent","Phone","Date","Date","Email","Lookup Relationship"];
+var $customFieldsNames = ["Automation ChildURL","Automation Childmultipicklist","Automation ChildPercent","Automation ChildPhone","Automation ChildDate2","Automation ChildDate3","Automation ChildEmail","Account"];
+var $fieldsToMap = ["Account","Include in Quote","Billable Line Price","Date Received","Start Date and Time","Automation ChildEmail","Automation Childmultipicklist","Billable Qty","Automation ChildPercent","Automation ChildPhone","Activity Type","Received City","Received Street","Reference Information","Automation ChildURL"];
+var $additionalFields = ["Include in Quote","Account","Billable Line Price","Date Received","Automation ChildDate2","Automation ChildDate3","Start Date and Time","End Date and Time","Closed On","Canceled On","Automation ChildEmail","Automation Childmultipicklist","Billable Qty","Automation ChildPercent","Automation ChildPhone","Cost Category","Received City","Received Street","Reference Information","Automation ChildURL"];
+$containerName = [$lineType,$lineType,$lineType,$lineType,$lineType,$lineType,$lineType,$lineType,$lineType,$lineType,$lineType,$lineType,$lineType,$lineType,$lineType,$lineType,$lineType,$lineType,$lineType,$lineType,$lineType];
+//Appending current timestamp to process name to make it unique.
+var $timeStamp = $bo_act_navigation.getCurrentTimeStamp(); 
+$processName = $processName + "_" + $timeStamp;
+var $pageLayoutName = $processName + "pg";
+var $mapName = $processName + "mp";
+
+//**************************************************************************************
+//Login and switch to classic
+
+$bo_act_login.login($g_url,$sfmdUsn,$sfmdPwd);
+
+_wait(15000);
+//***************************************************************************************
+
+//Create custom fields if needed
+$sfm_act_common.addCustomFields($childObject, $customFieldsNames, $missingStdDataTypes,$multiPicklistValues,$lookupValues);
+
+//Create work order
+var $wo_number = $sfm_act_common.createWoInClassic();
+var $sourceWlNumber = $sfm_act_common.createWorkDetail($lineType, "Usage/Consumption");
+//Find missing fields in Work Order Page Layout and them to the layout
+for($i=0;$i<$fieldsToMap.length;$i++){
+	if(!$sfm_act_common.findIfFieldPresentInPageLayout($fieldsToMap[$i])){
+		$fieldsAbsentInPage.push($fieldsToMap[$i]);
+	}	
+}
+_log($fieldsAbsentInPage);
+
+if($fieldsAbsentInPage.length > 0){
+	$sfm_act_common.navigateToObjectsInClassic($childObject);
+	$sfm_act_common.addFieldsToLightningPageLayout($objectName,$pageLayoutForProfile,$fieldsAbsentInPage,$myDomain);
+}
+
+
+var $x = $fieldsToMap.indexOf("Record Type");
+if($x != -1) {
+		$fieldsToMap[$x] = "Record Type ID";
+}
+
+//Enter values for Source child in order to verify field mapping at target child
+var $textLabels = ["Billable Line Price","Date Received","Billable Qty","Received City","Automation ChildPercent","Account"];
+var $textValues = ["6600","4/21/2018","345","Bengaluru","44","HCSAccountForTesting"];
+var $pickListLabels = ["Activity Type"];
+var $pickListValues = ["Calibration"];
+var $textAreaLabels = ["Received Street","Reference Information"];
+var $textAreaValues = ["123 somestreet,walnut corner","This machines gets stuck while printing"];
+var $checkBoxLabels = ["Include in Quote"];
+var $checkBoxValues = ["true"];
+var $dateTimeLabels = ["Start Date and Time"];
+var $dateTimeDateValues = ["4/11/2018"];
+var $timeValues = ["3:30 PM"];
+var $emailLabels = ["Automation ChildEmail"];
+var $emailValues = ["groupemail@group.com"];
+var $multiPickLabels = ["Automation Childmultipicklist","Automation Childmultipicklist"];
+var $multiPickValues = ["Multipicklist1","Multipicklist3"];
+var $urlLabels = ["Automation ChildURL"];
+var $urlValues = ["www.google.com"];
+var $telephoneLabels = ["Automation ChildPhone"];
+var $telephoneValues = ["2345407"];
+var $lookUpLabels = ["Account"];
+var $lookUpValues = ["HCSAccountForTesting"];
+
+$sfm_act_common.globalSearchOnce($sourceWlNumber);
+$sfm_act_common.editWorkOrder($textLabels, $textValues, $pickListLabels, $pickListValues, $textAreaLabels, $textAreaValues, $checkBoxLabels, $checkBoxValues, $dateTimeLabels, $dateTimeDateValues, $timeValues,$emailLabels,$emailValues,$multiPickLabels,$multiPickValues,$urlLabels,$urlValues,$telephoneLabels,$telephoneValues,$lookUpLabels,$lookUpValues);
+_wait(3000);
+$sfm_act_common.logoutInClassic();
+//Login and switch to lightning
+$bo_act_login.login($g_url,$sfmdUsn,$sfmdPwd);
+
+_wait(15000);
+
+//**************************************************************************************************
+
+//Navigate to servicemax setup and setup required process.
+//Create new process from scratch
+_setSpeed(3000);
+$bo_act_navigation.navigateToSfmTransactionDesigner();
+$sfm_act_SFM.selectSFM($process_to_clone,$isCustom);
+_click($bo_pg_sfmTransactionAndDesigner.btn_clone);
+_wait(2000);
+_wait(60000, _isVisible($bo_pg_sfmTransactionAndDesigner.txt_name));
+_setValue($bo_pg_sfmTransactionAndDesigner.txt_name, $processName);
+_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmTransactionId,"");
+_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmTransactionId,$processName);
+_setSelected($bo_pg_sfmTransactionAndDesigner.list_targetHeaderList,$objectName);
+if(_isVisible($bo_pg_sfmTransactionAndDesigner.btn_popUpOK)){
+	_click($bo_pg_sfmTransactionAndDesigner.btn_popUpOK);
+}
+//_click($bo_pg_sfmTransactionAndDesigner.list_sourceChild);
+_click($bo_pg_sfmTransactionAndDesigner.list_targetChild);
+_setValue($bo_pg_sfmTransactionAndDesigner.text_targetChildAlias,$lineType);
+//_click($bo_pg_sfmTransactionAndDesigner.chkbx_targetChild2);
+_click($bo_pg_sfmTransactionAndDesigner.btn_qualifyingCriteriaAndFieldMapping);
+_click(_f("main").s_dropdownlist("objCombo").near(_f("main").s_label($lineType)));
+_setSelected(_f("main").s_dropdownlist("objCombo").near(_f("main").s_label($lineType)),"Work Detail (Work Order)");
+
+_wait(2000);
+_click($bo_pg_sfmTransactionAndDesigner.btn_screenDesigner);
+_wait(6000);
+_setSelected($bo_pg_sfmTransactionAndDesigner.sel_sfmTemplate,$sfmTemplate);
+_wait(6000);
+_click($bo_pg_sfmTransactionAndDesigner.btn_newPageLayout);
+_click($bo_pg_sfmTransactionAndDesigner.txt_firstChildSection); 
+_setValue($bo_pg_sfmTransactionAndDesigner.txt_sectionName,$lineType);
+$bo_act_navigation.designHeaderScreen($pageLayoutName,$tempFields);
+_wait(2000);
+$bo_act_navigation.designChildScreen($pageLayoutName, $initialChildFields, $initalChildContainers);
+_click(_f("main").s_richtext($lineType));
+_click($bo_pg_sfmTransactionAndDesigner.chkbx_allowNew);
+_click($bo_pg_sfmTransactionAndDesigner.chkbx_allowDelete);
+_click($bo_pg_sfmTransactionAndDesigner.btn_savePage);
+_click($bo_pg_sfmTransactionAndDesigner.btn_quickSave1);
+
+//Create mapping for all possible standard data types.
+_click($bo_pg_sfmTransactionAndDesigner.btn_qualifyingCriteriaAndFieldMapping);
+$bo_act_mappings.createMapping($lineType,$mapType,[$fieldsToMap[0]],[$fieldsToMap[0]],[],[],$mapName);
+_selectDomain();
+_setSpeed(1000);
+
+//Add the custom process to SFM wizard.
+$sfm_act_wizards.addToWizard("Work Order",$currentWizardName,"SFM",$processName);
+
+//Navigate to created work order and launch the process
+$sfm_act_common.globalSearchOnce($wo_number);
+//Launch the process in SFM Delivery
+$sfm_act_common.launchSFMProcessInClassic($processName);
+_wait(10000);
+$sfm_act_common.clearSvmxCache();
+$sfm_act_common.saveClassicSfmProcess();
+_wait(14000,_isVisible($sfm_pg_wo.label_wo));
+var $childWoId= _getText($sfm_pg_wo.label_wo);
+_log("Child Work Order id "+ $childWoId);
+
+//Get Work Detail number to perform verification
+var $targetLineNumber = $sfm_act_common.getWorkDetailNumberFromWO();
+_log("Work detail created as Target child is "+$targetLineNumber);
+_click(_link($targetLineNumber));
+_wait(6000);
+
+//Verify values for Target line created
+$textLabels = ["Billable Line Price","Date Received","Billable Qty","Received City","Automation ChildPercent"];
+$textValues = ["6,600.000","4/21/2018","345.0000","Bengaluru","44"];
+$dateTimeDateValues = ["4/11/2018"];
+$res = $sfm_act_common.verifyValues($textLabels, $textValues, $pickListLabels, $pickListValues, $textAreaLabels, $textAreaValues, $checkBoxLabels, $checkBoxValues, $dateTimeLabels, $dateTimeDateValues, $timeValues,$emailLabels,$emailValues,$lookUpLabels,$lookUpValues,$multiPickLabels,$multiPickValues,$urlLabels,$urlValues,$telephoneLabels,$telephoneValues);
+_assertTrue($res);
+if($res){
+	_log("PASS: Field map for existing values in Child has values as per field mapping");
+}
+else {
+	_log("FAIL: Field map for existing values in Child does not have values as per field mapping");
+}
+
+//Add the fields in the Screen designer
+$sfm_act_common.globalSearchOnce($wo_number);
+$sfm_act_common.launchSFMProcessInClassic($processName);
+$sfm_act_common.openSfmProcess($processName);
+_click($bo_pg_sfmTransactionAndDesigner.btn_screenDesigner);
+_wait(5000);
+$bo_act_navigation.designChildScreen($pageLayoutName,$additionalFields,$containerName);
+_wait(2000);
+_click($bo_pg_sfmTransactionAndDesigner.btn_quickSave1);
+_wait(2000);
+_closeWindow();
+_selectWindow();
+$sfm_act_common.clearSvmxCache();
+$sfm_act_common.saveClassicSfmProcess();
+_wait(14000,_isVisible($sfm_pg_wo.label_wo));
+var $childWoId= _getText($sfm_pg_wo.label_wo);
+_log("Child Work Order id "+ $childWoId);
+
+//Get Work Detail number to perform verification
+var $targetLineNumber = $sfm_act_common.getWorkDetailNumberFromWO();
+_log("Work detail created as Target child is "+$targetLineNumber);
+_click(_link($targetLineNumber));
+_wait(6000);
+
+//Verify values for Target line created
+$res = $sfm_act_common.verifyValues($textLabels, $textValues, $pickListLabels, $pickListValues, $textAreaLabels, $textAreaValues, $checkBoxLabels, $checkBoxValues, $dateTimeLabels, $dateTimeDateValues, $timeValues,$emailLabels,$emailValues,$lookUpLabels,$lookUpValues,$multiPickLabels,$multiPickValues,$urlLabels,$urlValues,$telephoneLabels,$telephoneValues);
+_assertTrue($res);
+if($res){
+	_log("PASS: Field map for existing values in Child has values as per field mapping");
+}
+else {
+	_log("FAIL: Field map for existing values in Child does not have values as per field mapping");
+}
+
+$sfm_act_common.logoutInClassic();
+
+_setSpeed($g_stepSpeed);
+$RS_5028.end();
+
+
+
+
+

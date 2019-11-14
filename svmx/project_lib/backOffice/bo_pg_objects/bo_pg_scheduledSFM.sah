@@ -1,0 +1,45 @@
+var $bo_pg_scheduledSFM=new function bo_pg_scheduledSFM(){
+		this.lbl_scheduledSFMHomePage=_heading2("Custom Scheduled SFM Processes");
+		this.btn_new=_button("New");
+		this.lbl_processName=_textbox(1);
+		this.lbl_processID=_textbox(2);
+		this.chk_active=_checkbox("setupSFMScheduledProcess:Form1:pageBlock1:j_id29:tab1pageblock1:j_id50:j_id51:j_id54:j_id55");
+		this.sel_availablePros=_select("avilablePrcess");
+		this.img_selectedPros=_imageSubmitButton("Add");
+	
+		this.img_addNewServiceToSchedule=_imageSubmitButton("Add Row");
+		
+		// Vanditha : Changing this to generic expression since above id is dynamic
+		//	this.sel_objName=_select("/setupSFMScheduledProcess:Form1:pageBlock1:j_id28:tab1pageblock1:scheduleServicesTab:j_id78:0:j_id85/");
+		this.sel_objName=_select(0,_near(_div("Object Name")));
+	
+		//this.sel_qc=     _select("/setupSFMScheduledProcess:Form1:pageBlock1:j_id28:tab1pageblock1:scheduleServicesTab:j_id78:0:j_id93/");
+ 		this.sel_qc=_select(1,_near(_div("Qualification Criteria")));
+		
+		//this.txt_className=_textbox("setupSFMScheduledProcess:Form1:pageBlock1:j_id28:tab1pageblock1:scheduleServicesTab:j_id78:0:j_id99");
+		this.txt_className=_textbox(0,_under(_tableHeader("/Class Name/")));
+	
+		//_click(_cell("data2Col  first  last [13]"));
+		//this.txt_batchSize=_textbox("setupSFMScheduledProcess:Form1:pageBlock1:j_id28:tab1pageblock1:scheduleServicesTab:j_id78:0:j_id103");
+		this.txt_batchSize=_textbox(0,_under(_tableHeader("Batch Size")));
+
+		this.tab_scheduleAndNotification=_cell("Schedule & Notifications");
+		this.sel_runAt=_select(0,_near(_tableHeader("Run At")));
+		this.sel_nameOfDays1=_select(5);
+		//this.sel_nameOfDays2 = _select(7);
+		this.sel_nameOfDays2 = _select(0, _rightOf(_cell("/--None--Day of Week Date of Month/"))); // Added By Bhupendra Singh
+		this.btn_add=_image("Add");
+	
+		this.img_sendNotificationLookUp=_image("Assign To Dispatcher Lookup (New Window)");
+	
+		this.btn_go=_submit(" Go! ");
+		this.lnk_loggedInUser=_link("Common user");
+		
+		this.sel_setUser=_textbox("/userField/");
+ 		this.btn_quickSave=_button("Quick Save");
+		this.btn_saveAndClose=_button("Save & Close");
+	this.btn_runNow=_button("Run Now");
+	this.msgForRequestInQ=_div("messageText");
+	
+};
+	

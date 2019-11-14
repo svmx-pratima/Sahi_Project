@@ -1,0 +1,244 @@
+//DO NOT MODIFY THIS FILE !!!
+//DO NOT MODIFY THIS FILE !!!
+//DO NOT MODIFY THIS FILE !!!
+
+//Find the global variables in last line. DO not Modify here
+
+//******************************DO NOT EDIT START****************************
+function global_clearBrowserCache(){
+	_call(top.localStorage.clear());
+	_call(top.location.reload(true));
+};
+// Normalizing the paths to work both on MAC and Windows
+var $g_normalizedUserDir = _userDataDir().replace(/\\/g, "/");
+
+// Add the paths that need to be included and match it to the GitHub project
+// path
+// ===== Start of paths ====//
+var $g_projectLibPath = $g_normalizedUserDir
+		+ "/scripts/Sahi_Project/svmx/project_lib";
+var $g_utilitiesPath = $g_normalizedUserDir
+		+ "/scripts/Sahi_Project/svmx/utilities_lib";
+var $g_configPath = $g_normalizedUserDir
++ "/scripts/Sahi_Project/svmx/project_config";
+// ===== End of paths ====
+
+var $g_referancePath = $g_normalizedUserDir;
+
+// Store the file paths retrieved in a array
+var $g_includeFilesArray = [];
+
+// Flag to prevent multiple invocations of reference files
+var $global_referenceAdded = false;
+
+// This should execute only once across all the suites
+if ($global_referenceAdded === false) {
+
+	// Add all the paths from where we need to fetch reference files
+	// _log("Getting references from dir : " + $g_projectLibPath);
+	recursiveGetReferenceFiles($g_projectLibPath);
+	// _log("Getting references from dir : " + $g_utilitiesPath);
+	recursiveGetReferenceFiles($g_utilitiesPath);
+	// _log("Getting references from dir : " + $g_configPath);
+	recursiveGetReferenceFiles($g_configPath);
+	_log("File Array Count = " + $g_includeFilesArray.length);
+	for (var $i = 0; $i < $g_includeFilesArray.length; $i++) {
+		try {
+			_include($g_includeFilesArray[$i]);
+		} catch ($e) {
+			_log("Reference Exception : " + JSON.stringify($e));
+		}
+		;
+	}
+
+	// Set the flag to true to prevent duplicate addition of references
+	$global_referenceAdded = true;
+}
+
+// recursively traverses $filePath while adding files (with full path) ending in
+// ".sah" to $g_includeFilesArray
+function recursiveGetReferenceFiles($filePath) {
+	var fileList = getFilesAndFolders($filePath);
+
+	if (fileList) {
+		fileList
+				.forEach(function pushToArrayIfFile(fileOrFolder, index) {
+					var $fileOrFolderPath = $filePath + "/" + fileOrFolder;
+
+					if ($fileOrFolderPath.substr($fileOrFolderPath.length - 4) === ".sah") {
+						$g_includeFilesArray.push($fileOrFolderPath);
+					} else {
+						recursiveGetReferenceFiles($fileOrFolderPath);
+					}
+				});
+	}
+}
+
+// returns an array of files and folders for the given $filePath and .DS_Store
+// files will not be included
+function getFilesAndFolders($filePath) {
+	try {
+		var $files = new java.io.File($filePath);
+		// array of files and directory
+		var $fileList = $files.list();
+
+		// remove files and folders that start with "." this is mainly to remove
+		// .DS_Store files on macs
+		$fileList.forEach(function removeDots(element, index) {
+			if (element.charAt(0) === ".") {
+				$fileList.splice(index, 1);
+			}
+		});
+
+		return $fileList;
+	} catch ($e) {
+		Packages.java.lang.System.out.println("FILE EXCEPTION : " + $e);
+	}
+}
+
+// ==== Reference addition module END ====
+
+
+// ==== Reference addition module START ====
+// Include the salesforce js files to enable sforce API calls
+init_sForce_api();
+function init_sForce_api() {
+	// <browser>
+	var script = document.createElement('script');
+	script.type = 'text/javascript';
+	script.src = '/soap/ajax/41.0/connection.js';
+	document.head.appendChild(script);
+	var script1 = document.createElement('script');
+	script1.type = 'text/javascript';
+	script1.src = '/soap/ajax/41.0/apex.js';
+	document.head.appendChild(script1);
+	// </browser>
+}
+
+
+function onScriptError($e) {
+	return onScriptErrorDefault($e);
+}
+function onScriptFailure($e) {
+	onScriptFailureDefault($e);
+}
+
+function onScriptErrorDefault($e) {
+	if ($e.isBrowserNotResponding) {
+		if (!_isPhantomJS()) {
+			_takeScreenShot();
+			dumpWindowInfo();
+		}
+	}
+
+	else {
+		if (_sahi.isAndroid() || _sahi.isWindows() || _sahi.isApplet()
+				|| _sahi.isJava()) {
+			_takeScreenShot();
+		} else {
+			// _takeScreenShot(); // uncomment this if you want a full desktop
+			// screenshot too.
+			_lockWindow();
+			_focusWindow();
+			_selectDomain();
+			_takePageScreenShot();
+			_unlockWindow();
+		}
+	}
+	return false;
+}
+
+function onScriptFailureDefault($e) {
+	if ($e.isBrowserNotResponding) {
+		if (!_isPhantomJS()) {
+			_takeScreenShot();
+			dumpWindowInfo();
+		}
+	} else {
+		if (_sahi.isAndroid() || _sahi.isWindows() || _sahi.isApplet()
+				|| _sahi.isJava()) {
+			_takeScreenShot();
+		} else {
+			// _takeScreenShot(); // uncomment this if you want a full desktop
+			// screenshot too.
+			_lockWindow();
+			_focusWindow();
+			_selectDomain();
+			_takePageScreenShot();
+			_unlockWindow();
+		}
+	}
+}
+
+function dumpWindowInfo() {
+	var s = "<pre>";
+	var info = _getWindows();
+	for (var i = 0; i < info.length; i++) {
+		var w = info[i];
+		s += "\n-------------------\nWindow " + i + ":\n-------";
+		s += "\n  windowName: " + w.windowName;
+		s += "\n  derivedName:" + w.derivedName;
+		s += "\n  windowTitle:" + w.windowTitle;
+		s += "\n  windowURL:" + w.windowURL;
+		s += "\n  wasOpened:" + w.wasOpened + " ("
+				+ (w.wasOpened == 1 ? "popup window" : "base window") + ")";
+		s += "\n  domain:" + w.domain;
+		var initDate = new Date(parseFloat(w.initialTime));
+		var lastDate = new Date(parseFloat(w.lastTime));
+		var currentDate = new Date();
+		s += "\n  initialTime:" + initDate.toUTCString();
+		s += "\n  lastTime:" + lastDate.toUTCString();
+		s += "\n  currentTime:" + currentDate.toUTCString();
+		s += "\n  Last communication:" + (currentDate - lastDate) + " ms ago";
+	}
+	s += "</pre>";
+	_sahi._log(s);
+}
+
+//******************************DO NOT EDIT END****************************
+
+//CHANGE ONLY BELOW THIS LINE FOR GLOBAL VARIABLES AND JENKINS PARAMETERS!!!!
+//CHANGE ONLY BELOW THIS LINE FOR GLOBAL VARIABLES AND JENKINS PARAMETERS!!!!
+//CHANGE ONLY BELOW THIS LINE FOR GLOBAL VARIABLES AND JENKINS PARAMETERS!!!!
+
+_windowAction("resize", 1920, 1080);
+_setXHRReadyStatesToWaitFor("2,3");
+global_clearBrowserCache();
+var $g_stepSpeed = 400;
+_setSpeed($g_stepSpeed);
+
+//PLease CHANGE the Flag to decide whether Dev or Base in else
+var $orgnamespace;
+//Check if jenkins is setting the orgtype else use local
+if(java.lang.System.getenv("Org_Type") != null){
+	$orgtype = java.lang.System.getenv("Org_Type");
+	_log("Org Type from jenkins in use : "+$orgtype);
+}else{
+	//Change to run on dev or base
+	var $orgtype = "Base";
+}
+_log("Global Org in use : "+$orgtype);
+
+if ($orgtype == "Dev") {
+          $orgnamespace = "SVMXDEV";
+} else {
+          $orgnamespace = "SVMXC";
+}
+
+//Add All Global Variables here
+var $url = "https://test.salesforce.com";
+var $url_type;
+//Check if jenkins is setting the urltype else use local
+if(java.lang.System.getenv("Url_Type") != null){
+	$url_type = java.lang.System.getenv("Url_Type");
+	_log("Url Type from jenkins in use : "+$url_type);
+}else{
+	//Change to run on dev or base
+	 $url_type = "test";
+}
+
+var $g_url  = "https://"+$url_type+".salesforce.com/";
+var $g_un = "bhupen.win18tospr18@bacofc.com";;
+var $g_pwd = "backoffice@automation.124";
+var $g_domain = "/svmx/"; 
+

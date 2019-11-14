@@ -1,0 +1,60 @@
+//author - Mamata Rout
+
+
+var $RS_5520 = _testcase("RS_5520", "Verify creation of counter rollups - 2 service contracts have 1 covered product");
+$RS_5520.start();
+_setSpeed($g_stepSpeed);
+var $ProcessName= $bo_act_common.generateRandomName("5520pros");
+var $ProcessId=$bo_act_common.generateRandomName("5520procId");
+var $selectSFM1="Cancel Shipment Order";
+var	$selectSFM2="Work Order Complete";
+var $obName= "Service/Maintenance Contract";
+var $qc="SVMXSTD: Active Service Contracts Only";
+var $clsName="IPRD_CounterRollupService";
+var $btchSize="1";
+var $scheduleTime="12:00 AM";
+var $d1="Sunday";var $d2="Monday";var $d3="Tuesday";var $d4="Wednesday";var $d5="Thursday";var $d6="Friday";var $d7="Saturday";
+var $counterRuleName=$bo_act_common.generateRandomName("5520RuleName");
+var $prodCode="Product Code";
+var $operator="Contains";
+var $value=$bo_act_common.generateRandomName("value");
+var $counterName= "Miles";
+var $type="Increasing";
+var  $growsOrReducedBy="10";
+var $minValue="10";
+var $maxValue="100";
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+var $user=_getText(_span("menuButtonLabel"));
+var $accName = $bo_act_accounts.createAccount();
+var $proName = $bo_act_products.createProduct("pro12", "--None--");
+var $installedProduct = $bo_act_installedProduct.createInstalledProduct($proName,$accName,"");
+var $slaterm = $bo_act_slaTerms.createSlaTerms("Default");
+var $sconName = $bo_act_serviceMaintenanceContracts.createServiceMaintenanceContract($accName, $slaterm,1,0);
+$bo_act_serviceMaintenanceContracts.AddCoveredProductToSCON($sconName, $installedProduct);
+$bo_act_navigation.navigateToCounterRule();
+while(_isVisible(_checkbox("CounterRule:RuleForm:RuleBlock:CounterRuleList:0:Hide_selected")))
+{
+	_click(_checkbox("CounterRule:RuleForm:RuleBlock:CounterRuleList:0:Hide_selected"));
+	_click(_button("Delete Rule"));
+}
+$bo_act_counterRule.createNewCunterRule($counterRuleName,$value);
+$bo_act_navigation.navigateToScheduledSFM();
+$bo_act_scheduledSFM.newProcessNameID($ProcessName,$ProcessId);
+ $bo_act_scheduledSFM.selectSFMTransactionToSchedule($selectSFM1);
+// $bo_act_scheduledSFM.selectSFMTransactionToSchedule($selectSFM2);
+ $bo_act_scheduledSFM.addServiceToSchedule($obName,$qc,$clsName,$btchSize);
+ $bo_act_scheduledSFM.chooseTimeAndDateToRunTheProcess($scheduleTime,$d1,$d2,$d3,$d4,$d5,$d6,$d7);
+ $bo_act_scheduledSFM.setUserForNotification($user);
+ _click($bo_pg_scheduledSFM.btn_saveAndClose);
+_wait(9000,_isVisible($bo_pg_scheduledSFM.lbl_scheduledSFMHomePage));
+_log("Counter Roll up created successfully");
+
+_setSpeed($g_stepSpeed);
+$RS_5520.end();
+
+
+
+
+
+
+

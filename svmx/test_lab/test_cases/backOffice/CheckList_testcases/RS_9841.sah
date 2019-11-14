@@ -1,0 +1,26 @@
+// Author Meghana Rao P
+/*
+ * This test-case searches on the Checklist Designer with Group by Tag being ON
+ * Searching for tags , Questions and common value among them
+ */
+var $RS_9841 = _testcase("RS_9841", "To create a new Checklist SFM Designer");
+$RS_9841.start();
+
+
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+
+
+$number1 = Math.floor(Math.random() * 10);
+$bo_act_navigation.navigateToSvmxSetup();
+$bo_act_questionlibrary.createDateTimeQuestion("A RS_9841 Question", "Date" , "https://www.google.com", "RS9841TAG"+",");
+
+
+$bo_act_navigation.navigateToSfmTransactionDesigner();
+_wait(60000, _isVisible($bo_pg_sfmTransactionAndDesigner.btn_newSFM));
+_wait(1000);
+
+$bo_act_checklistdesigner.newChecklistTypeSFM("A RS_9841 Process 1"+$number1+"","to generate a Checklist/Survey type of Process", "Work Order");
+$bo_act_checklistdesigner.searchthevaluesinchecklist_groupbytagon("A RS_9841 Question", "RS9841TAG" , "9841");
+
+
+$RS_9841.end();

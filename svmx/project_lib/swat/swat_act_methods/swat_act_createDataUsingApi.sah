@@ -1,0 +1,111 @@
+var $swat_act_createDataUsingApi = new function $createDataUsingApi() {
+	
+	/**
+	 * Author		:	Ashwini Holagi
+	 * Function		:	To create Account through API
+	 */
+	this.createAccount = function($swat_un,$swat_pwd,$swat_ClientId,$swat_ConsumerSecret,$swat_OrgInstance){
+		var $accountName = $bo_act_common.generateRandomName("Acc");
+		$objName= "Account";
+		$obJson = "{\"Name\":\""+$accountName+"\"}";
+		$columnName = "ID";
+		$columnName1 = "Name";
+		$filter="id";
+		$filterValue=$sfm_act_restApiMethods.postRestApi($swat_un,$swat_pwd,$swat_ClientId,$swat_ConsumerSecret,$swat_OrgInstance,$objName,$obJson,"POST");
+		$AccountId=$sfm_act_restApiMethods.getRestApi($swat_un,$swat_pwd,$swat_ClientId,$swat_ConsumerSecret,$swat_OrgInstance,"GET", $objName, $columnName, $filter, $filterValue);
+		_log("AccountId: "+$AccountId);
+		var $Account=$sfm_act_restApiMethods.getRestApi($swat_un,$swat_pwd,$swat_ClientId,$swat_ConsumerSecret,$swat_OrgInstance,"GET", $objName, $columnName1, $filter, $filterValue);
+		_log("Account: "+$Account);
+		return $Account;
+	};
+	
+	/**
+	 * Author		:	Ashwini Holagi
+	 * Function		:	To create Contact through API
+	 */
+	this.createContact = function($swat_un,$swat_pwd,$swat_ClientId,$swat_ConsumerSecret,$swat_OrgInstance){
+		var $contactName = $bo_act_common.generateRandomName("Con");
+		$objName= "Contact";
+		$obJson = "{\"LastName\":\""+$contactName+"\",\"AccountId\":\""+$AccountId+"\"}";
+		$columnName = "ID";
+		$columnName1 = "Name";
+		$filter="id";
+		$filterValue=$sfm_act_restApiMethods.postRestApi($swat_un,$swat_pwd,$swat_ClientId,$swat_ConsumerSecret,$swat_OrgInstance,$objName,$obJson,"POST");
+		$ContactId=$sfm_act_restApiMethods.getRestApi($swat_un,$swat_pwd,$swat_ClientId,$swat_ConsumerSecret,$swat_OrgInstance,"GET", $objName, $columnName, $filter, $filterValue);
+		_log("ContactId: "+$ContactId);	
+		var $Contact=$sfm_act_restApiMethods.getRestApi($swat_un,$swat_pwd,$swat_ClientId,$swat_ConsumerSecret,$swat_OrgInstance,"GET", $objName, $columnName1, $filter, $filterValue);
+		_log("Contact: "+$Contact);	
+		return $Contact;
+	};
+	
+	/**
+	 * Author		:	Ashwini Holagi
+	 * Function		:	To create Product through API
+	 */
+	this.createProduct = function($swat_un,$swat_pwd,$swat_ClientId,$swat_ConsumerSecret,$swat_OrgInstance){
+		var $productName = $bo_act_common.generateRandomName("Pro");
+		$objName= "Product2";
+		$obJson = "{\"Name\":\""+$productName+"\"}";
+		$columnName = "ID";
+		$columnName1 = "Name";
+		$filter="id";
+		$filterValue=$sfm_act_restApiMethods.postRestApi($swat_un,$swat_pwd,$swat_ClientId,$swat_ConsumerSecret,$swat_OrgInstance,$objName,$obJson,"POST");
+		$ProductId=$sfm_act_restApiMethods.getRestApi($swat_un,$swat_pwd,$swat_ClientId,$swat_ConsumerSecret,$swat_OrgInstance,"GET", $objName, $columnName, $filter, $filterValue);
+		_log("ProductId: "+$ProductId);	
+		var $Product=$sfm_act_restApiMethods.getRestApi($swat_un,$swat_pwd,$swat_ClientId,$swat_ConsumerSecret,$swat_OrgInstance,"GET", $objName, $columnName1, $filter, $filterValue);
+		_log("Product: "+$Product);	
+		return $Product;
+	};
+	
+	/**
+	 * Author		:	Ashwini Holagi
+	 * Function		:	To create Installed Product through API
+	 */
+	this.createIb = function($swat_un,$swat_pwd,$swat_ClientId,$swat_ConsumerSecret,$swat_OrgInstance){
+		var $IbName= $bo_act_common.generateRandomName("IB_");
+		$objName= $orgnamespace+"__Installed_Product__c";
+		$obJson = "{\""+$orgnamespace+"__Company__c\":\""+$AccountId+"\",\""+$orgnamespace+"__Product__c\":\""+$ProductId+"\",\"Name\":\""+$IbName+"\"}";
+		$columnName = "ID";
+		$columnName1 = "Name";
+		$filter="id";
+		$filterValue=$sfm_act_restApiMethods.postRestApi($swat_un,$swat_pwd,$swat_ClientId,$swat_ConsumerSecret,$swat_OrgInstance,$objName,$obJson,"POST");
+		$IbId=$sfm_act_restApiMethods.getRestApi($swat_un,$swat_pwd,$swat_ClientId,$swat_ConsumerSecret,$swat_OrgInstance,"GET", $objName, $columnName, $filter, $filterValue);
+		_log("Installed Product Id: "+$IbId);	
+		var $InstalledPro=$sfm_act_restApiMethods.getRestApi($swat_un,$swat_pwd,$swat_ClientId,$swat_ConsumerSecret,$swat_OrgInstance,"GET", $objName, $columnName1, $filter, $filterValue);
+		_log("Installed Product: "+$InstalledPro);
+		return $InstalledPro;
+	};
+
+	/**
+	 * Author		:	Ashwini Holagi
+	 * Function		:	To create Work Order with Account, Contact, Product, Installed Product through API
+	 */
+	this.createWO = function($swat_un,$swat_pwd,$swat_ClientId,$swat_ConsumerSecret,$swat_OrgInstance){
+		$objName= $orgnamespace+"__Service_Order__c";
+		$obJson = "{\""+$orgnamespace+"__Company__c\":\""+$AccountId+"\",\""+$orgnamespace+"__Contact__c\":\""+$ContactId+"\"\,\""+$orgnamespace+"__Product__c\":\""+$ProductId+"\",\""+$orgnamespace+"__Component__c\":\""+$IbId+"\",\""+$orgnamespace+"__Order_Status__c\":\"Open\",\""+$orgnamespace+"__Order_Type__c\":\"Field Service\"}";
+		$columnName = "Name";
+		$filter="id";
+		$filterValue=$sfm_act_restApiMethods.postRestApi($swat_un,$swat_pwd,$swat_ClientId,$swat_ConsumerSecret,$swat_OrgInstance,$objName,$obJson,"POST");
+		var $workOrderNo=$sfm_act_restApiMethods.getRestApi($swat_un,$swat_pwd,$swat_ClientId,$swat_ConsumerSecret,$swat_OrgInstance,"GET", $objName, $columnName, $filter, $filterValue);
+		_log("Work Order NO: "+$workOrderNo);
+		return $workOrderNo;
+	};
+	
+	/**
+	 * Author		:	Ashwini Holagi
+	 * Function		:	To create Work Order with Order Status and Order Type through API
+	 */
+	this.createWorkOrder= function($swat_un,$swat_pwd,$swat_ClientId,$swat_ConsumerSecret,$swat_OrgInstance){
+		$objName= $orgnamespace+"__Service_Order__c";
+		$obJson = "{\""+$orgnamespace+"__Order_Status__c\":\"Open\",\""+$orgnamespace+"__Order_Type__c\":\"Field Service\"}";
+		$columnName = "Name";
+		$filter="id";
+		$filterValue=$sfm_act_restApiMethods.postRestApi($swat_un,$swat_pwd,$swat_ClientId,$swat_ConsumerSecret,$swat_OrgInstance,$objName,$obJson,"POST");
+		var $workOrderNo=$sfm_act_restApiMethods.getRestApi($swat_un,$swat_pwd,$swat_ClientId,$swat_ConsumerSecret,$swat_OrgInstance,"GET", $objName, $columnName, $filter, $filterValue);
+		_log("Work Order NO: "+$workOrderNo);
+		return $workOrderNo;
+	};
+	
+	
+	
+};

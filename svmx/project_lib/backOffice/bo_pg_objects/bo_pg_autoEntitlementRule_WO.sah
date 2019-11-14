@@ -1,0 +1,50 @@
+
+var $bo_pg_autoEntitlementRule_WO = new function $bo_pg_autoEntitlementRule_WO(){
+	this.btn_newRule = _submit("New Rule");
+	
+	this.txt_autoEntitlementRuleName = _textbox("/CounterRule:RuleForm/");
+	this.txt_autoEntitlementRuleDescription = _textarea("/CounterRule:RuleForm/");
+	this.sel_workOrderField = _select("/CounterRuleList:0:j_id106/");
+	this.sel_workOrderFieldOperator = _select("/CounterRuleList:0:j_id110/");
+	this.sel_workOrderFieldValue = _textbox("/CounterRuleList:0:j_id114/");
+	
+	/**
+	 * Selects Entitlement Settings radio button
+	 */
+	this.sel_EntitlementSettings = function($EntitSetting){
+		_click(_radio($EntitSetting));
+	};
+	
+	//Object for the section "Specify the Entitlement settings to be used when a Work Order matches the above criteria."
+	
+	this.sel_entitlementBePerformedOn_ProductsServiced = _select(0,_rightOf(_cell("/Should entitlement be performed on Products Serviced?/")));
+	this.sel_parentIBOfComponentBeIncluded = _select(0,_rightOf(_cell("/Should the parent installed product of the Component be included/")));
+	this.sel_topLevelIBOfComponentBeIncluded = _select(0,_rightOf(_cell("/Should the top-level installed product of the Component be included/")));
+	this.sel_entitlementConsider_warrantiesORSconORBoth = _select(0,_rightOf(_cell("Should auto-entitlement consider only warranties or service contracts or both?")));
+	this.sel_accountOnWoMatchedWithScon = _select(0,_rightOf(_cell("Should the Account on the Work Order be matched with the Account on the Service Contract?")));
+	this.sel_contactOnWoMatchedWithScon = _select(0,_rightOf(_cell("Should the Contact on the Work Order be matched with the contacts entitled in the Service Contract?")));
+	this.sel_locationOnWoIncluded = _select(0,_rightOf(_cell("Should Location on Work Order be included in entitlement check?")));
+	this.sel_multipleWarrantiesOrScon = _select(0,_rightOf(_cell("/If multiple warranties and\\/or service contracts are found/")));
+	this.sel_warrantiesOrSconSearched = _select(0,_rightOf(_cell("Should warranties and service contracts be searched using counters or validity dates or both?")));
+	this.sel_ConsiderSlaCoverageDefined = _select(0,_rightOf(_cell("/Only consider SLA coverage defined at the service contract header level rather than SLA coverage/")));
+	
+	this.btn_save = _submit(" Save ");
+	
+	this.sel_exchangeType = _select(0,_rightOf(_label("Exchange Type")));
+	//this.sel_templateType = _select(0,_rightOf(_label("Template Type")));
+	
+	this.txt_materialPercentCovered = _textbox("Material % Covered");
+	this.txt_durationOfMaterialCoverage = _textbox("Duration of Material Coverage");
+	this.sel_unitOfTimeForMaterialCoverage = _select(0,_rightOf(_label("Unit of Time for Material Coverage")));
+	
+	this.txt_laborPercentCovered = _textbox("Labor % Covered");
+	this.txt_durationOfLaborCoverage = _textbox("Duration of Labor Coverage");
+	this.sel_unitOfTimeForLaborCoverage = _select(0,_rightOf(_label("Unit of Time for Labor Coverage")));
+	
+	this.txt_expensesPercentCovered = _textbox("Expenses % Covered");
+	this.txt_durationOfExpensesCoverage = _textbox("Duration of Expenses Coverage");
+	this.sel_unitOfTimeForExpensesCoverage = _select(0,_rightOf(_label("Unit of Time for Expenses Coverage")));
+	
+	this.btn_save = _submit("Save");
+	
+};

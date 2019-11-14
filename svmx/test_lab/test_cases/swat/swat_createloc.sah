@@ -1,0 +1,168 @@
+// author = Lohitha
+
+var $swat_createloc = _testcase("swat_createloc","create locations");
+$swat_createloc.start();
+_setSpeed($g_stepSpeed);
+
+var $user_credentials_xls = $excel.readFromCustomExcel("../swat/swat_excelData/swatdata.xlsx", "USer_Details","","");
+var $accountdata_xls = $excel.readFromCustomExcel("../swat/swat_excelData/swatdata.xlsx", "Account","","");
+var $contactdata_xls = $excel.readFromCustomExcel("../swat/swat_excelData/swatdata.xlsx", "Contact","","" );
+var $locationdata_xls = $excel.readFromCustomExcel("../swat/swat_excelData/swatdata.xlsx", "Location","","");
+var $IBdata_xls = $excel.readFromCustomExcel("../swat/swat_excelData/swatdata.xlsx", "Installed Product","","");
+
+for(var $i=0; $i<$user_credentials_xls.length; $i++){
+	var $swat_un = $user_credentials_xls[$i][0];
+	var $swat_pwd = $user_credentials_xls[$i][1];
+	var $swat_url = $user_credentials_xls[$i][2];
+}
+
+for(var $i=0; $i<$accountdata_xls.length; $i++){
+	var $acc_id = $accountdata_xls[$i][0];
+	var $acc_accname= $accountdata_xls[$i][1];
+	_log("$acc_accname = "+$acc_accname);
+}
+for(var $i=0;$i<$contactdata_xls.length;$i++)
+{
+	var $con_id = $contactdata_xls[$i][0];
+	var $con_lastname = $contactdata_xls[$i][1];
+	var $con_accname = $contactdata_xls[$i][2];
+	_log("$con_lastname = "+$con_lastname);
+	_log("$con_accname = "+$con_accname);
+}
+
+for(var $i=0;$i<$locationdata_xls.length;$i++)
+{
+	var $loc_id = $locationdata_xls[$i][0];
+	var $loc_locname = $locationdata_xls[$i][1];
+	var $loc_street = $locationdata_xls[$i][2];
+	var $loc_city = $locationdata_xls[$i][3];
+	var $loc_state = $locationdata_xls[$i][4];
+	var $loc_country = $locationdata_xls[$i][5];
+	var $loc_zip = $locationdata_xls[$i][6];
+	var $loc_stockingloc = $locationdata_xls[$i][7];
+	var $loc_account = $locationdata_xls[$i][8];
+	_log("$loc_locname = "+$loc_locname);
+	_log("$loc_account = "+$loc_account);
+}
+
+for(var $i=0;$i<$IBdata_xls.length;$i++)
+{
+	var $ib_id = $IBdata_xls[$i][0];
+	var $ib_product = $IBdata_xls[$i][1];
+	var $ib_slnum = $IBdata_xls[$i][2];
+	var $ib_status = $IBdata_xls[$i][3];
+	var $ib_account = $IBdata_xls[$i][4];
+	var $ib_contact = $IBdata_xls[$i][5];
+	var $ib_location = $IBdata_xls[$i][6];
+	var $ib_ibid = $IBdata_xls[$i][7];
+	_log("$ib_product = "+$ib_product);
+	_log("$ib_account = "+$ib_account);
+	_log("$ib_contact = "+$ib_contact);
+	_log("$ib_location ="+$ib_location);
+	_log("$ib_ibid ="+$ib_ibid);
+	_log("$ib_slnum ="+$ib_slnum);
+}
+
+$bo_act_login.login($swat_url, $swat_un, $swat_pwd);
+//$bo_act_login.login("https://test.salesforce.com", "lohithaadmin@dcfull.com", "maxpl0re2");
+
+_set($login_result, _fetch(login($swat_un,$swat_pwd)));
+_log($login_result);
+
+_set($del_loc, _fetch(deleteLoc()));
+_log($del_loc);
+
+_set($loc_creation, _fetch(createLoc($locationdata_xls)));
+_log($loc_creation);
+
+if($loc_creation.length != null && $loc_creation != false && $loc_creation != null){
+	//updating location id in location excel
+	for(var $i=0; $i< $loc_creation.length; $i++){
+		_log("$loc_creation[i] ="+$loc_creation[$i]);
+		$excel.insertUnderColumn("../swat/swat_excelData/swatdata.xlsx", "Location", "Id", $loc_creation[$i],(1+$i));
+		//$excel.insertUnderColumn($filePath, $sheetName, $columnName, $dataToWrite, $rowIndex)
+	}
+	//updating locations in IB excel
+	$j=0;
+	for(var $i=0; $i< $IBdata_xls.length; $i++){
+		if($j == $loc_creation.length){
+			$j=0;
+		}
+		_log("$location value  = "+$loc_creation[$j]);
+		$excel.insertUnderColumn("../swat/swat_excelData/swatdata.xlsx", "Installed Product", "Location", $loc_creation[$j],(1+$i));
+		$j++;
+	}
+}
+
+//<browser>
+
+function login($swat_un,$swat_pwd)
+{
+	var $login_result = sforce.connection.login($swat_un,$swat_pwd);
+	return $login_result;
+}
+
+//delete and create locations
+function deleteLoc(){
+	var delete_loc = [];
+	//deleting the existing locations
+	var locresult = _call(sforce.connection.query("SELECT Id,Name FROM SVMXC__Site__c WHERE Name LIKE '%Auto%'"));
+	var del_loc = locresult.getArray("records");
+	_log("del loc.length = "+del_loc.length);
+	if(del_loc.length > 0){
+		for(var $i=0;$i<del_loc.length;$i++){
+			var loc = del_loc[$i];
+			delete_loc.push(loc.Id);
+		}
+		var delResult = sforce.connection.deleteIds([delete_loc]);
+		_log("del result loc = "+delResult);
+		if(delResult.length < 0){
+			_log(delResult.length +" Existed locations are deleted");
+		}
+	}
+	else{
+		_log("No Existed locations to delete");
+	}
+}
+
+function createLoc($locationdata_xls){
+	var $isSuccess = false;
+	var createLoc =[];
+	var loc_Id = [];
+	//creating locations
+	for(var $i=0; $i<$locationdata_xls.length; $i++){
+		var loc = new sforce.SObject("SVMXC__Site__c");
+		_log("$locations from excel "+$locationdata_xls[$i][1]);
+		loc.Name = $locationdata_xls[$i][1];
+		loc.SVMXC__Street__c = $locationdata_xls[$i][2];
+		loc.SVMXC__City__c = $locationdata_xls[$i][3];
+		loc.SVMXC__State__c = $locationdata_xls[$i][4];
+		loc.SVMXC__Country__c = $locationdata_xls[$i][5];
+		loc.SVMXC__Zip__c = $locationdata_xls[$i][6];
+		loc.SVMXC__Stocking_Location__c = $locationdata_xls[$i][7];
+		loc.SVMXC__Account__c = $locationdata_xls[$i][8];
+		createLoc.push(loc);
+		_log("createLoc "+createLoc);
+	}
+	//fetch location data from location excel
+	
+	var $loc_result = _call(sforce.connection.create(createLoc));
+	if($loc_result != 0 && $loc_result != null){
+		$isSuccess = true;
+		_log("$loc_result = "+$loc_result);
+		for(var $x=0; $x<$loc_result.length; $x++){
+			if($loc_result[$x].id === null){
+				$isSuccess = false;
+				return $isSuccess;
+			}
+			loc_Id.push($loc_result[$x].id);
+			_log("loc_Id.push = "+loc_Id);
+		}
+		_log("loc_Id = "+loc_Id);
+		return loc_Id;
+	}
+	return $isSuccess;
+}
+//</browser>
+
+

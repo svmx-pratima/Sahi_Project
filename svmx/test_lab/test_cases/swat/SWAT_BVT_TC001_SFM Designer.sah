@@ -1,0 +1,44 @@
+//author - Lohitha
+
+var $SWAT_BVT_TC001_SFMDesigner = _testcase("$SWAT_BVT_TC001_SFMDesigner","Clone create quote from WO SFM in designer");
+$SWAT_BVT_TC001_SFMDesigner.start();
+_setSpeed($g_stepSpeed);
+
+	var $objectName = "Work Order";
+	//Pre - Condition 
+	$bo_act_login.login($swat_url, $swat_un, $swat_pwd);
+	//$bo_act_login.login($g_url, "lohithaadmin@cct4part1.com", "maxpl0re1");
+	//$bo_act_navigation.navigateToSfmSearchInDesigner();
+	//$bo_act_sfmSearch.createSfmSearch();
+
+	$bo_act_navigation.navigateToSfmTransactionDesigner();
+	//_highlight(_object("main"));
+	
+	$bo_act_navigation.navigateToSfmWizard();
+	//_setSelected(_select("page1:form1:j_id1:j_id2:j_id3:ObjectSelect"), "Work Order"); // old stmt to be removed after review
+	_setSelected(_select("/ObjectSelect/"),$objectName);
+	_click(_submit("New"));
+	
+	//_setValue(_textbox("page1:form1:mainPblock:tab1:pblocksectionmain:j_id50:j_id54:hdrname"), "Automation Wizards");// old stmt to be removed after review
+	_setValue(_textbox(_textbox(0, _rightOf(_cell("Wizard Title")))),"Automation Wizards");
+	
+	//_click(_cell("data2Col [1]"));
+
+	//_setValue(_textbox("page1:form1:mainPblock:tab1:pblocksectionmain:j_id58:j_id61:hdrprocessid"), "Automation Wizards");// old stmt to be removed after review
+	  _setValue(_textbox("/hdrprocessid.*/",_rightOf(_cell("Wizard ID"))),"Automation");
+	
+	_click(_cell("Manage Wizard Steps"));
+	_click(_button("New Step"));
+	
+	//_setSelected(_select("page1:form1:mainPblock:tab2mainpblock:j_id149:j_id153:j_id154:actnFieldtype"), "SFM");// old stmt to be removed after review
+	_setSelected(_select("/actnFieldtype.*/",_label("Wizard Step Type[1]")),"SFM");
+	
+	//_setSelected(_select("page1:form1:mainPblock:tab2mainpblock:j_id149:j_id153:j_id159:actntype"), "Create Quote from Work Order_Cloned_Auto");// old stmt to be removed after review
+	_setSelected(_select("/actntype.*/",_label("Step Name[1]")),"Create Quote from Work Order_Cloned_Auto");
+	
+	_click(_button("Save"));
+	_click(_button("Save & Close"));
+
+$SWAT_BVT_TC001_SFMDesigner.end();
+
+

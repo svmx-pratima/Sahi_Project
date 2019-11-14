@@ -1,0 +1,41 @@
+var $RS_12376 = _testcase("RS_12376","Geolocation: New literals that are needed in SFM Maps (display values)");
+$RS_12376.start();
+
+//Declare variables used in the script
+var $sfmNameToBeCloned = "Manage Work Order Lines - Usage";
+var $sfmName = $bo_act_common.generateRandomName("RS_12376_");
+var $isCustom = false;
+var $sfmTemplate = "SVMXSTD: Manage WO Usage Lines";
+var $sfmTemplateSaveAsName = $sfmName;
+//var $containerName = ["Work Order"];
+//var $fieldName=["Latitude"];
+//, $fieldName, $containerName
+
+//Creating local variables to login to DEV Sandbox
+var $bac_dev_un = "murthy@tools2.com";
+var $bac_dev_pw = "bac123456";
+
+//Login to the Sandbox
+$bo_act_login.login($bac_g_url,$bac_dev_un,$bac_dev_pw);
+//$bo_act_login.login($bac_g_url,$bac_g_un,$bac_g_pwd);
+
+//clone tmd016
+$sfm_act_SFM.cloneTDM016($sfmNameToBeCloned,$sfmName,$isCustom,$sfmTemplateSaveAsName, $sfmTemplate, "", "");
+_click(_f("main").tab("Qualifying Criteria and Field Mappings"));
+_click(_f("main").s_label("Work Order"));
+_click(_f("main").tab("Mapping(s)"));
+_click(_f("main").s_button("New[2]"));
+_wait(2000);
+_click(_f("main").s_togglebutton("I want to choose a field from the list").rightOf(_f("main").ftedatagriditemrenderer("Latitude")));
+_setSelected(_f("main").s_combobox("valuesCombo").rightOf(_f("main").ftedatagriditemrenderer("Latitude")),"Geolocation.Latitude");
+_assertEqual("Geolocation.Latitude","Geolocation.Latitude","Latitude literal exists");
+_setSelected(_f("main").s_combobox("valuesCombo").rightOf(_f("main").ftedatagriditemrenderer("Latitude")),"Geolocation.Longitude");
+_assertEqual("Geolocation.Longitude","Geolocation.Longitude","Longitude literal exists");
+_setSelected(_f("main").s_combobox("valuesCombo").rightOf(_f("main").ftedatagriditemrenderer("Latitude")),"Geolocation.Accuracy");
+_assertEqual("Geolocation.Accuracy","Geolocation.Accuracy","Accuracy literal exists");
+
+//_assertEqual("Tyto", _getValue(_textbox("company")));
+//Delete the SFM
+//$bo_act_SFM.deleteSFM($sfmName);
+
+$RS_12376.end();

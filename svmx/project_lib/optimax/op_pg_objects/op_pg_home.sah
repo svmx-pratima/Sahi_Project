@@ -1,0 +1,9 @@
+
+/**
+ * Home page object repository
+ */
+
+var $op_pg_home = new function op_pg_home(){
+	this.link_home = _link("Home");
+	this.link_servicemaxSetup = _link("ServiceMax Setup");
+};

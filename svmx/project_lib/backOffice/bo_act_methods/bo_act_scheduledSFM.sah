@@ -1,0 +1,71 @@
+var $bo_act_scheduledSFM=new function bo_act_scheduledSFM(){
+	
+	this.newProcessNameID=function($ProcessName,$ProcessId){
+		_click($bo_pg_scheduledSFM.btn_new);
+		_setValue($bo_pg_scheduledSFM.lbl_processName,$ProcessName);
+		_setValue($bo_pg_scheduledSFM.lbl_processID,$ProcessId);
+	};
+		this.selectSFMTransactionToSchedule=function($avilPros){
+			_setSelected($bo_pg_scheduledSFM.sel_availablePros, [$avilPros]);
+			_click($bo_pg_scheduledSFM.img_selectedPros);
+			
+		};
+			this.addServiceToSchedule=function($obName,$qc,$clsName,$btchSize){
+				_click($bo_pg_scheduledSFM.img_addNewServiceToSchedule);
+				_wait(30000);
+				_setSelected($bo_pg_scheduledSFM.sel_objName,$obName);
+				_wait(30000);
+				_setSelected($bo_pg_scheduledSFM.sel_qc,$qc);
+				_setValue($bo_pg_scheduledSFM.txt_className,$clsName);
+				_setValue($bo_pg_scheduledSFM.txt_batchSize,$btchSize);
+				
+			};
+				this.chooseTimeAndDateToRunTheProcess=function($scheduleTime,$d1,$d2,$d3,$d4,$d5,$d6,$d7){
+					_click($bo_pg_scheduledSFM.tab_scheduleAndNotification);
+					_setSelected($bo_pg_scheduledSFM.sel_runAt,$scheduleTime);
+						//if(_isVisible($bo_pg_scheduledSFM.sel_nameOfDays2)){
+							_setSelected($bo_pg_scheduledSFM.sel_nameOfDays2, [$d1,$d2,$d3,$d4,$d5,$d6,$d7]);
+						 //  }else{
+						  // _setSelected($bo_pg_scheduledSFM.sel_nameOfDays1, [$d1,$d2,$d3,$d4,$d5,$d6,$d7]);
+						  // }
+					_click($bo_pg_scheduledSFM.btn_add);					
+				};
+			this.setUserForNotification=function($user){
+				_click($bo_pg_scheduledSFM.img_sendNotificationLookUp);		
+				_selectWindow("lookup");
+				_click($bo_pg_scheduledSFM.btn_go);
+				_click(_link($user));
+				_selectWindow();
+				_setValue($bo_pg_scheduledSFM.sel_setUser,$user);		
+			};
+				this.clickRunNow=function($ProcessName1,$ProcessName2){
+					_check(_checkbox(0,_leftOf(_cell($ProcessName1))));
+					_click($bo_pg_scheduledSFM.btn_runNow);
+					var $msg1=_getText($bo_pg_scheduledSFM.msgForRequestInQ);
+					if ($msg1=="Success:Your request is added to the queue. You will get a nvalidateApexJobsotification once processing is complete.");
+						_log("Schedule SFM1 is successful");
+						_uncheck(_checkbox(0,_leftOf(_cell($ProcessName1))));
+					//_wait(30000);
+					_check(_checkbox(0,_leftOf(_cell($ProcessName2))));
+					_click($bo_pg_scheduledSFM.btn_runNow);					
+				
+					var $msg2=_getText($bo_pg_scheduledSFM.msgForRequestInQ);
+					if ($msg2=="Success:Your request is added to the queue. You will get a notification once processing is complete.");
+						_log("Schedule SFM2 is successful");
+					_uncheck(_checkbox(0,_leftOf(_cell($ProcessName2))));
+				};
+				this.navigateApexJobsPage=function(){
+					_click($bo_pg_salesforcePageSetUp.lnk_salesforceSetUp);
+					_click($bo_pg_salesforcePageSetUp.txt_salesforceSetUpSrch);
+					_setValue($bo_pg_salesforcePageSetUp.txt_salesforceSetUpSrch, "Apex Jobs");
+					_click($bo_pg_salesforcePageSetUp.lnk_apexJobs);					
+				};	
+					this.deleteScheduledSFM=function($ProcessName){						
+						_check(_checkbox(0,_leftOf(_cell($ProcessName))));
+						_click(_button("Delete"));
+						if (_isVisible(_div("Success:Record(s) deleted successfully"))){
+							_log("Scheduled SFM Deleted Successfully");
+						}
+						
+					};
+};

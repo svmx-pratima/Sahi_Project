@@ -1,0 +1,57 @@
+
+/**
+ * Home page object repository
+ */
+
+var $an_pg_rv = new function an_pg_rv(){
+	this.link_home = _link("Home");
+	this.link_servicemaxSetup = _link("ServiceMax Setup");
+	this.btn_serviceperformancemetrics = _div("Service Performance Metrics");
+	this.btn_serviceperformancemetricsetup = _div("Service Performance Metrics Setup");
+	this.span_businessprocessconfig = _span("Business Process Config") ;
+	this.txt_issuetracker = _textbox("issueTracker") ;
+	this.listItemCase = _listItem("Case");
+	this.listItemSR = _listItem("Service Request");
+	this.txt_businessQualificationExpr = _textbox("qualificationExpression");
+	this.list_closedcases = _listItem("SVMXSTD: Closed Cases");
+	this.list_openservicerequest = _listItem("SVMXSTD: Open Service Request");
+	this.btn_save = _span("Save");
+	this.btn_click_OK = _span("OK");
+	this.btn_click_metrics = _span("Metrics");
+	this.btn_click_add = _span("Add");
+	this.txt_Calmethod = _textarea("appliesTo");
+	this.txt_FTFCalmethod = _textarea("appliesTo");
+	this.btn_clicksettings = _span("Settings");
+	this.btn_clickCriteria = _span("Criteria");
+	this.txt_click_FTFQualification = _textbox("tabPanel_0_editprocesspanel_expression_QualificationCriteriafieldset_id-inputEl");
+	this.list_select_StandardClosedWO = _listItem("SVMXSTD: Closed Work Orders");
+	this.list_select_USA_ClosedWO = _listItem("Closed United States WO");
+	this.list_select_UK_ClosedWO = _listItem("Closed UK WO");
+	this.btn_click_Schedule_Notifications = _span("Schedule & Notifications");
+	this.txt_Email_onSuccess = _textbox("emailOnSuccess");
+	this.btn_click_run = _link("Run Now");
+	this.btn_RepeatVisit = _span("Repeat Visit");
+	this.list_Account = _listItem("Account");
+	this.list_Location = _listItem("Location");
+	this.list_primary_wo = _listItem("Work Order");
+	
+	
+	// To click the Repeat visit Calcuation method values 
+	this.btn_AddRepeatVisit = _span("Add[1]");
+	this.btn_Activecheckbox1 = _button("svmx-form-field svmx-form-checkbox");
+	this.btn_Activecheckbox2 = _button("checkboxfield-1335-inputEl");
+	this.txt_click_RepeatVisitQualification = _textbox("tabPanel_7_editprocesspanel_expression_QualificationCriteriafieldset_id-inputEl");
+	this.txt_RepeatVisit_itemsforCalc = _textbox("Select one or more fields to be considered for Repeat Visit");
+	this.list_Additionfieldtocheck = _label("Additional field to be considered for Repeat Visit:");
+	this.txt_additionalfield = _textbox("Additional field to be considered for Repeat Visit");
+	this.list_RV_Priority = _listItem("Priority");
+	this.btn_RV_Schedule_Notifications = _span("Schedule & Notifications[1]");
+	this.list_customclosedSR = _listItem("Custom Closed SR");
+	this.list_customAccount = _listItem("Custom Account");
+	this.btn_Account_selection =_textbox("Select the source for Account field");
+	this.list_repeatvisit_maps = _textbox("Select an object mapping to store additional data for this metric");
+	this.list_rvmap_value1 =_listItem("SPM Maps for Repeat Visit");
+	
+	
+	
+};

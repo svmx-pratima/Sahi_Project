@@ -1,0 +1,89 @@
+var $user_credentials = $excel.readFromCustomExcel("../op_excleData/automation.xlsx", "User_Details","","");
+var $BH_details = $excel.readFromCustomExcel("../op_excleData/automation.xlsx", "RTO_DispatchProcess","","");
+
+
+//var $nArr;
+//Calling the sforce API
+for(var $i=0;$i<$user_credentials.length;$i++)
+{
+var $g_un = $user_credentials[$i][0];
+var $g_pwd = $user_credentials[$i][1];
+var $g_url = $user_credentials[$i][2];
+}
+
+var $RS_6705 = _testcase("RS_6705", "Select Territory which has inactive business hour");
+
+$RS_6705.start();
+
+$bo_act_login.login($g_url, $g_un, $g_pwd);
+
+var $PrimaryTerr = $BH_details[0][15];
+var $horizon = $BH_details[0][1];
+var $threshold = $BH_details[0][2];
+var $syncInterval = $BH_details[0][3];
+var $date = "" + new Date();
+var $DPName = "Eco_DPName_" + $date;
+
+_set($login_result, _fetch(login($g_un,$g_pwd)));
+_log($login_result);
+
+_set($email, _fetch(get_Email($g_un)));
+_log($email);
+
+_click(_link("ServiceMax Setup"));
+_wait(20000,_isVisible(_div("Dispatch Management")));
+_click(_div("Dispatch Management"));
+_click(_div("Dispatch Processes"));
+_click(_submit("New Process"));
+_setValue(_textbox("page1:form1:block1:tab1block1:j_id77:j_id78:name"), $DPName);
+_setSelected(_select("page1:form1:block1:tab1block1:j_id77:j_id85:j_id89"), "Real Time Optimization");
+_setSelected(_select("page1:form1:block1:tab1block1:j_id114:j_id115:tab1table1:0:j_id120"), "Priority");
+_setSelected(_select("page1:form1:block1:tab1block1:j_id114:j_id115:tab1table1:0:j_id124"), "Equals");
+_setValue(_textbox("page1:form1:block1:tab1block1:j_id114:j_id115:tab1table1:0:j_id128"), "High");
+_click(_button("Next >>"));
+_click(_button("Add Territory"));
+_setValue(_textbox("page1:form1:block1:tab3block1:tab3block2:j_id322:0:j_id328"), $PrimaryTerr);
+_click(_image("Territory Lookup (New Window)"));
+_selectWindow("lookup");
+_click(_link($PrimaryTerr));
+_selectWindow();
+_setValue(_textbox("page1:form1:block1:tab3block1:tab3block2:j_id322:0:j_id328"), $PrimaryTerr);
+_click(_button("Prioritization >>"));
+_click(_cell("Scheduling"));
+_setValue(_textbox("page1:form1:block1:tab8block1:LeadTimeSection:LeadTimeItem:LeadTime"), $threshold);
+_setValue(_textbox("page1:form1:block1:tab8block1:LeadTimeSection:OptimizerSyncIntervalItem:SyncTime"), $syncInterval);
+_setValue(_textbox("page1:form1:block1:tab8block1:j_id668:j_id669:j_id674"), $horizon);
+_setValue(_textbox("page1:form1:block1:tab8block1:SuccessSection:SuccessItem:SuccessEmail"), $email);
+_setValue(_textbox("page1:form1:block1:tab8block1:SuccessSection:ErrorItem:ErrorEmail"), $email);
+_click(_submit("Save And Close[1]"));
+_assertExists(_div("message errorM3"));
+_assertVisible(_div("message errorM3"));
+_assertEqual("Error:Business Hours associated with this territory is not active.", _getText(_div("message errorM3")));
+
+
+//<browser>
+
+function login($g_un,$g_pwd){
+	
+	var $login_result = sforce.connection.login($g_un,$g_pwd);
+	return $login_result;
+}
+
+
+function get_Email ($g_un)
+{
+var Email_List = sforce.connection.query("SELECT Email,Username FROM User WHERE Username = '" + $g_un + "'");
+var Email_Arr = Email_List.getArray("records");
+var Email_Id = Email_Arr[0];
+
+return Email_Id.Email;
+}
+
+
+
+//</browser>
+
+
+$RS_6705.end();
+	 
+	 

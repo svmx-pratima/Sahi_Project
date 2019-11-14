@@ -1,0 +1,57 @@
+var $user_credentials = $excel.readFromCustomExcel("../optimax/op_excleData/automation.xlsx", "User_Details","","");
+var $dp_details = $excel.readFromCustomExcel("../optimax/op_excleData/automation.xlsx", "Dispatch_Process","","");
+
+//var $nArr;
+//Calling the sforce API
+for(var $i=0;$i<$user_credentials.length;$i++)
+{
+var $g_un = $user_credentials[$i][0];
+var $g_pwd = $user_credentials[$i][1];
+var $g_url = $user_credentials[$i][2];
+}
+
+var $DPName = $dp_details[1][0];
+
+var $RS_6703 = _testcase("RS_6703", "After save, validate Territory is not editable");
+
+$RS_6703.start();
+
+/*var $g_url = "https://test.salesforce.com/";
+var $g_un = "govendhan@svmx-cct5.org.cct5part1";
+var $g_pwd = "maxpl0re2";*/
+
+$bo_act_login.login($g_url, $g_un, $g_pwd);
+	
+_log($DPName);
+var $rowCount = 0;
+
+_click(_link("ServiceMax Setup"));
+_wait(20000,_isVisible(_div("Dispatch Management")));
+_click(_div("Dispatch Management"));
+_wait(20000,_isVisible(_div("Dispatch Processes")));
+_click(_div("Dispatch Processes"));
+
+_set($rowCount, _table("page1:form1:block1:j_id81:j_id82").rows.length);
+for (var $i = 0; $i < $rowCount; $i++) 
+{
+	var $temp = _getText(_cell("page1:form1:block1:j_id81:j_id82:" + $i
+			+ ":j_id86"));
+	if (_areEqual($DPName, $temp)) 
+	{
+		$rowCount = $i;
+	}
+}
+_check(_checkbox("page1:form1:block1:j_id81:j_id82:" + $rowCount
+		+ ":j_id85"));
+
+_click(_submit("Edit"));
+_click(_cell("Territories"));
+_assertTrue(_button("Add Territory").disabled);
+_assertTrue(_button("Delete Territory").disabled);
+_assertTrue(_button("Go!").disabled);
+_assertTrue(_button("Add Selected").disabled);
+
+_click(_submit("Cancel[1]"));
+
+$bo_act_login.logOut();
+$RS_6703.end();

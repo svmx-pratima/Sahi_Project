@@ -1,0 +1,21 @@
+/*Activity Master object repository
+ */
+
+var $bo_pg_activityMaster = new function bo_pg_activityMaster(){
+	this.btn_newActivityMaster = _button("New Activity Master");
+	this.btn_deleteActivityMaster = _button("Delete");
+	this.btn_editActivityMaster = _button(" Edit ");
+	this.btn_cloneActivityMaster = _button(" Clone ");
+	this.txt_ActivityMasterDeliveryPage = _span("Activity Master");
+	this.txt_activityType = _textbox("Activity Type:");
+	this.btn_addSingleLine = _span("/sfmd-add-line-icon/");
+	this.btn_addMultiLine = _span("/sfmd-multi-add-line-icon/");
+	this.btn_deleteFirstRow = _image("/sfmd-delete-icon/");
+	this.btn_saveActivityMaster = _span("/sfmd-save-icon/");
+	this.txt_focusOnProduct = _div("svmx-grid-cell-inner [1]"); //Focus on 1st Row of Product
+	this.txt_activityProductName = _textbox("svmx-form-field svmx-form-text");
+	this.txt_ActivityMasterPage = _heading2("Activity Master Detail");
+	this.btn_editFirstRowOfActivityProduct = _image("/svmx-sfmd-edit-icon/");
+	this.btn_update = _span("Update");
+		
+};

@@ -1,0 +1,61 @@
+var $an_pg_contractuptime = new function an_pg_contractuptime()
+{
+	this.btn_contractuptimemetric = _span("Contract Up Time");
+	this.btn_Add = _span("Add[1]");
+	this.btn_active = _button("svmx-form-field svmx-form-checkbox");
+	this.txt_description = _textarea("appliesTo");
+	this.btn_settings = _span("Settings");
+	this.list_consider_downtime = _textbox("Consider Downtime from:");
+	this.btn_work_order = _listItem("Work Order");
+	this.btn_downtime = _listItem("Down Time");
+	this.list_choose_start_Date = _textbox("Select the source for the Created On Date field");
+	this.btn_preferred_start_time = _listItem("Preferred Start Time");
+	this.list_choose_endDate = _textbox("Select the source for Fixed On Date field");
+	this.btn_preferred_end_time = _listItem("Preferred End Time[1]");
+	this.list_select_component = _textbox("Select the source for Installed Product field");
+	this.btn_component = _listItem("Component");
+	this.list_business_hours = _textbox("Select the source for Business Hours field");
+	this.btn_business_hours = _listItem("Business Hours");
+	this.btn_criteria = _span("Criteria");
+	this.list_Contract_qualification_criteria = _textbox("tabPanel_2_editprocesspanel_expression_QualificationCriteriafieldset_id-inputEl");
+	this.btn_std_service_contract_expr = _listItem("SVMXSTD: Active Service Contracts Only");
+	this.list_qualifying_covered_product = _textbox("tabPanel_2_editprocesspanel_expression_FilterCriteriafieldset_id-inputEl");
+	this.btn_std_covered_product_expr = _listItem("SVMXSTD: Valid Covered Products");
+	this.btn_advanced_custom_expr = _listItem("Advanced Expression");
+	this.list_workOrder_downtime = _textbox("tabPanel_2_editprocesspanel_expression_WorkOrderCriteriafieldset_id-inputEl");
+	this.btn_custom_covered_product = _listItem("Custom Covered Product EXPR");
+	
+	this.btn_closed_workorders = _listItem("SVMXSTD: Closed Work Orders");
+	this.btn_save = _span("Save");
+	this.btn_OK = _span("OK");
+	
+	
+	
+	// For Schedule & Notifications
+	
+	this.btn_schedule_notifications = _span("Schedule & Notifications[1]");
+	this.list_timezone = _textbox("timezone");
+	this.btn_ist_timezone = _listItem("(GMT+05:30) India Standard Time (Asia/Kolkata)");
+	this.list_period = _textbox("period");
+	this.btn_daily = _listItem("Daily");
+	this.list_time = _textbox("timeAt");
+	this.btn_choose_time = _listItem("6:00 AM");
+	this.txt_emailOnSuccess = _textbox("emailOnSuccess");
+	this.btn_sn_save = _span("Save");
+	this.btn_sn_OK = _div("OK");
+	this.btn_Run_Now = _link("Run Now");
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+};
+	

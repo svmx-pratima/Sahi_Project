@@ -1,0 +1,62 @@
+
+//author - NoorSalmaSharieff
+
+var $RS_12422 = _testcase("$RS_12422","Verify the impact of setting SET003 (Hide SFM Wizard Display) on Lightning.");
+$RS_12422.start();
+_setSpeed($g_stepSpeed);
+ 
+$bo_act_login.login($g_url, $bac_light_un, $bac_light_pwd);
+
+//Set the Setting to Blank and Verify SFM Wizards must be displayed in Lightning Mode.
+$bo_act_configurationProfiles.editGroupProfileForTextSettings("AutoBACGroup", "Service Flow Wizard", "Service Flow Wizard Delivery", "SET003", " ");
+var $accName = $bo_act_accounts.createAccount();
+$bo_act_navigation.switchToLightningMode();
+$bo_act_salesforcePages.LightningSalesforceSearch($accName);
+_selectDomain("/servicemaxlightning/");
+_assertExists(_button("/a/"));
+_selectDomain();
+
+_click($sfm_pg_commonSfdc.link_userProfileInLightning);
+_wait(3000);
+_click($sfm_pg_commonSfdc.link_switchToClassic);
+_wait(4000);
+//Set the Setting to Lightning and Verify SFM Wizards must be displayed in Lightning Mode.
+$bo_act_configurationProfiles.editGroupProfileForTextSettings("AutoBACGroup", "Service Flow Wizard", "Service Flow Wizard Delivery", "SET003", "Lightning");
+$bo_act_navigation.switchToLightningMode();
+$bo_act_salesforcePages.LightningSalesforceSearch($accName);
+_selectDomain("/servicemaxlightning/");
+_assertNotExists(_button("/a/"));
+_selectDomain();
+
+_click($sfm_pg_commonSfdc.link_userProfileInLightning);
+_wait(3000);
+_click($sfm_pg_commonSfdc.link_switchToClassic);
+_wait(4000);
+
+//Set the Setting to Salesforce1 and Verify SFM Wizards must be displayed in Lightning Mode.
+$bo_act_configurationProfiles.editGroupProfileForTextSettings("AutoBACGroup", "Service Flow Wizard", "Service Flow Wizard Delivery", "SET003", "Salesforce1");
+$bo_act_navigation.switchToLightningMode();
+$bo_act_salesforcePages.LightningSalesforceSearch($accName);
+_selectDomain("/servicemaxlightning/");
+_assertExists(_button("/a/"));
+_selectDomain();
+
+_click($sfm_pg_commonSfdc.link_userProfileInLightning);
+_wait(3000);
+_click($sfm_pg_commonSfdc.link_switchToClassic);
+_wait(4000);
+
+//Set the Setting to LIGHTNING,Salesforce1 and Verify SFM Wizards must not be displayed in Lightning Mode.
+$bo_act_configurationProfiles.editGroupProfileForTextSettings("AutoBACGroup", "Service Flow Wizard", "Service Flow Wizard Delivery", "SET003", "Lightning,Salesforce1");
+$bo_act_navigation.switchToLightningMode();
+$bo_act_salesforcePages.LightningSalesforceSearch($accName);
+_selectDomain("/servicemaxlightning/");
+_assertNotExists(_button("/a/"));
+_selectDomain();
+
+
+$RS_12422.end();
+
+
+
+

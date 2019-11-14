@@ -1,0 +1,58 @@
+var $rs_7011 = _testcase("RS_7011","Verify source to target all SFM Process.");
+$rs_7011.start();
+
+var $sfmNameToBeCloned = "Add/Edit Products Serviced";
+var $sfmName = $bo_act_common.generateRandomName("RS_7011_");
+var $isCustom = false;
+var $sfmPgLayoutName =	$sfmName;
+var $sfmTemplate = "SVMXSTD: Add/Edit Products Serviced";
+var $sfmTemplateSaveAsName = $sfmName;
+var $containerNameArray = ["Products Serviced"];
+var $fieldNameArray = ["Line Number"];
+
+//Create WO through UI for the validation
+var $woNumber = $sfm_act_createCustomWizard.createBlankWoFromRest($sfmdUsn, $sfmdPwd, $sfmClientId, $sfmConsumerSecret, $sfmOrgInstance);
+
+var $ProductID = $sfm_act_restApiMethods.postRestApi($sfmdUsn, $sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,"Product2","{\"Name\":\""+$sfmName+"\"}","POST");
+var $ProductName =$sfm_act_restApiMethods.getRestApi($sfmdUsn, $sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,"GET", "Product2", "Name", "id", $ProductID);
+
+
+_setSpeed($g_stepSpeed);
+$bo_act_login.login($g_url,$sfmdUsn, $sfmdPwd);
+
+$sfm_act_SFM.cloneTDM016($sfmNameToBeCloned, $sfmName, $isCustom, $sfmTemplateSaveAsName,$sfmTemplate, $fieldNameArray, $containerNameArray);
+_wait(2000);
+_click($sfm_pg_sfmDesigner.btn_saveSFM); 
+
+//$bo_act_navigation.navigateToSfmTransactionDesigner();
+//$sfm_act_Transactions.cloneAndSaveProcess($processName, $sfmName, $sfmPgLayoutName);
+$sfm_act_wizards.addToWizard("Work Order", $sfmd_wizardName[2], $sfmd_wizardType[1], $sfmName); 
+
+//Navigate to the WO for validation
+$bo_act_navigation.navigateToCreatedRecordUsingGlobalSearch($woNumber);
+
+$sfm_act_createCustomWizard.clickWizardBtn($sfmName);
+$sfm_act_createCustomWizard.addProductServiced($ProductName);
+_wait(5000);
+
+$sfm_act_createCustomWizard.addParts($ProductName);
+$sfm_act_createCustomWizard.addLabor($ProductName);
+$sfm_act_createCustomWizard.addExpenses("Airfare");
+$sfm_act_createCustomWizard.addTravel();
+_click($sfm_pg_sfmDesigner.btn_deliverySave);
+_wait(10000,_isVisible($sfm_pg_wizardWindow.tab_productServiced));
+_click($sfm_pg_sfmDesigner.btn_deliverySave);
+_wait(10000,_isVisible(_heading2($woNumber)));
+
+//validate in work order for WL lines 
+_call(_heading3("Work Details").scrollIntoView());
+if((_getText(_link("/WL/",_leftOf(_cell("Products Serviced"))))) == _getText(_link("/WL/", _rightOf(_cell("Parts")))) &&
+		(_getText(_link("/WL/",_leftOf(_cell("Products Serviced"))))) == _getText(_link("/WL/", _rightOf(_cell("Labor")))) &&
+		(_getText(_link("/WL/",_leftOf(_cell("Products Serviced"))))) == _getText(_link("/WL/", _rightOf(_cell("Expenses")))) &&
+		(_getText(_link("/WL/",_leftOf(_cell("Products Serviced"))))) == _getText(_link("/WL/", _rightOf(_cell("Travel"))))){
+	_log("Pass ::: Linked SFM child lines are associated to main process lines ");
+}else{
+	_log("Fail ::: Linked SFM child lines are associated to main process lines","FAILURE");
+}
+
+$rs_7011.end();

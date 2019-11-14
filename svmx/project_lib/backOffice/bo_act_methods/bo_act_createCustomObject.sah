@@ -1,0 +1,25 @@
+var $bo_act_createCustomObject = new function bo_act_createCustomObject() {
+	
+	this.createNewcustomObj=function(){
+	_click($bo_pg_createCustomObj.lnk_salesforceSetUp);
+	_setValue($bo_pg_createCustomObj.txt_seachTxt,"obj");
+	_click($bo_pg_createCustomObj.lnk_clkObj);
+	_click($bo_pg_createCustomObj.btn_newCustomObj);
+	_setValue($bo_pg_createCustomObj.txt_nameOfCustObj,"AllDataType");
+	_setValue($bo_pg_createCustomObj.txt_pluralLabel, "AllDataTypeObj");
+	_click($bo_pg_createCustomObj.btn_submit);
+	
+	}
+		
+		this.deleteCustomObj=function(){
+	_click($bo_pg_createCustomObj.lnk_salesforceSetUp);
+	_setValue($bo_pg_createCustomObj.txt_seachTxt,"obj");
+	_click($bo_pg_createCustomObj.lnk_clkObj);
+	_click($bo_pg_createCustomObj.lnk_delete);
+	_popup("Confirm Custom Object Delete")._check($bo_pg_createCustomObj.chk_confirmationChkbox);	
+	_popup("Confirm Custom Object Delete")._click($bo_pg_createCustomObj.button_clickDeleteButton);
+
+			
+			
+}
+			}

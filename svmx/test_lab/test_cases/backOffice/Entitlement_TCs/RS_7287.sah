@@ -1,0 +1,56 @@
+//Tests are to be written here [Bhupendra Singh Chouhan]
+//==============
+
+var $RS_7287 = _testcase("$RS_7287","Verify the creation of SLA Term.");
+$RS_7287.start();
+_setSpeed($g_stepSpeed);
+
+/**
+* Login to the Sandbox Org
+*/
+
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+
+//Create 1st SLA Term SLA01 [Platinum SLA]
+$bo_act_navigation.navigateToSlaTerms();
+var $slaName01 = $bo_act_slaTerms.createSlaTerms("Default");
+$bo_act_slaTerms.addInitialResponseToSLA($slaName01,"WorkOrder","Field Service","Medium","Created Date","5","10","SLA");
+$bo_act_slaTerms.addOnsiteResponseToSLA($slaName01,"WorkOrder","Field Service","Medium","Created Date","10","15","SLA");
+
+//validation of SLA creation
+_assertExists(_span($slaName01));
+
+
+//Create 2nd SLA Term SLA02 [Gold SLA]
+$bo_act_navigation.navigateToSlaTerms();
+var $slaName02 = $bo_act_slaTerms.createSlaTerms("Default");
+$bo_act_slaTerms.addInitialResponseToSLA($slaName02,"WorkOrder","Field Service","Medium","Created Date","5","10","SLA");
+$bo_act_slaTerms.addOnsiteResponseToSLA($slaName02,"WorkOrder","Field Service","Medium","Created Date","10","15","SLA");
+
+//validation of SLA creation
+_assertExists(_span($slaName02));
+
+//Create 3rd SLA Term SLA03 [Silver SLA]
+$bo_act_navigation.navigateToSlaTerms();
+var $slaName03 = $bo_act_slaTerms.createSlaTerms("Default");
+$bo_act_slaTerms.addInitialResponseToSLA($slaName03,"WorkOrder","Field Service","Medium","Created Date","5","10","SLA");
+$bo_act_slaTerms.addOnsiteResponseToSLA($slaName03,"WorkOrder","Field Service","Medium","Created Date","10","15","SLA");
+
+//validation of SLA creation
+_assertExists(_span($slaName03));
+
+
+//Clean up function
+$bo_act_common.deleteSLA($bac_un, $bac_pwd, $orgnamespace, $slaName01);
+$bo_act_common.deleteSLA($bac_un, $bac_pwd, $orgnamespace, $slaName02);
+$bo_act_common.deleteSLA($bac_un, $bac_pwd, $orgnamespace, $slaName03);
+//
+//var $datacreated = [$slaName01,$slaName02,$slaName03];
+//for (var i = 0; i < $datacreated.length; i++) {
+//	$bo_act_common.cleanUpfunction($datacreated[i]);
+//}
+
+$bo_act_login.logOut();
+
+$RS_7287.end();
+//}

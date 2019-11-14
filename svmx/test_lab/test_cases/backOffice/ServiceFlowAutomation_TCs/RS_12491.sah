@@ -1,0 +1,76 @@
+//Tests are to be written here [Bhupendra Singh Chouhan]
+
+var $RS_12491 = _testcase("$RS_12491","SFA:- Verify the Service Flow Automation Configuration UI for ServiceMax Event object on Salesforce Event Service");
+$RS_12491.start();
+_setSpeed($g_stepSpeed);
+
+/**
+* Login to the Sandbox Org
+*/
+
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+
+// Create SFA Process with Record Field Update Event on ServiceMax Event object
+var $eventType = "Record Field Updated";
+var $object = "ServiceMax Event";
+var $filterCriteria = "--- None ---";
+var $updatedFieldName = "Status";
+var $recipientsField = "Technician";
+var $notificationTitle = "SFA Notification Text for Smax Event";
+var $pushNotificationText = "Hi [$OwnerId], Servicemax Event [$Name] is updated. Please check the status as ";
+var $inserField = "Status";
+var $sfmName = "New SFM for Smax Event";
+
+
+var $sfaProcessName = $bo_act_serviceFlowAutomation.createServiceFlowAutomationProcess_SalesforceEvent($eventType, $object, $filterCriteria, $updatedFieldName, $recipientsField, $notificationTitle, $pushNotificationText,$inserField,$sfmName);
+_log($sfaProcessName);
+/**
+ *Verify the SFA Process is created 
+*/
+var $actMsg = _getText(_heading2("slds-text-heading--small"));
+var $expMsg = "Automation created successfully";
+
+_assertEqual($expMsg,$actMsg,"Actual and expected SFA Success message are not same");
+_wait(30000, _isVisible($bo_pg_serviceFlowAutomation.btn_newAutomation));
+_assertExists(_link($sfaProcessName));
+
+// Delete the created SFA process
+$bo_act_serviceFlowAutomation.deleteSFAProcess($sfaProcessName);
+
+/**
+ Verify the SFA Process is deleted 
+*/
+var $actdltMsg = _getText(_heading2("slds-text-heading--small"));
+var $expdltMsg = "Automation deleted successfully.";
+_assertEqual($expdltMsg,$actdltMsg,"Actual and expected SFA Success message are not same");
+
+
+//Create SFA Process with Record Created Or Updated Event type on ServiceMax Event object
+var $eventType1 = "Record Created Or Updated";
+
+var $sfaProcessName1 = $bo_act_serviceFlowAutomation.createServiceFlowAutomationProcess_SalesforceEvent($eventType1, $object, $filterCriteria, $updatedFieldName, $recipientsField, $notificationTitle, $pushNotificationText,$inserField,$sfmName);
+_log($sfaProcessName1);
+/**
+* Verify the SFA Process is created 
+*/
+var $actMsg = _getText(_heading2("slds-text-heading--small"));
+var $expMsg = "Automation created successfully";
+
+_assertEqual($expMsg,$actMsg,"Actual and expected SFA Success message are not same");
+_wait(30000, _isVisible($bo_pg_serviceFlowAutomation.btn_newAutomation));
+_assertExists(_link($sfaProcessName1));
+
+//Delete the created SFA process
+$bo_act_serviceFlowAutomation.deleteSFAProcess($sfaProcessName1);
+
+/**
+* Verify the SFA Process is deleted 
+*/
+var $actdltMsg = _getText(_heading2("slds-text-heading--small"));
+var $expdltMsg = "Automation deleted successfully.";
+_assertEqual($expdltMsg,$actdltMsg,"Actual and expected SFA Success message are not same");
+
+$bo_act_login.logOut(); 
+
+$RS_12491.end();
+

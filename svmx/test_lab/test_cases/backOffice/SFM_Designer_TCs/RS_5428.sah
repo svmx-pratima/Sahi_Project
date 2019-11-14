@@ -1,0 +1,34 @@
+//_includeOnce("../../../references/references.js");
+
+//author - Mamata Rout
+
+var $RS_5428 = _testcase("RS_5428", "Test the functionality SFM App permision for a scenario");
+$RS_5428.start();
+_setSpeed($g_stepSpeed);
+
+var $checklistName = $bo_act_common.generateRandomName("RS-5428");
+var $searchText = $checklistName;
+var $questionText = $bo_act_common.generateRandomName("How are you");
+var $sfmType = "to generate a Checklist/Survey type of Process";
+var $objName = "Work Order";
+var $sfmName = $checklistName;
+
+// ----Creating a checklist having question type text on WO object
+
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+$bo_act_navigation.navigateToSfmTransactionDesigner();
+_wait(3000);
+$bo_act_SFM.newChecklistTypeSFM($checklistName, $sfmType, $objName);
+$bo_act_SFM.addQuestionToChecklist($questionText);
+
+// ---Verifying in App Permission page if the created checklist display---
+
+$bo_act_navigation.navigateToSfmAppPermission();
+$bo_act_SFMAppPermission.searchSFMDisplay($checklistName);
+_assertEqual("", _getText(_div("gridview-1028")), "Checklist does display");
+$bo_act_navigation.navigateToSfmTransactionDesigner();
+$bo_act_SFM.deleteSFM($sfmName);
+
+_setSpeed($g_stepSpeed);
+
+$RS_5428.end()

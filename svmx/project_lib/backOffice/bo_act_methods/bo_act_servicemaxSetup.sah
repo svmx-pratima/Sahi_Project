@@ -1,0 +1,130 @@
+/**
+ * Functions for the servicemax Setup Object
+ */
+var $bo_act_servicemaxSetup = new function bo_act_servicemaxSetup() {
+
+	this.createADepotStockingLocation = function($depotName,$level,$depot1Name){
+		$bo_act_navigation.navigateTodepotAndStockingLocations();
+		_click(_button("Add Top Level"));
+		_setValue(_textbox(0,_rightOf(_label("Level/Depot Name"))),$depotName);
+		_click(_button("Quick Save"));
+		_click(_link($depotName));
+		_click(_button("Add Level"));
+		_setValue(_textbox(0,_rightOf(_label("Level/Depot Name"))),$level);
+		_click(_button("Quick Save"));
+		_click(_link($depotName));
+		_click(_link($level));
+		_click(_button("Add Depot"));
+		_setValue(_textbox(0,_rightOf(_label("Level/Depot Name"))),$depot1Name);
+		_setValue(_textbox(0,_under(__div("Name"))),$level);
+		_setSelected(_select(0,_under(__div("Function"))),1);
+		_click(_button("Quick Save"));
+		_click(_submit("Save and Close"));
+		};
+		
+	this.createOutBoundRouting = function($depotName){
+			_click(_submit("Outbound Routing"));
+			_assertExists(_heading2("Manage Repair Shipment Preparation Rules"));
+			_setValue(_textbox(0,_rightOf(_span("Name"))),$depotName);
+			_click(_button("Save"));
+			_assertExists(_div("Success:Process saved."));
+		};
+    this.createDeliveryRule = function($object,$field,$operator,$value){
+	var $deliveryruleDescription = $bo_act_common.generateRandomName("Del");
+	var $ruleName = $bo_act_common.generateRandomName("rule");
+	_click(_submit("Delivery Rule"));
+	_setValue(_textbox(0,_rightOf(_label("Description"))),$deliveryruleDescription);
+	_click(_button("New"));
+	_setValue(_textbox(0,_rightOf(_label("Rule Name"))),$ruleName);
+	_setSelected(_select(0,_near(_div("Object Name"))),$object);
+	_setSelected(_select(1,_near(_div("Field Name"))),$field);
+	_setSelected(_select(2,_near(_div("Operator"))),$operator);
+	_setValue(_textbox(0,_near(_div("Value"))),$value);
+	_click(_button("Save"));
+	_assertExists(_div("Success:Delivery Rule saved"));
+	
+};
+
+	this.enableFeaturePermissionToUser = function($username) {
+	$bo_act_navigation.navigateToFeaturePermissionPage();
+	_wait(30000,_label("/Profile/"));
+		for (var $i = 0; $i < 5; $i++) {
+
+			if (_isVisible(_label("/Profile/"))) {
+				break;
+			}
+
+			else {
+				_call(top.location.reload());
+				_wait(30000, _isVisible(_label("/Profile/")));
+			}
+		}
+	_setValue(_textbox("profileName"),$groupProfileName);
+	//_setValue(_div("/svmx-trigger-index/",_rightOf(_textbox("profileName"))),"AutoBACGroup");
+	_setValue(_textbox("profileName"), $groupProfileName);
+	_click(_listItem($groupProfileName));
+	_setValue(_textbox("searchtextfield-inputEl"),$username);
+	_click(_span("Search"));
+	
+	//For Checklist Designer
+	if(true, _isVisible(_div("svmx-grid-checkheader svmx-grid-checkheader-checked")))
+	{
+	_logOutput("Checklist Designer is Checked");
+	}
+	else
+	{_click($bo_pg_servicemaxSetup.chk_checkChecklistDesigner);
+		_logOutput("Checklist Designer was not Checked");}
+	//For SFM Designer
+	if(true, _isVisible(_div("svmx-grid-checkheader svmx-grid-checkheader-checked[1]")))
+	{
+	_logOutput("SFM Designer is Checked");
+	}
+	else
+	{_click($bo_pg_servicemaxSetup.chk_checkSFMDesigner);
+		_logOutput("SFM Designer was not Checked");}
+	_click(_span("Save"));
+	_click(_span("Ok"));
+	};
+	
+	this.enableFeaturePermission = function($username,$profile) {
+		$bo_act_navigation.navigateToFeaturePermissionPage();
+		_wait(30000,_label("/Profile/"));
+			for (var $i = 0; $i < 5; $i++) {
+
+				if (_isVisible(_label("/Profile/"))) {
+					break;
+				}
+
+				else {
+					_call(top.location.reload());
+					_wait(30000, _isVisible(_label("/Profile/")));
+				}
+			}
+		_setValue(_textbox("profileName"),$profile);
+		//_setValue(_div("/svmx-trigger-index/",_rightOf(_textbox("profileName"))),"AutoBACGroup");
+		_setValue(_textbox("profileName"), $profile);
+		_click(_listItem($profile));
+		_setValue(_textbox("searchtextfield-inputEl"),$username);
+		_click(_span("Search"));
+		
+		//For Checklist Designer
+		if(true, _isVisible(_div("svmx-grid-checkheader svmx-grid-checkheader-checked")))
+		{
+		_logOutput("Checklist Designer is Checked");
+		}
+		else
+		{_click($bo_pg_servicemaxSetup.chk_checkChecklistDesigner);
+			_logOutput("Checklist Designer was not Checked");}
+		//For SFM Designer
+		if(true, _isVisible(_div("svmx-grid-checkheader svmx-grid-checkheader-checked[1]")))
+		{
+		_logOutput("SFM Designer is Checked");
+		}
+		else
+		{_click($bo_pg_servicemaxSetup.chk_checkSFMDesigner);
+			_logOutput("SFM Designer was not Checked");}
+		_click(_span("Save"));
+		_click(_span("Ok"));
+		};
+
+};

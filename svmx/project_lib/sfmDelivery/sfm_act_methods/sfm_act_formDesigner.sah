@@ -1,0 +1,631 @@
+var $sfm_act_formDesigner = new function sfm_act_formDesigner() {
+	
+	
+	/**
+	 * Author		:	Anand Kakhandaki
+	 * Function		: 	To Edit checklist section 
+	 * Parameter	:	$sectionName=section name
+	 * Example		:	Refer _ _ _ _ file for function usage
+	 */
+	this.editSection= function($sectionName){
+		var $scollElement=_f("main").s_vscrollbar("verticalScrollBar");
+		//$sfm_act_Transactions.lookUpScrollIntoView($sectionName, $scollElement);
+		_click($sfm_pg_formDesigner.btn_editSection.near(_f("main").s_richeditabletext($sectionName)));
+		_wait(5000,_isVisible($sfm_pg_formDesigner.tab_entryCriteria));
+	};
+	
+	/**
+	 * Author		:	Anand Kakhandaki
+	 * Function		: 	To Create new Section 
+	 * Parameter	:	None
+	 * Example		:	Refer _ _ _ _ file for function usage
+	 */
+	this.createNewSection=function(){
+		_click($sfm_pg_formDesigner.btn_addSection);
+		_wait(5000);
+	};
+	
+	/**
+	 * Author		:	Anand Kakhandaki
+	 * Function		: 	To Edit checklist section details
+	 * Parameter	:	$name=section name
+	 * 					$description=Section description
+	 * 					$url=help URL
+	 * Example		:	Refer _ _ _ _ file for function usage
+	 */
+	this.editSectionInformation=function($name,$description,$url){
+		_setValue($sfm_pg_formDesigner.txt_sectionName,$name);
+		_setValue($sfm_pg_formDesigner.txt_sectionDescription,$description);
+		_setValue($sfm_pg_formDesigner.txt_helpURL,$url);
+	};
+	
+	
+	/**
+	 * Author		:	Anand Kakhandaki
+	 * Function		: 	To Create CheckList Question
+	 * Parameter	:	$sectionName=Section name
+	 * 					$queCommonDetails=Array of $queType,$queName,$helpURL,$tag,$addToLibAndForm details
+	 * 					$queSpecificDetails=Array of details needed for specific question
+	 * Example		:	Refer _ _ _ _ file for function usage
+	 */
+	this.createCheckListQuestion=function($sectionName,$queCommonDetails,$queSpecificDetails){
+		var $queType=$queCommonDetails[0];
+		
+		_setStrictVisibilityCheck(true);
+		//_selectDomain($g_domain);
+		_click(_f("main").s_richeditabletext($sectionName));
+		_click($sfm_pg_formDesigner.btn_addNewQuestion);
+		if ($queType=="Text") {
+			_click(_f("main").uiftetextfield($queType+"[1]"));
+		}else{
+			_click(_f("main").uiftetextfield($queType));
+		}
+		
+		//adding question details
+		this.addEditCheckListQuestionDetails($queCommonDetails, $queSpecificDetails);
+		_wait(5000);
+		_click($sfm_pg_formDesigner.btn_closeChkWindow);
+		_setStrictVisibilityCheck(false);
+	};
+	
+	
+	/**
+	 * Author		:	Anand Kakhandaki
+	 * Function		: 	To rename CheckList Question
+	 * Parameter	:	$sectionName=Section name
+	 * 					$sectionRename=section new name
+	 * 					$description=description
+	 * 					$url=section URL
+	 * Example		:	Refer RS_9364 file for function usage
+	 */	
+	this.editAndSaveSectionDetails=function($sectionName,$sectionRename,$description,$url){
+	var $scollElement=_f("main").s_vscrollbar("verticalScrollBar");
+		//$sfm_act_Transactions.lookUpScrollIntoView($sectionName, $scollElement);
+		this.editSection($sectionName);
+		this.editSectionInformation($sectionRename, $description, $url);
+		_click($bo_pg_sfmTransactionAndDesigner.btn_applyChecklistSection);
+		_wait(3000);
+		_click($bo_pg_sfmTransactionAndDesigner.btn_closeSectionEdit);
+		_wait(5000);
+	};
+	
+	
+	/**
+	 * Author		:	Anand Kakhandaki
+	 * Function		: 	To Edit CheckList Question
+	 * Parameter	:	$sectionName=Section name
+	 * 					$queCommonDetails=Array of $queType,$queName,$helpURL,$tag,$addToLibAndForm details
+	 * 					$queSpecificDetails=Array of details needed for specific question
+	 * Example		:	Refer _ _ _ _ file for function usage
+	 */	
+	this.editCheckListQuestion=function($sectionName,$queCommonDetails,$queSpecificDetails){
+		_selectDomain($g_domain);
+		var $queName=$queCommonDetails[1];
+		this.editQuestionInSection($sectionName, $queName);
+		this.addEditCheckListQuestion($queCommonDetails, $queSpecificDetails)
+		
+	};
+	
+	/**
+	 * Author		:	Anand Kakhandaki
+	 * Function		: 	To Add/Edit CheckList Question
+	 * Parameter	:	$queCommonDetails=Array of $queType,$queName,$helpURL,$tag,$addToLibAndForm details
+	 * 					$queSpecificDetails=Array of details needed for specific question
+	 * Example		:	Refer _ _ _ _ file for function usage
+	 */
+	this.addEditCheckListQuestionDetails=function($queCommonDetails, $queSpecificDetails){
+		var $queType=$queCommonDetails[0];
+		var $queName=$queCommonDetails[1];
+		var $helpURL=$queCommonDetails[2];
+		var $tag=$queCommonDetails[3];
+		var $addToLibAndForm=$queCommonDetails[4];
+		
+		_wait(10000,_isVisible($sfm_pg_formDesigner.tab_questionDetails));
+		//Common fields
+		_setValue($sfm_pg_formDesigner.txt_queName,$queName);
+		_setValue($sfm_pg_formDesigner.txt_helpURL,$helpURL);
+		_setValue(_setValue($sfm_pg_formDesigner.txt_tag,$tag));
+		
+		if ($queType=="Attachment") {
+			this.createAttachementQue($queSpecificDetails);
+		}else if ($queType=="Checkbox" || $queType=="Multi-select Picklist" ) {
+			this.createCheckBoxQue($queSpecificDetails);
+		}else if ($queType=="Date"||$queType=="Date Time") {
+			this.createDateQue($queSpecificDetails);
+		}else if ($queType=="Picklist"||$queType=="Radio Button") {
+			this.createPicklistQue($queSpecificDetails);
+		}else if ($queType=="Number"||$queType=="Text") {
+			this.createNumberQue($queSpecificDetails);
+		}
+		_wait(5000);
+		if ($addToLibAndForm==true) {
+			_click($sfm_pg_formDesigner.btn_addToLibAndForm);
+		}else {
+			_click($sfm_pg_formDesigner.btn_addToLib);
+		}
+		
+	};
+	
+	/**
+	 * Author		:	Anand Kakhandaki
+	 * Function		: 	To Create CheckList Question -Attachment type
+	 * Parameter	:	$attQueDetails=Array of $includeINOPDOC,$descReq details in true/false
+	 * 
+	 * Example		:	Refer _ _ _ _ file for function usage
+	 */
+	this.createAttachementQue=function($attQueDetails){
+		//attachment parameter
+		//$attQueDetails=[$includeINOPDOC,$descReq]
+		var $includeINOPDOC=$attQueDetails[0];
+		var $descReq=$attQueDetails[1];
+
+		if ($includeINOPDOC==false) {
+			_click($sfm_pg_formDesigner.btn_includeINPDOC);
+		}
+		if ($descReq==false) {
+			_click($sfm_pg_formDesigner.btn_descReq);
+		}
+	};
+	
+	/**
+	 * Author		:	Anand Kakhandaki
+	 * Function		: 	To Create CheckList Question - Checkbox / Multi-select Picklist type
+	 * Parameter	:	$attQueDetails=Array of $responseSet,$responseSetName,$ansValueSet,$default
+	 * 				:   $responseSet=Name of already available Response set name
+	 * 				:   $responseSetName= New Response set name
+	 * 				:   $ansValueSet=Array of answer values
+	 * 				:   $default=Array containing detail to select value as default or not in true/false format
+	 * Example		:	Refer _ _ _ _ file for function usage
+	 */
+	this.createCheckBoxQue=function($chkQueDetails){
+		//$chkQueDetails=[$responseSet,$responseSetName,$ansValueSet,$default]
+		var $responseSet=$chkQueDetails[0];
+		var $responseSetName=$chkQueDetails[1];
+		var $ansValueSet=$chkQueDetails[2];
+		var $default=$chkQueDetails[3];
+		
+		if ($responseSet=="Create New") {
+			_setValue($sfm_pg_formDesigner.txt_responseSetName, $responseSetName);
+			for (var $i = 0; $i < $ansValueSet.length; $i++) {
+				var $ansField=null;
+				if ($i==0) {
+					$ansField=_f("main").s_textinput("/ansValue/").near($sfm_pg_formDesigner.btn_addAns);
+					_setValue($ansField,$ansValueSet[$i]);	
+				}else{
+					_click($sfm_pg_formDesigner.btn_addAns);
+					$ansField=_f("main").s_textinput("ansValue["+$i+"]").near($sfm_pg_formDesigner.btn_addAns);
+					_setValue($ansField,$ansValueSet[$i]);	
+				}
+				if ($default[$i]==true) {
+					_click($sfm_pg_formDesigner.btn_default.near($ansField));
+				}
+			}
+		}else {
+			_setSelected($sfm_pg_formDesigner.sel_responseSet, $responseSet);
+		}
+	};
+	
+	
+	/**
+	 * Author		:	Anand Kakhandaki
+	 * Function		: 	To Create CheckList Question - Date / Date Time Type
+	 * Parameter	:	$dateQueDetails=Array of $preFillFromWO,$defaultAnsType,$defaultVal
+	 * 				:   $preFillFromWO= prefill from WO in true/false format
+	 * 				:   $defaultAnsType= if no preFill, what is Ans type in Value/Function
+	 * 				:   $defaultVal=Ans value. Ex source field name if prefill selected, or date if value selected or today if function selected
+	 * Example		:	Refer _ _ _ _ file for function usage
+	 */
+	this.createDateQue=function($dateQueDetails){
+		//$dateQueDetails=[$preFillFromWO,$defaultAnsType,$defaultVal];
+		var $preFillFromWO=$dateQueDetails[0];
+		var $defaultAnsType=$dateQueDetails[1];
+		var $defaultVal=$dateQueDetails[2];
+	
+		if ($preFillFromWO==true) {
+			_click($sfm_pg_formDesigner.btn_preFill);
+			_wait(5000);
+			_setSelected($sfm_pg_formDesigner.sel_sourceField, $defaultVal);
+		}else {
+			_setSelected($sfm_pg_formDesigner.sel_defaultAnsType,$defaultAnsType);
+			if ($defaultAnsType=="Value") {
+				_setValue($sfm_pg_formDesigner.txt_dateField,$defaultVal);
+			}else {
+				_setSelected($sfm_pg_formDesigner.sel_dateFunction, $defaultVal);
+			}
+		}
+	};
+	
+	/**
+	 * Author		:	Anand Kakhandaki
+	 * Function		: 	To Create CheckList Question - Number / Text Type
+	 * Parameter	:	$numberQueDetails=Array of $preFillFromWO,$defaultVal
+	 * 				:   $preFillFromWO= prefill from WO in true/false format
+	 * 				:   $defaultVal=Ans value. Ex source field name if prefill selected, or text value
+	 * Example		:	Refer _ _ _ _ file for function usage
+	 */
+	this.createNumberQue=function($numberQueDetails){
+		//$numberQueDetails=[$preFillFromWO,$defaultVal]
+		var $preFillFromWO=$numberQueDetails[0];
+		var $defaultVal=$numberQueDetails[1];
+		
+		if ($preFillFromWO==true) {
+			_click($sfm_pg_formDesigner.btn_preFill);
+			_setSelected($sfm_pg_formDesigner.sel_sourceField, $defaultVal);
+		}else {
+			_setValue($sfm_pg_formDesigner.txt_defaultAns,$defaultVal);
+		}
+	};
+	
+	/**
+	 * Author		:	Anand Kakhandaki
+	 * Function		: 	To Create CheckList Question - Picklist / Radio Button Type
+	 * Parameter	:	$$picklistQueDetails=Array of $preFillFromWO,$responseSet,$responseSetName,$ansValueSet,$default
+	 * 				:   $preFillFromWO= prefill from WO in true/false format
+	 * 				:   $responseSet=Name of already available Response set name
+	 * 				:   $responseSetName= New Response set name
+	 * 				:   $ansValueSet=Array of answer values
+	 * 				:   $default=Array containing detail to select value as default or not in true/false format
+	 * Example		:	Refer _ _ _ _ file for function usage
+	 */
+	this.createPicklistQue=function($picklistQueDetails){
+		//$picklistQueDetails=[$preFillFromWO,$responseSet,$responseSetName,$ansValueSet,$default]
+		var $preFillFromWO=$picklistQueDetails[0];
+		var $defaultVal=$picklistQueDetails[1];
+		var $responseSet=$picklistQueDetails[2];
+		var $responseSetName=$picklistQueDetails[3];
+		var $ansValueSet=$picklistQueDetails[4];
+		var $default=$picklistQueDetails[5];
+		
+		if ($preFillFromWO==true) {
+			_click($sfm_pg_formDesigner.btn_preFillinNumberQue);
+			_wait(3000);
+			_setSelected($sfm_pg_formDesigner.sel_sourceFieldinNumberQue, $defaultVal);
+			_wait(5000);
+			_setValue($sfm_pg_formDesigner.txt_responseSetName, $responseSetName);
+			_wait(15000,_isVisible($bo_pg_sfmTransactionAndDesigner.div_pickListResponseSetAlert));
+		}
+	
+		//Create New
+		if ($responseSet=="Create New") {
+			_setValue($sfm_pg_formDesigner.txt_responseSetName, $responseSetName);
+			for (var $i = 0; $i < $ansValueSet.length; $i++) {
+				var $ansField=null;
+				if ($i==0) {
+					$ansField=_f("main").s_textinput("/ansValue/").near($sfm_pg_formDesigner.btn_addAns);
+					_setValue($ansField,$ansValueSet[$i]);	
+				}else{
+					_click($sfm_pg_formDesigner.btn_addAns);
+					$ansField=_f("main").s_textinput("ansValue["+$i+"]").near($sfm_pg_formDesigner.btn_addAns);
+					_setValue($ansField,$ansValueSet[$i]);	
+				}
+				if ($default[$i]==true) {
+					_click($sfm_pg_formDesigner.btn_defaultRadioButton.near($ansField));
+				}
+			}
+		}else if($responseSet!=="" && $responseSet!==null) {
+			_setSelected($sfm_pg_formDesigner.sel_responseSet, $responseSet);
+		}
+		_wait(5000);
+		if (_isVisible($bo_pg_sfmTransactionAndDesigner.div_pickListResponseSetAlert)) {
+			_click(_f("main").button("Yes"));
+		}
+	};
+
+	
+	
+	/**
+	 * Author		:	Anand Kakhandaki
+	 * Function		: 	To Create Entry criteria for checklist section
+	 * Parameter	:	$existingEntryCriteria=existing entry criteria name
+	 * 					$criteriaDetails=details of entry criteria
+	 * Example		:	Refer _ _ _ _ file for function usage
+	 */
+	this.createEntryCriteria=function($existingEntryCriteria,$criteriaDetails){
+		_click($sfm_pg_formDesigner.tab_entryCriteria);
+		this.setEntryCriteria($existingEntryCriteria, $criteriaDetails);
+		//_click($sfm_pg_formDesigner.btn_applyRemove);
+		_click($bo_pg_sfmTransactionAndDesigner.btn_applyEntryCriteria);
+		_wait(10000,_isVisible($sfm_pg_formDesigner.label_saveEditSectionMsg));
+		_click($sfm_pg_formDesigner.btn_entryCriteriaApplyButton);
+		_click($bo_pg_sfmTransactionAndDesigner.btn_applyEntryCriteria);
+	};
+	
+	
+	/**
+	 * Author		:	Anand Kakhandaki
+	 * Function		: 	To set Entry criteria for checklist section
+	 * Parameter	:	$existingEntryCriteria=existing entry criteria name
+	 * 					$criteriaDetails=details of entry criteria
+	 * Example		:	Refer _ _ _ _ file for function usage
+	 */
+	this.setEntryCriteria=function($existingEntryCriteria,$criteriaDetails){
+		var $comboField=$criteriaDetails[0];
+		var $comboConditions=$criteriaDetails[1]; 
+		var $toggleButton=$criteriaDetails[2];
+		var $comboInput=$criteriaDetails[3];
+		var $advExpr=$criteriaDetails[4];
+		var $criteriaName=$criteriaDetails[5];
+		
+	//check if Entry criteria is available already
+	if ($existingEntryCriteria!=="" && $existingEntryCriteria!==null) {
+		_setSelected($sfm_pg_formDesigner.sel_searchEntryCriteria,$existingEntryCriteria);
+	}else{
+		_click($sfm_pg_formDesigner.btn_newEntryCriteriaFilter);
+		_wait(5000,_isVisible($sfm_pg_screenDesigner.btn_addRow));
+		if ($comboField.length==1) {
+			_click($sfm_pg_screenDesigner.btn_deleteRow.near(_f("main").s_label("2")));
+		}else if ($comboField.length>2) {
+			for (var $i = 0; $i < $comboField.length-2; $i++) {
+				_log("Add row: "+$i);
+				_click($sfm_pg_screenDesigner.btn_addRow);
+				}
+			}
+	
+		var $ele=null;
+		var $eleType=null;
+		var $index=null;
+		var $temp=null;
+		var $rowNumber=null;
+		for (var $i = 1; $i <= $comboField.length; $i++) {
+			_log("$i value: "+$i);
+			$temp=$i;
+			$index=$temp-1;
+			_log("index: "+$index);
+			$rowNumber=_f("main").s_label($i.toString()).near($sfm_pg_formDesigner.tab_entryCriteria);
+			_setSelected($sfm_pg_screenDesigner.sel_comboField.near($rowNumber),$comboField[$index]);
+			_setSelected($sfm_pg_screenDesigner.sel_comboConditions.near($rowNumber), $comboConditions[$index]);
+			if ($comboConditions[$index]!=="Is Null"&&$comboConditions[$index]!=="Is Not Null") {
+				if ($toggleButton[$index]!=="") {
+					_click($sfm_pg_screenDesigner.btn_toggleChoose.near($rowNumber));
+					_wait(3000);
+					_setSelected($sfm_pg_screenDesigner.btn_inputCombobox.near($rowNumber),$comboInput[$index]);
+				}else{
+					$ele=$sfm_pg_screenDesigner.sel_comboField.near($rowNumber);
+					$eleType=_exists($sfm_pg_screenDesigner.btn_toggleChoose.rightOf($ele));
+					if ($eleType==true) {
+						_setValue($sfm_pg_screenDesigner.txt_input.near($rowNumber),$comboInput[$index]);
+					}else{
+						_setSelected($sfm_pg_screenDesigner.btn_inputCombobox.near($rowNumber),$comboInput[$index]);
+					}	
+				}
+			}
+		}
+		_setValue($sfm_pg_screenDesigner.txt_advExpr,$advExpr);
+		_setValue($sfm_pg_formDesigner.txt_saveAsTextField,$criteriaName);
+		_setValue($sfm_pg_formDesigner.txt_saveAsIDTextField,$criteriaName);
+		_click($sfm_pg_formDesigner.btn_saveEntryCriteria);
+		_wait(10000,_isVisible($sfm_pg_formDesigner.label_saveEntryCriteriaMsg));
+		}
+	};
+	
+	/**
+	 * Author		:	Anand Kakhandaki
+	 * Function		: 	To remove question from specified section
+	 * Parameter	:	$question=Question text
+	 * 					$sectionName=Question name
+	 * Example		:	Refer _ _ _ _ file for function usage
+	 */
+	this.removeQuestionFromSection=function($question,$sectionName){
+		_click($sfm_pg_formDesigner.btn_removeQuestion.near(_f("main").s_label($question).near(_f("main").s_richeditabletext($sectionName))));
+		_wait(10000);
+		_assertNotExists(_f("main").s_label($question).near(_f("main").s_richeditabletext($sectionName)));
+	};
+	
+	/**
+	 * Author		:	Anand Kakhandaki
+	 * Function		: 	To Add question to specified section
+	 * Parameter	:	$sectionName=Question name
+	 * 					$question=Question text
+	 * Example		:	Refer _ _ _ _ file for function usage
+	 */
+	this.addQuestionToSection=function($sectionName,$question){
+		_click(_f("main").s_richeditabletext($sectionName));
+		_setValue($sfm_pg_formDesigner.txt_searchQuestion, "");
+		_setValue($sfm_pg_formDesigner.txt_searchQuestion, $question);
+		//_mouseOver(_f("main").s_label($question+"[1]"));
+		_mouseOver(_f("main").questionlisttreeitemrendererm($question));
+		_click($sfm_pg_formDesigner.btn_addQuestion.near(_f("main").s_label($question)));
+	};
+	
+	
+	/**
+	 * Author		:	Anand Kakhandaki
+	 * Function		: 	click on exit tab
+	 * Parameter	:	$sectionName=Question name
+	 * 					$question=Question text
+	 * Example		:	Refer _ _ _ _ file for function usage
+	 */
+	this.addExistCriteria=function(){
+		_click($sfm_pg_formDesigner.tab_exitCriteria);
+		_wait(2000);
+	};
+	
+	/**
+	 * Author		:	Anand Kakhandaki
+	 * Function		: 	Add question to exit criteria tab
+	 * Parameter	:	$questionNames=Array of question Names
+	 * 					$questionType=Array of Question type - Date, Date/Time etc.
+	 * 					$criteriaDetails=Queation all criteria deatils;
+	 * Example		:	Refer _ _ _ _ file for function usage
+	 */
+	this.addQuesToExistCriteriaTab=function($questionNames,$questionType,$criteriaDetailList){
+		var $questionId;
+		var $criteriaDetails;
+		
+		for (var $i = 0; $i < $questionNames.length; $i++) {
+			if ($i==0) {
+				$questionId=_f("main").s_label("Question");
+			}else {
+				_click($sfm_pg_formDesigner.link_addQuestion);
+				_wait(2000);
+				$questionId=_f("main").s_label("Question["+$i.toString()+"]");
+			}
+			_setSelected($sfm_pg_formDesigner.sel_questionSelect.near($questionId),$questionNames[$i]);
+			if ($questionType[$i]=="Date" || $questionType[$i]=="Date/Time") {
+				$criteriaDetails=$criteriaDetailList[$i];
+				var $comboField=$criteriaDetails[0];
+				var $operandType=$criteriaDetails[1];
+				var $answer=$criteriaDetails[2];
+				var $skipTo=$criteriaDetails[3];
+				this.setExitCriteriaOnDateQuestion($questionId, $comboField, $operandType, $answer, $skipTo);
+			}else if ($questionType[$i]=="Number") {
+				$criteriaDetails=$criteriaDetailList[$i];
+				var $comboField=$criteriaDetails[0];
+				var $operandType=$criteriaDetails[1];
+				var $answer=$criteriaDetails[2];
+				var $skipTo=$criteriaDetails[3];
+				this.setExitCriteriaOnDateQuestion($questionId, $comboField, $operandType, $answer, $skipTo);
+			}
+			
+		}
+		_wait(3000);
+		_click($sfm_pg_formDesigner.btn_applyRemove);
+		_wait(2000);
+		_click($sfm_pg_screenDesigner.btn_applyExitCriteria);
+		_click($sfm_pg_formDesigner.btn_closeChkWindow);
+	};
+	
+	/**
+	 * Author		:	Anand Kakhandaki
+	 * Function		: 	Add question to exit criteria tab
+	 * Parameter	:	$questionNames=Array of question Names
+	 * 					$questionType=Question type - Date, Date/Time etc.
+	 * 					$criteriaDetails=Queation all criteria deatils;
+	 * Example		:	Refer _ _ _ _ file for function usage
+	 */
+	this.setExitCriteriaOnDateQuestion=function($questionId, $comboField, $operandType, $answer, $skipTo){
+		_log("$comboField.length: "+$comboField.length);
+		if ($comboField.length>1) {
+			for (var $i = 0; $i < $comboField.length-1; $i++) {
+				_log("Add row: "+$i);
+				_click($sfm_pg_formDesigner.link_addAnswer.near($questionId));
+			}
+		}
+			var $index=null;
+			var $temp=null;
+			var $rowNo=null;
+			for (var $i = 1; $i <= $comboField.length; $i++) {
+				_log("$i value: "+$i);
+				$temp=$i;
+				$index=$temp-1;
+				_log("index: "+$index);
+				$rowNo=_f("main").s_label($i.toString()).near($sfm_pg_formDesigner.label_evaluation.near($questionId));
+				_log($comboField[$index]);
+				_setSelected($sfm_pg_formDesigner.sel_comboFiled.near($rowNo),$comboField[$index]);
+				_log($operandType[$index]);
+				_setSelected($sfm_pg_formDesigner.sel_operandType.near($rowNo),$operandType[$index]);
+				if ($operandType[$index]=="Value") {
+						_setValue(_f("main").s_richeditabletext(0).near($rowNo), $answer[$index]);
+					}else{
+						_setSelected($sfm_pg_formDesigner.sel_ansPicklist.near($rowNo),$answer[$index]);
+				}
+				_setSelected($sfm_pg_formDesigner.sel_skipToSection.near($rowNo), $skipTo[$index]);
+			}
+	};
+	
+	
+	/**
+	 * Author		:	Anand Kakhandaki
+	 * Function		: 	Add question to exit criteria tab
+	 * Parameter	:	$questionNames=Array of question Names
+	 * 					$questionType=Question type - Date, Date/Time etc.
+	 * 					$criteriaDetails=Queation all criteria deatils;
+	 * Example		:	Refer _ _ _ _ file for function usage
+	 */
+	this.setExitCriteriaOnNumberQuestion=function($questionId, $comboField, $operandType, $answer, $skipTo){
+		//_log("$comboField.length: "+$comboField.length);
+		if ($comboField.length>1) {
+			for (var $i = 0; $i < $comboField.length-1; $i++) {
+				_log("Add row: "+$i);
+				_click($sfm_pg_formDesigner.link_addAnswer.near($questionId));
+			}
+		}
+			var $index=null;
+			var $temp=null;
+			var $rowNo=null;
+			for (var $i = 1; $i <= $comboField.length; $i++) {
+				_log("$i value: "+$i);
+				$temp=$i;
+				$index=$temp-1;
+				_log("index: "+$index);
+				$rowNo=_f("main").s_label($i.toString()).near($sfm_pg_formDesigner.label_evaluation.near($questionId));
+				_log($comboField[$index]);
+				_setSelected($sfm_pg_formDesigner.sel_comboFiled.near($rowNo),$comboField[$index]);
+				_log($operandType[$index]);
+				_setSelected($sfm_pg_formDesigner.sel_operandType.near($rowNo),$operandType[$index]);
+				_setValue($sfm_pg_formDesigner.txt_ansTextValue.near($rowNo),$answer[$index]);
+				_setSelected($sfm_pg_formDesigner.sel_skipToSection.near($rowNo), $skipTo[$index]);
+			}
+	};
+	
+	this.editQuestionInSection=function($sectionName, $question){
+		_click($sfm_pg_formDesigner.btn_editQuestion.near(_f("main").s_label($question).near(_f("main").s_richeditabletext($sectionName))));
+		_wait(3000,_isVisible($sfm_pg_formDesigner.tab_dataValidation));
+	};
+	
+	
+	this.dataValidationOnCheckListQuestion=function($dvrName,$dvrID,$dvrExpressionDetails){
+		_click($sfm_pg_formDesigner.tab_dataValidation);
+		_setValue($sfm_pg_formDesigner.txt_dvrName,$dvrName);
+		_setValue($sfm_pg_formDesigner.txt_dvrID,$dvrID);
+		
+		var $comboField;
+		var $operandType;
+		var $answer;
+		var $advExpr;
+		var $errorMsg;
+		var $questionType;
+		//add Expression to DVR
+		$comboField=$dvrExpressionDetails[0];
+		$operandType=$dvrExpressionDetails[1];
+		$answer=$dvrExpressionDetails[2];
+		$advExpr=$dvrExpressionDetails[3];
+		$msfType=$dvrExpressionDetails[4];
+		$errorMsg=$dvrExpressionDetails[5];
+		$questionType=$dvrExpressionDetails[6];
+		this.addDVRExpressions($comboField, $operandType, $answer, $advExpr, $msfType, $errorMsg,$questionType);
+		
+	};
+	
+	this.addDVRExpressions=function($comboField, $operandType, $answer, $advExpr, $msfType, $errorMsg,$questionType){
+		//_log("$comboField.length: "+$comboField.length);
+		if ($comboField.length>1) {
+			for (var $i = 0; $i < $comboField.length-1; $i++) {
+				//_log("Add row: "+$i);
+				_click($sfm_pg_formDesigner.btn_dvrAddRow.near($sfm_pg_formDesigner.label_dvrExpr));
+			}
+		}
+			var $index=null;
+			var $temp=null;
+			var $rowNo=null;
+			for (var $i = 1; $i <= $comboField.length; $i++) {
+				_log("$i value: "+$i);
+				$temp=$i;
+				$index=$temp-1;
+				_log("index: "+$index);
+				$rowNo=_f("main").s_label($i.toString()).near($sfm_pg_formDesigner.label_dvrExpr);
+				_log("$comboField: "+$comboField[$index]);
+				_setSelected($sfm_pg_formDesigner.sel_dvrComboField.near($rowNo),$comboField[$index]);
+				_log("$operandType: "+$operandType[$index]);
+				if($comboField[$index]!=="Is Null" && $comboField[$index]!=="Is Not Null" ){
+					_log("row no: "+$rowNo+" inde no: "+$index+" $operandType[$index]: "+$operandType[$index]);
+					_setSelected($sfm_pg_formDesigner.sel_operandType.near($rowNo),$operandType[$index]);
+					if ($operandType[$index]=="Value") {
+						//_log("Inside Value");
+						if ($questionType=="Number") {
+							_setValue($sfm_pg_formDesigner.txt_dvrNumberAnsValue.near($rowNo),$answer[$index]);
+						}else {
+							_setValue($sfm_pg_formDesigner.txt_dvrDateAnsValue.near($rowNo),$answer[$index]);
+						}
+						
+					}else {
+						_setSelected($sfm_pg_formDesigner.sel_ansPicklist.near($rowNo),$answer[$index]);
+					}
+				}
+
+			}
+			_setValue($sfm_pg_formDesigner.txt_dvrAdvExpr,$advExpr);
+			_setSelected($sfm_pg_formDesigner.sel_dvrMsgType,$msfType);
+			_setValue($sfm_pg_formDesigner.txt_dvrErrorMsg,$errorMsg);
+	};
+};

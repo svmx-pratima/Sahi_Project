@@ -1,0 +1,45 @@
+var $user_credentials = $excel.readFromCustomExcel("../optimax/op_excleData/automation.xlsx", "User_Details","","");
+var $MTTSData = $excel.readFromCustomExcel("../optimax/op_excleData/automation.xlsx", "Rules","","");
+
+for(var $i=0;$i<$user_credentials.length;$i++)
+{
+var $g_un = $user_credentials[$i][0];
+var $g_pwd = $user_credentials[$i][1];
+var $g_url = $user_credentials[$i][2];
+}
+
+
+var $RS_6297 = _testcase("RS_6297", "Changing Rule Sequence of MTTS Rule");
+
+$RS_6297.start();
+
+$bo_act_login.login($g_url, $g_un, $g_pwd);
+var $mttsRuleName = $MTTSData[0][0];
+
+_log($mttsRuleName);
+
+_click(_link("ServiceMax Setup"));
+_wait(20000,_isVisible(_div("Dispatch Management")));
+_click(_div("Dispatch Management"));
+_wait(20000,_isVisible(_div("MTTS Rules")));
+_click(_div("MTTS Rules"));
+_click(_button("Rule Sequence"));
+_setSelected(_select("MTTSRule:RuleForm:TrtrySeqBlk:list1:j_id36"), [$mttsRuleName]);
+_click(_imageSubmitButton("Top"));
+_click(_button("Submit"));
+
+
+var $MTTSName =  _getText(_cell("MTTSRule:RuleForm:RuleBlock:MTTSRuleList:0:j_id88"));
+
+"MTTSRule:RuleForm:RuleBlock:MTTSRuleList:" + $i+ ":j_id88"
+if (_areEqual($mttsRuleName, $MTTSName)) 
+{
+	_log("MTTS Rule Sequence Updated Successfully");
+}
+else
+	{
+	_fail("Error in Updating the MTTS Rule Sequence");
+	}
+
+$bo_act_login.logOut();
+$RS_6297.end();

@@ -1,0 +1,28 @@
+/**
+ * method to clone Work Order Service Report
+ */
+var $swat_act_workOrderServiceReport = new function swat_act_workOrderServiceReport() {
+
+	this.cloneWOServiceReport = function($sfmNameToBeCloned, $sfmName, $isCustom,
+			 $sfmTemplateSaveAsName,$sfmTemplate, $fieldName, $containerName) {
+		$bo_act_navigation.navigateToSfmTransactionDesigner();
+		
+		$sfm_act_SFM.selectSFM($sfmNameToBeCloned, $isCustom);
+
+		_click($bo_pg_sfmTransactionAndDesigner.btn_clone);
+		_wait(60000, _isVisible($bo_pg_sfmTransactionAndDesigner.txt_name));
+		_wait(3000);
+		_setValue($bo_pg_sfmTransactionAndDesigner.txt_name, $sfmName);
+		_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmTransactionId, "");
+		_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmTransactionId, $sfmName);
+		_click($bo_pg_sfmTransactionAndDesigner.btn_templateDesigner);
+		
+		_setSelected($bo_pg_sfmTransactionAndDesigner.sel_sfmTemplateforOpDoc,$sfmTemplate);
+				
+		//_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmSaveTemplateAs,$sfmTemplateSaveAsName);
+		//_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmSaveTemplateLayoutID,$sfmTemplateSaveAsName);
+		_click($bo_pg_sfmTransactionAndDesigner.btn_quickSave);
+		_wait(3000);
+		_click($bo_pg_sfmTransactionAndDesigner.btn_saveAndclose);
+	};
+};

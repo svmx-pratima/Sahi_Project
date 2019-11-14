@@ -1,0 +1,154 @@
+var $sfm_pg_sfmDesigner = new function sfm_pg_sfmDesigner() {
+	
+	this.btn_quickSaveSFM = _f("main").s_button("Quick Save");
+	this.btn_saveSFM = _f("main").s_button("Save & Close");
+	this.lnk_home = _link("Home");
+	this.lnk_workOrder = _link("Work Orders");
+	this.btn_deliveryQuickSave = _span("svmx-btn-icon svmx-sfmd-quicksave-icon");
+	this.btn_deliverySave = _span("svmx-btn-icon svmx-sfmd-save-icon");
+	this.btn_deliveryCancel = _span("svmx-btn-icon svmx-sfmd-cancel-icon");
+	this.btn_deliveryGetPrice = _span("Get Price");
+	this.btn_deliveryUserSettings = _span("svmx-btn-icon svmx-sfmd-setting-icon");
+	this.btn_deliveryHelp = _span("svmx-btn-icon svmx-sfmd-help-icon");
+	this.btn_deliveryClearCache = _span("svmx-btn-icon svmx-sfmd-cache-icon");
+	this.btn_edit = _button("edit");
+	this.btn_saveSFMDelivery=_button("Save");
+	
+	//SFM Delivery page objects
+	this.btn_deliveryPartsTab = _span("Parts");
+	this.btn_deliveryLaborTab = _span("Labor");
+	this.btn_deliveryExpenseTab = _span("Expenses");
+	this.btn_deliveryTravelTab = _span("Travel");
+	this.btn_deliveryAddRowParts = _span("/add-line-icon/");
+	this.btn_deliveryAddMultiParts = _span("svmx-btn-icon svmx-sfmd-multi-add-line-icon");
+	this.btn_deliveryAddChildRow = _div("sfm-button-1193");
+	this.btn_deliveryExtendedEdit = _image("/edit-icon/", _in(_div("svmx-grid-cell-inner ")));
+	this.btn_deliveryExtendedEditLabor = _image("/gif/", _near(_span("svmx-btn-icon svmx-sfmd-add-line-icon[1]")));
+	this.btn_deliveryExtendedEditExpenses = _image("/gif/", _near(_span("svmx-btn-icon svmx-sfmd-add-line-icon[2]"))) ;
+	this.btn_deliveryExtendedEditTravel = _image("/gif/", _near(_span("svmx-btn-icon svmx-sfmd-add-line-icon[3]")));
+	this.btn_deliveryAddRowLabor = _span("svmx-btn-icon svmx-sfmd-add-line-icon[1]");
+	this.btn_deliveryAddRowExpenses = _span("svmx-btn-icon svmx-sfmd-add-line-icon[2]");
+	this.btn_deliveryAddRowTravel = _span("svmx-btn-icon svmx-sfmd-add-line-icon[3]");
+	this.btn_deliveryDeleteChildRow = _image("/svmx-sfmd-delete-icon/");
+	this.btn_toggleSwitchButton=_image("svmx-tool-flow",_rightOf(_span("Lines")));//Added by Rubi Agrawal
+	this.btn_collapseExpandParts=_image("/svmx-tool/",_rightOf(_span("Parts")));
+	this.btn_collapseExpandLabor=_image("/svmx-tool/",_rightOf(_span("Labor")));
+	
+	//Extended edit page objects --Parts
+	
+	this.window_partsSearchWindow=_div("/window-closable/");
+	this.lbl_part=_label("Part:",_in(this.window_partsSearchWindow));
+	this.txt_partTextbox=_textbox("/inputEl/",_near(this.lbl_part));
+	this.searchPartIcon=_span("/lookup_icon/",_near(this.lbl_part));
+	this.lbl_recentItemProducts=_div("/lookupslidingwindow/");
+	this.window_ProductSearchWindow=_parentNode(this.lbl_recentItemProducts,"DIV",5);
+	this.lbl_account=_label("Account:",_in(this.window_partsSearchWindow));
+	this.txt_accountTextbox=_textbox("/inputEl/",_near(this.lbl_account));
+	this.btn_searchAccountIcon=_button(0,_near(this.lbl_account));
+	this.lbl_autoContact=_label("AutoContact:",_in(this.window_partsSearchWindow));
+	this.txt_autoContactTextbox=_textbox("/inputEl/",_near(this.lbl_autoContact));
+	this.txt_autoContactTextboxInChild=_cell("/inputCell/",_near(_span("AutoContact")));
+	this.sel_AutoContact=_div("/trigger/",_near(this.txt_autoContactTextboxInChild));
+	this.cell_AutoContact=_cell("/cell/",_under(_div("/column-header-last/",_near(_div("AutoContact")))));
+	this.btn_advFilterIcon=_span("/lookup-advfilter-expand-icon/");
+	this.btn_myTrunkStock=_button("SVMXSTD:Limit Items to My Trunk Stock");
+	
+	
+	this.btn_searchautoContactIcon=_button(0,_near(this.lbl_autoContact));
+	this.link_cancelPartSearch=_button("Cancel",_in(this.window_partsSearchWindow));
+	this.lbl_case=_label("Case:",_in(this.window_partsSearchWindow));
+	this.link_searchCaseIcon=_span("/lookup_icon/",_near(this.lbl_case));
+	this.button_updatePartsSearch=_button("Update",_in(this.window_partsSearchWindow));
+	this.btn_bubble=_image("/bubble-icon/",_near(_div("/lookupcelleditor/")));
+	this.btn_casebubble=_click(_image("/svmx-component svmx-sfmd-bubble-icon svmx-box-item svmx-component-default/"));
+	//_click(_image("/bubble-icon/"),_in(_row("Case:")));
+	this.btn_bubbleDiv=_div("/lightningtooltip/");
+	this.txt_eeLineQty = _textbox("Line Qty:",_rightOf(_label("Line Qty:")));
+	this.txt_eeReceivedStreet = _textarea(0,_rightOf(_label("Received Street:")));
+	this.btn_eeUpdate = _span("Update",_in(_div("/sfm-window/")));
+	this.btn_eeCancel = _span("Cancel");
+	this.btn_saveConfirmation = _span("Save",_leftOf(_span("Cancel")));
+	this.txt_eeEstimatedPricePerUnit= _textbox("/svmx-number-/",_rightOf(_label("Estimated Price Per Unit:")));
+	this.txt_eeReceivedCity =_textbox("/sfm-text-/",_rightOf(_label("Received City:")));
+	this.txt_eeReferenceInformation = _textarea("/sfm-textarea-/",_rightOf(_label("Reference Information:")));
+	this.txt_eeActivityType = _textbox("Activity Type:",_rightOf(_label("Activity Type:")));
+	this.btn_caseLookUpInWO = _span("/svmx_lookup_icon/",_near(_textbox("/svmx-text/",_rightOf(_label("Case:")))));
+	this.txt_caseInHeader =  _textbox("/svmx-text/",_rightOf(_label("Case:")));
+	this.btn_select = _span("Select");
+	
+	this.btn_cacheClear=_span("/cache-icon/");
+	this.btn_proceed=_span("Proceed");
+	//header fields
+	this.lbl_headerAccount=_label("Account:");
+	this.txt_headerAccount=_textbox("/inputEl/",_near(this.lbl_headerAccount));
+	this.btn_headerAccountSearchIcon=_span("/lookup_icon/",_near(this.lbl_headerAccount));
+	this.lbl_headerContact=_label("Contact:");
+	this.txt_headerContact=_textbox("/inputEl/",_near(this.lbl_headerContact));
+	this.link_ContactInDVR=_link("Contact",_in(_div("Contact: Multiple items found. Click lookup icon to refine search.")));
+	this.btn_headerContactsearchIcon=_button(0,_near(this.lbl_headerContact));
+	this.txt_accountPicklist=_textbox(0,_near(_label("Account Picklist:")));
+	this.txt_headerCity=_textbox(0,_near(_label("City:")));
+	this.btn_entitlementError=_div("Price not calculated, because entitlement check has not been performed.");
+	this.btn_ok=_span("Ok");
+	
+	this.link_Update=_button("Update");
+	this.link_quickSave=_span("/quicksave-icon/");
+	this.btn_hideMsg=_span("/hide-icon/");
+	
+	this.link_accountInDVR=_link("Account",_in(_div("Account: Multiple items found. Click lookup icon to refine search.")));
+	this.btn_searchIconInSFM=_div("/trigger-search/",_in(_div("/sfm-lookupcelleditor/")));
+	this.link_searchLink=_span("/search-icon/");
+	this.btn_searchTextBox=_textbox("/sfm-text/",_near(this.link_searchLink));	
+	this.link_accountInDVRNoMatch=_link("Account",_in(_div("Account: Multiple items found. Click lookup icon to refine search.")));
+	this.label_contextOverride=_label("/Limit search to/");
+	this.btn_contextOverride=_button(0,_near(this.label_contextOverride));
+	this.btn_cancelContactWindow=_button("Cancel",_near(_div("/SelectCancel/")));
+	this.btn_SelectAccount=_button("Select",_near(_div("/SelectCancel/")));
+	this.btn_noRecordMSG=_div("No matching record(s) found for this keyword");
+	
+	this.link_autoContactInDVR=_link("AutoContact",_in(_div("AutoContact: Multiple items found. Click lookup icon to refine search.")));
+	this.txt_autoContactTextBoxInSFM=_div("/grid-cell/",_under(_parentNode(_span("AutoContact"),"DIV",4)));
+	
+	this.sel_ContextSource=_f("main").s_combobox("/ComboBox/").rightOf(_f("main").uiftetextfield("Context Source"));
+	this.chk_OverrideContext=_f("main").s_checkbox("Override Context");
+	this.sel_Context=_f("main").s_combobox("/ComboBox/").rightOf(_f("main").uiftetextfield("Context"));
+	this.sel_matchinField=_f("main").s_combobox("/ComboBox/").near(_f("main").uiftetextfield("Matching Field"));
+	
+	
+	//Extended edit page objects --Labor
+	
+	this.txt_eeStartDateTime =_textbox("/svmx-date-/",_rightOf(_label("Start Date and Time:")));
+	this.txt_billingQty = _textbox("Billable Qty:",_rightOf(_label("Billable Qty:")));
+	this.txt_billingLinePrice = _textbox("/svmx-number-/",_rightOf(_label("Billable Line Price:")));
+	this.txt_eeLinePricePerUnit = _textbox("/svmx-number-/",_rightOf(_label("Line Price Per Unit:")));
+	this.txt_eeExpenseType = _textbox("Expense Type:",_rightOf(_label("Expense Type:")));
+	this.btn_usePriceFromPricebook=_button("Use Price From Pricebook/Contract:");
+	
+	this.txt_eeStartDateTime = _textbox("/svmx-date-/",_rightOf(_label("Start Date and Time:")));
+	this.txt_eeEndDateTime=_textbox("/svmx-date-/",_rightOf(_label("End Date and Time:")));
+	this.txt_proformaIAmt = _textbox("/svmx-number/",_rightOf(_label("Proforma Invoice Amount:")));
+	this.txt_eeDateReceived = _textbox("/svmx-date/",_rightOf(_label("Date Received:")));
+	
+	this.txt_priceAlert = _div("Price not calculated, because entitlement check has not been performed.");
+	this.btn_priceAlertOk = _span("Ok");
+	this.txt_scheduledDateTime=_textbox(0,_rightOf(_label("Scheduled Date Time:")));//Added by Rubi
+	this.txt_previousDateTime=_textbox(0,_rightOf(_label("Previous Scheduled Date Time:")));//Added by Rubi
+	this.txt_scheduledDate= _textbox(0,_rightOf(_label("Scheduled Date:")));
+	this.txt_billingType = _textbox("/sfm-picklist/",_rightOf(_label("Billing Type:")));
+	this.txt_Account = _textbox("/svmx-text/",_rightOf(_label("Account:")));
+	this.btn_searchProductLookUp = _span("svmx-btn-icon svmx-sfmd-search-icon ",_near(_span("Recent Items: Products")));
+	this.txt_searchProductLookUp = _textbox("/sfm-text/",_near(_span("Recent Items: Products")));
+	this.chk_allProductLookUp = _span("svmx-column-header-text",_leftOf(_span("/Name/")));
+	this.btn_selectProductLookUp = _span("Select",_in(_div("/sfm-lookupcomponent/")));
+	this.btn_cancelProductLookUp = _span("Cancel",_in(_div("/sfm-lookupcomponent/")));
+	this.txt_deliveryComponent = _textbox("/svmx-text/",_rightOf(_label("Component:")));
+	this.chk_deliveryIsEntitlePerformed = _button("Is Entitlement Performed:",_rightOf(_label("Is Entitlement Performed:")));
+	this.txt_noOfTimesAssigned = _textbox("No Of Times Assigned:");
+	this.txt_orderType = _textbox("Order Type:");
+	this.txt_problemDescription = _textarea("/sfm-textarea/",_rightOf(_label("Problem Description:")));
+	this.txt_invoiceNumber = _textbox("Invoice Number:");
+	this.txt_priority = _textbox("Priority:");
+	this.txt_zip = _textbox("Zip:");
+	this.txt_drivingTime = _textbox("Driving Time (in Minutes):");
+	this.txt_orderStatus= _textbox("Order Status:");
+};

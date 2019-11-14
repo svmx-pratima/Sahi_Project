@@ -1,0 +1,86 @@
+//Tests are to be written here [Meghana Rao]
+//==============
+
+//Pre - Condition Test Data
+
+var $RS_9635 = _testcase("$RS_9635","Creation of auto Entitlement for Case and then verifying the data when Setting is FALSE");
+$RS_9635.start();
+_setSpeed($g_stepSpeed);
+/**
+* Login to the Sandbox Org
+*/
+
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+
+
+/**
+ * Configure the Global Profile SET001
+ * Global Setting SET001 - Enable Auto Entitlement For Work Order is set to True for Auto Entitlement process to trigger 
+ * (This is a Global Setting and is available under Module "Entitlement Verification" and Submodule "Auto-Entitlement - Work Order") 
+ */
+
+var $Module = "Entitlement Verification";
+var $SubModule = "Auto-Entitlement-Case";
+var $Setting = "SET001";
+var $value = false;
+$bo_act_configurationProfiles.editGlobalProfileForBooleanSettings($Module, $SubModule, $Setting, $value);
+
+/**
+ * Create Auto Entitlement Rules for Work Order
+ */
+
+var $CaseField1 = "Case Origin";
+var $Operator = "Equals";
+var $Value1 = "Email";
+var $CaseField2 = "Case Reason";
+var $Value2 = "New problem";
+var	$p1 = "Service Contracts";	// $p4 = Warranties/Scon/Both for Entitlement check?
+var	$p2 = "Both";     // $p8 = Validity dates/Counters/Both
+var	$p3 = "Warranties";
+var $caseStatus = "New";
+var $casePriority = "High";// $p4 = Warranties/Scon/Both for Entitlement check?
+
+var $pastYear = 2;  // Start Date for Service Contract
+var $futureYear = 2;
+//Navigate to Auto Entitlement Rules - Case Rule1
+$autoEntitlementRuleName_Case1 = $bo_act_autoEntitlementRule_Case.createAutoEntitlementRule_Case($CaseField1, $Operator, $Value1, $CaseField2, $Value2, $p1, $p2);
+_assertExists(_span($autoEntitlementRuleName_Case1));
+
+
+
+// To create Service/Maintainence Contract and IB
+
+var $accountName = $bo_act_accounts.createAccount();
+var $contactName = $bo_act_contacts.createContact($accountName);
+
+var $productName = $bo_act_products.createProduct();
+var $IBName = $bo_act_installedProduct.createInstalledProduct($productName, $accountName, $contactName);
+var $slaterm = $bo_act_slaTerms.createSlaTerms("Default");
+var $ServiceContract = $bo_act_serviceMaintenanceContracts.createServiceMaintenanceContract($accountName, $slaterm, $futureYear, $pastYear);
+$bo_act_serviceMaintenanceContracts.activateServiceContract($ServiceContract);
+
+var $coveredproduct = $bo_act_serviceMaintenanceContracts.AddCoveredProductToSCON($ServiceContract, $IBName);
+var $Casename = $bo_act_Cases.createcase_checkentitlement($caseStatus, $casePriority, $Value1, $Value2,$IBName);
+
+
+
+var $RS_9635_get_case = "Select Id ,"+$orgnamespace+"__Auto_Entitlement_Status__c , "+$orgnamespace+"__Service_Contract__c from Case where CaseNumber ='"+$Casename+"'";
+var $RS_9635_fetch_case   = $op_act_sForceApiCall.sForceQuery($bac_un, $bac_pwd,$RS_9635_get_case,"query");
+
+ var $RS_9635_case_ID = $RS_9635_fetch_case[0].Id;
+ var $RS_9635_case_auto_entitlement_status = $RS_9635_fetch_case[0].SVMXC__Auto_Entitlement_Status__c;
+ var $RS_9635_case_SC = $RS_9635_fetch_case[0].SVMXC__Service_Contract__c;
+// to verify if the Case was Auto Entitled 
+	
+_assertEqual(null, $RS_9635_case_auto_entitlement_status);
+
+//Clean up function
+
+var $datacreated = $autoEntitlementRuleName_Case1;
+
+$bo_act_autoEntitlementRule_Case.deleteAutoEntitlementRule_Case($datacreated);
+
+$bo_act_login.logOut(); 
+
+$RS_9635.end();
+

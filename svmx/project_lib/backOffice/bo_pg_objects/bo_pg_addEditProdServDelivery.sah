@@ -1,0 +1,31 @@
+var $bo_pg_addEditProdServDelivery=new function bo_pg_addEditProdServDelivery() {
+	
+	
+	this.btn_svmxLookUpIcon=_span("svmx-btn-icon svmx_lookup_icon");
+	
+	this.btn_svmxSearchIcon=_span("/svmx-btn-icon svmx-sfmd-search-icon/");
+		this.btn_select=_span("Select");
+		this.txt_workPerform=_textarea("svmx-form-field svmx-form-text");
+		this.btn_svmxAddLineIcon=_span("svmx-btn-icon svmx-sfmd-add-line-icon");
+		this.lbl_IBSerialNumField=_div("svmx-grid-cell-inner [2]");
+		this.btn_lookupIconForSerialNum=_span("svmx-btn-icon svmx_lookup_icon[1]");
+		this.btn_limitSrchCheckbox=_button("svmx-form-field svmx-form-checkbox");
+		this.lbl_partField=_div("svmx-grid-cell-inner [3]");
+		this.btn_lookupIconForPart=_span("svmx-btn-icon svmx_lookup_icon[2]");
+		this.lbl_prodWarranty=_div("svmx-grid-cell-inner [4]");
+		this.btn_clickProdWarranty=_span("svmx-btn-icon svmx_lookup_icon[3]");
+		this.lnk_addEdit = _span("/Modify Work Details/");  // Add Add/Modify Work Details SFM
+	this.txt_startDate=_textbox("svmx-form-field svmx-form-text[3]");
+		this.txt_endDate=_textbox("svmx-form-field svmx-form-text[4]");
+		this.lbl_parts=_div("svmx-grid-cell-inner [1]");
+	this.lbl_labor=_span("Labor");
+	this.lbl_expenses=_span("Expenses");
+	this.icon_Save = _span("svmx-btn-icon svmx-sfmd-save-icon");
+	this.icon_quicksave = _span("/svmx-sfmd-quicksave-icon/");
+		this.chk_usePriceFrom=_div("svmx-grid-checkheader svmx-grid-checkheader-unchecked svmx-grid-checkcolumn-contentalign-undefined[1]");
+		
+	
+	
+	
+	
+};

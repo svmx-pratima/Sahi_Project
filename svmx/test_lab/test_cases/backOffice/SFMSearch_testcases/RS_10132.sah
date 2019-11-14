@@ -1,0 +1,40 @@
+// Author Meghana Rao P
+/*
+ * This test case verifies the quick save of SFM search and checking the SFM Search Delivery
+ */
+var $RS_10132 = _testcase("RS_10132", "quick save and checking the delivery");
+$RS_10132.start();
+
+// To generate Random names for SearchTitle and Search ID
+var $searchTitle = $bo_act_common.generateRandomName("Search");
+var $searchId = $bo_act_common.generateRandomName("SearchId");
+
+var $data = _readExcelFile("../../backOffice/bo_excleData/BORegressionDatasheet.xlsx",$orgtype,true);
+var $createwoquery = $data[1]["CreateWorkOrderOpen"];
+var $fetchwo = $data[1]["fetchwo"];
+var $username = $data[1]["Username"];
+// create a Work Order
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+
+var $username_query = "Select Name from User where Id = '"+$username+"'";
+var $rs_10132_fetch_user = $op_act_sForceApiCall.sForceQuery($bac_un, $bac_pwd, $username_query ,"query");
+
+
+var $username_rs_10132 = $rs_10132_fetch_user[0].Name;
+
+var $rs_10132_result = $op_act_sForceApiCall.sForceQuery($bac_un, $bac_pwd, $createwoquery ,"create");
+var $rs_10132_query_wo = $fetchwo;
+var $rs_10132_fetch = $op_act_sForceApiCall.sForceQuery($bac_un, $bac_pwd, $rs_10132_query_wo ,"query");
+
+$rs_10132_WO1 = $rs_10132_fetch[0].Name;
+
+// To create a Custom SFM Search value
+// createsfmsearch = For Single Expression
+$bo_act_sfmsearch.sfmsearch_advancedexpression($searchId, $searchTitle, "Work Order", "Last Modified By ID", "SVMX.CURRENTUSER", "Equals", "Last Modified By ID", "SVMX.OWNER", "10132");
+$bo_act_sfmsearch.sfmsearch_displayfields($searchTitle ,"Work Orders", "Work Order" , "Last Modified By ID" , "Owner ID");
+$bo_act_sfmsearchdelivery.sfmsearch($searchTitle, $rs_10132_WO1, false);
+
+_assertEqual(true, _isVisible(_div("Last Modified By ID")));
+_assertEqual(true, _isVisible(_link($username_rs_10132)));
+
+$RS_10132.end();

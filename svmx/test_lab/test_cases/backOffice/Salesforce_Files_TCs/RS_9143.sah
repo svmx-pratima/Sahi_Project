@@ -1,0 +1,27 @@
+//Tests are to be written here [Srinivasa Murthy S]
+// Creating variable for the printing the test case number and name
+var $RS_9143 = _testcase("$RS_9143","Create / define a SFM to generate Output Documents in SFM Designer");
+$RS_9143.start();
+
+//Login to the Sandbox using the credentials from 
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+
+var $sfmName=$bo_act_common.generateRandomName("RS_9143_");
+
+//Clone the Standard OPDOC to custom process
+$bo_act_navigation.navigateToSfmTransactionDesigner();
+_wait(15000,_isVisible($bo_pg_sfmTransactionAndDesigner.btn_newSFM));
+_wait(5000,_isVisible($bo_pg_sfmTransactionAndDesigner.txt_name));
+$bo_act_SFM.cloneStandardOPDOCProcess("Work Order Service Report",$sfmName,$sfmName);
+
+//Check if the added SFM is available in the Custom SFM tab
+_click($bo_pg_sfmTransactionAndDesigner.btn_yourCustomSfmTransactions);
+_click($bo_pg_sfmTransactionAndDesigner.txt_yourCustomSfmTransactionsQuickFind);
+_setValue($bo_pg_sfmTransactionAndDesigner.txt_yourCustomSfmTransactionsQuickFind,$sfmName);
+_assertExists(_f("main").s_label($sfmName));
+
+//Delete the SFM Created
+$bo_act_SFM.deleteSFM($sfmName);
+
+
+$RS_9143.end();

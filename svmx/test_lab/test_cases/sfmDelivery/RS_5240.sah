@@ -1,0 +1,126 @@
+//_includeOnce("../../../references/references.js");
+
+//author - Mamata Rout
+
+var $RS_5240 = _testcase("RS_5240", "Verify All features of map in standalone mapping");
+$RS_5240.start();
+_setSpeed($g_stepSpeed);
+
+
+var $sfmName=$bo_act_common.generateRandomName("5240SFM");
+//change  the name of $sfmTemplateSaveAsName before execution.
+var $sfmTemplateSaveAsName=$bo_act_common.generateRandomName("5240Temp");
+var $mapName=$bo_act_common.generateRandomName("5240Map");
+var $objName="Work Order";
+var $sfmd_wizardName=$bo_act_common.generateRandomName("5240Wizard");
+var $wizardID=$sfmd_wizardName;
+var $nameOfTranType="as Standalone for the purpose of editing an existing record";
+var $executionMode="Interactive";
+var $fieldActnType="SFM";
+var $actnName=$sfmName;
+var $wizardButtonName=$sfmName;
+var $selectMapping="5240mapping";
+
+
+//*************Login to Servicemax App***********
+//$bo_act_login.login($g_url, $bac_un,$bac_pwd);
+$bo_act_login.login($g_url,$sfmdUsn, $sfmdPwd);
+
+//*****Navgate to SFm Designer and create a new SFM of type source to Target All ********
+			$bo_act_navigation.navigateToSfmTransactionDesigner();
+			$bo_act_SFM.createNewSFM($sfmName);
+			$bo_act_SFM.selectTypeOfSfmTranToBeCreated($nameOfTranType);
+			_click(_f("main").s_textinput("textInput[1]"));
+			_setValue(_f("main").s_textinput("textInput[1]"),"");
+			_setValue(_f("main").s_textinput("textInput[1]"),"Work Order");			
+			_setSelected(_f("main").s_combobox("objCombo1[1]"), "Work Order");
+			_wait(3000);
+			_click($bo_pg_sfmTransactionAndDesigner.btn_popUpOK);
+			_wait(2000);
+
+
+			
+//**********IN QC creating header field map of all field data type**************
+			_click($bo_pg_sfmTransactionAndDesigner.btn_qualifyingCriteriaAndFieldMapping);
+			_click($bo_pg_sfmTransactionAndDesigner.lbl_clkHeaderInQcPage);
+				_click($bo_pg_sfmTransactionAndDesigner.btn_mappings);
+				_wait(1000);
+			
+_setSelected(_f("main").s_combobox("searchCombo[2]"), $selectMapping);
+
+//********** Create a new template and add field Account to its header and save the template and SFM process************
+			_click($bo_pg_sfmTransactionAndDesigner.btn_screenDesigner);
+			_wait(6000,_isVisible(_f("main").tab("Screen Designer")));
+			_click($bo_pg_manageWOLineUsageForSorting.btn_screenDesignerNew);
+			$bo_act_SFM.addFieldToHeaderOfScreenDesigner("Account");
+			$bo_act_SFM.addFieldToHeaderOfScreenDesigner("Problem Description");			
+			_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmSavePageLayoutAs, $sfmTemplateSaveAsName);
+			_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmSavePageLayoutAsId, $sfmTemplateSaveAsName);
+			
+			_click($bo_pg_sfmTransactionAndDesigner.btn_pageLayoutSave);
+			_wait(5000);
+			_click($bo_pg_sfmTransactionAndDesigner.btn_saveAndclose);
+			_wait(2000);
+
+//*******Nagigate to SFM Wizard and Create Wizard and Add Above Transaction to it**********
+				$bo_act_navigation.navigateToSfmWizard();
+				$bo_act_SFW.createWizardGeneralInfo($objName,$sfmd_wizardName,$wizardID);
+				$bo_act_SFW.createWizardStep($fieldActnType,$actnName,$executionMode);
+
+//******Launch the Wizard in delivery for WO object**************
+
+			$bo_act_sfmVerifyWorkOrder.verifyWizardOnWOObj($wizardButtonName);
+
+//getting work order number diplayed
+		var $workOderNum1=_getText(_heading2("/WO-/"));
+
+//****Click on Wizard and Save it without entering anything			
+			$bo_act_sfmVerifyWorkOrder.clkOnWizard($wizardButtonName);
+			while(_isVisible(_image("svmx-action-col-icon svmx-action-col-0   svmx-sfmd-edit-icon"))==true){
+			_click(_image("svmx-action-col-icon svmx-action-col-1   svmx-sfmd-delete-icon"));
+			}
+			$bo_act_SFM.addHeaderFromLookupInDelivery();
+			var $actValConsole=_getText($bo_pg_sfmVerifyWorkOrder.accountValueInConsole);
+			var $prbDesValConsole=_getText($bo_pg_sfmVerifyWorkOrder.probDescripInConsole);
+			_click($bo_pg_addEditProdServDelivery.icon_Save);
+			_wait(6000, _isVisible(_heading2("Work Order Detail")));
+
+			if(_isVisible($bo_pg_sfmVerifyWorkOrder.problemDescription)){
+				var $probDes2=_getText($bo_pg_sfmVerifyWorkOrder.problemDescription);
+			}
+			if(_isVisible(_link(0,_rightOf(_span("/Account/"))))){
+				var $accountNum2=_getText(_link(0,_rightOf(_span("/Account/"))));
+			}
+
+//			_assertEqual($actValConsole, $accountNum2,"Account is not Matching");
+			if($actValConsole==$accountNum2){
+				_log("Pass::Accounts are matching");
+			}
+			else{
+				_fail("Fail::Accounts are not matching");
+			}
+//			_assertEqual($prbDesValConsole,$probDes2,"Problem Description is not Matching");
+			if($probDes2==null){
+				$probDes2 = "";
+			}
+			
+			if($prbDesValConsole==$probDes2){
+				_log("Pass::Problem Description are matching");
+			}
+			else{
+				_fail("Fail::Problem Description are not matching");
+			}
+
+
+
+		//*****************Deleteing testdata************
+		$bo_act_navigation.navigateToSfmWizard();
+		_setSelected($bo_pg_sfmWizard.sel_objPrevMaintPlan,$objName	);
+		$bo_act_SFW.deleteWizard($sfmd_wizardName);	
+		$bo_act_navigation.navigateToSfmTransactionDesigner();
+		$bo_act_SFM.deleteSFM($sfmName);
+		_setSpeed($g_stepSpeed);
+
+$RS_5240.end();
+
+

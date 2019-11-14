@@ -1,0 +1,51 @@
+// Vanditha
+var $RS_3731 = _testcase("RS_3731", "Creation of Event Subject Rule");
+$RS_3731.start();
+
+var $url= "http://test.salesforce.com" ;
+var $un = "commonuser@svmxpqt.com";
+var $pwd = "servicemax2";
+var $eventSubjectRuleName = "Event Subject Rule: Work Order";
+var $eventSubjectRuleDescription = "Event Subject Rule created on Work Order";
+_setSpeed(1000);
+
+
+//Login to the org
+$bo_act_login.login($url, $un, $pwd);
+ 
+//Verify Event Subject Rule Page Load
+/*
+$dc_act_eventSubjectRule.verifyEventSubjectRulePage($eventSubjectRuleName, $eventSubjectRuleDescription);
+if (_assertVisible($dc_pg_eventSubjectRule.btn_newRule)) {
+    _log("Event Subject Rule Page is loaded successfully");
+} else {
+    _log("Event Subject Rule Page is not loaded successfully");
+};
+ */
+//Verify Event Subject Rule Creation
+$dc_act_eventSubjectRule.createAdvancedEventSubjectRule($eventSubjectRuleName, $eventSubjectRuleDescription);
+if (_assertVisible($dc_pg_eventSubjectRule.btn_newRule)) {
+    _log("Event Subject Rule created successfully");
+} else {
+	_log("Event Subject Rule not created");
+};
+ 
+//Verify Event Subject Rule Modification
+$dc_act_eventSubjectRule.editAdvancedEventSubjectRule($eventSubjectRuleName);
+
+if (_assertVisible($dc_pg_eventSubjectRule.btn_newRule)) {
+    _log("Event Subject Rule edited successfully");
+} else {
+    _log("Event Subject Rule not edited");
+};
+
+//Verify Event Subject Rule Deletion
+$dc_act_eventSubjectRule.deleteEventSubjectRule($eventSubjectRuleName);
+
+//Validation of the Delete Message displayed
+$expectedMessage = "Success:Record(s) Deleted";
+$actualMessage=_getText(_div("messageText"));
+_log($actualMessage);
+_assertEqual($expectedMessage,$actualMessage,"Event Subject Rule deleted successfully");
+
+

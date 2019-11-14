@@ -1,0 +1,54 @@
+var $user_credentials = $excel.readFromCustomExcel("../optimax/op_excleData/automation.xlsx", "User_Details","","");
+var $TerrData = $excel.readFromCustomExcel("../optimax/op_excleData/automation.xlsx", "Rules","","");
+
+
+//var $nArr;
+//Calling the sforce API
+for(var $i=0;$i<$user_credentials.length;$i++)
+{
+var $g_un = $user_credentials[$i][0];
+var $g_pwd = $user_credentials[$i][1];
+var $g_url = $user_credentials[$i][2];
+}
+
+var $RS_6325 = _testcase("RS_6325", "Changing Rule Sequence of Territory Match Rule");
+
+$RS_6325.start();
+
+var $TerrName = $TerrData[0][2];
+
+/*var $g_url = "https://test.salesforce.com/";
+var $g_un = "govendhan@svmx-cct5.org.cct5part1";
+var $g_pwd = "maxpl0re2";*/
+
+$bo_act_login.login($g_url, $g_un, $g_pwd);
+
+var $rowCount = 0;
+
+_click(_link("ServiceMax Setup"));
+_wait(20000,_isVisible(_div("Dispatch Management")));
+_click(_div("Dispatch Management"));
+_wait(20000,_isVisible(_div("Territory Match Rules")));
+_click(_div("Territory Match Rules"));
+_click(_button("Rule Sequence"));
+_setSelected(_select("TRTRYRule:RuleForm:TrtrySeqBlk:list1:j_id36"), [$TerrName]);
+_click(_imageSubmitButton("Top"));
+_click(_button("Submit"));
+
+
+var $temp = _getText(_cell("TRTRYRule:RuleForm:RuleBlock:TrtryRuleList:0:j_id89"));
+
+_log("Name : " + $temp);
+
+if (_areEqual($TerrName, $temp)) 
+{
+	_log("Territory Match Rule Sequence Updated Successfully");
+}
+else
+	{
+	_fail("Error in Updating the Territory Match Rule Sequence");
+	}
+
+
+$bo_act_login.logOut();
+$RS_6325.end();

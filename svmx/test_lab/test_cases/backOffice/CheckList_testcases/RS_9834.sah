@@ -1,0 +1,32 @@
+
+// Author Meghana Rao P
+/*
+ * To verify if the questions are allowed to be deleted from the Form designer
+ */
+
+
+
+var $RS_9834 = _testcase("RS_9834", "To verify if the questions are allowed to be deleted from the Form Designer");
+$RS_9834.start();
+
+var $QuestionName = $bo_act_common.generateRandomName("A RS_9834");
+var $Process1 = $bo_act_common.generateRandomName("A_RS_9834_Pro1");
+var $Tagname = $bo_act_common.generateRandomName("RS_9834TAG");
+
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+
+$bo_act_navigation.navigateToSfmTransactionDesigner();
+_wait(60000, _isVisible($bo_pg_sfmTransactionAndDesigner.btn_newSFM));
+_wait(1000);
+
+
+
+
+$bo_act_checklistdesigner.newChecklistTypeSFM($Process1,"to generate a Checklist/Survey type of Process", "Work Order");
+
+$bo_act_checklistdesigner.create_newquestion_tag_in_designer($QuestionName, "");
+
+$bo_act_checklistdesigner.create_newquestion_tag_in_designer($QuestionName, $Tagname);
+
+
+

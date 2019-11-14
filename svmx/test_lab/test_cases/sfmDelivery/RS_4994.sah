@@ -1,0 +1,24 @@
+var $rs_4994 = _testcase("RS_4994","Assign to a group and log in as different group member.");
+/* Logging in with a different group member cannot be validated because 
+ * The step to add permission in addManageWizSteps function was commented out
+ * while modifying the codes to run on both Dev as well as Base.
+ */
+$rs_4994.start();
+//Create WO through REST API
+var $woNumber = $sfm_act_createCustomWizard.createBlankWoFromRest($sfmdUsn, $sfmdPwd, $sfmClientId, $sfmConsumerSecret, $sfmOrgInstance);
+
+$wizTitle = $bo_act_common.generateRandomName("SFMWizPermission_");
+$bo_act_login.login($g_url,$sfmdUsn, $sfmdPwd);
+$sfm_act_wizards.addToWizard("Work Order", $wizTitle, $sfmd_wizardType[4], "Work Order Service Report","false","Default Group Profile"); 
+
+//Navigate to the WO for validation
+$bo_act_navigation.navigateToCreatedRecordUsingGlobalSearch($woNumber);
+
+_selectDomain($g_domain);
+$sfm_pg_wo.assert_wizard($wizTitle);
+
+//delete the above created wizard
+_wait(3000);
+_selectDomain();
+$sfm_act_wizards.deleteSfmWizard("Work Order",$wizTitle);
+$rs_4994.end();

@@ -1,0 +1,25 @@
+var $bo_pg_customAction = new function bo_pg_customAction() {
+	
+	//this.sel_objWO=_select("ManageAction:form1:j_id0:j_id28:j_id29:j_id30:j_id32");
+	this.sel_objWO = _select(0);
+	this.btn_new=_submit("New");
+//	this.sel_actionType=_select("j_id0:j_id1:BLOCK1:j_id7:j_id8:j_id9:j_id11");
+	this.sel_actionType = _select(0);
+	this.txt_actionName=_textbox("j_id0:j_id1:BLOCK1:j_id39:j_id44:j_id45:j_id46:j_id55:j_id58");
+	this.txt_actionID= _textbox("j_id0:j_id1:BLOCK1:j_id39:j_id44:j_id45:j_id46:j_id61:actnId");
+	this.txt_enterURL= _textbox(0,_rightOf(_label("URL To Launch")));
+	this.btn_quickSave=_button("Quick Save");
+	this.btn_saveAndClose=_submit("Save & Close");
+	this.btn_backToSetUpHome=_submit("Back To Setup Home");
+	
+	this.txt_actionTitle = _textbox(0,_rightOf(_label("Action Title")));
+	this.txt_actionID = _textbox(0,_rightOf(_label("Action ID")));
+	this.txt_className = _textbox(0,_rightOf(_label("Class Name")));
+	this.txt_methodName = _textbox(0,_rightOf(_label("Method Name")));
+	this.btn_delete = _button("Delete");
+	this.txt_parameterName = _textbox(0,_near(_div("Parameter Name"),_under(_table("list"))));
+	this.sel_parameterValueType = _select(0,_near(_div("Parameter Value Type"),_under(_table("list"))));
+	this.sel_parameterSource = _select("j_id0:j_id1:BLOCK1:BLOCK2:j_id144:TABLE:0:parameterSource",_near(_div("Parameter Source"),_under(_table("list"))));
+	this.txt_parameterValue = _select("j_id0:j_id1:BLOCK1:BLOCK2:j_id144:TABLE:0:j_id172",_near(_div("Parameter Value")),_under(_table("list")));
+
+};

@@ -1,0 +1,36 @@
+
+//Author - Noor Salma Sharieff
+
+var $RS_10320 = _testcase("First time users opt in as Servicemax user.");
+$RS_10320.start();
+_setSpeed(100);
+
+var $Workbenchurl = "https://workbench.developerforce.com/login.php";
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+$bo_act_configurationProfiles.editGlobalProfileForBooleanSettings("Common", "User License Provisioning", "SET003", true);
+
+//var $userName = $bo_act_salesforcePageSetUp.createUser("Salesforce", "System Administrator");
+
+//Navigate to the current users profile
+_click(_link("Setup"));
+_setValue(_textbox("setupSearch"), "Users");
+_wait(3000);
+_click(_link("Users",_under(_link("Manage Users"))));
+_wait(3000);
+_click(_link($bac_un));
+_wait(3000);
+
+//$bo_act_workOrders.checkFieldAvailableInPageLayout($bo_pg_salesforcePageSetUp.cell_servicemaxUser,$bo_pg_salesforcePageSetUp.btn_servicemaxUser);
+$bo_act_salesforcePageSetUp.editUsercheckboxForCheck(true);
+_assertExists(_link("Product & Pricebook"));
+
+//Clean up function
+$bo_act_salesforcePageSetUp.editUsercheckboxForUnCheck(false);
+
+
+$RS_10320.end();
+
+
+
+
+

@@ -1,0 +1,200 @@
+/**
+ * Function to create a MTTC Calculation method 
+ */
+var $an_act_MTTC = new function an_act_MTTC() {
+	
+	this.MTTC_closed_wo_calc = function($Calculationmethodname) {
+
+		// To setup the values
+		$TopLevelWO.an_toplevelwo();
+		_click($an_pg_mttc.metrics);
+		_click($an_pg_mttc.btn_mttc);
+		_click($an_pg_mttc.btn_addmttc);
+		_wait(200);
+		_click($an_pg_mttc.btn_activecheckboxmttc);
+		_setValue($an_pg_mttc.txt_mttc_description, $Calculationmethodname);
+		_wait(200);
+		_click($an_pg_mttc.btn_settings);
+		_click($an_pg_mttc.source_Technician);
+		_click($an_pg_mttc.listitem_technician);
+		_click($an_pg_mttc.source_product);
+		_click($an_pg_mttc.listitem_product);
+		_click($an_pg_mttc.source_create_on_field);
+		_click($an_pg_mttc.listitem_created_date);
+		_click($an_pg_mttc.source_completed);
+		_click($an_pg_mttc.listitem_closedon);
+		
+		_click($an_pg_mttc.source_Account);
+		_click($an_pg_mttc.listitem_account);
+		_click($an_pg_mttc.mapping);
+		_click($an_pg_mttc.none);
+		_wait(200);
+		_click($an_pg_mttc.Criteria);
+		_click($an_pg_mttc.WO_QC);
+		_click($an_pg_mttc.Closed_Work_Orders);
+		_click($an_pg_mttc.save);
+		_click($an_pg_mttc.ok);		
+		
+	};	
+	this.MTTC_runEngine = function($emailId)
+	{
+		_click($an_pg_mttc.metrics);
+		_click($an_pg_mttc.btn_mttc);
+		_click($an_pg_mttc.btn_click_Schedule_Notifications);
+		_click($an_pg_mttr.list_timezone);
+	    _click($an_pg_mttr.btn_ist_timezone);
+	    _click($an_pg_mttr.btn_period);
+	    _click($an_pg_mttr.btn_daily);
+	    _click($an_pg_mttr.list_time);
+	    _click($an_pg_mttr.btn_time);
+		_click($an_pg_mttc.txt_Email_onSuccess);
+		_setValue($an_pg_mttc.txt_Email_onSuccess, $emailId);
+		_click($an_pg_mttc.save);
+		_click($an_pg_mttc.ok);
+		_wait(300);
+		_click($an_pg_mttc.btn_click_run);
+		_click($an_pg_mttc.ok);
+		_wait(1000);
+		
+	};
+	this.MTTC_Case=function()
+	{
+		$TopLevelCase.an_toplevelcase();		
+		_click($an_pg_mttc.metrics);
+		_click($an_pg_mttc.btn_mttc);	
+	};
+	this.MTTC_SR = function() {
+		// To setup the values
+				$TopLevelSR.an_topLevelSR();		
+				_click($an_pg_mttc.metrics);
+				_click($an_pg_mttc.btn_mttc);
+			};	
+
+this.MTTC_custom_field=function($Calculationmethodname)
+{
+	$TopLevelSR.an_topLevelSR();	
+	_click($an_pg_mttc.metrics);
+	_click($an_pg_mttc.btn_mttc);
+	_click($an_pg_mttc.btn_addmttc);
+	_wait(200);
+	_click($an_pg_mttc.btn_activecheckboxmttc);
+	_setValue($an_pg_mttc.txt_mttc_description, $Calculationmethodname);
+	_wait(200);
+	_click($an_pg_mttc.btn_settings);
+	_click($an_pg_mttc.source_Technician);
+	_click($an_pg_mttc.listitem_technician);
+	_click($an_pg_mttc.source_product);
+	_click($an_pg_mttc.listitem_product);
+	_click($an_pg_mttc.source_create_on_field);
+	_click($an_pg_mttc.listitem_created_date);
+	_click($an_pg_mttc.source_completed);
+	_click($an_pg_mttc.listitem_closedon);
+	_click($an_pg_mttc.source_Account);
+	_click($an_pg_mttc.listitem_Customaccount);
+	_click($an_pg_mttc.mapping);
+	_click($an_pg_mttc.none);
+	_wait(200);
+	_click($an_pg_mttc.Criteria);
+	_click($an_pg_mttc.WO_QC);
+	_click(_listItem("SVMXSTD: To Qualify Work Orders for FTF processing"));
+	_click($an_pg_mttc.save);
+	_click($an_pg_mttc.ok);		
+	};
+	
+	this.MTTC_custom_Expression=function($Calculationmethodname)
+	{
+		$TopLevelWO.an_toplevelwo();
+		_click($an_pg_mttc.metrics);
+		_click($an_pg_mttc.btn_mttc);
+		_click($an_pg_mttc.btn_addmttc);
+		_wait(200);
+		_click($an_pg_mttc.btn_activecheckboxmttc);
+		_setValue($an_pg_mttc.txt_mttc_description, $Calculationmethodname);
+		_wait(200);
+		_click($an_pg_mttc.btn_settings);
+		_click($an_pg_mttc.source_Technician);
+		_click($an_pg_mttc.listitem_technician);
+		_click($an_pg_mttc.source_product);
+		_click($an_pg_mttc.listitem_product);
+		_click($an_pg_mttc.source_create_on_field);
+		_click($an_pg_mttc.listitem_created_date);
+		_click($an_pg_mttc.source_completed);
+		_click($an_pg_mttc.listitem_closedon);
+		_click($an_pg_mttc.source_Account);
+		_click($an_pg_mttc.listitem_account);
+		_click($an_pg_mttc.mapping);
+		_click(_listItem("Custom_checkbox"));
+		_wait(200);
+		_click($an_pg_mttc.Criteria);
+		_click($an_pg_mttc.WO_QC);
+		_click(_listItem("Auto_exp"));
+		_click($an_pg_mttc.save);
+		_click($an_pg_mttc.ok);		
+		};
+		
+		this.MTTC_multiple_cal1 = function($Calculationmethodname) {
+
+			// To setup the values
+			$TopLevelCase.an_toplevelcase();		
+			_click($an_pg_mttc.metrics);
+			_click($an_pg_mttc.btn_mttc);
+			_click($an_pg_mttc.btn_addmttc);
+			_wait(200);
+			_click($an_pg_mttc.btn_activecheckboxmttc);
+			_setValue($an_pg_mttc.txt_mttc_description, $Calculationmethodname);
+			_wait(200);
+			_click($an_pg_mttc.btn_settings);
+			_click($an_pg_mttc.source_Technician);
+			_click($an_pg_mttc.listitem_technician);
+			_click($an_pg_mttc.source_product);
+			_click($an_pg_mttc.listitem_product);
+			_click($an_pg_mttc.source_create_on_field);
+			_click($an_pg_mttc.listitem_created_date);
+			_click($an_pg_mttc.source_completed);
+			_click($an_pg_mttc.listitem_closedon);
+			_click($an_pg_mttc.source_Account);
+			_click($an_pg_mttc.listitem_account);
+			_click($an_pg_mttc.mapping);
+			_click($an_pg_mttc.none);
+			_wait(200);
+			_click($an_pg_mttc.Criteria);
+			_click($an_pg_mttc.WO_QC);
+			_click(_listItem("SVMXSTD: Field Service Type Work Order With No Billing Type"));
+			_click($an_pg_mttc.save);
+			_click($an_pg_mttc.ok);	
+			
+		};
+		this.MTTC_multiple_cal2 = function($Calculationmethodname) {
+
+			// To setup the values
+		
+		_click($an_pg_mttc.metrics);
+		_click($an_pg_mttc.btn_mttc);
+		_click($an_pg_mttc.btn_addmttc);
+		_wait(200);
+		_click($an_pg_mttc.btn_activecheckboxmttc);
+		_setValue($an_pg_mttc.txt_mttc_description, $Calculationmethodname);
+		_wait(200);
+		_click($an_pg_mttc.btn_settings);
+		_click($an_pg_mttc.source_Technician);
+		_click($an_pg_mttc.listitem_technician);
+		_click($an_pg_mttc.source_product);
+		_click($an_pg_mttc.listitem_product);
+		_click($an_pg_mttc.source_create_on_field);
+		_click($an_pg_mttc.listitem_created_date);
+		_click($an_pg_mttc.source_completed);
+		_click($an_pg_mttc.listitem_closedon);
+		_click($an_pg_mttc.source_Account);
+		_click($an_pg_mttc.listitem_account);
+		_click($an_pg_mttc.mapping);
+		_click($an_pg_mttc.none);
+		_wait(200);
+		_click($an_pg_mttc.Criteria);
+		_click($an_pg_mttc.WO_QC);
+		_click(_listItem("SVMXSTD: Generic Type Work Order"));
+		_click($an_pg_mttc.save);
+		_click($an_pg_mttc.ok);		
+
+		};
+
+};

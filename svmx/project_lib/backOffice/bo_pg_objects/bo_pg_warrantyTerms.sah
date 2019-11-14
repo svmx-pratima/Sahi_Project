@@ -1,0 +1,61 @@
+
+
+var $bo_pg_warrantyTerms = new function bo_pg_warrantyTerms(){
+	this.btn_new = _button(" New ");
+	this.txt_templateName = _textbox("/Template Name/");
+	this.sel_exchangeType = _select(0,_rightOf(_label("Exchange Type")));
+	//this.sel_templateType = _select(0,_rightOf(_label("Template Type")));
+	
+	this.txt_materialPercentCovered = _textbox("Material % Covered");
+	this.txt_durationOfMaterialCoverage = _textbox("Duration of Material Coverage");
+	this.sel_unitOfTimeForMaterialCoverage = _select(0,_rightOf(_label("Unit of Time for Material Coverage")));
+	
+	this.txt_laborPercentCovered = _textbox("Labor % Covered");
+	this.txt_durationOfLaborCoverage = _textbox("Duration of Labor Coverage");
+	this.sel_unitOfTimeForLaborCoverage = _select(0,_rightOf(_label("Unit of Time for Labor Coverage")));
+	
+	this.txt_expensesPercentCovered = _textbox("Expenses % Covered");
+	this.txt_durationOfExpensesCoverage = _textbox("Duration of Expenses Coverage");
+	this.sel_unitOfTimeForExpensesCoverage = _select(0,_rightOf(_label("Unit of Time for Expenses Coverage")));
+	
+	this.btn_save = _submit(" Save ");
+	
+	//Object for configuring Coverage "Effective From" in Warranty Terms
+	
+	this.btn_configureStartDateSFM = _button("Configure Start Date");
+	this.btn_coverageByCounters = _button("Coverage By Counters");
+	this.sel_CoverageEffectiveFrom = _select(0,_rightOf(_label("Coverage Effective From")));
+	this.txt_coverageStartsAt = _textbox(0,_near(_div("Coverage Starts At")));
+	this.txt_countersCovered = _textbox(1,_near(_div("Counters Covered")));
+	this.btn_saveCoverage =_button("Save");
+	this.btn_close =_submit("Close");
+	
+	//Objects for Applicable product
+	this.btn_newApplicableProduct = _button("New Applicable Product");
+	this.txt_product = _textbox("/\\*Product|^Product/");
+	this.btn_save = _submit(" Save ");
+	
+	// Click on the Warranty Terms on Applicable Product Detail Page
+	this.clickOnWarranty = function($warrantyName){
+		
+		_click(_link($warrantyName,_near(_heading2("Applicable Product Detail"))));
+		
+		};
+		
+	//Objects for Create Warranty
+	this.btn_cretaeWarrantySFM = _button("Create Warranty");
+	this.btn_updateCountersSFM = _button("Update Counters");
+	this.txt_counterCurrentReading = _textbox(0,_near(_div("Current Reading")));
+	
+	/**
+	 * Selects a warranty radio button
+	 */
+	this.selectWarranty = function($warrantyName){
+		
+	_click(_radio(0,_leftOf(_link($warrantyName,_near(_div("Template Name"))))));
+	
+	};
+	
+	this.btn_cretaeWarranty =_submit("Create Warranty");
+	this.exchangeType = _cell("Exchange Type");
+};

@@ -1,0 +1,69 @@
+var $user_credentials = $excel.readFromCustomExcel("../optimax/op_excleData/automation.xlsx", "User_Details","","");
+for(var $i=0;$i<$user_credentials.length;$i++)
+{
+var $g_un = $user_credentials[$i][0];
+var $g_pwd = $user_credentials[$i][1];
+var $g_url = $user_credentials[$i][2];
+}
+
+var $RS_6288 = _testcase("RS_6288", "Create a SLA Terms");
+
+$RS_6288.start();
+
+var $rowCount = 0;
+var $date = "" + new Date();
+var $SLAName = "SLATerms_" + $date;
+	
+$bo_act_login.login($g_url, $g_un, $g_pwd);
+
+_click(_link("ServiceMax Setup"));
+_wait(20000,_isVisible(_div("Warranties & Service Contracts")));
+_click(_div("Warranties & Service Contracts"));
+_wait(20000,_isVisible(_div("SLA terms")));
+_click(_div("SLA terms"));
+_wait(20000,_isVisible(_button("New SLA Terms")));
+_click(_button("New SLA Terms"));
+_set($rowCount, _table("page1:form1:block1:j_id34:j_id35").rows.length);
+_log($rowCount);
+$rowCount=$rowCount-2;
+_log($rowCount);
+_setValue(_textbox("page1:form1:block1:j_id34:j_id35:"+$rowCount+":j_id44"), $SLAName);
+//_click(_cell("dataCell[13]"));
+_check(_checkbox("page1:form1:block1:j_id34:j_id35:"+$rowCount+":j_id52"));
+_setSelected(_select("page1:form1:block1:DetailSection:tab1block1:j_id85:j_id86:j_id88"), "WorkOrder");
+_click(_button("Add Record"));
+_setSelected(_select("page1:form1:block1:DetailSection:tab1block1:SectionIR:Tab1_Table:0:j_id103"), "Cleaning");
+_setSelected(_select("page1:form1:block1:DetailSection:tab1block1:SectionIR:Tab1_Table:0:j_id109"), "High");
+_setSelected(_select("page1:form1:block1:DetailSection:tab1block1:SectionIR:Tab1_Table:0:j_id113"), "Created Date");
+_setValue(_textbox("page1:form1:block1:DetailSection:tab1block1:SectionIR:Tab1_Table:0:j_id117"), "60");
+_setValue(_textbox("page1:form1:block1:DetailSection:tab1block1:SectionIR:Tab1_Table:0:j_id122"), "30");
+_setSelected(_select("page1:form1:block1:DetailSection:tab1block1:SectionIR:Tab1_Table:0:j_id127"), "SLA");
+_click(_button("Add Record"));
+_check(_checkbox("page1:form1:block1:DetailSection:tab1block1:SectionIR:Tab1_Table:1:tab1selected"));
+_expectConfirm("Are you sure?", true);
+_click(_button("Delete"));
+_assertEqual("Are you sure?", _lastConfirm());
+_click(_button("Next >>"));
+_setSelected(_select("page1:form1:block1:DetailSection:tab2block1:j_id169:j_id170:j_id172"), "WorkOrder");
+_click(_button("Add Record[1]"));
+_setSelected(_select("page1:form1:block1:DetailSection:tab2block1:j_id181:Tab2_Table:0:j_id188"), "Cleaning");
+_setSelected(_select("page1:form1:block1:DetailSection:tab2block1:j_id181:Tab2_Table:0:j_id194"), "High");
+_setSelected(_select("page1:form1:block1:DetailSection:tab2block1:j_id181:Tab2_Table:0:j_id198"), "Initial Response Internal By");
+_setValue(_textbox("page1:form1:block1:DetailSection:tab2block1:j_id181:Tab2_Table:0:j_id202"), "60");
+_setValue(_textbox("page1:form1:block1:DetailSection:tab2block1:j_id181:Tab2_Table:0:j_id207"), "30");
+_setSelected(_select("page1:form1:block1:DetailSection:tab2block1:j_id181:Tab2_Table:0:j_id212"), "SLA");
+_click(_button("Next >>[1]"));
+_setSelected(_select("page1:form1:block1:DetailSection:tab3block1:j_id255:j_id256:j_id258"), "WorkOrder");
+_click(_button("Add Record[2]"));
+_setSelected(_select("page1:form1:block1:DetailSection:tab3block1:j_id267:Tab3_Table:0:j_id274"), "Cleaning");
+_setSelected(_select("page1:form1:block1:DetailSection:tab3block1:j_id267:Tab3_Table:0:j_id280"), "High");
+_setSelected(_select("page1:form1:block1:DetailSection:tab3block1:j_id267:Tab3_Table:0:j_id284"), "Onsite Response Internal By");
+_setValue(_textbox("page1:form1:block1:DetailSection:tab3block1:j_id267:Tab3_Table:0:j_id288"), "60");
+_setValue(_textbox("page1:form1:block1:DetailSection:tab3block1:j_id267:Tab3_Table:0:j_id293"), "30");
+_setSelected(_select("page1:form1:block1:DetailSection:tab3block1:j_id267:Tab3_Table:0:j_id298"), "SLA");
+_click(_button("Next >>[2]"));
+_click(_button("Next >>[3]"));
+_click(_button("Save"));
+
+$RS_6288.end();
+

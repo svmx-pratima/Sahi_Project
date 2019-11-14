@@ -1,0 +1,77 @@
+
+//author - Noor Salma Sharieff
+
+var $9830 = _testcase("9830","SFW - Handover on multisource wizard step.");
+$9830.start();
+_setSpeed($g_stepSpeed);
+
+var $PMPlanName = $bo_act_common.generateRandomName("PMPlan");
+var $sconName = $bo_act_common.generateRandomName("Scon");
+
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+
+var $wizardTitleName = $bo_act_common.generateRandomName("SFWTitle");
+var $wizardIDName = $bo_act_common.generateRandomName("SFWId");
+$bo_act_navigation.navigateToSfmWizard();
+$bo_act_SFW.createWizardGeneralInfo("Account", $wizardTitleName, $wizardIDName);
+$bo_act_SFW.createSFMWizardStepwithHandOver("SFM", "Create Preventive Maintenance Plan From Account", "Interactive",true);
+$bo_act_SFW.createSFMWizardStepwithHandOver("SFM", "Create Service Contract From Account", "Interactive",false);
+$bo_act_SFW.quickSaveSFWizard();
+$bo_act_SFW.saveAndClose();
+
+var $accountName = $bo_act_accounts.createAccount();
+var $proName = $bo_act_products.createProduct();
+var $servicePlan = $bo_act_servicePlans.createServicePlan();
+
+var $PMPTempName = $bo_act_PMPlanTemplate.createTimeBasedPMPlanTemplate($proName, "Location (Visit Only)","","Weeks");
+
+$bo_act_navigation.navigateToAccountsPage();
+_click(_link($accountName));
+
+_selectDomain($g_domain);
+_assertExists(_button("/Create Preventive Maintenance Plan From Account/",_near(_cell($wizardTitleName))));
+_click(_button("/Create Preventive Maintenance Plan From Account/",_near(_cell($wizardTitleName))));
+_selectDomain();
+_wait(60000,_isVisible($bo_pg_PMPlan.txt_PMPlanName));
+_setValue($bo_pg_PMPlan.txt_PMPlanName, $PMPlanName);
+_setValue($bo_pg_PMPlan.txt_PMPlanTemplateName, $PMPTempName);
+_click($bo_pg_PMPlan.sel_coverageType);
+_click(_listItem("Location (Must Have Location)"));
+_setValue($bo_pg_PMPlan.txt_startDate, $bo_act_common.currentDate("/"));
+_setValue($bo_pg_PMPlan.txt_endDate, $bo_act_common.getfutureDate(1, "/"));
+_click($bo_pg_PMPlan.btn_save);
+
+_wait(60000, _isVisible(_span("Service/Maintenance Contract")));
+_setValue($bo_pg_serviceMaintenanceContracts.txt_SFMSconName, $sconName);
+_setValue($bo_pg_serviceMaintenanceContracts.txt_SFMSconEndDate, $bo_act_common.getfutureDate(1, "/"));
+_setValue(_textbox(0,_rightOf(_label("Service Plan:"))),$servicePlan);
+_click($bo_pg_PMPlan.btn_save);
+
+$bo_act_navigation.navigateToAccountsPage();
+_click(_link($accountName));
+
+_assertExists(_link("/"+$PMPlanName+"/",_near(_heading3("Preventive Maintenance Plans"))));
+_assertExists(_link("/"+$sconName+"/",_near(_heading3("Service/Maintenance Contracts"))));
+
+//Clean up function
+//var $datacreated = [$proName,$accountName];
+//for (var i = 0; i < $datacreated.length; i++) {
+	//$bo_act_common.cleanUpfunction($datacreated[i]);
+//}
+
+$bo_act_SFW.deleteWizards("Account", $wizardIDName);
+$bo_act_servicePlans.deleteServicePlan($servicePlan);
+
+var $Workbenchurl = "https://workbench.developerforce.com/login.php";
+var $nameSpace = $bo_act_salesforcePages.checkNameSpace();
+
+var $delscript =
+	"DELETE[SELECT id FROM Contact WHERE Name = '"+$proName+"'];\n"+
+	"DELETE[SELECT id FROM Account WHERE Name = '"+$accountName+"'];\n";
+	
+$bo_act_login.loginToWorkBench($Workbenchurl,"Sandbox", $bac_un, $bac_pwd);
+$bo_act_login.runApexScriptinWB($delscript);
+$9830.end();
+
+
+

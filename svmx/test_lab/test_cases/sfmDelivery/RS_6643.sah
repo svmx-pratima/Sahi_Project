@@ -1,0 +1,254 @@
+//author - Anand Kakhandaki
+var $RS_6643 = _testcase("RS_6643", "Verify help url on checklists");
+$RS_6643.start();
+
+
+		/**
+		 * pre-Req: Ensure that the setting GBL029 Enable Checklist Capabilities is set to 
+		 * TRUE under module "Common" and SubModule " Global Settings" in Global profile
+		 */ 
+		//pre_Req
+		//create Work orders
+		$objName= $orgnamespace+"__Service_Order__c";
+		$obJson = "{\""+$orgnamespace+"__Order_Status__c\":\"Open\",\""+$orgnamespace+"__Order_Type__c\":\"Field Service\"}";
+		$columnName = "Name";
+		$filter="id";
+		$filterValue=$sfm_act_restApiMethods.postRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,$objName,$obJson,"POST");
+		$WONumber =$sfm_act_restApiMethods.getRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,"GET", $objName, $columnName, $filter, $filterValue);
+		_log("WO number: "+$WONumber);
+
+		
+
+		//Login to app
+		$bo_act_login.login($g_url,$sfmdUsn,$sfmdPwd);
+		
+		var $sfmName=$bo_act_common.generateRandomName("RS6643_cklist_");
+		var $tagID=$bo_act_common.generateRandomName("Tg_");
+		var $urlList=["https://support.google.com/docs","https://sahipro.com/docs","https://cetonline.karnataka.gov.in/kea/","www.soundtoll.nl/index.php/en/help-docs","https://www.google.com/abcdefg","http://www.soundtoll.nl/index.php/en/help-dosssssscs"];
+//		var $urlList=["https://support.google.com/docs","https://sahipro.com/docs","http://kea.kar.nic.in/","www.soundtoll.nl/index.php/en/help-docs","https://www.google.com/abcdefg","http://www.soundtoll.nl/index.php/en/help-dosssssscs"];
+//		var $urlList=["https://support.google.com/docs","https://sahipro.com/docs","www.soundtoll.nl/index.php/en/help-docs","https://www.google.com/abcdefg","http://www.soundtoll.nl/index.php/en/help-dosssssscs"];
+		createChecklistProcess($sfmName);
+		_click($bo_pg_sfmTransactionAndDesigner.btn_quickSave1);
+		
+		_click($sfm_pg_formDesigner.tab_formDesigner);
+		_wait(5000);
+		
+		var $queNameList=new Array;
+		var $sectionName1="Checklist Section Title";
+		///////////// Question Type - Date //////////////////
+//#1	//Create Date Question in section - PreFill
+		var $queType="Date";
+		var $queName=$bo_act_common.generateRandomName("ch_date_");
+		var $helpURL=$urlList[0];
+		var $tag=$tagID+"ch_date_-01";
+		var $addToLibAndForm=true;
+		var $queCommonDetails=[$queType,$queName,$helpURL,$tag,$addToLibAndForm];
+		$queNameList[0]=$queName;
+		
+		var $preFillFromWO=true;
+		var $defaultAnsType="";
+		var $defaultVal="Scheduled Date";
+		var $queSpecificDetails=[$preFillFromWO,$defaultAnsType,$defaultVal];
+		$sfm_act_formDesigner.createCheckListQuestion($sectionName1, $queCommonDetails, $queSpecificDetails);
+		
+		
+//#1	//create Date Question in section - Value
+		var $queType="Date";
+		var $queName=$bo_act_common.generateRandomName("ch_date_");
+		var $helpURL=$urlList[1];
+		var $tag=$tagID+"ch_date_-01";
+		var $addToLibAndForm=true;
+		var $queCommonDetails=[$queType,$queName,$helpURL,$tag,$addToLibAndForm];
+		$queNameList[1]=$queName;
+		
+		var $preFillFromWO=false;
+		var $defaultAnsType="Value";
+		var $defaultVal=getToday();
+		_log($defaultVal);
+		var $queSpecificDetails=[$preFillFromWO,$defaultAnsType,$defaultVal];
+		$sfm_act_formDesigner.createCheckListQuestion($sectionName1, $queCommonDetails, $queSpecificDetails);
+		
+		
+//#3	//create Date Question in section - Function
+		var $queType="Date";
+		var $queName=$bo_act_common.generateRandomName("ch_date_");
+		var $helpURL=$urlList[2];
+		var $tag=$tagID+"ch_date_-01";
+		var $addToLibAndForm=true;
+		var $queCommonDetails=[$queType,$queName,$helpURL,$tag,$addToLibAndForm];
+		$queNameList[2]=$queName;
+		
+		var $preFillFromWO=false;
+		var $defaultAnsType="Function";
+		var $defaultVal="Today";
+		var $queSpecificDetails=[$preFillFromWO,$defaultAnsType,$defaultVal];
+		$sfm_act_formDesigner.createCheckListQuestion($sectionName1, $queCommonDetails, $queSpecificDetails);
+		
+		
+		///////////// Question - Number //////////////////
+//#4	//create Number Question in section - preFill
+		var $queType="Number";
+		var $queName=$bo_act_common.generateRandomName("ch_Number_");
+		var $helpURL=$urlList[3];
+		var $tag=$tagID+"ch_Number_-01";
+		var $addToLibAndForm=true;
+		var $queCommonDetails=[$queType,$queName,$helpURL,$tag,$addToLibAndForm];
+		$queNameList[3]=$queName;
+		
+		var $preFillFromWO=true;
+		var $defaultVal="Time To Assign";
+		var $queSpecificDetails=[$preFillFromWO,$defaultVal];
+		$sfm_act_formDesigner.createCheckListQuestion($sectionName1, $queCommonDetails, $queSpecificDetails);
+		
+//#5	//create Number Question in section - No PreFill
+		var $queType="Number";
+		var $queName=$bo_act_common.generateRandomName("ch_Number_");
+		var $helpURL=$urlList[4];
+		var $tag=$tagID+"ch_Number_-01";
+		var $addToLibAndForm=true;
+		var $queCommonDetails=[$queType,$queName,$helpURL,$tag,$addToLibAndForm];
+		$queNameList[4]=$queName;
+		
+		var $preFillFromWO=false;
+		var $defaultVal="12112";
+		var $queSpecificDetails=[$preFillFromWO,$defaultVal];
+		$sfm_act_formDesigner.createCheckListQuestion($sectionName1, $queCommonDetails, $queSpecificDetails);
+		
+		
+		///////////// Attachment - Number //////////////////
+//#6	//create Attachment Question in section - 
+		var $queType="Attachment";
+		var $queName=$bo_act_common.generateRandomName("ch_Attachment_");
+		var $helpURL=$urlList[5];
+		var $tag=$tagID+"ch_Attachment_-01";
+		var $addToLibAndForm=true;
+		var $queCommonDetails=[$queType,$queName,$helpURL,$tag,$addToLibAndForm];
+		$queNameList[5]=$queName;
+		
+		var $includeINOPDOC=true;
+		var $descReq=true;
+		var $queSpecificDetails=[$includeINOPDOC,$descReq];
+		$sfm_act_formDesigner.createCheckListQuestion($sectionName1, $queCommonDetails, $queSpecificDetails);
+
+		///////////// Question - Checkbox //////////////////
+//#7	//create Checkbox Question in section - response Set
+		var $queType="Checkbox";
+		var $queName=$bo_act_common.generateRandomName("ch_Checkbox_");
+		var $helpURL="";
+		var $tag=$tagID+"ch_Checkbox_-01";
+		var $addToLibAndForm=true;
+		var $queCommonDetails=[$queType,$queName,$helpURL,$tag,$addToLibAndForm];
+		$queNameList[6]=$queName;
+		
+		var $responseSet="Create New";
+		var $responseSetName=$bo_act_common.generateRandomName("ch_resSet_");
+		var $ansValueSet=["FSA","Back Office","DC2.0"];
+		var $default=[false,true,false];
+		var $queSpecificDetails=[$responseSet,$responseSetName,$ansValueSet,$default];
+		$sfm_act_formDesigner.createCheckListQuestion($sectionName1, $queCommonDetails, $queSpecificDetails);
+		
+		
+		///////////// Question - Picklist //////////////////
+//#8	//create Picklist Question in section - preFill without response set
+		var $queType="Picklist";
+		var $queName=$bo_act_common.generateRandomName("ch_Picklist_");
+		var $helpURL="";
+		var $tag=$tagID+"ch_Picklist_-01";
+		var $addToLibAndForm=true;
+		var $queCommonDetails=[$queType,$queName,$helpURL,$tag,$addToLibAndForm];
+		$queNameList[7]=$queName;
+		
+		var $preFillFromWO=false;
+		var $defaultVal="";
+		var $responseSet="Create New";
+		var $responseSetName=$bo_act_common.generateRandomName("ch_Picklist_");
+		var $ansValueSet=["Yes","No"];
+		var $default=[false,false];
+		var $queSpecificDetails=[$preFillFromWO,$defaultVal,$responseSet,$responseSetName,$ansValueSet,$default];
+		$sfm_act_formDesigner.createCheckListQuestion($sectionName1, $queCommonDetails, $queSpecificDetails);
+		
+		_click($bo_pg_sfmTransactionAndDesigner.btn_quickSave1);
+		$sfm_act_Transactions.sfmQualifyingCriteriaieldMappings("Work Order", "", "", "","SVMXSTD: Map Work Order to Checklist");
+		
+		for (var $i = 0; $i < $queNameList.length; $i++) {
+			_log($queNameList[$i]);
+		}
+		_click($bo_pg_sfmTransactionAndDesigner.btn_quickSave1);
+		_wait(10000);
+		_click($bo_pg_sfmTransactionAndDesigner.btn_saveAndclose);
+		
+		//add sfm to wizard
+		var $wizardObject="Work Order";
+		var $sfmd_wizardName1 =$sfmd_wizardName[7];
+		var $sfmd_wizardType="Checklist";
+		var $profile="";
+		var $handOver=false;
+		_log("Wizard Name: "+$sfmd_wizardName1);
+		$sfm_act_wizards.addToWizard($wizardObject, $sfmd_wizardName1, $sfmd_wizardType, "", $handOver, $profile); 
+	
+		$sfm_act_common.globalSearchOnce($WONumber);
+		_wait(10000);
+		_setStrictVisibilityCheck(true);
+		$sfm_act_createCustomWizard.clickWizardBtn("Default title for Checklist");
+		_wait(5000,_isVisible(_link("/Checklists/")));
+		
+		//assertion
+		_click(_label($sfmName));
+		_wait(10000,_isVisible(_link($sfmName)));
+		var $Title;
+		
+		for (var $j = 0; $j < $queNameList.length; $j++) {
+			if ($j<$urlList.length) {
+				_click(_span("/chklst-helpurl-icon/",_near(_div($queNameList[$j]+":"))));
+				_log("queName: "+$queNameList[$j]+" "+"URL: "+$urlList[$j]);
+				_selectWindow("/"+$urlList[$j]+"/");
+				$Title = window.document.title;
+				if ($j<4) {
+					_assertFalse($Title.includes("404"));
+				}else {
+					_assertTrue($Title.includes("404"));
+				}
+				_closeWindow();
+				_selectWindow();
+				_selectDomain();
+			}else {
+				_assertNotExists(_span("/chklst-helpurl-icon/",_near(_div($queNameList[$j]+":"))));
+			}
+
+		}
+		
+		
+		
+
+
+function createChecklistProcess($sfmName){
+	$bo_act_navigation.navigateToSfmTransactionDesigner();
+	_wait(15000,_isVisible($bo_pg_sfmTransactionAndDesigner.btn_newSFM));
+	_click($bo_pg_sfmTransactionAndDesigner.btn_newSFM);
+	_wait(5000,_isVisible($bo_pg_sfmTransactionAndDesigner.txt_name));
+	_setValue($bo_pg_sfmTransactionAndDesigner.txt_name, "");
+	_setValue($bo_pg_sfmTransactionAndDesigner.txt_name, $sfmName);
+	_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmTransactionId, "");
+	_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmTransactionId, $sfmName);
+	_setSelected($sfm_pg_screenDesigner.sel_createSFMTransaction, "to generate a Checklist/Survey type of Process");
+	_setStrictVisibilityCheck(true);
+	_setValue($sfm_pg_screenDesigner.txt_srcObject,"");
+	_setValue($sfm_pg_screenDesigner.txt_srcObject,"Wo");
+	_wait(5000);
+	_click($sfm_pg_screenDesigner.lbl_workOrder);
+	_setStrictVisibilityCheck(false);
+};
+
+
+	
+function getToday(){
+var $currentTime = new Date();
+var $month = $currentTime.getMonth() + 1;
+var $day = $currentTime.getDate();
+var $year = $currentTime.getFullYear();
+var $ret=$month+"/"+$day+"/"+$year;
+_log("Today date: "+$ret);
+return $ret;
+};
+		
+$RS_6643.end();

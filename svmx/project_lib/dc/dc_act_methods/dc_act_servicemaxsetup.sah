@@ -1,0 +1,110 @@
+/*Page objects of Salesforce and reusable methods
+ * 
+ */
+var $dc_act_servicemaxsetup = new function dc_act_servicemaxsetup() {
+	// Variables - Global for DC
+	
+
+
+	
+	//Reusable methods
+	/**
+	 * Navigates to Servicemax setup.
+	 */
+	this.navigateServiceMaxSetup = function() {
+		_click($dc_pg_servicemaxsetup.link_servicemaxSetup);
+		_selectWindow();
+		_wait(5000,
+				_isVisible($dc_pg_servicemaxsetup.txt_WelcometoServiceMaxSetup));
+		return $callBack.returnResult(
+				$dc_pg_servicemaxsetup.txt_WelcometoServiceMaxSetup,
+				"Navigated to ServiceMax setup page successfully");
+	};
+	
+	/**
+	 * Navigates to Team Technician Management Console.
+	 */
+	this.navigateTeamTechnicianMngmt = function() {
+		_click($dc_pg_servicemaxsetup.btn_ServiceOrganization);
+		_click($dc_pg_servicemaxsetup.btn_ServiceOrg);
+		_wait(5000,
+				_isVisible($dc_pg_servicemaxsetup.btn_NewServiceTeam
+						&& $dc_pg_servicemaxsetup.btn_NewTechnician));
+		return $callBack
+				.returnResult(
+						_isVisible($dc_pg_servicemaxsetup.btn_NewServiceTeam
+								&& $dc_pg_servicemaxsetup.btn_NewTechnician),
+						"Navigated to ServiceMax setup - Team Technician Management Console page successfully");
+	};
+
+	/**
+	 * Creates Team.
+	 */
+	this.createTeam = function($name, $street, $city, $state, $zip, $country) {
+		_click($dc_pg_servicemaxsetup.btn_NewServiceTeam);
+		_assert(_isVisible($dc_pg_servicemaxsetup.txt_AddEditTeam),
+				"Add/Edit team popup is displayed to create new team");
+		_log("Add/Edit Team popup is displayed");
+
+		_setValue($dc_pg_servicemaxsetup.txtfld_Name, $name);
+		_check($dc_pg_servicemaxsetup.chkbx_Active);
+		_setValue($dc_pg_servicemaxsetup.txtfld_StreetTeam, $street);
+		_setValue($dc_pg_servicemaxsetup.txtfld_City, $city);
+		_setValue($dc_pg_servicemaxsetup.txtfld_State, $state);
+		_setValue($dc_pg_servicemaxsetup.txtfld_Zip, $zip);
+		_setSelected($dc_pg_servicemaxsetup.lst_CountryTeam, $country);
+		_click($dc_pg_servicemaxsetup.btn_Save);
+		_wait(8000);
+		return $callBack.returnResult(_isVisible(_link($name))&& _isVisible($dc_pg_servicemaxsetup.btn_NewServiceTeam),
+				"Service Team is created ");
+
+	};
+	
+	/**
+	 * Adds Dispatcher to created Team.
+	 */
+	this.addDispatcher = function() {
+		_click($dc_pg_servicemaxsetup.btn_Dispatcher);
+		_assert(_isVisible($dc_pg_servicemaxsetup.txt_DispatcherName),
+				"Dispatcher blog is not displayed to add dispatcher");
+		_log("Dispatcher blog is displayed to add dispatcher");
+
+		_click($dc_pg_servicemaxsetup.btn_AddDispatcher);
+		_setValue($dc_pg_servicemaxsetup.txtfld_Dispatcher, $dc_dispatcher);
+		_click($dc_pg_servicemaxsetup.img_DispatcherLookup);
+		_selectWindow($dc_pg_servicemaxsetup.win_lookup);
+
+		_click(_link($dc_dispatName));
+		_selectWindow();
+		_click($dc_pg_servicemaxsetup.btn_Save);
+		return $callBack.returnResult(
+				_isVisible($dc_pg_servicemaxsetup.txt_Success),
+				"Dispatcher is added");
+
+	};
+	/**
+	 * Creates technician.
+	 */
+	this.createTech = function($techName, $street, $city, $state, $zip,	$country) {
+		_click($dc_pg_servicemaxsetup.btn_NewTechnician);
+		_assert(_isVisible($dc_pg_servicemaxsetup.txt_AddEditTechnician),
+				"Add/Edit Technician popup is not displayed to create new technician");
+		_log("Add/Edit Technician popup is displayed");
+
+		_setValue($dc_pg_servicemaxsetup.txtfld_TechnicianName, $techName);
+		_check($dc_pg_servicemaxsetup.chkbx_Active);
+		_check($dc_pg_servicemaxsetup.chkbx_EnableScheduling);
+		_setValue($dc_pg_servicemaxsetup.txtfld_StreetTech, $street);
+		_setValue($dc_pg_servicemaxsetup.txtfld_City, $city);
+		_setValue($dc_pg_servicemaxsetup.txtfld_State, $state);
+		_setValue($dc_pg_servicemaxsetup.txtfld_Zip, $zip);
+		_setSelected($dc_pg_servicemaxsetup.lst_CountryTech, $country);
+		_click($dc_pg_servicemaxsetup.btn_Save);
+
+		_assert(_isVisible(_link($techName)) && _isVisible($dc_pg_servicemaxsetup.btn_NewTechnician),
+				"Service Technician is not created");
+		return $callBack.returnResult(_isVisible(_link($techName))&& _isVisible($dc_pg_servicemaxsetup.btn_NewTechnician),
+				"Service Technician is created ");
+
+	};
+};

@@ -1,0 +1,158 @@
+var $rs_6911 = _testcase("RS_6911","Verify Lookup configuration for Search, Display, Bubble, No of records to display.");
+$rs_6911.start();
+
+
+		/**
+		* Note: Use below script to clear product created
+		 * delete[SELECT Name FROM Product2 WHERE Name LIKE 'PN_RS6911_%' limit 10000];
+		 */
+
+		//Pre_Requesite
+		//Create Product
+		$objName= "Product2";
+		var $productName=new Array;
+		var $productCode=new Array;
+		var $productNameReg="PN_RS6911_";
+		var $productCodeReg="PC_RS6911_";
+		for (var $i = 0; $i < 5; $i++) {
+			$productName[$i]=$bo_act_common.generateRandomName($productNameReg);
+			$productCode[$i]=$bo_act_common.generateRandomName($productCodeReg);
+			$obJson = "{\"Name\":\""+$productName[$i]+"\",\"ProductCode\":\""+$productCode[$i]+"\",\""+$orgnamespace+"__Product_Line__c\":\"Storage\",\""+$orgnamespace+"__Product_Type__c\":\"Consumable\"}";
+			$filterValue=$sfm_act_restApiMethods.postRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,$objName,$obJson,"POST");
+			_log($productName[$i]);
+			_log($productCode[$i]);
+		}
+
+		//create Work orders
+		$objName= $orgnamespace+"__Service_Order__c";
+		$obJson = "{\""+$orgnamespace+"__Order_Status__c\":\"Open\",\""+$orgnamespace+"__Order_Type__c\":\"Field Service\"}";
+		$columnName = "Name";
+		$filter="id";
+		$filterValue=$sfm_act_restApiMethods.postRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,$objName,$obJson,"POST");
+		$WONumber =$sfm_act_restApiMethods.getRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,"GET", $objName, $columnName, $filter, $filterValue);
+		_log("WO number: "+$WONumber);
+
+
+		// Login to App
+		$bo_act_login.login($g_url,$sfmdUsn,$sfmdPwd);
+		
+		//clone standard SFM
+		var $sfmNameToBeCloned="Manage Work Order Lines - Usage";
+		var $sfmName=$bo_act_common.generateRandomName("rs_6911_");
+		var $sfmTemplateSaveAsName=$bo_act_common.generateRandomName("SFM_Page_");
+		var $sfmTemplate="SVMXSTD: Manage WO Usage Lines";
+		var $fieldName=["Account","Contact"];
+		var $containerName=["Order Status","Order Status"];
+		$sfm_act_SFM.cloneTDM016($sfmNameToBeCloned, $sfmName, false, $sfmTemplateSaveAsName, $sfmTemplate, $fieldName, $containerName);
+		
+		//Remove multi-add for part childline
+		$sfm_act_SFM.partsMultiAdd("--None--");
+		
+		//Context lookup setup on Parts Child object
+		_setValue($bo_pg_sfmTransactionAndDesigner.btn_scrollbar.near(_f("main").s_richtext("Parts")),"00");
+		_click($bo_pg_sfmTransactionAndDesigner.txt_partOnChild);
+		
+		//create lookup for part object in Child
+		var $object="Part";
+		var $lookupTempName="SVMXSTD: Product Lookup";
+		var $fieldNameList=["Product Type"];
+		var $addToSearchList=[true];
+		var $addToDisplayList=[true];
+		var $addToBubbleList=[true];
+		var $lookupFieldsToAdd=[$fieldNameList,$addToSearchList,$addToDisplayList,$addToBubbleList];
+		var $noOfRecords=50;
+		var $lookUpName=$bo_act_common.generateRandomName("rs_6911_lookup_");
+		
+		$sfm_act_Transactions.createLookUp($object, $lookupTempName, $lookupFieldsToAdd, "", $lookUpName,"Parts",$noOfRecords);
+		
+		//Save SFM after adding context lookup
+		RS6911_saveSFM();
+		
+		//add sfm to wizard
+		var $wizardObject="Work Order";
+		var $sfmd_wizardName1 =$sfmd_wizardName[3];
+		var $sfmd_wizardType="SFM";
+		var $profile="";
+		var $handOver=false;
+		_log("Wizard Name: "+$sfmd_wizardName1);
+		$sfm_act_wizards.addToWizard($wizardObject, $sfmd_wizardName1, $sfmd_wizardType, $sfmName, $handOver, $profile); 
+			
+	
+		//Search WO and launch SFM
+		RS6911_searchWOandLaunchSFM($WONumber,$sfmName);
+		
+		//** Adding ChildLine **/
+		$sfm_act_sfmDesigner.addChildLine("Parts");
+		_wait(10000,_isVisible($sfm_pg_sfmDesigner.txt_partTextbox));
+		_click($sfm_pg_sfmDesigner.searchPartIcon);
+		_wait(5000,_isVisible($sfm_pg_sfmDesigner.lbl_recentItemProducts));
+		_setValue($sfm_pg_sfmDesigner.btn_searchTextBox,$productNameReg);
+		_click($sfm_pg_sfmDesigner.link_searchLink);
+		var $fieldsName=["Product Name","Product Code","Product Line","Product Type"];
+		/**
+		 * Below code is temp as one issue is exists
+		 */
+		//var $fieldsName=["Name","ProductCode","SVMXC__Product_Line__c","SVMXC__Product_Type__c"];
+		//Column assertion
+		for (var $i = 0; $i < $fieldsName.length; $i++) {
+			_assertExists(_span($fieldsName[$i]));
+		}
+		//Product name based Search
+		for (var $i = 0; $i < $productName.length; $i++) {
+			RS6911_searchObject($productName[$i]);
+			_assertExists(_cell($productName[$i]));
+		}
+		
+		//Product Code based Search
+		for (var $i = 0; $i < $productCode.length; $i++) {
+			RS6911_searchObject($productCode[$i]);
+			_assertExists(_cell($productCode[$i]));
+		}
+	
+		//Product line based Search  $productCode
+		_setValue($sfm_pg_sfmDesigner.btn_searchTextBox,"Storage");
+		_click($sfm_pg_sfmDesigner.link_searchLink);
+		for (var $i = 0; $i < $productName.length; $i++) {
+			RS6911_searchObject($productName[$i]);
+			_assertExists(_cell($productName[$i]));
+		}
+		RS6911_searchObject($productName[0]);
+		_click(_cell($productName[0]));
+		_click($sfm_pg_sfmDesigner.btn_select);
+		_click($sfm_pg_sfmDesigner.button_updatePartsSearch);
+		_wait(5000);
+		
+		//Bubble assert
+		_click(_cell($productName[0]));
+		_click($sfm_pg_sfmDesigner.btn_bubble);
+		_wait(3000,_isVisible($sfm_pg_sfmDesigner.btn_bubbleDiv));
+		
+		
+		_assertExists(_row($fieldsName[0]+":"+$productName[0]));
+		_assertExists(_row($fieldsName[1]+":"+$productCode[0]));
+		_assertExists(_row($fieldsName[2]+":"+"Storage"));
+		//_assertExists(_row($fieldsName[3]+":"+"Comsumable"));
+
+function RS6911_saveSFM(){
+	_setStrictVisibilityCheck(true);
+	_click($bo_pg_sfmTransactionAndDesigner.btn_pageLayoutSave);
+	_wait(5000,_isVisible($bo_pg_sfmTransactionAndDesigner.btn_sfmpageSaveConfirmMsg));
+	_click($bo_pg_sfmTransactionAndDesigner.btn_saveAndclose);
+	_setStrictVisibilityCheck(false);
+};	
+function RS6911_searchWOandLaunchSFM($WONumber,$sfmName){
+	$sfm_act_common.globalSearchOnce($WONumber);
+	_wait(10000);
+	_setStrictVisibilityCheck(true);
+	$sfm_act_createCustomWizard.clickWizardBtn($sfmName);
+	_wait(5000,_isVisible(_div("/"+$sfmName+"/")));
+}
+
+function RS6911_searchObject($object){
+	_wait(5000,_isVisible($sfm_pg_sfmDesigner.btn_searchTextBox));
+	_setValue($sfm_pg_sfmDesigner.btn_searchTextBox,$object);
+	_click($sfm_pg_sfmDesigner.link_searchLink);
+	_wait(5000,_isVisible(_cell($object)));
+};	
+
+$rs_6911.end();

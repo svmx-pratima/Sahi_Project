@@ -1,0 +1,114 @@
+var $RS_7014 = _testcase("RS_7014","Verify current record header literals in map");
+$RS_7014.start();
+//Variables used
+var $object_name = "Work Order";
+var $ctrlPicklist = "Order Status";
+var $processName = "RS_7014";
+var $process_to_clone = "Manage Work Order Lines - Usage";
+var $sfmTemplate = "SVMXSTD: Manage WO Usage Lines";
+var $isCustom = false;
+var $ctr = 0;
+var $i = 0;
+var $success_message = "Work Order was saved.";
+var $containerName = ["Order Status","Order Status","Order Status","Order Status","Parts","Parts","Parts","Labor","Labor","Labor"];
+var $fieldName=["City","Estimated Duration","Country","Previous Scheduled Date Time","Received Country","Line Type","Record Type ID","Received City","Line Type","Record Type ID"];
+var $z = 0;
+var $fields_array = [];
+var $currentWizardName = $sfmd_wizardName[4];
+var $success_message = "Work Order was saved.";
+var $stdMap = "SVMXSTD: Close Work Order";
+var $pickListLabels = [];
+var $pickListValues = [];
+var $textLabels = ["Received Country","Billable Qty"];
+var $textValues = ["SVMX.CURRENTRECORDHEADER."+$orgnamespace+"__Country__c","SVMX.CURRENTRECORDHEADER."+$orgnamespace+"__SM_Estimated_Duration__c"];
+var $textLabelsArrayHeader = ["City","Estimated Duration"];
+var $textValuesArrayHeader = ["Bengaluru","45"];
+var $picklistLabelsArrayHeader = ["Country"];
+var $picklistValuesArrayHeader = ["India"];
+var $dateTimeField = "Previous Scheduled Date Time";
+var $productName = "Chrome";
+var $mapType = "Value Map For New Records";
+
+//Appending current timestamp to process name to make it unique.
+var $timeStamp = $bo_act_navigation.getCurrentTimeStamp();
+$processName = $processName + "_" + $timeStamp;
+var $pageLayoutName = $processName + "pg";
+var $mapName = $processName + "mp";
+
+//**************************************************************************************
+$bo_act_login.login($g_url,$sfmdUsn,$sfmdPwd);
+
+_wait(15000);
+//Navigate to servicemax setup and setup required process.
+//Clone standard process and add the dependent picklist in the screen designer
+_setSpeed(3000);
+$sfm_act_SFM.cloneTDM016($process_to_clone,$processName,$isCustom,$pageLayoutName, $sfmTemplate, $fieldName, $containerName);
+_click($bo_pg_sfmTransactionAndDesigner.btn_quickSave1);
+_click($bo_pg_sfmTransactionAndDesigner.btn_qualifyingCriteriaAndFieldMapping);
+
+//Set up the mapping with SVMX.CURRENTRECORDHEADER literals for Parts
+$bo_act_mappings.createMapping("Parts",$mapType,$pickListLabels,$pickListValues,$textLabels,$textValues,$mapName);
+$textLabels = ["Received City","Start Date and Time"];
+$textValues = ["SVMX.CURRENTRECORDHEADER."+$orgnamespace+"__City__c","SVMX.CURRENTRECORDHEADER."+$orgnamespace+"__Previous_Scheduled_Date_Time__c"];
+//$textValues = ["SVMX.CURRENTRECORDHEADER.SVMXC__City__c","SVMX.CURRENTRECORDHEADER.SVMXC__Previous_Scheduled_Date_Time__c"];
+$mapName = $mapName + "_2";
+//Set up the mapping with SVMX.CURRENTRECORDHEADER literals for Labor
+$bo_act_mappings.createMapping("Labor",$mapType,$pickListLabels,$pickListValues,$textLabels,$textValues,$mapName);
+_setSpeed(1000);
+//Add the custom process to SFM wizard.
+$sfm_act_wizards.addToWizard($object_name,$currentWizardName,"SFM",$processName);
+_selectDomain();
+_setSpeed(1000);
+//Create a work order
+var $wo_number = $sfm_act_common.createWoInClassic();
+$sfm_act_common.globalSearchOnce($wo_number);
+//Launch the process in SFM Delivery
+$sfm_act_common.launchSFMProcessInClassic($processName);
+_wait(10000);
+
+//Enter header values and hit 'Quick Save'
+$sfm_act_SFM.fillHeaderTextValues($textLabelsArrayHeader,$textValuesArrayHeader);
+$sfm_act_SFM.fillHeaderPicklistValues($picklistLabelsArrayHeader,$picklistValuesArrayHeader);
+$sfm_act_SFM.fillDateTimeFields(["Previous Scheduled Date Time"],["8/16/2018"],["1:30 PM"]);
+$sfm_act_common.performQuickSave();
+_wait(3000);
+var $textLabels = ["Line Qty"];
+var $textValues = ["365"];
+var $pickListLabels = ["Line Type","Record Type"];
+$pickListValues = ["Parts","Usage/Consumption"];
+var $textAreaLabels = [];
+var $textAreaValues = [];
+var $checkBoxLabels = [];
+var $checkBoxValues = [];
+var $dateLabels = [];
+var $dateValues = [];
+var $dateTimeLabels = [];
+var $dateTimeDateValues = [];
+var $timeValues = [];
+$sfm_act_SFM.addChildLine("Parts",$productName, $textLabels, $textValues, $pickListLabels, $pickListValues, $textAreaLabels, $textAreaValues, $checkBoxLabels, $checkBoxValues, $dateLabels, $dateValues, $dateTimeLabels, $dateTimeDateValues, $timeValues);
+$sfm_act_common.performQuickSave();
+$textPicklistDateLabels = ["Billable Qty","Received Country"];
+$textPicklistDateExpValues = ["45","India"];
+$sfm_act_SFM.openLatestExtEdit();
+var $verifyResult1 = $sfm_act_common.verifyValuesInDelivery($textPicklistDateLabels,$textPicklistDateExpValues,[],[],[],[],[],[],[],[]);
+_click($sfm_pg_wo.btn_updateExtEdit);
+$pickListValues = ["Labor","Usage/Consumption"];
+$sfm_act_SFM.addChildLine("Labor",$productName,[],[], $pickListLabels, $pickListValues,[],[],[],[],[],[],[],[],[]);
+$textPicklistDateLabels = ["Start Date and Time","Received City"];
+$textPicklistDateExpValues = ["08/16/2018","Bengaluru"];
+$sfm_act_SFM.openLatestExtEdit();
+$verifyResult2 = $sfm_act_common.verifyValuesInDelivery($textPicklistDateLabels,$textPicklistDateExpValues,["Start Date and Time"],["1:30 PM"],[],[],[],[],[],[]);
+_click($sfm_pg_wo.btn_updateExtEdit);
+$verifyResult = $verifyResult1 && $verifyResult2;
+_assertTrue($verifyResult);
+if($verifyResult){
+	_log("PASS: Current Header literals are verified in mapping");
+}
+else {
+	_log("FAIL:Current Header literals failed in mapping");
+}
+$sfm_act_common.saveClassicSfmProcess();
+_wait(3000);
+$sfm_act_common.logoutInClassic();
+_setSpeed($g_stepSpeed);
+$RS_7014.end();

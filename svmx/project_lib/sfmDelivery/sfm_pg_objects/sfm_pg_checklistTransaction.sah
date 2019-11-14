@@ -1,0 +1,83 @@
+/**
+ * 
+* SFM  Custom Actions object repository 
+*/
+
+var $sfm_pg_checklistTransaction = new function sfm_pg_checklistTransaction() {
+
+	this.btn_newSFMTransaction=_f("main").s_button("New SFM Transaction");
+	this.sel_typeOfSFMTransaction=_f("main").s_dropdownlist("purposeCombo");
+	this.txt_checklistProcess="to generate a Checklist/Survey type of Process";
+	this.txt_selSourceObject="Select a source object";
+    this.txt_selWorkOrderasSourceObject="Work Order";
+	
+	
+	this.btn_backToSetupHome =_submit("Back To Setup Home");
+	this.sel_sourceObject=_f("main").s_textinput("textInput");
+	this.sel_sourceObjectValue=_f("main").s_combobox("objCombo1");
+	this.txt_OKMsg=_f("main").s_button("OK");
+	this.txt_checklistProcessName=_f("main").s_textinput("pName");
+	this.txt_checklistProcessId=_f("main").s_textinput("pId");
+	this.txt_qualifyingCriteriaMapping=_f("main").tab("Qualifying Criteria and Field Mappings");
+	this.btn_newCriteria=_f("main").s_button("New");
+	this.sel_fieldCriteria=_f("main").s_combobox("fieldCombo");
+	this.sel_conditionCriteria=_f("main").s_dropdownlist("conditionsCombo");
+	this.sel_valueInCriteria=_f("main").s_combobox("valuesCombo");
+	this.txt_filter=_f("main").s_textinput("Save this filter as");
+	this.txt_filterName=_f("main").s_textinput("Input ID Here");
+	this.btn_removeFilterCondition=_f("main").s_button("-[1]");
+	this.btn_saveFilter=_f("main").s_button("Save");
+	this.txt_formDesigner=_f("main").tab("Form Designer");
+	this.txt_formDesignerSearch = _f("main").s_textinput("searchText");   //_f("main").s_textinput("searchText[2]");
+	this.lnk_addQuestiontoForm=_f("main").s_button("Add question to form");
+	this.btn_quickSave=	_f("main").s_button("Quick Save");
+	this.btn_saveAndClose=_f("main").s_button("Save & Close");
+	
+	
+	this.txt_checklistQuestionLibrary=_span("Checklist Question Library");
+	this.btn_addQuestion=_div("Add");
+	this.txt_addQuestion=_span("Add Question");
+	this.txt_responseType=_textbox("Answer Type:");
+	this.sel_textAnswerType=_listItem("Text");
+	this.sel_checkBoxAnswerType= _listItem("Checkbox");
+	this.sel_radioButtonAnswerType=_listItem("Radio Button");
+	this.sel_picklistAnswerType=_listItem("Picklist");
+	this.sel_multiSelectPicklistAnswerType=_listItem("Multi-select Picklist");
+	this.sel_numberAnswerType=_listItem("Number");
+	this.sel_dateAnswerType=_listItem("Date");
+	this.sel_dateTimeAnswerType=_listItem("DateTime");
+	this.txt_questionText=_textbox("questionText");
+	this.txt_questionText1 = _f("main").s_label("Question Text"); // Owner Meghana
+	this.txt_helpURL=_textbox("helpURL");
+	this.txt_helpURL2 = _f("main").s_label("Help URL"); // Owner Meghana
+	this.txt_helpurltextfield = _f("main").s_textinput("helpUrl"); // Owner Meghana
+	this.field_stringtoolong = _f("main").label("STRING_TOO_LONG"); // Owner Meghana
+	this.txt_responseSetName=_textbox("newResponseSetName");
+	this.txt_answerValue1=_textbox("answers");
+	this.txt_answerValue2=_textbox("answers[1]");
+	this.txt_answerValue3=_textbox("answers[2]");
+	this.txt_tagName=_textbox("TagField");
+	this.txt_tagName2 = _f("main").s_label("Tags"); // Owner Meghana
+	this.picklist_answertype2 =_f("main").s_dropdownlist("ansType"); // Owner Meghana
+	this.btn_addAnswer=_div("+Add Answer");
+	this.btn_saveQuestion=_span("Save");
+	this.txt_saveSucessMessage=_div("Record(s) saved successfully");
+	this.btn_okMessage=_span("OK");	
+	this.sel_dateoptionFunction=_textbox("valueFunctionCombo");
+	this_sel_dateoptionValue=_listItem("Function");
+	this.sel_dateoptionLiteral=_textbox("literalCombo");
+	this.sel_todayLiteral=_listItem("Today");	
+	this.txt_checklistQuestionSearch=_textbox(1);
+	this.btnDelete=_span("Delete");
+	this.selQuestion=_div("svmx-grid-row-checker");
+	this.seldeletionConfirm=_span("Yes");
+	this.txt_deleteSucessMessage=_div("Record(s) deleted successfully");
+	this.txt_confirmDelete=_div("Confirm Delete");
+	this.btn_editQuestion = _f("main").s_button("Edit Question"); // Owner Meghana
+	this.btn_removeQuestion = _f("main").s_button("Remove Question"); 
+	this.btn_defaultcheckbox = _f("main").s_checkbox("defaultCheckBox");
+	this.btn_defaultcheckbox2 = _f("main").s_checkbox("defaultCheckBox[1]");
+	this.btn_defaultRadiobutton2 = _f("main").s_radiobutton(1);
+	this.txt_successHeaderMsg=_div("Success");
+	
+};

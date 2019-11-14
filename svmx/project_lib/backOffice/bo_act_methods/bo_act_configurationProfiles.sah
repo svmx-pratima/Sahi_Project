@@ -1,0 +1,128 @@
+/**
+ * Functions for the Accounts Object
+ */
+var $bo_act_configurationProfiles = new function bo_act_configurationProfiles() {
+
+	
+	this.editGlobalProfileForBooleanSettings = function($Module, $SubModule, $Setting, $value) {
+	$bo_act_navigation.navigateToConfigurationProfilesPage();
+	_check($bo_pg_configurationProfiles.chk_globalProfile);
+	 _click($bo_pg_configurationProfiles.btn_edit);
+	 _setSelected($bo_pg_configurationProfiles.sel_selectModule,$Module);
+	 _setSelected($bo_pg_configurationProfiles.sel_selectSubModule,$SubModule);
+	 _click(_link("Edit",_leftOf(_span($Setting))));
+	  _selectWindow("/Servicemax_Conf_Prof/");
+	 if($value == true)
+	{
+	  _check($bo_pg_configurationProfiles.chk_true);
+	  _click($bo_pg_configurationProfiles.btn_popUpSave);
+	  _click($bo_pg_configurationProfiles.btn_popUpClose);
+	  _selectWindow();
+		_click($bo_pg_configurationProfiles.btn_save);
+		_wait(10000);	
+	 
+	}
+	 else
+	{
+		 _check($bo_pg_configurationProfiles.chk_false);
+		 _click($bo_pg_configurationProfiles.btn_popUpSave);
+		 _click($bo_pg_configurationProfiles.btn_popUpClose);
+		 _selectWindow();
+		 _click($bo_pg_configurationProfiles.btn_save);
+	}
+	};
+	
+	this.editGlobalProfileForPicklistSettings = function($Module, $SubModule, $Setting, $picklistValue) {
+		 $bo_act_navigation.navigateToConfigurationProfilesPage();
+		 _check($bo_pg_configurationProfiles.chk_globalProfile);
+		 _click($bo_pg_configurationProfiles.btn_edit);
+		 _setSelected($bo_pg_configurationProfiles.sel_selectModule,$Module);
+		 _setSelected($bo_pg_configurationProfiles.sel_selectSubModule,$SubModule);
+		 _click(_link("Edit",_leftOf(_span($Setting))));
+		 _selectWindow("/Servicemax_Conf_Prof/");
+		 _setSelected($bo_pg_configurationProfiles.sel_chooseOption,$picklistValue);
+		 _click($bo_pg_configurationProfiles.btn_popUpSave);
+		 _click($bo_pg_configurationProfiles.btn_popUpClose);
+		 _selectWindow();
+		 _click($bo_pg_configurationProfiles.btn_save);
+		};
+		
+		this.editGroupProfileForTextSettings = function($groupProfileName, $Module, $SubModule, $Setting, $settingValue) {
+			$bo_act_navigation.navigateToConfigurationProfilesPage();
+			_check(_checkbox(0,_leftOf(_span($groupProfileName))));
+			 _click($bo_pg_configurationProfiles.btn_editForGrp);
+			 _wait(1000);
+			 _setSelected($bo_pg_configurationProfiles.sel_selectModule,$Module);
+			 _setSelected($bo_pg_configurationProfiles.sel_selectSubModule,$SubModule);
+			 _click(_link("Edit",_leftOf(_span($Setting))));
+			 _selectWindow("/Servicemax_Conf_Prof/");
+			 _setValue($bo_pg_configurationProfiles.txt_settingValues,$settingValue);
+			 _click($bo_pg_configurationProfiles.btn_popUpSave);
+			 _click($bo_pg_configurationProfiles.btn_popUpClose);
+			 _selectWindow();
+			 _click($bo_pg_configurationProfiles.btn_save);
+			};
+	
+	this.editGroupProfileForBooleanSettings = function($groupProfileName, $Module, $SubModule, $Setting, $value) {
+		$bo_act_navigation.navigateToConfigurationProfilesPage();
+		_check(_checkbox(0,_leftOf(_span($groupProfileName))));
+		 _click($bo_pg_configurationProfiles.btn_editForGrp);
+		 _setSelected($bo_pg_configurationProfiles.sel_selectModule,$Module);
+		 _setSelected($bo_pg_configurationProfiles.sel_selectSubModule,$SubModule);
+		 _click(_link("Edit",_leftOf(_span($Setting))));
+		  _selectWindow("Servicemax_Conf_Prof");
+		 if($value == true)
+		  _check($bo_pg_configurationProfiles.chk_true);
+		 else
+			 _check($bo_pg_configurationProfiles.chk_false);
+			 _click($bo_pg_configurationProfiles.btn_popUpSave);
+			 _click($bo_pg_configurationProfiles.btn_popUpClose);
+			 _selectWindow();
+			 _click($bo_pg_configurationProfiles.btn_save);
+		};
+
+this.createGroupProfile = function($groupProfileName){
+	 _check(_checkbox(0,_leftOf(_span("Default Group Profile"))));
+	_click(_submit("Clone[1]"));
+	_setValue(_textbox(0,_rightOf(_label("Profile Name"))),$groupProfileName);
+	_setSelected(_select("selectAvilProfil"),"System Administrator");
+	_click(_image("Add"));
+	_click(_submit("Save"));
+	
+};
+
+//Added by Srinivasa to create an Empty Group Profile without assigning any Salesforce profile for BAC-4850
+this.createEmptyGroupProfile = function($groupProfileName){
+	 _check(_checkbox(0,_leftOf(_span("Default Group Profile"))));
+	_click(_submit("Clone[1]"));
+	_setValue(_textbox(0,_rightOf(_label("Profile Name"))),$groupProfileName);
+	_click(_image("Add"));
+	_click(_submit("Save"));
+	
+};
+
+this.deleteEmptyGroupProfile = function($groupProfileName){
+	$bo_act_navigation.navigateToConfigurationProfilesPage();
+	_check(_checkbox(0,_leftOf(_span($groupProfileName))));
+	_click(_submit("Edit[1]"));
+	_uncheck(_checkbox("Active"));
+	_click(_submit("Save"));
+	//_check(_checkbox(0,_leftOf(_span("/RS_12407/"))));
+	_check(_checkbox(0,_leftOf(_span($groupProfileName))));
+	_click(_button("Delete[1]"));
+};
+
+
+this.linkSalesforceProfileToServiceMax = function($groupProfileName, $profile){
+	$bo_act_navigation.navigateToConfigurationProfilesPage();
+	_check(_checkbox(0,_leftOf(_span($groupProfileName))));
+	 _click($bo_pg_configurationProfiles.btn_editForGrp);	
+		_setSelected(_select("selectAvilProfil"),$profile);
+		_click(_image("Add"));
+		_click(_button("Quick Save"));
+		_wait(3000);
+		_click(_submit("Save"));
+};
+
+
+};

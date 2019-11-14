@@ -1,0 +1,49 @@
+//Tests are to be written here [Srinivasa Murthy S]
+// Creating variable for the printing the test case number and name
+var $RS_9147 = _testcase("RS_9147","Generate Output Document when Qualifiication criteria is not met");
+$RS_9147.start();
+
+//Login to the Sandbox using the credentials from 
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+
+var $sfmName=$bo_act_common.generateRandomName("RS_9147_");
+
+$bo_act_navigation.navigateToSfmTransactionDesigner();
+_wait(15000,_isVisible($bo_pg_sfmTransactionAndDesigner.btn_newSFM));
+_wait(5000,_isVisible($bo_pg_sfmTransactionAndDesigner.txt_name));
+$bo_act_SFM.cloneStandardOPDOCProcess("Work Order Service Report",$sfmName,$sfmName);
+
+//Add the Created OPDOC to wizard
+$bo_act_navigation.navigateToSfmWizard();
+$bo_act_SFW.createWizardGeneralInfo("Work Order", $sfmName, $sfmName);
+$bo_act_SFW.createOutputDocumentWizardStepwithSelectTemplate("Output Document",$sfmName,false);
+
+//Create WO with Closed Status
+$objName= "SVMXC__Service_Order__c";
+$obJson = "{\"SVMXC__Order_Status__c\":\"Closed\",\"SVMXC__Order_Type__c\":\"Field Service\"}";     
+$columnName = "Name";
+$filter="id";
+ 
+$workorderid=$sfm_act_restApiMethods.postRestApi($bac_un,$bac_pwd,$bac_client_id,$bac_client_secret,$bac_orginstance,$objName,$obJson,"POST");
+_log($workorderid);
+//get the wo
+$WOname =$sfm_act_restApiMethods.getRestApi($bac_un,$bac_pwd,$bac_client_id,$bac_client_secret,$bac_orginstance,"GET", $objName, $columnName, $filter, $workorderid);
+_log($WOname);
+
+//Go to Work Order tab
+$bo_act_workOrders.navigateToWorkOrder($WOname);
+$sfm_act_createCustomWizard.clickWizardBtn($sfmName);
+_assertEqual("This record does not meet the qualification criteria for this SFM Transaction", _lastAlert());
+
+//Get back to Home Page
+_click(_link("Home"));
+
+//Delete the Wizard created
+$bo_act_SFW.deleteWizards("Work Order",$sfmName);
+
+//Delete the SFM Created
+$bo_act_SFM.deleteSFM($sfmName);
+
+
+
+$RS_9147.end();

@@ -1,0 +1,85 @@
+//Author: Safi Ahmed
+var $rs_6932 = _testcase("RS_6932","Verify Lookup advanced filter - User Trunk literal");
+$rs_6932.start();
+
+/**
+ * Pre-Req: Should have service team called "Lightning Team", stockable location named "Lightning Automation Location" and Technician user named "Lightning Technician" should have been created and associated to the logged in user as mentioned in confluence page
+ */
+		//pre-Req
+		$objName=$orgnamespace+"__Site__c";
+		$filter="Name";
+		$filterValue="Classic+Automation+Location";
+		$columnName = "id";
+		//create a case
+		$locationId =$sfm_act_restApiMethods.getRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,"GET", $objName, $columnName, $filter, $filterValue);
+		_log("Location ID: "+$locationId);
+		
+		var $productName=new Array;
+		for (var $i = 0; $i < 3; $i++) {
+			$proObjName= "Product2";
+			$productName[$i]=$bo_act_common.generateRandomName("PN_RS6932_");
+			$proObJson = "{\"Name\":\""+$productName[$i]+"\"}";
+			$filterValue=$sfm_act_restApiMethods.postRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,$proObjName,$proObJson,"POST");
+			_log($productName[$i]);
+			
+			if ($i<2) {
+				$proStockObjName= ""+$orgnamespace+"__Product_Stock__c";
+				$proStockObJson = "{\""+$orgnamespace+"__Location__c\":\""+$locationId+"\",\""+$orgnamespace+"__Product__c\":\""+$filterValue+"\",\""+$orgnamespace+"__Quantity2__c\":\"1\",\""+$orgnamespace+"__Status__c\":\"Available\"}";
+				$filterValue=$sfm_act_restApiMethods.postRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,$proStockObjName,$proStockObJson,"POST");
+				_log($filterValue);
+			}
+
+		}
+
+		
+		//create Work orders
+		$objName= $orgnamespace+"__Service_Order__c";
+		$obJson = "{\""+$orgnamespace+"__Order_Status__c\":\"Open\",\""+$orgnamespace+"__Order_Type__c\":\"Field Service\",\""+$orgnamespace+"__Priority__c\":\"High\",\""+$orgnamespace+"__Billing_Type__c\":\"Paid\"}";
+		$columnName = "Name";
+		$filter="id";
+		$filterValue=$sfm_act_restApiMethods.postRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,$objName,$obJson,"POST");
+		$WONumber =$sfm_act_restApiMethods.getRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,"GET", $objName, $columnName, $filter, $filterValue);
+		_log("WO number: "+$WONumber);
+
+		
+		// Login to App
+		$bo_act_login.login($g_url,$sfmdUsn,$sfmdPwd);
+		
+		//Search WO and launch SFM
+		RS6932_searchWOandLaunchSFM($WONumber,"Record T&M");
+		
+		$sfm_act_sfmDesigner.addChildLine("Parts");
+		_click($sfm_pg_sfmDesigner.searchPartIcon);
+		_wait(5000,_isVisible($sfm_pg_sfmDesigner.lbl_recentItemProducts));
+		_click($sfm_pg_sfmDesigner.btn_advFilterIcon);
+		_click($sfm_pg_sfmDesigner.btn_myTrunkStock);
+		for (var $j = 0; $j < $productName.length; $j++) {
+			if ($j<2) {
+				_setValue($sfm_pg_sfmDesigner.btn_searchTextBox,$productName[$j]);
+				_click($sfm_pg_sfmDesigner.link_searchLink);
+				_assertExists(_cell($productName[$j]));
+			}else {
+				_setValue($sfm_pg_sfmDesigner.btn_searchTextBox,$productName[$j]);
+				_click($sfm_pg_sfmDesigner.link_searchLink);
+				_assertNotExists(_cell($productName[$j]));
+				_wait(3000);
+				_click($sfm_pg_sfmDesigner.btn_myTrunkStock);
+				_wait(5000);
+				_click($sfm_pg_sfmDesigner.link_searchLink);
+				_assertExists(_cell($productName[$j]));
+			}
+
+		}
+		
+
+		
+//Search WO and launch SFM
+function RS6932_searchWOandLaunchSFM($WONumber,$sfmName){
+	$sfm_act_common.globalSearchOnce($WONumber);
+	_wait(10000);
+	_setStrictVisibilityCheck(true);
+	$sfm_act_createCustomWizard.clickWizardBtn($sfmName);
+	_wait(5000,_isVisible(_div("/"+$sfmName+"/")));
+}
+		
+$rs_6932.end();

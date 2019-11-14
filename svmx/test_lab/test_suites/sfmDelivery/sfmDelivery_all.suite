@@ -1,0 +1,14 @@
+../../../test_lab/test_cases/sfmDelivery/sfmdPackInstallation.sah
+../../../test_lab/test_cases/sfmDelivery/SFMD_Suite_Data_Setup.sah
+../../../test_lab/test_suites/sfmDelivery/SFMDelivery_MappingsTestCases.suite
+../../../test_lab/test_suites/sfmDelivery/SFMDelivery_WebServicesTestCases.suite
+../../../test_lab/test_suites/sfmDelivery/SFMDelivery_FormulaTestCases.suite
+../../../test_lab/test_suites/sfmDelivery/SFMDelivery_DVRTestCases.suite
+../../../test_lab/test_suites/sfmDelivery/SFMDelivery_ProcessTestCases.suite
+../../../test_lab/test_suites/sfmDelivery/SFMDelivery_SearchTestCases.suite
+../../../test_lab/test_suites/sfmDelivery/SFMDelivery_CheckListTestCases.suite
+../../../test_lab/test_suites/sfmDelivery/SFMDelivery_ExpressionTestCase.suite
+../../../test_lab/test_suites/sfmDelivery/SFMDelivery_opdoc.suite
+../../../test_lab/test_suites/sfmDelivery/SFMDelivery_LookUpTestCases.suite
+//SFMD Pre release test suite
+//../../../test_lab/test_suites/sfmDelivery/SFMDelivery_ClassicPreRelease.suite

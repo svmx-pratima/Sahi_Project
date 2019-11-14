@@ -1,0 +1,41 @@
+/**
+ * Home page object repository
+ */
+
+var $bo_pg_workDetails = new function bo_pg_workDetails(){
+	this.btn_newWorkDetail = _button("New Work Detail");
+	this.txt_workDetailRecordTypePage = _heading2("Select Work Detail Record Type");
+	this.sel_workDetailsRecordType = _select(0,_rightOf(_label("/Record Type of new record/")));
+	this.btn_WDcontinue = _submit("Continue");
+	this.txt_IBSerialNumber = _textbox(0,_rightOf(_label("/IB Serial Number/")));
+	this.link_IBSearchIcon = _link(0,_rightOf(_label("IB Serial Number")));
+	
+	this.sel_WDActivityType = _select(0,_rightOf(_label("/Activity Type/")));
+	this.sel_WDLineType = _select(0,_rightOf(_label("/Line Type/")));
+	this.btn_saveWorkDetails = _submit(" Save ");
+	this.txt_getworkDetailsNumber = _heading2("/WL-/");
+	this.label_WDStartDate=_label("Start Date and Time");
+	this.txt_WDstartDate=_textbox(0,_rightOf(_label("Start Date and Time")));
+	this.txt_WDendDate=_textbox(0,_rightOf(_label("End Date and Time")));
+	this.txt_WDcanceledOn=_textbox(0,_rightOf(_label("Canceled On")));
+	this.txt_WDclosedOn=_textbox(0,_rightOf(_label("Closed On")));
+	this.link_today=_link("Today");
+	this.txt_WDlineQTY=_textbox(0,_rightOf(_label("Line Qty")));
+	this.txt_part=_textbox(0,_near(_label("Part")));
+	this.link_partSearchIcon=_link(0,_near(_label("Part")));
+	this.btn_editWD=_button(" Edit ");
+	this.txt_requestedCity=_textbox(0,_rightOf(_label("Requested City")));
+	this.txt_billableQTY=_textbox(0,_rightOf(_label("Billable Qty")));
+	this.dateRequired=
+	
+	
+	// Click on the Work Order on Work Details record Page
+	this.clickOnWorkOrder = function($WO_Number){
+		
+		_click(_link($WO_Number,0,_rightOf(_cell("/Work Order/"))));	
+	};
+	
+};
+
+
+

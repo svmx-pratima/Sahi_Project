@@ -1,0 +1,46 @@
+// Author Meghana Rao P
+/*
+ * Validation of  "Update library (all checklists using this question will be updated)"  while editing a question of type Radio Button/Picklist
+ */
+var $RS_9843 = _testcase("RS_9843", "Validation of  Update library  while editing a question of type Radio Button/Picklist");
+$RS_9843.start();
+
+
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+
+var $number1 = $bo_act_common.generateRandomName("num");
+var $QuestionName = $bo_act_common.generateRandomName("A RS_9843");
+var $Process1 = $bo_act_common.generateRandomName("A_RS_9843_Pro1");
+var $Process2 = $bo_act_common.generateRandomName("A_RS_9843_Pro2");
+
+$bo_act_navigation.navigateToSvmxSetup();
+// To create a Checkbox Question with default checklist number 1
+$bo_act_questionlibrary.createCheckbox_RadioQuestion($QuestionName, "Radio Button", "RS_9843 URL", "RS_9843 "+$number1+"");
+
+
+
+$bo_act_navigation.navigateToSfmTransactionDesigner();
+_wait(60000, _isVisible($bo_pg_sfmTransactionAndDesigner.btn_newSFM));
+_wait(1000);
+
+// To create Checklist Process 1
+$bo_act_checklistdesigner.newChecklistTypeSFM($Process1,"to generate a Checklist/Survey type of Process", "Work Order");
+$bo_act_checklistdesigner.addsamequestion_tochecklist($QuestionName);
+
+// To create Checklist Process 2
+
+$bo_act_checklistdesigner.newChecklistTypeSFM($Process2,"to generate a Checklist/Survey type of Process", "Work Order");
+$bo_act_checklistdesigner.addsamequestion_tochecklist($QuestionName);
+
+// To Edit Checklist Process 1
+$bo_act_checklistdesigner.re_openChecklistTypeSFM($Process1, true);
+
+$bo_act_checklistdesigner.edit_checklist_process_checkbox($QuestionName, "Radio Button");
+
+
+// To verify the changes in Checklist Process 2
+$bo_act_checklistdesigner.re_openChecklistTypeSFM($Process2, true);
+$bo_act_checklistdesigner.verifythechangesinquestion($QuestionName, "Radio Button");
+
+
+

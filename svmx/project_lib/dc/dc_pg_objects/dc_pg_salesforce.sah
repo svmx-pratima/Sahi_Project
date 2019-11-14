@@ -1,0 +1,46 @@
+//Page objects of Salesforce and reusable methods
+
+var $dc_pg_salesforce = new function dc_pg_salesforce() {
+
+	// Variables - Global for DC
+	this.login_result = "";
+	this.workOrder = "";
+	this.result = "";
+	this.longwait = 12000;
+	this.mediumwait = 8000;
+	this.shortwait = 3000;
+	this.street = "";
+	this.city = "";
+	this.state = "";
+	this.zip = "";
+	this.country = "";
+
+	// Page Objects - Text Field
+	this.txtfld_username = _emailbox("username");
+	this.txtfld_password = _password("pw");
+	// this.txtfld_search = _textbox("Search");
+	// this.txtfld_search = _textbox("sbstr");
+
+	// Page Objects - Button
+	this.btn_go = _submit(" Go! ");
+	this.btn_login = _submit("/Login/");
+	this.btn_userName = _span("userNavLabel");
+	this.btn_allTabs = _image("All Tabs");
+
+	// Page Objects - Link
+	this.link_home = _link("Home");
+	this.link_servicemaxSetup = _link("ServiceMax Setup");
+	this.link_accounts = _link("Accounts[1]");
+	this.link_contacts = _link("Contacts[1]");
+	this.link_products = _link("Products[1]");
+	this.link_installedProducts = _link("Installed Products[1]");
+	this.link_serviceMaintenanceContracts = _link("Service/Maintenance Contracts[1]");
+	this.link_locations = _link("Locations[1]");
+	this.link_logOut = _link("Logout");
+	this.link_allTabs = _image("All Tabs");
+	this.link_Gauteng_Tech = _link("lookupa1If00000047TDt00Nf0000000V4o7");
+	this.link_WorkOrdersTab = _link("Work Orders");
+
+	
+
+};

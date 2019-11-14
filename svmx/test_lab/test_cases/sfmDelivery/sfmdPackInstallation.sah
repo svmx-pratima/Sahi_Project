@@ -1,0 +1,28 @@
+var $sfmdPackInstallation = _testcase("PackageInstallation","Install the latest package on the org");
+$sfmdPackInstallation.start();
+
+var $runPackageId = java.lang.System.getenv("Package_id");
+_log("Package id :"+$runPackageId);
+var $runPackageBuild = java.lang.System.getenv("Install_Package"); 
+/*
+var $runPackageId = "04t0g000000UKik";
+_log("Package id :"+$runPackageId);
+var $runPackageBuild = "Yes"; */
+var $packStatus;
+//install package only when packageId is passed and runPackageBuild=Yes
+if( $runPackageBuild=="Yes" && ($runPackageId!=null || $runPackageId!="") ){
+	$packStatus=$packageInstallation.installPackage($runPackageId,$sfmdUsn,$sfmdPwd);
+	if($packStatus){
+		_log("!! STATUS Package installation is successful, continue with script execution");
+		_debug("!! STATUS Package installation is successful, continue with script execution");
+
+	}else{
+		_log("!! STATUS Package installation failed, stop the execution","FAILURE");
+		_debug("!! STATUS Package installation failed, stop the execution");
+		_execute("cmd /C "+_userDataDir()+"/scripts/Sahi_Project/svmx/project_lib/packageInstallation/killSahi.bat");
+	}
+}else{
+	_log("Continue with script execution without package installation");
+}
+
+$sfmdPackInstallation.end();

@@ -1,0 +1,105 @@
+/**
+ * Function for the Creation of a new Event Hover Rule
+ */
+
+//vanditha
+var $dc_act_eventHoverRule = new function dc_act_eventHoverRule() {
+	 
+	/**
+	 * Create a new Event Hover Rule
+	 * 
+	 * @param $ruleName, $ruleDescription
+	 */
+	
+
+	this.verifyEventHoverRulePage = function($eventHoverRuleName, $eventHoverRuleDescription){
+		$dc_act_navigation.navigateToEventHoverRule();
+	   	_wait(60000, _isVisible($dc_pg_eventHoverRule.btn_newRule));
+
+		};	
+
+	this.createHoverRule = function($eventHoverRuleName, $eventHoverRuleDescription){
+	    
+		//Work Order Fields to be displayed in Event Hover Rule 
+	    var $woNumber ="Work Order Number";
+	    var $city="City";
+	    var $priority="Priority";
+		
+		$dc_act_navigation.navigateToEventHoverRule();
+	    _click($dc_pg_eventHoverRule.btn_newRule);
+	    
+	    //Setting values in Event Subject Rule and Event Subject Rule Description
+	    _setValue($dc_pg_eventHoverRule.txt_eventHoverRuleName,$eventHoverRuleName);
+	    _setValue($dc_pg_eventHoverRule.txt_eventHoverRuleDescription,$eventHoverRuleDescription);
+	    
+	    //Setting up Work Order field Criteria
+	    _setSelected($dc_pg_eventHoverRule.sel_eventHoverRuleWorkOrderField1,"Order Status");
+	    _setSelected($dc_pg_eventHoverRule.sel_eventHoverRuleOperatorField1,"Equals");
+	    _setValue($dc_pg_eventHoverRule.txt_eventHoverRuleCriteriaValue1,"Open");
+	    _click($dc_pg_eventHoverRule.btn_Add);
+	    _wait(5000);
+	    
+	    _setSelected($dc_pg_eventHoverRule.sel_eventHoverRuleWorkOrderField2,"Billing Type");
+	    _setSelected($dc_pg_eventHoverRule.sel_eventHoverRuleOperatorField2,"Is Not Null");
+	     _wait(5000);
+	     
+	    _setSelected($dc_pg_eventHoverRule.sel_eventHoverRuleWorkOrderField3,"Priority");
+	    _setSelected($dc_pg_eventHoverRule.sel_eventHoverRuleOperatorField3,"Equals");
+	    _setValue($dc_pg_eventHoverRule.txt_eventHoverRuleCriteriaValue3,"High");
+	    _wait(5000);
+	    _setValue($dc_pg_eventHoverRule.txt_eventHoverRuleCriteriaAdvancedExpression,"(1 AND 2) OR 3");
+	 
+  	    _setSelected($dc_pg_eventHoverRule.sel_eventHoverRuleFieldSelection,[$city]);
+	    _click($dc_pg_eventHoverRule.sel_eventHoverRuleFieldSelected);	    
+	    _setSelected($dc_pg_eventHoverRule.sel_eventHoverRuleFieldSelection,[$woNumber]);
+	    _click($dc_pg_eventHoverRule.sel_eventHoverRuleFieldSelected);	    
+	    _setSelected($dc_pg_eventHoverRule.sel_eventHoverRuleFieldSelection,[$priority]);
+	    _click($dc_pg_eventHoverRule.sel_eventHoverRuleFieldSelected);
+	    
+	    _setSelected($dc_pg_eventHoverRule.sel_eventHoverRuleFieldOption,[$woNumber]);
+	    _click($dc_pg_eventHoverRule.sel_eventHoverRuleFieldUpArrow);
+   	    _setSelected($dc_pg_eventHoverRule.sel_eventHoverRuleFieldOption,[$city]);
+	    _click($dc_pg_eventHoverRule.sel_eventHoverRuleFieldDownArrow);  
+	    _setSelected($dc_pg_eventHoverRule.sel_eventHoverRuleFieldOption,[$priority]);
+	    _click($dc_pg_eventHoverRule.sel_eventHoverRuleFieldBottomArrow); 
+	    
+	   _click($dc_pg_eventHoverRule.btn_save);
+	   _wait(60000, _isVisible($dc_pg_eventHoverRule.btn_newRule));
+    
+	};
+	
+	this.editAdvancedEventHoverRule = function($eventHoverRuleName){
+	   
+		var $woNumber ="Work Order Number";
+	    var $city="City";
+	    var $priority="Priority";
+	    var $account="Account";		
+	    
+   	    _click(_span($eventHoverRuleName));
+	    _click(_checkbox(0,_leftOf(_span($eventHoverRuleName))));
+	    _click($dc_pg_eventHoverRule.btn_editRule);
+	    _wait(60000, _isVisible($dc_pg_eventHoverRule.btn_save));
+	    
+	    //Edit the existing Subject Rule wrt Criteria
+	    _setSelected($dc_pg_eventHoverRule.sel_eventHoverRuleWorkOrderField3,"Priority");
+	    _setSelected($dc_pg_eventHoverRule.sel_eventHoverRuleOperatorField3,"Equals");
+	    _setValue($dc_pg_eventHoverRule.txt_eventHoverRuleCriteriaValue3,"Low");
+	    
+	    //Edit the existing Subject Rule wrt fields displayed in Event Subject Rule
+	    _setSelected($dc_pg_eventHoverRule.sel_eventHoverRuleFieldSelection,[$account]);
+	     _click($dc_pg_eventHoverRule.sel_eventHoverRuleFieldSelected);
+	     _click($dc_pg_eventHoverRule.btn_save);
+		 _wait(60000,_isVisible($dc_pg_eventHoverRule.btn_newRule));
+  	};
+  	
+	this.deleteEventHoverRule = function($eventHoverRuleName){
+		 
+   	    _click(_span($eventHoverRuleName));
+	    _click(_checkbox(0,_leftOf(_span($eventHoverRuleName))));
+	    _click($dc_pg_eventSubjectRule.btn_deleteRule);
+	    _wait(10000);
+	      
+	};	
+	
+}
+

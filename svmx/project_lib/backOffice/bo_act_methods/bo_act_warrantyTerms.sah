@@ -1,0 +1,110 @@
+/**
+ * Functions for the Warranty Terms Records
+ */
+var $bo_act_warrantyTerms = new function bo_act_warrantyTerms() {
+
+	/**
+	 * Create a Warranty Terms
+	 * 
+	 * @param $warranty Terms Name
+	 */
+	this.createWarrantyTerms = function($exchangeType,$materialPercentCovered,$durationOfMaterialCoverage,$unitOfTimeForMaterialCoverage,$laborPercentCovered,$durationOflaborCoverage,$unitOfTimeForlaborCoverage,$expensesPercentCovered,$durationOfExpensesCoverage,$unitOfTimeForExpensesCoverage,$coverageEffectiveFrom) {
+		var $warrantyName = $bo_act_common.generateRandomName("warn");
+		$bo_act_navigation.navigateToWarrantyTermsPage();
+		_click($bo_pg_warrantyTerms.btn_new);
+		
+		_setValue($bo_pg_warrantyTerms.txt_templateName, $warrantyName);
+		_setSelected($bo_pg_warrantyTerms.sel_exchangeType, $exchangeType);
+		//_setSelected($bo_pg_warrantyTerms.sel_templateType, $templateType);
+		
+		_setValue($bo_pg_warrantyTerms.txt_materialPercentCovered, $materialPercentCovered);
+		_setValue($bo_pg_warrantyTerms.txt_durationOfMaterialCoverage, $durationOfMaterialCoverage);
+		_setSelected($bo_pg_warrantyTerms.sel_unitOfTimeForMaterialCoverage, $unitOfTimeForMaterialCoverage);
+		
+		_setValue($bo_pg_warrantyTerms.txt_laborPercentCovered, $laborPercentCovered);
+		_setValue($bo_pg_warrantyTerms.txt_durationOfLaborCoverage, $durationOflaborCoverage);
+		_setSelected($bo_pg_warrantyTerms.sel_unitOfTimeForLaborCoverage, $unitOfTimeForlaborCoverage);
+		
+		_setValue($bo_pg_warrantyTerms.txt_expensesPercentCovered, $expensesPercentCovered);
+		_setValue($bo_pg_warrantyTerms.txt_durationOfExpensesCoverage, $durationOfExpensesCoverage);
+		_setSelected($bo_pg_warrantyTerms.sel_unitOfTimeForExpensesCoverage, $unitOfTimeForExpensesCoverage);
+		
+		_click($bo_pg_warrantyTerms.btn_save);
+		_assertNotVisible(_div("/Error: Invalid Data/"));
+		_wait(30000, _isVisible($warrantyName));
+		_logOutput($warrantyName+ " Warranty Terms is created");
+		
+		//Actions for configuring Coverage "Effective From" in Warranty Terms
+		_selectDomain($g_domain);
+		_click($bo_pg_warrantyTerms.btn_configureStartDateSFM);
+		_selectDomain();
+		_selectWindow("/a/");   // changed by Bhupendra Singh _selectWindow("/a1/"); 
+		_wait(30000, _isVisible(_heading1("Define Warranty Coverage Start Date for")));
+		_setSelected($bo_pg_warrantyTerms.sel_CoverageEffectiveFrom, $coverageEffectiveFrom);
+		_click($bo_pg_warrantyTerms.btn_saveCoverage);
+		_wait(30000, _isVisible(_div("Success:Saved successfully!")));
+		_click($bo_pg_warrantyTerms.btn_close);
+		_selectWindow();
+		_call(top.location.reload());
+		_wait(30000, _isVisible(_div("/__Date_Installed__c/")));
+		
+		return $warrantyName;
+	};
+	
+	//Function for Applicable product
+	this.createApplicableProducts = function($product_Name, $warrantyName) {
+		_wait(30000, _isVisible($bo_pg_warrantyTerms.btn_newApplicableProduct));
+		_click($bo_pg_warrantyTerms.btn_newApplicableProduct);
+		_setValue($bo_pg_warrantyTerms.txt_product, $product_Name);
+		_click($bo_pg_warrantyTerms.btn_save);
+		_assertNotVisible(_div("/Error: Invalid Data/"));
+		$bo_pg_warrantyTerms.clickOnWarranty($warrantyName);
+		//return $callBack.returnResult([_isVisible($product_Name), "Applicable Product created",$product_Name] );
+		
+	};
+	
+	//Function for configuring Coverage "Coverage By Counters" in Warranty Terms
+	this.createCoverageByCounters = function($coverageStartsAt,$countersCovered){
+	_selectDomain($g_domain);
+	_click($bo_pg_warrantyTerms.btn_coverageByCounters);
+	_selectDomain();
+	_wait(30000, _isVisible(_bold("/Please enter coverage limit for each counter./")));
+	_setValue($bo_pg_warrantyTerms.txt_coverageStartsAt, $coverageStartsAt);
+	_setValue($bo_pg_warrantyTerms.txt_countersCovered, $countersCovered);
+	_click($bo_pg_warrantyTerms.btn_saveCoverage);
+	_wait(30000, _isVisible(_div("/__Date_Installed__c/")));
+	};	
+	
+	//Function for create Warranty
+	this.createWarranty = function($warrantyName) {
+		_selectDomain($g_domain);
+		_click($bo_pg_warrantyTerms.btn_cretaeWarrantySFM);
+		_selectDomain();
+		$bo_pg_warrantyTerms.selectWarranty($warrantyName);
+		_click($bo_pg_warrantyTerms.btn_cretaeWarranty);
+	};
+	
+	//Function for Update Counters on IB Record
+	this.updateCounters = function($CurrentReading) {
+		_selectDomain($g_domain);
+		_click($bo_pg_warrantyTerms.btn_updateCountersSFM);
+		_selectDomain();
+		_wait(30000, _isVisible(_div("Current Reading")));
+		_setValue($bo_pg_warrantyTerms.txt_counterCurrentReading, $CurrentReading);
+		_click($bo_pg_warrantyTerms.btn_saveCoverage);
+	};
+	
+	this.createWarrantyTermsSimple = function() {
+		var $warrantyName = $bo_act_common.generateRandomName("warn");
+		$bo_act_navigation.navigateToWarrantyTermsPage();
+		_click($bo_pg_warrantyTerms.btn_new);
+		
+		_setValue($bo_pg_warrantyTerms.txt_templateName, $warrantyName);
+		_click($bo_pg_warrantyTerms.btn_save);
+		_assertNotVisible(_div("/Error: Invalid Data/"));
+		return $warrantyName;
+	};
+	
+
+};
+

@@ -1,0 +1,50 @@
+
+//author - Noor Salma Sharieff
+
+var $RS_5259 = _testcase("$RS_5259","Verify the impact of SLA setting values on SLA clocks on Case Object");
+$RS_5259.start();
+_setSpeed($g_stepSpeed);
+
+//Pre - Condition 
+$bo_act_login.login($PRT_url, $bac_PRTun, $bac_PRTpwd);
+$bo_act_navigation.navigateToConfigurationProfilesPage();
+$bo_act_configurationProfiles.editGlobalProfileForBooleanSettings("Service Level Agreement", "SLA Clock on Case", "SET003", true);
+$bo_act_configurationProfiles.editGlobalProfileForBooleanSettings("Service Level Agreement", "SLA Clock on Case", "SET005", true);
+
+var $slaterm = $bo_act_slaTerms.createSlaTerms("Default");
+$bo_act_slaTerms.addInitialResponseToSLA($slaterm, "Case","Problem", "High", "Created Date", 30, 60, "SLA");
+
+var $caseNumber = $bo_act_Cases.createCase("New", "High", "Email");
+//$bo_act_workOrders.checkFieldAvailableInPageLayout($bo_pg_workOrders.slaTerm,$bo_pg_salesforcePageSetUp.btn_slaTerm);
+//$bo_act_workOrders.checkFieldAvailableInPageLayout($bo_pg_workOrders.intialResponseInternalBy,$bo_pg_salesforcePageSetUp.btn_InitialResponseInternalBy);
+//$bo_act_workOrders.checkFieldAvailableInPageLayout($bo_pg_workOrders.intialResponseCustomerBy,$bo_pg_salesforcePageSetUp.btn_InitialResponseCustomerBy);
+//$bo_act_workOrders.checkFieldAvailableInPageLayout($bo_pg_workOrders.actualInitialResponse,$bo_pg_salesforcePageSetUp.btn_actualInitialResponse);
+//$bo_act_workOrders.checkFieldAvailableInPageLayout($bo_pg_workOrders.timeToInitialResponse,$bo_pg_salesforcePageSetUp.btn_timeToInitialResponse);
+
+$bo_act_Cases.editCaseOnly($caseNumber);
+$bo_act_Cases.updateTextBoxFields($bo_pg_Cases.txt_slaTermOnEdit, $slaterm);
+$bo_act_Cases.updateDropdownFields($bo_pg_Cases.sel_TypeOnEdit, "Problem");
+$bo_act_Cases.saveCase();
+
+//Validations
+_selectDomain($g_domain);
+_wait(3000,_isVisible($bo_pg_Cases.txt_SLAClock));
+_assertNotContainsText("Initial Response 00:00:00:00",$bo_pg_Cases.txt_SLAClock,"SLA Clock Issue");
+_selectDomain();
+_assertNotEqual(_getText($bo_pg_Cases.txt_InitialResponseInternalBy)," ","Issue in Initial Response Internal By field");
+_assertNotEqual(_getText($bo_pg_Cases.txt_InitialResponseCustomerBy)," ","Issue in Initial Response Customer By field");
+
+$bo_act_Cases.editCaseOnly($caseNumber);
+$bo_act_Cases.clickLinktoUpdateTextfields($bo_pg_Cases.txt_actualInitialResponseOnEdit);
+$bo_act_Cases.saveCase();
+
+_assertNotEqual(_getText($bo_pg_Cases.txt_TimeToInitialResponse),"", "issue in Time to Initial Response");
+
+//Clean up function
+$bo_act_login.logOut(); 
+_closeWindow();
+
+$RS_5259.end();
+
+
+

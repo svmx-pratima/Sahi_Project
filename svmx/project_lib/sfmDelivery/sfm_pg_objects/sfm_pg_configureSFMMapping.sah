@@ -1,0 +1,11 @@
+var $sfm_pg_configureSfmMapping = new function sfm_pg_configureSfmMapping(){
+	//Objects of SFD page
+	this.btn_SfmMapping= _div("SFM Mappings");
+	
+	//Object of Product page
+	this.txt_productDesc=_textarea("Description");
+	this.check_active=_checkbox("IsActive");
+	this.txt_prodCost=_textbox("Product Cost");
+	
+	
+};

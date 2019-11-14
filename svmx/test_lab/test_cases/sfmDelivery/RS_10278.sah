@@ -1,0 +1,197 @@
+var $RS_10278 = _testcase("RS_10278","Verify Dependent picklist's values when Controlling picklist is not present in SFM process for header but present in mapping");
+$RS_10278.start();
+
+//Variables used
+var $object_name = "Work Order";
+var $ctrlPicklist = "Order Status";
+var $processName = "RS_10278";
+var $process_to_clone = "Manage Work Order Lines - Usage";
+var $dependentPicklist = "Order Type";
+var $ctrl_unique_values = ["Open","Closed"];
+var $ctrl_picklist_values = ["Open","Open","Closed"];
+var $dep_picklist_values = ["Depot Repair","Field Service","Field Service"];
+var $ctr = 0;
+var $sfmTemplate = "SVMXSTD: Manage WO Usage Lines";
+var $isCustom = false;
+var $ctr = 0;
+var $i = 0;
+var $success_message = "Work Order was saved.";
+var $containerName = ["Order Status"];
+var $fieldName=["Order Type"];
+var $z = 0;
+var $fields_array = [];
+$fields_array.push($dependentPicklist);
+var $currentWizardName = $sfmd_wizardName[4];
+var $success_message = "Work Order was saved.";
+var $stdMap = "SVMXSTD: Close Work Order";
+var $pickListLabels = ["Order Status"];
+var $pickListValues = ["Open"];
+var $textLabels = [];
+var $textValues = [];
+var $mapType = "Value Map for Existing Records";
+
+
+//Appending current timestamp to process name to make it unique.
+var $timeStamp = $bo_act_navigation.getCurrentTimeStamp();
+$processName = $processName + "_" + $timeStamp;
+var $pageLayoutName = $processName + "pg";
+var $mapName = $processName + "mp";
+//var $myDomain = "/lightning/";
+//**************************************************************************************
+//Login and switch to classic
+
+$bo_act_login.login($g_url,$sfmdUsn,$sfmdPwd);
+
+_wait(15000);
+
+//Navigate to Object manager and navigate to work order object.
+$sfm_act_common.navigateToObjectsInClassic($object_name);
+_click(_link($ctrlPicklist));
+
+//Delete existing dependencies and create new one.
+if(_isVisible(_tableHeader($dependentPicklist,_under(_div("/Field Dependencies/"))))){
+	_click(_link("Del",_leftOf(_tableHeader($dependentPicklist,_under(_div("/Field Dependencies/"))))));
+}
+_click($sfm_pg_commonSfdc.btn_new_field_dependency);
+_setSelected($sfm_pg_commonSfdc.picklist_controller, $ctrlPicklist);
+_setSelected($sfm_pg_commonSfdc.picklist_dependent, $dependentPicklist);
+_click($sfm_pg_commonSfdc.btn_continue);
+for(var $i=0;$i<$ctrl_picklist_values.length;$i++){
+	$sfm_act_common.addDependentControllingPicklistValues($ctrlPicklist,$ctrl_picklist_values[$i],$dep_picklist_values[$i]);
+}
+
+_expectConfirm($sfm_pg_commonSfdc.btn_save_dep_picklist);
+_click($sfm_pg_commonSfdc.btn_save_dep_picklist);
+_selectDomain();
+
+//Navigate to servicemax setup and setup required process.
+//Clone standard process and add the dependent picklist in the screen designer
+_setSpeed(3000);
+$sfm_act_SFM.cloneTDM016($process_to_clone,$processName,$isCustom,$pageLayoutName, $sfmTemplate, $fieldName, $containerName);
+$bo_pg_sfmTransactionAndDesigner.deleteField($ctrlPicklist);
+_click($bo_pg_sfmTransactionAndDesigner.btn_pageLayoutSave);
+_click($bo_pg_sfmTransactionAndDesigner.btn_quickSave1);
+_click($bo_pg_sfmTransactionAndDesigner.btn_qualifyingCriteriaAndFieldMapping);
+_click($bo_pg_sfmTransactionAndDesigner.btn_newLineForQc);
+_setSelected(_f("main").s_combobox("fieldCombo[1]"), "Order Status");
+_setSelected(_f("main").s_combobox("valuesCombo[1]"), "Closed");
+_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmSavePageLayoutAsId, "1 OR 2");
+_setValue($bo_pg_sfmTransactionAndDesigner.txt_saveExprAs, $processName);;
+_setValue($bo_pg_sfmTransactionAndDesigner.txt_inputIdAs, $processName);
+_click($bo_pg_sfmTransactionAndDesigner.button_saveAsQcTab);
+_assertVisible($bo_pg_sfmTransactionAndDesigner.label_exprSaved);
+_click($bo_pg_sfmTransactionAndDesigner.btn_quickSave1);
+if(_condition(_isVisible($bo_pg_sfmTransactionAndDesigner.btn_proceed_anyways))){
+	_click($bo_pg_sfmTransactionAndDesigner.btn_proceed_anyways);
+}
+
+//Set up the mapping. Order status is set to "Open"
+$bo_act_mappings.createMapping($object_name,$mapType,$pickListLabels,$pickListValues,$textLabels,$textValues,$mapName);
+_setSpeed(1000);
+//Add the custom process to SFM wizard.
+$sfm_act_wizards.addToWizard($object_name,$currentWizardName,"SFM",$processName);
+_selectDomain();
+
+/*//Create a work order
+var $wo_number = $sfm_act_common.createWoInClassic();
+$sfm_act_common.globalSearchOnce($wo_number);
+*/
+//pre_Req: Create Work orders
+var $objName= $orgnamespace+"__Service_Order__c";
+var $obJson = "{\""+$orgnamespace+"__Order_Status__c\":\"Open\",\""+$orgnamespace+"__Is_Entitlement_Performed__c\":\"true\",\""+$orgnamespace+"__Order_Type__c\":\"Field Service\"}";
+var $columnName = "Name";
+var $filter="id";
+var $filterValue=$sfm_act_restApiMethods.postRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,$objName,$obJson,"POST");
+var $wo_number =$sfm_act_restApiMethods.getRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,"GET", $objName, $columnName, $filter, $filterValue);
+_log("WO number: "+$wo_number);
+$sfm_act_common.globalSearchOnce($wo_number);
+
+
+//Launch SFM delivery and verify dependent pick list values
+var $expected_list = [];
+//Verify the values one by one.
+
+ var $i = 0;var $j = 0;
+ for ($j=0;$j<$ctrl_picklist_values.length;$j++) {
+ 	if($ctrl_picklist_values[$j] === $ctrl_unique_values[0]) {
+ 		$i = $i+1;
+ 		$expected_list.push($dep_picklist_values[$j]);
+ 	}
+ }
+for($z=0;$z<$ctrl_unique_values.length;$z++){
+	
+	//Steps to edit wo and save
+	_click($sfm_pg_commonSfdc.btn_editWo);
+	_setSelected(_select(0,_near(_label("/"+$ctrlPicklist+"/"))),$ctrl_unique_values[$z]);
+	_click($sfm_pg_commonSfdc.btn_saveWo);
+	_wait(10000);
+	$sfm_act_common.launchSFMProcessInClassic($processName);
+	var $actual_list = [];
+	//Verify the count of values first
+	_wait(4000);
+    _click(_div("/svmx-trigger/",_near(_label("/"+$dependentPicklist+"/"))));
+    _wait(1000);
+	var $no_of_values = _collect("_listItem", "/.*/", _under(_div("/"+$dependentPicklist+"/")));
+	
+	for($ctr = 1;$ctr < $no_of_values.length;$ctr++ ){
+		$actual_list.push(_getText($no_of_values[$ctr]));
+	}
+	_log("Actual values "+$actual_list);
+	if(_assertEqualArrays($expected_list, $actual_list)){
+		_log("PASS: RS_10278 - Dependent picklist values for header when controlling picklist is present in mapping - verified ");
+	}
+	else {
+		_log("FAIL: RS_10278 - Dependent picklist values for child when controlling picklist is present in mapping - not verified");
+	}
+	$sfm_act_common.saveClassicSfmProcess();
+}
+
+//Now edit the mapping and save the changes.
+$sfm_act_common.openSfmProcess($processName);
+_wait(10000);
+_click($bo_pg_sfmTransactionAndDesigner.btn_qualifyingCriteriaAndFieldMapping);
+$pickListValues = ["Closed"];
+$bo_act_mappings.editExistingFieldsInMapping($object_name,$mapType,$pickListLabels, $pickListValues, [], [], $mapName);
+_closeWindow();
+_selectWindow();
+$expected_list = [];
+_wait(5000);
+
+var $i = 0;var $j = 0;
+for ($j=0;$j<$ctrl_picklist_values.length;$j++) {
+	if($ctrl_picklist_values[$j] === $ctrl_unique_values[1]) {
+		$i = $i+1;
+		$expected_list.push($dep_picklist_values[$j]);
+	}
+}
+for($z=0;$z<$ctrl_unique_values.length;$z++){
+//Steps to edit wo and save
+_click($sfm_pg_commonSfdc.btn_editWo);
+_setSelected(_select(0,_near(_label("/"+$ctrlPicklist+"/"))),$ctrl_unique_values[$z]);
+_click($sfm_pg_commonSfdc.btn_saveWo);
+_wait(2000);
+$sfm_act_common.launchSFMProcessInClassic($processName);
+var $actual_list = [];
+//Verify the count of values first
+_wait(4000);
+_click(_div("/svmx-trigger/",_near(_label("/"+$dependentPicklist+"/"))));
+_wait(1000);
+var $no_of_values = _collect("_listItem", "/.*/", _under(_div("/"+$dependentPicklist+"/")));
+
+for($ctr = 1;$ctr < $no_of_values.length;$ctr++ ){
+	$actual_list.push(_getText($no_of_values[$ctr]));
+}
+_log("Actual values "+$actual_list);
+if(_assertEqualArrays($expected_list, $actual_list)){
+	_log("PASS: RS_10278 - Dependent picklist values for header when controlling picklist is present in mapping - verified ");
+}
+else {
+	_log("FAIL: RS_10278 - Dependent picklist values for child when controlling picklist is present in mapping - not verified");
+}
+$sfm_act_common.saveClassicSfmProcess();
+}
+
+$sfm_act_common.logoutInClassic();
+_setSpeed($g_stepSpeed);
+	
+$RS_10278.end();

@@ -1,0 +1,106 @@
+//Author	:- 	Shashikala Kamath
+//Modified By :- Ashwini Holagi
+	
+var $swat_tc_003_manage_work_order_lines_usage = _testcase("swat_tc_003_manage_work_order_lines_usage","Verify the functionality of SFM type - as Standalone for the purpose of editing an existing record");
+	
+	$swat_tc_003_manage_work_order_lines_usage.start();
+	
+	_setSpeed($g_stepSpeed);
+	
+	var $wizardObjectName = "Work Order";
+	var $wizardTitleName = $bo_act_common.generateRandomName("SFWTitle");
+	var $wizardIDName = $bo_act_common.generateRandomName("SFWId");
+	var $wizardStepType = "SFM";
+	var $wizardStepName = "Manage Work Order Lines - Usage";
+	var $executionMode = "Interactive";
+	var $handOver = false;
+	var $slaName = "sla2812019123944";
+	var $wizardTitleName1 = "Check Entitlement WO";
+
+	
+	//Login to App
+	$bo_act_login.login($swat_Url,$swat_un,$swat_pwd);
+
+	//Create Work Order through API
+	var $Account = $swat_act_createDataUsingApi.createAccount($swat_un,$swat_pwd,$swat_ClientId,$swat_ConsumerSecret,$swat_OrgInstance);
+	var $Contact = $swat_act_createDataUsingApi.createContact($swat_un,$swat_pwd,$swat_ClientId,$swat_ConsumerSecret,$swat_OrgInstance);
+	var $Product = $swat_act_createDataUsingApi.createProduct($swat_un, $swat_pwd, $swat_ClientId, $swat_ConsumerSecret, $swat_OrgInstance);
+	var $InstalledPro = $swat_act_createDataUsingApi.createIb($swat_un, $swat_pwd, $swat_ClientId, $swat_ConsumerSecret, $swat_OrgInstance);
+	var $workOrderNo = $swat_act_createDataUsingApi.createWO($swat_un, $swat_pwd, $swat_ClientId, $swat_ConsumerSecret, $swat_OrgInstance);
+
+	//Steps to create SFM Wizard and Add Steps of type SFM and Others
+	$swat_act_sfmWizard.createSfmWizardMutipleStep($wizardObjectName,$wizardTitleName, $wizardIDName,$wizardStepType,$wizardStepName, $executionMode, $handOver);
+	
+	//Create Service Contract
+	var $pastYear = 2;  // Start Date for Service Contract
+	var $futureYear = 2;  // End Date for Service Contract
+	var $serviceContractName = $bo_act_serviceMaintenanceContracts.createServiceMaintenanceContract($Account, $slaName, $futureYear, $pastYear);
+	
+	//Activating Created Service Contract
+	$bo_act_serviceMaintenanceContracts.activateServiceContract($serviceContractName);
+	
+	//Add Covered Product to Service Contract 
+	$bo_act_serviceMaintenanceContracts.AddCoveredProducToServiceContract($serviceContractName, $InstalledPro, $slaName, $pastYear, $futureYear);
+	_wait(10000);
+	
+	//Add Entitled Contact to Service Contract 
+	$bo_act_serviceMaintenanceContracts.addEntitledContactsToServiceContract($serviceContractName, $Contact);
+	
+	//Add Parts Pricing To Service Contract 
+	var $pricePerUnit = 150;
+	$bo_act_serviceMaintenanceContracts.addPartsPricingToServiceContract($serviceContractName, $Product, $pricePerUnit);
+	_wait(10000);
+	
+	//Add Labor Pricing To Service Contract 
+	var $RoundingType="Actuals";
+	var $unit="Flat Rate";
+	var $minimumLaborMins="60";
+	var $regularRate="300";
+	var $activityType="Repair";
+	$bo_act_serviceMaintenanceContracts.addLaborPricingToServiceContract($serviceContractName, $RoundingType, $unit, $minimumLaborMins, $regularRate, $activityType);
+	
+	
+	//Perform Interactive Entitlement 
+	$bo_act_interactiveEntitlement_WO.performInteractiveEntitlementWO_UsingScon($workOrderNo, $serviceContractName);
+	_wait(15000);
+	
+	//Click 'Manage Work Order Lines - Usage' in SFM Wizard
+	$swat_act_sfmDelivery.launchSfmDelivery($wizardStepName,$wizardTitleName);
+
+	//Add a Parts Line
+	var $lineQty=10;
+	var $searchValue=$Product;
+	var $startHrs = "02";
+	var $endHrs = "04";
+	$bo_act_getPrice.addPartsLineToSFMDelivery($searchValue, $lineQty);
+	_wait(15000);
+	//isBillable check box selection validation.
+	$swat_act_sfmDelivery.isBillableCheckBoxValidation();
+	
+	//Add Labor Line
+	$bo_act_getPrice.addLaborLineToSFMDelivery($searchValue, $activityType, $startHrs, $endHrs);
+	//isBillable check box selection validation.
+	$swat_act_sfmDelivery.isBillableCheckBoxValidation();
+	
+	//Click Get Price Button
+	_click($bo_pg_getPrice.btn_getPrice);
+	_wait(10000);
+
+	// Parts price validation
+	var $expectedPartPrice = "1,500.000";
+	$swat_act_sfmDelivery.verifyPriceCalculated("Parts", $expectedPartPrice);
+	
+	//Labor price validation
+	var $expectedLaborPrice = "300.000";
+	$swat_act_sfmDelivery.verifyPriceCalculated("Labor", $expectedLaborPrice);
+
+	//Save SFM Delivery
+	$swat_act_sfmDelivery.saveSfmDelivery();
+	
+	//Delete SFM Wizard 
+	$bo_act_SFW.deleteSFMWizard($wizardObjectName, $wizardIDName);
+	
+	//Delete Scon
+	$swat_act_deleteData.deleteData($serviceContractName);
+
+	$swat_tc_003_manage_work_order_lines_usage.end();

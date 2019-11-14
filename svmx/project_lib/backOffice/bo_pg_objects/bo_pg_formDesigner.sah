@@ -1,0 +1,107 @@
+var $bo_pg_formDesigner=new function bo_pg_formDesigner(){
+
+	this.tab_clickFormDesigner=_f("main").tab("Form Designer");
+	this.btn_addNewQuestion=_f("main").s_button("Add new question");
+	//Note: Below listbasecontentholder(11) value might change if org is change.
+	this.btn_selectQuestionDataType = _f("main").listbasecontentholder(12);
+	this.txt_selectNumberAnswerType = _f("main").uiftetextfield("Number");
+	this.btn_selectQuestionDataTypewith12 = _f("main").listbasecontentholder(12);
+	this.lbl_questionText = _f("main").s_textinput("questionText");
+	this.txt_defaultAnswerForQuestion = _f("main").s_textinput("defaultResponseIdTxtInp");
+	this.chk_prefillWithValueFromCheckbox = _f("main").s_checkbox("PrefillCheckBoxId");
+	this.btn_addQuestionToLibraryAndForm = _f("main").s_button("Add to Library and Form");
+	this.btn_closeQuestionPopUp=_f("main").s_button("closeButton");
+	this.btn_quickSave=_f("main").s_button("Quick Save");
+	this.btn_save_close = _f("main").s_button("Save & Close");
+	this.btn_delete1 = _f("main").s_button("Remove Question");
+	this.btn_delete2 = _f("main").s_button("Remove Question[1]");
+	this.btn_groupbytag = _f("main").s_checkbox("Group by Tag");
+	this.btn_addquestion_toform = _f("main").s_button("Add question to form");
+	this.btn_gobacktoSetupHome = _f("main").s_label("< Back To Setup Home");
+	this.tag_btn_txt  = _f("main").uitextfield(2);
+	this.tagbutton = _f("main").s_label("Tags");
+	this.txt_searchQuestion=_f("main").s_textinput("searchText[2]");//owner Shruthi Shanthappa
+	this.tab_homeScreen = _link("Home");
+	this.btn_selectQuestionFromList=_f("main").listbasecontentholder("/ListBaseContentHolder/");
+	this.btn_selectAttachmentType=_f("main").uiftetextfield("Attachment");
+	this.txt_attachmentDescription=_textbox("/inputEl/");
+
+	
+	// Addition of fields by Meghana Rao P
+	
+	this.picklist_responseset1_cb = _f("main").s_label("Response-Set-1[1]");
+	this.txt_data_entry = _f("main").uitextfield(2);
+	
+	// Added by Bhupendra Singh
+	this.sel_selectQuestionAnswerType = _f("main").s_dropdownlist("ansType");
+	this.tab_clickSourceObjectUpdateTab = _f("main").tab("Source Object Update");
+	this.txt_clickSourceObjToBeUpdated = _f("main").s_label("/sourceLabel/").near(_f("main").s_label("Select source object(s) to be updated from target(s)"));
+	this.btn_addRowForSourceObj  = _f("main").s_button("Add a row");
+	this.txt_clickToAddFieldForSourceObj = _f("main").s_label("Click to add field");
+	this.txt_responseSetName = _f("main").s_textinput("responseSetName");
+	this.txt_answerValuesFirst = _f("main").s_textinput("ansValue");
+	this.txt_answerValuesSecond = _f("main").s_textinput("ansValue[1]");
+	this.txt_answerValuesThird = _f("main").s_textinput("ansValue[2]");
+	this.btn_addNewAnswer = _f("main").s_button("Add an Answer");
+	this.btn_cloneButtonOnChecklistDesigner = _f("main").s_button("Clone");
+	
+	this.btn_clickChecklistProcess = function($checklistProcessName){
+		_click(_label($checklistProcessName));
+	};
+	
+	// Add rows to SOU configuration
+	this.txt_addFieldToSOU = function($fieldName, $operandType, $operandValue){
+		if($operandType == "Value"){
+			_click($bo_pg_formDesigner.txt_clickToAddFieldForSourceObj);
+			//_setValue(_f("main").s_textinput("searchText[4]"),$fieldName);
+			_setValue(_f("main").s_textinput("/searchText/").near(_f("main").s_button("Add Field")), $fieldName);
+			_click(_f("main").s_label($fieldName));
+			_click(_f("main").s_button("Add Field"));
+			_setSelected(_f("main").s_dropdownlist("operandTypeCombo").near(_f("main").s_label($fieldName)),$operandType);
+			_setValue(_f("main").s_textinput("/textInput/").near(_f("main").s_label($fieldName)), $operandValue);
+		}
+		else if ($operandType == "Question"){
+				_click($bo_pg_formDesigner.txt_clickToAddFieldForSourceObj);
+				//_setValue(_f("main").s_textinput("searchText[4]"),$fieldName);
+				_setValue(_f("main").s_textinput("/searchText/").near(_f("main").s_button("Add Field")), $fieldName);
+				_click(_f("main").s_label($fieldName));
+				_click(_f("main").s_button("Add Field"));
+				_setSelected(_f("main").s_dropdownlist("operandTypeCombo").near(_f("main").s_label($fieldName)),$operandType);
+				_setValue(_f("main").s_textinput("/textInput/").near(_f("main").s_label($fieldName)), $operandValue);
+				_click(_f("main").s_label($operandValue+"[1]"));
+				}
+		else {
+	_click($bo_pg_formDesigner.txt_clickToAddFieldForSourceObj);
+	//_setValue(_f("main").s_textinput("searchText[4]"),$fieldName);
+	_setValue(_f("main").s_textinput("/searchText/").near(_f("main").s_button("Add Field")), $fieldName);
+	_click(_f("main").s_label($fieldName));
+	_click(_f("main").s_button("Add Field"));
+	_setSelected(_f("main").s_dropdownlist("operandTypeCombo").near(_f("main").s_label($fieldName)),$operandType);
+	_setValue(_f("main").s_textinput("/textInput/").near(_f("main").s_label($fieldName)), $operandValue);
+	_click(_f("main").s_label($operandValue));
+		}
+	};
+	
+	this.sel_addFieldToSOUWithPicklist = function($fieldName, $operandType, $operandValue){
+		_click($bo_pg_formDesigner.txt_clickToAddFieldForSourceObj);
+		//_setValue(_f("main").s_textinput("searchText[4]"),$fieldName);
+		_setValue(_f("main").s_textinput("/searchText/").near(_f("main").s_button("Add Field")), $fieldName);
+		_click(_f("main").s_label($fieldName));
+		_click(_f("main").s_button("Add Field"));
+		_setSelected(_f("main").s_dropdownlist("operandTypeCombo").near(_f("main").s_label($fieldName)),$operandType);
+		_setValue(_f("main").s_textinput("/textInput/").near(_f("main").s_label($fieldName)), $operandValue);
+		_click(_f("main").s_label($operandValue));
+	};
+	
+};
+
+//this code to generate a random number with defined length	
+	this.generateRandomNumber=function generateRandomNumber($len)
+		{
+    		var number ="";
+    		for(var i=0;i<len;i++)
+    			{
+       				 number += generateRandomNumber(0,9);
+    			}
+    			return number;
+		};	

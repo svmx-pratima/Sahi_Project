@@ -1,0 +1,55 @@
+var $bo_act_customLabel = new function bo_act_customLabel() {
+	this.createCustomLabelForAppPermission=function ($newTransValue){		
+		_click($bo_pg_salesforcePageSetUp.lnk_appPermissionProcessIDTag);
+		_click($bo_pg_salesforcePageSetUp.btn_newLocalTrans);
+		//_setSelected($bo_pg_salesforcePageSetUp.sel_language);
+		_setSelected($bo_pg_salesforcePageSetUp.sel_language,"English");
+		_setValue($bo_pg_salesforcePageSetUp.txt_newTranslatedValue,$newTransValue);
+		_click($bo_pg_salesforcePageSetUp.btn_save1);		
+	};
+		this.deleteNewTranslatedValue=function($viewName){
+			 _click($bo_pg_salesforcePageSetUp.lnk_salesforceSetUp);
+			_setValue($bo_pg_salesforcePageSetUp.txt_salesforceSetUpSrch,"custom label");
+			_click($bo_pg_salesforcePageSetUp.lnk_customLabels);
+			_wait(2000);
+			_setSelected(_select("fcf"), $viewName);
+			_wait(2000);
+			_click($bo_pg_salesforcePageSetUp.lnk_appPermissionProcessIDTag);
+			_click($bo_pg_salesforcePageSetUp.lnk_deleteNewTranslatedValue);
+			
+		};
+	
+			
+			this.createNewView=function($viewName,$viewID,$labelStartsWith,$filterLanguage){
+				_click($bo_pg_salesforcePageSetUp.lnk_salesforceSetUp);
+				_setValue($bo_pg_salesforcePageSetUp.txt_salesforceSetUpSrch,"custom label");
+				_click($bo_pg_salesforcePageSetUp.lnk_customLabels);
+				_wait(2000);
+				_click(_link("Create New View"));
+				_wait(2000);
+				_setValue(_textbox("fname"),$viewName);
+				_setValue(_textbox("devname"),$viewID);
+				_setSelected(_select("fcol1"), "Value");
+				_setSelected(_select("fop1"),"contains");
+				_setValue(_textbox("fval1"),$labelStartsWith);
+				if(_isVisible(_select("fl"))){
+					_setSelected(_select("fl"), $filterLanguage);
+				}
+				_click(_submit(" Save "));
+				_wait(2000);
+			};
+			this.deleteView=function($viewName){
+				_click($bo_pg_salesforcePageSetUp.lnk_salesforceSetUp);
+				_setValue($bo_pg_salesforcePageSetUp.txt_salesforceSetUpSrch,"custom label");
+				_click($bo_pg_salesforcePageSetUp.lnk_customLabels);
+				_wait(2000);
+				_setSelected(_select("fcf"), $viewName);
+				_wait(2000);
+				_click(_link(0,_rightOf(_select("fcf"))));
+				_click(_button("Delete"));
+				if (_isVisible(_link("Create New View"))){
+				_log("Custom View successfully Deleted");
+					
+				}
+			};
+};

@@ -1,0 +1,313 @@
+
+var $bo_act_WebServices=new function bo_act_WebServices(){
+	this.createSFmForWebServices=function($sfmToBeCloned, $sfmName,$subTypePart,$subTypeActivityType,$subTypeExpenses,$subTypeTravel,$sfmTemplateSaveAsName){
+			_click($bo_pg_sfmTransactionAndDesigner.txt_standardSfmTransactionQuickFind);
+			_setValue($bo_pg_sfmTransactionAndDesigner.txt_standardSfmTransactionQuickFind,$sfmToBeCloned);
+			//_click(_f("main").s_checkbox("chk").leftOf(_f("main").s_label($sfmToBeCloned), 10, 10))
+			//_click(_f("main").s_checkbox("/CheckBox/").leftOf(_f("main").s_label($sfmToBeCloned),10,10));
+		if (_isVisible(_f("main").s_checkbox("/Chk/").leftOf(_f("main").s_label($sfmToBeCloned), 10, 10))) {
+			_wait(3000);
+			_click(_f("main").s_checkbox("/Chk/").leftOf(_f("main").s_label($sfmToBeCloned), 10, 10));
+
+		} else if (_isVisible(_f("main").s_checkbox(2).leftOf(_f("main").s_label($sfmToBeCloned), 10, 10))) {
+			_wait(3000);
+			_click(_f("main").s_checkbox(2).leftOf(_f("main").s_label($sfmToBeCloned), 10, 10));
+
+		} else {
+			_click(_f("main").s_checkbox("/CheckBox/").leftOf(_f("main").s_label($sfmToBeCloned), 10, 10));
+		} 
+			_click($bo_pg_sfmTransactionAndDesigner.btn_clone);	
+			_wait(60000, _isVisible($bo_pg_sfmTransactionAndDesigner.txt_name));
+			_setValue($bo_pg_sfmTransactionAndDesigner.txt_name, $sfmName);
+			_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmTransactionId, "");
+			_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmTransactionId, $sfmName);
+		
+			_click($bo_pg_sfmTransactionAndDesigner.btn_screenDesigner);
+			_wait(6000,_isVisible(_f("main").tab("Screen Designer")));
+			_click($bo_pg_manageWOLineUsageForSorting.btn_screenDesignerNew);
+			_click($bo_pg_manageWOLineUsageForSorting.sel_selHeaderOption);
+			_click($bo_pg_manageWOLineUsageForSorting.txt_searchItem);
+			_setValue($bo_pg_manageWOLineUsageForSorting.txt_searchItem,"Driving Time");
+			_doubleClick($bo_pg_manageWOLineUsageForSorting.lbl_drivingTime);
+			_wait(1000);
+			
+			_click($bo_pg_manageWOLineUsageForSorting.sel_selHeaderOption1);
+			_click($bo_pg_manageWOLineUsageForSorting.txt_searchItem);
+			_setValue($bo_pg_manageWOLineUsageForSorting.txt_searchItem,"Order Type");
+			_doubleClick($bo_pg_manageWOLineUsageForSorting.lbl_orderType);
+			_wait(1000);
+			
+			_click($bo_pg_manageWOLineUsageForSorting.sel_selHeaderOption2);
+			_click($bo_pg_manageWOLineUsageForSorting.txt_searchItem);
+			_setValue($bo_pg_manageWOLineUsageForSorting.txt_searchItem,"Zip");
+			_doubleClick($bo_pg_manageWOLineUsageForSorting.lbl_zip);
+			_wait(1000);
+			
+			_click($bo_pg_manageWOLineUsageForSorting.sel_selHeaderOption3);
+			_click($bo_pg_manageWOLineUsageForSorting.txt_searchItem);
+			_setValue($bo_pg_manageWOLineUsageForSorting.txt_searchItem,"Is Entitlement Performed");
+			_doubleClick($bo_pg_manageWOLineUsageForSorting.lbl_isEntitlementPrform);
+			_wait(1000);
+			_click($bo_pg_manageWOLineUsageForSorting.sel_grpPart);
+			_click($bo_pg_manageWOLineUsageForSorting.txt_searchItem);
+			_setValue($bo_pg_manageWOLineUsageForSorting.txt_searchItem,$subTypePart);
+			_doubleClick($bo_pg_manageWOLineUsageForSorting.lbl_dateReceived);
+			_wait(3000);
+			_click($bo_pg_manageWOLineUsageForSorting.sel_grpExpenses);
+			_click($bo_pg_manageWOLineUsageForSorting.txt_searchItem);
+			_setValue($bo_pg_manageWOLineUsageForSorting.txt_searchItem,$subTypeActivityType);
+//			_doubleClick($bo_pg_manageWOLineUsageForSorting.lbl_activityType);
+			_doubleClick(_f("main").s_label("Activity Type[1]"));
+			_wait(3000);
+			_click($bo_pg_manageWOLineUsageForSorting.sel_grpExpenses);
+			_click($bo_pg_manageWOLineUsageForSorting.txt_searchItem);
+			_setValue($bo_pg_manageWOLineUsageForSorting.txt_searchItem,$subTypeExpenses);
+			_doubleClick($bo_pg_manageWOLineUsageForSorting.lbl_billableQty);
+			_wait(3000);
+			_click($bo_pg_manageWOLineUsageForSorting.sel_grpTravel);
+			_click($bo_pg_manageWOLineUsageForSorting.txt_searchItem);
+			_setValue($bo_pg_manageWOLineUsageForSorting.txt_searchItem,$subTypeTravel);
+			_doubleClick($bo_pg_manageWOLineUsageForSorting.lbl_ConsumedFromLocation);
+			_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmSavePageLayoutAs, $sfmTemplateSaveAsName);
+			_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmSavePageLayoutAsId, $sfmTemplateSaveAsName);
+			_wait(3000);
+			_click($bo_pg_manageWOLineUsageForSorting.lbl_propertiesForPart);
+			_click($bo_pg_manageWOLineUsageForSorting.chk_allowNewLine);
+			_click($bo_pg_manageWOLineUsageForSorting.chk_allowDelete);
+		/*DO NOT DELETE BEOW COMMENTED LINES
+			_click($bo_pg_manageWOLineUsageForSorting.lbl_propertiesForLabor);
+			_click($bo_pg_manageWOLineUsageForSorting.chk_allowNewLine);
+			_click($bo_pg_manageWOLineUsageForSorting.chk_allowDelete);
+		*/
+			_click($bo_pg_manageWOLineUsageForSorting.lbl_propertiesForExpenses);
+			_click($bo_pg_manageWOLineUsageForSorting.chk_allowNewLine);
+			_click($bo_pg_manageWOLineUsageForSorting.chk_allowDelete);
+
+			_click($bo_pg_manageWOLineUsageForSorting.lbl_propertiesForTravel);
+			_click($bo_pg_manageWOLineUsageForSorting.chk_allowNewLine);
+			_click($bo_pg_manageWOLineUsageForSorting.chk_allowDelete);
+			_click($bo_pg_sfmTransactionAndDesigner.btn_pageLayoutSave);
+		
+	}			
+		
+		this.saveAndClose=function(){
+			_click(_f("main").s_button("Save & Close"));
+			_wait(10000);
+		}
+			this.enableOnload=function(){
+				_click($bo_pg_sfmTransactionAndDesigner.txt_sfmSavePageLayoutAsId);
+				_wait(1000);
+				_click(_f("main").s_textinput("textInput[18]"));
+				_setValue(_f("main").s_textinput("textInput[18]"),"");
+				_setValue(_f("main").s_textinput("textInput[18]"), "We");
+				_setSelected(_f("main").s_combobox(10),"Webservice");
+				
+				_wait(1000);
+				_setValue(_f("main").s_textinput("txtip"), "objWebService.onLoad");
+				_wait(1000);
+				_click($bo_pg_sfmTransactionAndDesigner.btn_pageLayoutSave);
+			};
+				this.enableBeforeSave=function(){
+				_click($bo_pg_sfmTransactionAndDesigner.txt_sfmSavePageLayoutAsId);
+				_wait(1000);
+				_click(_f("main").s_textinput("textInput[20]"));
+				_setValue(_f("main").s_textinput("textInput[20]"),"");
+				_setValue(_f("main").s_textinput("textInput[20]"), "We");
+				_setSelected(_f("main").s_combobox(11),"Webservice");
+				
+				_wait(1000);
+				_setValue(_f("main").s_textinput("txtip[1]"), "objWebService.beforeSaveOrUpdate");
+				_wait(1000);
+				_click($bo_pg_sfmTransactionAndDesigner.btn_pageLayoutSave);
+			};
+					this.enableOnChange=function(){
+					_click(_f("main").s_textinput("textInput[9]"));
+					_wait(1000);
+					_click(_f("main").s_textinput("textInput[18]"));
+					_setValue(_f("main").s_textinput("textInput[18]"),"");
+					_setValue(_f("main").s_textinput("textInput[18]"), "We");
+					_setSelected(_f("main").s_combobox(10),"Webservice");
+
+					_wait(1000);
+					_setValue(_f("main").s_textinput("txtip"), "objWebService.onChange");
+					_wait(1000);
+					_click($bo_pg_sfmTransactionAndDesigner.btn_pageLayoutSave);
+			};
+						this.enableOnExit=function(){
+							_click(_f("main").s_textinput("txtIp[1]"));
+							_wait(1000);
+							_click(_f("main").s_textinput("textInput[18]"));
+							_setValue(_f("main").s_textinput("textInput[18]"),"");
+							_setValue(_f("main").s_textinput("textInput[18]"), "We");
+							_setSelected(_f("main").s_combobox(10),"Webservice");
+
+							_wait(1000);
+							_setValue(_f("main").s_textinput("txtip"), "objWebService.onExit");
+							_wait(1000);
+							_click($bo_pg_sfmTransactionAndDesigner.btn_pageLayoutSave);
+						};
+							this.enableOnChangeForChildLabelField=function(){
+								_click(_f("main").s_textinput("textInput[14]"));
+								_wait(1000);
+								_click(_f("main").s_textinput("textInput[18]"));
+								_setValue(_f("main").s_textinput("textInput[18]"),"");
+								_setValue(_f("main").s_textinput("textInput[18]"), "We");
+								_setSelected(_f("main").s_combobox(10),"Webservice");
+
+								_wait(1000);
+								_setValue(_f("main").s_textinput("txtip"), "objWebService.onChange");
+								_wait(1000);
+								_click($bo_pg_sfmTransactionAndDesigner.btn_pageLayoutSave);								
+							};
+								
+							this.enableOnExitForChildLabelField=function(){
+								_click(_f("main").s_textinput("lblData"));
+								_wait(1000);
+								_click(_f("main").s_textinput("textInput[18]"));
+								_setValue(_f("main").s_textinput("textInput[18]"),"");
+								_setValue(_f("main").s_textinput("textInput[18]"), "We");
+								_setSelected(_f("main").s_combobox(10),"Webservice");
+
+								_wait(1000);
+								_setValue(_f("main").s_textinput("txtip"), "objWebService.onExit");
+								_wait(1000);
+								_click($bo_pg_sfmTransactionAndDesigner.btn_pageLayoutSave);								
+							};
+								
+				
+		
+	this.verifyOnloadValues=function($enteredMinOL,$enteredOTOL,$enteredZipOL){
+		var $drMin=_getText(_textbox("Driving Time (in Minutes):"));
+		var $orderTy=_getText(_textbox("Order Type:"));
+		var $zip=_getText(_textbox("Zip:"));
+		//var $isEntitlementPrfOL=_getText(_checkbox("x-form-cb-input"));
+		
+		
+		if ( $enteredMinOL== $drMin){
+				_log("Entered Driving Time  is matching with OnLoad Driving Time");
+		};
+		if($orderTy==$enteredOTOL){
+			_log("Entered OrderType  is matching with OnLoad OrderType");
+		}
+		if($zip==$enteredZipOL){
+			
+		}
+		/*
+			if( $isEntitlementPrf='true'){
+			_log("Is Entitlement Perform is matching with OnLoad Value");
+}*/
+	}
+		
+		this.verifyBeforeSaveUpdate=function($enteredMinBS,$enteredOTBS,$enteredZipBS){
+			var $drMin=_getText(_textbox("Driving Time (in Minutes):"));
+			var $orderTy=_getText(_textbox("Order Type:"));
+			var $zip=_getText(_textbox("Zip:"));
+			//var $isEntitlementPrfOL=_getText(_checkbox("x-form-cb-input"));
+		
+		
+		if ( $enteredMinBS== $drMin){
+				_log("Entered Driving Time  is matching with BeforeSaveUpdate Driving Time");
+		};
+		if($orderTy==$enteredOTBS){
+			_log("Entered OrderType  is matching with BeforeSaveUpdate OrderType");
+		}
+		if($zip==$enteredZipBS){
+			_log("Entered Zip is matching with BeforeSaveUpdate Zip");
+		}
+			/*
+			if( $isEntitlementPrf='false'){
+			_log("Is Entitlement Perform is matching with BeforeSaveUpdate Value");
+}*/
+	}
+				
+				this.verifyOnChange=function($enteredMinOC,$enteredOTOC,$enteredZipOC,$onChangeValue){
+					_setValue(_textbox("Order Type:"),"");
+					_setValue(_textbox("Order Type:"),"Fi");
+					_click(_listItem($onChangeValue));
+					_click(_span("Work Order"));
+					var $drMin=_getText(_textbox("Driving Time (in Minutes):"));
+					var $orderTy=_getText(_textbox("Order Type:"));
+					var $zip=_getText(_textbox("Zip:"));
+					//var $isEntitlementPrfOL=_getText(_checkbox("x-form-cb-input"));
+
+					if ( $enteredMinOC== $drMin){
+							_log("Entered Driving Time  is matching with On Change Driving Time");
+					};
+					if($orderTy==$enteredOTOC){
+						_log("Entered OrderType  is matching with On Change OrderType");
+					}
+					if($zip==$enteredZipOC){
+						_log("Entered Zip is matching with On Change Zip");
+					}
+					
+				}
+					this.verifyOnExit=function($enteredMinOE,$enteredOTOE,$enteredZipOE){
+					_click(_textbox("Zip:"));
+					_wait(1000);
+					_click(_div("Driving Time (in Minutes):"));
+					_click(_span("Work Order"));
+					var $drMin=_getText(_textbox("Driving Time (in Minutes):"));
+					var $orderTy=_getText(_textbox("Order Type:"));
+					var $zip=_getText(_textbox("Zip:"));
+
+					if ( $enteredMinOE== $drMin){
+							_log("Entered Driving Time  is matching with On Exit Driving Time");
+					};
+					if($orderTy==$enteredOTOE){
+						_log("Entered OrderType  is matching with On Exit OrderType");
+					}
+					if($zip==$enteredZipOE){
+						_log("Entered Zip is matching with On Exit Zip");
+					}
+					
+				}
+					this.verifyOnChangeForChildField=function($enteredMinOC,$enteredOTOC,$enteredZipOC){
+					_click(_span("Expense"));
+					_click(_span("svmx-btn-icon svmx-sfmd-add-line-icon[1]"));
+					_click(_textbox("sfm-picklistcelleditor-1076-inputEl"));
+					_setValue(_textbox("sfm-picklistcelleditor-1076-inputEl"), "Re");
+					_click(_listItem("Repair"));
+					_wait(10000);
+					var $drMin=_getText(_textbox("Driving Time (in Minutes):"));
+					var $orderTy=_getText(_textbox("Order Type:"));
+					var $zip=_getText(_textbox("Zip:"));
+
+					if ( $enteredMinOC== $drMin){
+							_log("Entered Driving Time  is matching with On Change Driving Time  after child field is updated");
+					};
+					if($orderTy==$enteredOTOC){
+						_log("Entered OrderType  is matching with On Change OrderType  after child field is updated");
+					}
+					if($zip==$enteredZipOC){
+						_log("Entered Zip is matching with On Change Zip after child field is updated");
+					}
+					
+				}
+					this.verifyOnExitForChildField=function($enteredMinOC,$enteredOTOC,$enteredZipOC){
+					_click(_span("Expense"));
+					_click(_span("svmx-btn-icon svmx-sfmd-add-line-icon[1]"));
+					_click(_div("svmx-grid-cell-inner [2]"));
+					_wait(5000);
+					_click(_span("Travel"));
+					_wait(10000);
+					var $drMin=_getText(_textbox("Driving Time (in Minutes):"));
+					var $orderTy=_getText(_textbox("Order Type:"));
+					var $zip=_getText(_textbox("Zip:"));
+
+					if ( $enteredMinOC== $drMin){
+							_log("Entered Driving Time  is matching with On Change Driving Time  after child field is updated");
+					};
+					if($orderTy==$enteredOTOC){
+						_log("Entered OrderType  is matching with On Change OrderType  after child field is updated");
+					}
+					if($zip==$enteredZipOC){
+						_log("Entered Zip is matching with On Change Zip after child field is updated");
+					}
+					
+					
+				}
+					
+			
+			
+		}
+	

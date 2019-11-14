@@ -1,0 +1,86 @@
+/**
+ * Author	: Pratima
+ * Reviewer	: 
+ * Pre-req	: Nothing
+ * Testcase	: SFA_trnList: Launch Automation List View - Using URL
+ * Steps	: Launch Automation List View - Using URL
+ * Expt Res	: Automation List View should launch successfully�by verifying:
+				a) Check - 'Automation' is displayed on table Header
+				b) 'Back To Setup Home' is displayed
+				c) 'Help' option is displayed
+				d) Verify all 6 columns are displayed i.e. Transaction Name, Event Service,Action Service,Enabled,Group Profile,Last Edited.
+				e) Check if 'New Automation' button appears.
+ 				f) Automation Name list view should be launched successfully. 
+ 				g) Clicking on Automation Name column should be sorted ascending A -> Z
+ 				h) Again Clicking on same column should be sorted descending Z -> A
+*/
+
+var $SFA_trnList=_testcase("$SFA_trnList","Launch Automation List View - Using URL");
+$SFA_trnList.start();
+//_setSpeed($g_stepSpeed);
+	
+	/**
+	 * Global Variable declaration
+	 */
+
+//
+	var $url="https://svmxdev-dev-ed.lightning.force.com";
+	var $un="pratima.svmxdev@servicemax.com";
+	var $pwd="Testing123";
+	var $viewName="automations";
+	
+//	/**
+//	 * Login to the Sandbox Org and launching Automation list view
+//	 */
+	
+	$bo_act_login.login($url, $un, $pwd);
+
+	
+	
+	_click(_link("ServiceMax Setup"));
+	_click(_div("Mobile"));
+	_click(_div("Service Flow Automation"));
+	_wait(1000);
+
+	//Assertions on Aut list view
+		_windowAction("resize",500,300); // resize the window with the given width and height.
+			_assertExists($sfa_pg_SFAListView.btn_NewTrn);
+
+		_assertExists($sfa_pg_SFAListView.btn_heading_autName);
+		_assertExists($sfa_pg_SFAListView.btn_heading_EventService);
+		_assertExists($sfa_pg_SFAListView.btn_heading_ActionService);
+		_assertExists($sfa_pg_SFAListView.btn_heading_enabled);
+		_assertExists($sfa_pg_SFAListView.btn_heading_groupProfile);
+		_assertExists($sfa_pg_SFAListView.btn_heading_lastEditedCol);
+
+
+		
+		/**
+		 * Target Object Column sorting
+		 */
+		$colName="Automation Name";
+		$order="ascending";
+		//Ascending Order
+		_click($sfa_pg_SFAListView.btn_heading_autName);
+		_wait(5000,_isVisible($sfa_pg_SFAListView.btn_actionMenu));
+		var $sortStatus=$sfa_pg_SFAListView.colSort($colName, $order);
+		_assertTrue($sortStatus, "Links on "+$colName+" column are sorted in order");
+		
+		//descending
+		$order="descending";
+		_click($sfa_pg_SFAListView.btn_heading_autName);
+		_wait(5000,_isVisible($sfa_pg_SFAListView.btn_actionMenu));
+		var $sortStatus=$sfa_pg_SFAListView.colSort($colName, $order);
+		_assertTrue($sortStatus, "Links on "+$colName+" column are sorted in order");
+	
+		
+		//$sfmrdz_act_common.launchHomeWindow($homecurrentHomePageULR);
+	//	_wait(10000,_isVisible($bo_pg_home.link_home));
+	//	$sfm_act_lightningConfig.logoutInLightning();
+		
+		//_wait(10000,_isVisible($bo_pg_home.link_home));
+	//	$sfmrdz_act_lightningConfig.logoutInLightning();
+
+		
+	
+$SFA_trnList.end();

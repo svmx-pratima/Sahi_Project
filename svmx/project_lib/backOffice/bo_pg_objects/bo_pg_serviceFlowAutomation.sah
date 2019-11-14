@@ -1,0 +1,33 @@
+
+var $bo_pg_serviceFlowAutomation = new function bo_pg_serviceFlowAutomation(){
+	
+	/**
+	 * Common Objects for Case and Work Order
+	 */
+	
+	this.btn_newAutomation = _button("New Automation");
+	this.txt_automationName = _textbox("strSFAProcessName");
+	this.txt_automationDescription = _textarea("strDescription");
+	this.btn_enableAutomation = _span("slds-checkbox--faux");
+	this.btn_nextTabOnAutomation = _button("Next");
+	this.rdbtn_selectSalesforceEventForAutomation = _span("slds-radio--faux");
+	this.txt_notificationTitle = _textbox("Title");
+	this.txt_pushNotificationText = _textarea("objSFDCActionJson__Message_Body");
+	this.lnk_insertFields = _link("Insert Fields");
+	this.txt_woFieldsOptionSerch = _textbox("WorkOrderFieldsOptionSearch");
+	this.btn_finishOnAutomation = _button("Finish");
+	this.txt_deleteSFAProcess = _span("Delete");
+	this.txt_editSFAProcess = _span("Edit");
+	this.btn_proceesToDeleteSFAProcess = _span("Proceed");
+	
+	this.rdbtn_selectGeolocationEventForAutomation = _span("slds-radio--faux[1]");
+	this.txt_localNotificationText = _textarea("objGeofenceActionJson__Message_Body");
+	
+	/**
+	 * Selects Entitlement Settings radio button
+	 */
+	this.sel_SFAProcess = function($sfaProcessName){
+		_click(_button(0,_near(_link($sfaProcessName))));
+	};
+	
+};

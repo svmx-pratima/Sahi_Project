@@ -1,0 +1,150 @@
+
+
+/**
+ * Servicemax setup page object repository
+ */
+
+var $bo_pg_servicemaxSetup = new function bo_pg_servicemaxSetup(){
+	this.btn_serviceFlowManager = _div("Service Flow Manager");
+	this.btn_sfmTransactionAndDocsDesigner= _div("SFM Transaction & Docs Designer");
+	this.btn_warrantiesAndServiceContracts = _div("Warranties & Service Contracts");
+	this.btn_mobile = _div("Mobile");
+	this.btn_slaTerms = _div("SLA terms");
+	this.btn_servicePlans = _div("Service Plans");
+	this.btn_sfmSearch = _div("SFM Search");
+	this.btn_services = _div("Services");
+	this.btn_newAvailableService = 	_button("New Available Service");
+	this.btn_backToSetupHome = _span("Back To Setup Home");
+	this.btn_sfmMappings = _div("SFM Mappings");
+	
+	this.btn_appAdministration = _div("App Administration");
+	this.btn_configurationProfiles = _div("Configuration Profiles");
+
+	this.btn_installedBaseAndPM = _div("Installed Base & PM");
+	this.btn_PMPlanTemplate = _div("PM Plan Templates");
+	this.btn_sfmWizard= _div("SFM Wizards");
+	this.btn_sfmAppPermission = _div("SFM App Permissions");
+	this.btn_sfmCustomAction=_div("SFM Custom Actions");
+	this.btn_PMProcess = _div("PM Process");
+	this.btn_TaskTemplate = _div("Task Templates");
+	this.btn_configProfiles = _div("Configuration Profiles");
+	this.label_orgWide = _heading2("Org-wide Configuration Settings");
+	
+	this.btn_FeaturePermission = _div("Feature Permission");
+	this.btn_serviceFlowAutomation = _div("Service Flow Automation");
+	
+	//Object for Auto Entitlement Rules - Work Order
+	this.btn_autoEntitlementRulesWO = _div("Auto Entitlement Rules - Work Order");
+	
+	//Object for Auto Entitlement Rules - Case
+	this.btn_autoEntitlementRulesCase = _div("Auto Entitlement Rules - Case");
+	
+	//Object for Activity Master
+	this.btn_activityMaster = _div("Activity Master"); 
+	
+	//Object for Checklist Import Master
+	this.btn_ChecklistImport = _div("Checklist Import"); 
+	
+	//Object for Service Pricebooks
+	this.btn_servicePricebooks = _div("Service Pricebooks");
+	this.btn_instalBaseAndPM=_div("Installed Base & PM");
+	this.btn_counterRule=_div("Counter Rules");
+	this.btn_scheduledSFM=_div("Scheduled SFM");
+	this.btn_checklistQuestionLibrary= _div("Checklist Question Library");
+	this.txt_checklistQuestionLibrary=_span("Checklist Question Library");
+    //Object for Reverse Logistics
+	this.btn_reverseLogistics = _div("Reverse Logistics");
+	this.btn_depotAndStockingLocations = _div("Depot & Stocking Locations");
+	this.btn_returnsProcess = _div("Returns Process");
+	this.btn_deliveryRules = _div("Delivery Rules");
+	this.btn_shippingProcess = _div("Shipping Process");
+	this.btn_productSubstitutionMatrix = _div("Product Substitution Matrix");
+	this.btn_routesAndStops = _div("Routes & Stops");
+	this.btn_receivingProcess = _div("Receiving Process");
+	this.btn_repairShipmentPreparation = _div("Repair Shipment Preparation");
+	this.btn_sourcingRules = _div("Sourcing Rules");
+	this.btn_receivingProcess = _div("Receiving Process");
+	
+	//Owner Narendra babu
+	this.btn_mobileAndOffline = _div("Mobile & Offline");
+	this.btn_mobileconfiguration = _div("Mobile Configuration");
+	this.btn_mobile_permissions = _div("SFM Mobile Permissions");
+	this.listselectprofile = _select(0);
+	
+	this.btn_checklistManager = _div("Checklist Manager");
+	this.btn_checklistDesigner = _div("Checklist Designer");
+	this.btn_checklistQuestionLibrary = _div("Checklist Question Library");
+	this.btn_checklistImport = _div("Checklist Import");
+	this.chk_checkChecklistDesigner = _span("Checklist Designer");
+	this.chk_checkSFMDesigner = _span("SFM Designer");	
+	this.btn_serviceOrganization = _div("Service Organization");
+	this.btn_timesheet = _div("Timesheet");
+	this.chk_checkSFMDesigner = _span("SFM Designer");		
+	
+	
+		this.btn_downloadcriteria_checkbox1 = _checkbox(0);
+		this.btn_downloadcriteria_edit = _button("Edit");
+		this.btn_downloadceiteriatab = _cell("Download Criteria");
+		this.list_downloadcriteria = _under(_tableHeader("Download Criteria"));
+		this.list_OwnershipType = _under(_tableHeader("Ownership Type"));
+		this.objectselection = _under(_tableHeader("Object Name"));
+		this.list_advanceddownloadcriteria = _under(_tableHeader("Advanced Download Criteria"));
+		
+		//this.picklist1DCobject = _select(9);
+		//this.picklist2DCobject = _select(11);
+		//this.picklist3DCobject = _select(13);
+		//this.picklist4DCobject = _select(15);
+		this.btn_AddObjectDC = _button("Add[1]");
+		this.btn_SavebuttonDcObject = _button("Save");
+		this.picklist22DCobject = _select(20);
+		this.btn_downloadcriteria_backtosetup = _button("Back To Setup Home");
+		this.btn_downloadcriteriadelete_checkbox = _under(_div("Select[1]"));
+		this.btn_Offline_Profile = _div("Offline Profiles");
+		this.btn_SFM_Mobile_Permissions = _div("SFM Mobile Permissions");
+		this.btn_iPad_Settings = _div("iPad Settings");
+		this.btn_Notifications = _div("Notifications");
+		
+		
+		
+		// Navigation buttons
+		this.btn_app_administration = _div("App Administration");
+		this.btn_modules = _div("Modules");
+        this.btn_submodules =_div("Submodules");
+        this.btn_Settings =_div("Settings");
+        this.btn_TriggerControl =_div("Trigger Controls");
+        this.btn_DisplayTags =_div("Display Tags");
+        this.btn_ConfigurationProfiles =_div("Configuration Profiles");
+        this.btn_Translations =_div("Translations");
+        //this.btn_FeaturePermission =_div("FeaturePermission");
+        
+        this.btn_Service_Organization = _div("Service Organization");
+        this.btn_Territories = _div("Territories");
+        this.btn_ServiceOrg = _div("Service Org");
+        this.btn_Skills = _div("Skills");
+        this.btn_OvernightPolicySetup = _div("Overnight Policy Set up");
+        
+        this.btn_Installed_Base_PM = _div("Installed Base & PM");
+        this.btn_Counter_Rule = _div("Counter Rules");
+        this.btn_Task_Template = _div("Task Templates");
+        this.btn_PM_Plan_Templatese = _div("PM Plan Templates");
+        this.btn_PM_Process = _div("PM Process");
+        
+        this.btn_Warranties_Service_Contracts = _div("Warranties & Service Contracts");
+        this.btn_SLA_terms = _div("SLA terms");
+        this.btn_Auto_Entitlement_Rules_Work_Order = _div("Auto Entitlement Rules - Work Order");
+        this.btn_Activity_Master = _div("Activity Master");
+        this.btn_Service_Plans = _div("Service Plans");
+        this.btn_Warranty_Terms = _div("Warranty Terms");
+        
+        this.btn_Connected_Field_Service = _div("Connected Field Service");
+        this.btn_Installed_Base_App_Setup = _div("Installed Base App Setup");
+        this.btn_IoT_Setup = _div("IoT Setup");
+       
+        this.btn_Dispatch_Management = _div("Dispatch Management");
+        this.btn_Skill_Match_Rule =  _div("Skill Match Rules");
+        this.btn_Event_Subject_Rules = _div("Event Subject Rules");
+
+};
+
+
+

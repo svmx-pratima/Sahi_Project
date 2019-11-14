@@ -1,0 +1,77 @@
+var $an_act_tech_util = new function an_act_tech_util() {
+	
+	this.basic_util_calc = function($Calculationmethodname) {
+		
+		_click($an_pg_techutilization.link_home);
+		_click($an_pg_techutilization.link_servicemaxSetup);
+		_click($an_pg_techutilization.btn_serviceperformancemetrics);
+		_click($an_pg_techutilization.btn_serviceperformancemetricsetup);
+		_click($an_pg_techutilization.btn_technician_utilization);
+		_click($an_pg_techutilization.btn_add);
+		_click($an_pg_techutilization.btn_active);
+		_setValue($an_pg_techutilization.txt_description, $Calculationmethodname);
+		_click($an_pg_techutilization.btn_settings);
+		_click($an_pg_techutilization.list_productivetime_choose);
+		_click($an_pg_techutilization.btn_training);
+		_click($an_pg_techutilization.list_leave_types);
+		_click($an_pg_techutilization.btn_Sick_leave);
+		_click($an_pg_techutilization.list_breaktime);
+		_click($an_pg_techutilization.btn_criteria);
+		_click($an_pg_techutilization.list_qualification_metric_criteria);
+		_click($an_pg_techutilization.btn_save);
+		_click($an_pg_techutilization.btn_OK);
+		
+	};
+	
+  this.custom_util_calc = function($Calculationmethodname) {
+		
+		_click($an_pg_techutilization.link_home);
+		_click($an_pg_techutilization.link_servicemaxSetup);
+		_click($an_pg_techutilization.btn_serviceperformancemetrics);
+		_click($an_pg_techutilization.btn_serviceperformancemetricsetup);
+		_click($an_pg_techutilization.btn_technician_utilization);
+		_click($an_pg_techutilization.btn_add);
+		_click($an_pg_techutilization.btn_active);
+		_setValue($an_pg_techutilization.txt_description, $Calculationmethodname);
+		_click($an_pg_techutilization.btn_settings);
+		_click($an_pg_techutilization.list_productivetime_choose);
+		_click($an_pg_techutilization.btn_training);
+		_click($an_pg_techutilization.list_leave_types);
+		_click($an_pg_techutilization.btn_Sick_leave);
+		_click($an_pg_techutilization.list_breaktime);
+		_click($an_pg_techutilization.btn_criteria);
+		_click($an_pg_techutilization.list_qualification_metric_criteria);
+		_click($an_pg_techutilization.btn_custom_time_sheet);
+		_click($an_pg_techutilization.btn_save);
+		_click($an_pg_techutilization.btn_OK);
+		
+		
+		
+	};
+	
+	
+	this.tu_schedule_notifications = function($emailOnSuccess){
+	
+		_click($an_pg_techutilization.link_home);
+		_click($an_pg_techutilization.link_servicemaxSetup);
+		_click($an_pg_techutilization.btn_serviceperformancemetrics);
+		_click($an_pg_techutilization.btn_serviceperformancemetricsetup);
+		_click($an_pg_techutilization.btn_technician_utilization);
+		_click($an_pg_techutilization.btn_schedule_notifications);
+		_click($an_pg_techutilization.list_timezone);
+		_click($an_pg_techutilization.btn_ist_timezone);
+		_click($an_pg_techutilization.list_period);
+		_click($an_pg_techutilization.btn_choose_daily);
+		_click($an_pg_techutilization.list_choose_time);
+		_click($an_pg_techutilization.btn_time_chosen);
+		_setValue($an_pg_techutilization.txt_emailOnsuccess ,$emailOnSuccess);
+		_click($an_pg_techutilization.btn_save);
+		_click($an_pg_techutilization.btn_OK);
+		_click($an_pg_techutilization.btn_run_now);
+		_wait(1000);
+		_click($an_pg_techutilization.btn_OK);
+		
+		
+		
+	};
+};

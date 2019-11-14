@@ -1,0 +1,53 @@
+var $bo_act_counterRule=new function bo_act_counterRule(){
+
+this.createNewCunterRule=function($counterRuleName,$value){
+		_click($bo_pg_counterRule.btn_newRule);
+		_setValue($bo_pg_counterRule.txt_counterRuleName, $counterRuleName);
+		_setSelected($bo_pg_counterRule.sel_prodCode, "Product Code");
+		_setSelected($bo_pg_counterRule.sel_operator, "Contains");
+		_setValue($bo_pg_counterRule.sel_value, $value);
+		_setValue($bo_pg_counterRule.txt_counterName, "miles");
+		_setSelected($bo_pg_counterRule.sel_type, "Increasing");
+		_setValue($bo_pg_counterRule.txt_growsOrReducedBy, "10");
+		_setValue($bo_pg_counterRule.txt_minValue, "10");
+		_setValue($bo_pg_counterRule.txt_maxValue, "100");
+		_check($bo_pg_counterRule.chk_activefield);
+		_click($bo_pg_counterRule.btn_save);
+		_click(_button("Back To Setup Home"));
+		_wait(5000);
+	};
+	
+	this.createCunterRule = function($prodField,$operator,$value,$counterName,$type,$growsOrReducedBy,$min,$max){
+		$bo_act_navigation.navigateToCounterRule();
+		var $counterRuleName = $bo_act_common.generateRandomName("CRule_");
+		_click($bo_pg_counterRule.btn_newRule);
+		_setValue($bo_pg_counterRule.txt_counterRuleName, $counterRuleName);
+		_setValue($bo_pg_counterRule.txt_rule_Description, $counterRuleName);
+		_setSelected($bo_pg_counterRule.sel_productField_row1, $prodField);
+		_setSelected($bo_pg_counterRule.sel_prodFieldOperator_row1, $operator);
+		_setValue($bo_pg_counterRule.txt_prodFieldValue_row1, $value);
+		_setValue($bo_pg_counterRule.txt_counterName, $counterName);
+		_setSelected($bo_pg_counterRule.sel_type, $type);
+		_setValue($bo_pg_counterRule.txt_growsOrReducedBy, $growsOrReducedBy);
+		_setValue($bo_pg_counterRule.txt_minValue, $min);
+		_setValue($bo_pg_counterRule.txt_maxValue, $max);
+		_check($bo_pg_counterRule.chk_activefield);
+		_click($bo_pg_counterRule.btn_save);
+		_wait(3000);
+		/*_click(_button("Back To Setup Home"));
+		_wait(5000);*/
+		return $counterRuleName;
+	};
+	this.deleteCunterRule = function($counterRuleName){
+		$bo_act_navigation.navigateToCounterRule();
+		_click(_checkbox(0,_leftOf(_span($counterRuleName,_near(_div("Counter Rule Name"))))));
+		_click($bo_pg_counterRule.btn_deleteRule);
+	};
+	this.changingCounterRule_SequenceTop = function($counterRuleName) {
+		_click($bo_pg_counterRule.btn_counterRuleSequence);
+		_wait(30000, _isVisible(_cell("Sequence of Counter Rules")));
+		$bo_pg_counterRule.selectCounterRule_SequenceTop($counterRuleName);
+		_wait(30000, _isVisible(_cell("/In this screen, you can create one or more advanced formulas to define the Counters applicable to various products./")));
+	};
+	
+	};

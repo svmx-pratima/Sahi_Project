@@ -1,0 +1,71 @@
+var $ChecklistVerification = _testcase("Checklist",
+		"Creating a checklist process in designer and verifying it in delivery");
+$ChecklistVerification.start();
+_setSpeed($g_stepSpeed);
+
+//Pre - Condition 
+$bo_act_login.login($swatUrl, $swatUsn, $swatPwd);
+
+// NEW ADDITION UP
+$number1 =(Math.random() * 10);
+$bo_act_navigation.navigateToSvmxSetup();
+$tag = "SWAT";
+var $wizardObject = "Work Order";
+var $wizardIDName = $bo_act_common.generateRandomName("Swat Checklist");
+var $wizardIDName1 = $bo_act_common.generateRandomName("Swat Checklist");
+var $wizardStepType = "Checklist";
+$stepIDTitle = $bo_act_common.generateRandomName("Swat Checklist Step");
+$selectTemplateAtRunTime = true; 
+$sfmName1 = "to generate a Checklist/Survey type of Process";
+$objectName = "Work Order";
+var checklist_lnk = _link("Checklists");
+var $checklistName = "Swat Checklist"+$number1;
+var $attachmentName = $bo_act_common.generateRandomName("Attachment"); ///new
+
+//To create Checklist Process 1
+$bo_act_navigation.navigateToSfmTransactionDesigner();
+_wait(60000, _isVisible($bo_pg_sfmTransactionAndDesigner.btn_newSFM));
+_wait(1000);
+$bo_act_checklistdesigner.newChecklistTypeSFM($checklistName, $sfmName1 ,$objectName);
+_click($bo_pg_formDesigner.tab_clickFormDesigner); //comment it later
+_click($bo_pg_formDesigner.btn_addNewQuestion);
+_select($bo_pg_formDesigner.btn_selectQuestionFromList);
+_click($bo_pg_formDesigner.btn_selectAttachmentType);
+_setValue($bo_pg_formDesigner.lbl_questionText,$attachmentName);
+_click($bo_pg_formDesigner.btn_addQuestionToLibraryAndForm);
+_click($bo_pg_formDesigner.btn_closeQuestionPopUp);	
+_click($bo_pg_formDesigner.btn_quickSave);
+_click($bo_pg_formDesigner.btn_save_close);
+
+_click($bo_pg_formDesigner.tab_homeScreen);
+$bo_act_navigation.navigateToSfmWizard();
+$bo_act_SFW.createWizardGeneralInfo($wizardObject, $wizardIDName, $wizardIDName1);
+$bo_act_SFW.createChecklistWizardStep($wizardStepType, $stepIDTitle);
+$bo_act_SFW.quickSaveSFWizard();
+$bo_act_SFW.saveAndClose();
+$bo_pg_formDesigner.tab_homeScreen;
+_wait(1000);
+
+$workOrderNo = $swat_act_workOrders.createWorkOrder("", "", "", "", "Open", "High", "Field Service");
+
+_selectDomain($g_domain);
+_wait(10000,_isVisible(_cell($wizardIDName)));
+_click(_button($stepIDTitle, _in(_cell($wizardIDName))));
+_selectDomain();
+$swat_act_pageLoadWait.waitTillPageLoads(checklist_lnk);
+_click(_label($checklistName));
+_setFile2(_file("/fileInputEl/"), "C:\\auto\\sahi_pro\\userdata\\P1.png", "", true, true);
+_setValue($bo_pg_formDesigner.txt_attachmentDescription,"Attachment");
+_click($sfm_pg_checklistQuestionLibrary.btn_submitChecklist);
+if(_isVisible(_label("/Completed/"),_rightOf(_label($checklistName))))
+	_log("The checklist is completed");
+else
+	_log("The checklist is not completed");
+
+
+$bo_act_SFW.deleteSFMWizard($wizardObject, $wizardIDName);
+$bo_act_SFM.deleteSFM($checklistName);
+$swat_act_workOrders.deleteWorkOrder($workOrderNo);
+
+
+$ChecklistVerification.end();

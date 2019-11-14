@@ -1,0 +1,30 @@
+
+
+/**
+ * Home page object repository
+ */
+
+var $bo_pg_locations = new function bo_pg_locations(){
+	this.btn_new = _button(" New ");
+	this.btn_edit = _button(" Edit ");
+	this.sel_recordType = _select(0,_rightOf(_label("/Record Type of new record/")));
+	this.btn_continue = _submit("Continue");
+	this.txt_locationName = _textbox("Name");
+	this.txt_street = _textarea(0,_rightOf(_label("/Street/")));
+	this.sel_country = _select(0,_rightOf(_label("/Country/")));
+	this.txt_externalRecordID = _textbox("External Record ID");
+	this.txt_externalAccountID = _textbox("Account (External)");
+	this.txt_city = _textbox("City");
+	this.txt_zip = _textbox(0,_rightOf(_label("/Zip/")));
+	this.txt_accountName = _textbox("/\\*Account|^Account/");
+	this.btn_save = _submit(" Save ");
+	this.chk_stockingLocation = _checkbox("Stocking Location");
+	this.btn_delete = _button("Delete");
+	this.btn_NewInstalledProduct = _button("New Installed Product");
+	
+};
+
+
+
+
+

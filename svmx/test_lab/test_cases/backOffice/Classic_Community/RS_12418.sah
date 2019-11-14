@@ -1,0 +1,51 @@
+
+//author - NoorSalmaSharieff
+
+var $RS_12418 = _testcase("$RS_12418","Verify the impact of setting SET003 (Hide SFM Wizard Display) on Classic Community.");
+$RS_12418.start();
+_setSpeed($g_stepSpeed);
+
+$bo_act_login.login($g_url, $bac_light_un, $bac_light_pwd);
+
+//Set the Setting to Blank and Verify SFM Wizards must be displayed in Lightning Mode.
+$bo_act_configurationProfiles.editGroupProfileForTextSettings("AutoBACGroup", "Service Flow Wizard", "Service Flow Wizard Delivery", "SET003", " ");
+var $accName = $bo_act_accounts.createAccount();
+//LogintoCommunity
+$bo_act_login.classic_community_login($classic_community_url, $classic_community_un,$classic_community_pwd);
+$bo_act_salesforcePages.ClassicCommunitySearch($accName);
+_assertExists(_button("/svmxbtn/"));
+
+
+//Set the Setting to Lightning and Verify SFM Wizards must be displayed in Lightning Mode.
+//Provide Community Profile
+$bo_act_login.login($g_url, $bac_light_un, $bac_light_pwd);
+$bo_act_configurationProfiles.editGroupProfileForTextSettings("AutoBACGroup", "Service Flow Wizard", "Service Flow Wizard Delivery", "SET003", "Lightning");
+
+$bo_act_login.classic_community_login($classic_community_url, $classic_community_un,$classic_community_pwd);
+$bo_act_salesforcePages.ClassicCommunitySearch($accName);
+_assertExists(_button("/svmxbtn/"));
+
+
+
+//Set the Setting to Salesforce1 and Verify SFM Wizards must be displayed in Lightning Mode.
+$bo_act_login.login($g_url, $bac_light_un, $bac_light_pwd);
+$bo_act_configurationProfiles.editGroupProfileForTextSettings("AutoBACGroup", "Service Flow Wizard", "Service Flow Wizard Delivery", "SET003", "Salesforce1");
+
+$bo_act_login.classic_community_login($classic_community_url, $classic_community_un,$classic_community_pwd);
+$bo_act_salesforcePages.ClassicCommunitySearch($accName);
+_assertExists(_button("/svmxbtn/"));
+
+//Set the Setting to LIGHTNING,Salesforce1 and Verify SFM Wizards must not be displayed in Lightning Mode.
+$bo_act_login.login($g_url, $bac_light_un, $bac_light_pwd);
+$bo_act_configurationProfiles.editGroupProfileForTextSettings("AutoBACGroup", "Service Flow Wizard", "Service Flow Wizard Delivery", "SET003", "Lightning,Salesforce1");
+
+$bo_act_login.classic_community_login($classic_community_url, $classic_community_un,$classic_community_pwd);
+$bo_act_salesforcePages.ClassicCommunitySearch($accName);
+_assertExists(_button("/svmxbtn/"));
+
+
+$RS_12418.end();
+
+
+
+

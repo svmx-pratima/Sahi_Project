@@ -1,0 +1,44 @@
+var $set012_attachrate = _testcase("SET012_AttachRate","To change the setting of AttachRate to TRUE");
+$set012_attachrate.start();
+var $data = _readExcelFile("../../analytics/an_excleData/an_Datasheet1.xlsx","Sheet1",true);
+var $un = $data[1]["Username"];
+var $pwd = $data[1]["pwd"];
+var $url = "https://test.salesforce.com";
+$bo_act_login.login($url, $un, $pwd);
+
+// To collect the setting value of SET011
+
+var $SET012_AttachRate = "Select Id from SVMXC__ServiceMax_Processes__c where SVMXC__Settings_Name__c = 'Global Setting for Attach rate -Trending' Limit 1";
+
+var  $set012_query_fetch = $op_act_sForceApiCall.sForceQuery($un, $pwd, $SET012_AttachRate,"query");
+
+var $set011_processID;
+_wait(10000);
+	
+$set012_processID = $set012_query_fetch[0].Id ;
+
+
+// to get the configuration value
+
+var $SET012_ConfigID_fetch = "Select Id from SVMXC__ServiceMax_Config_Data__c where SVMXC__Setting_ID__c = '"+$set012_processID+"' AND 	SVMXC__Config_Profile_Name__c = 'Cloned_Default' Limit 1";
+
+var  $SET012_ConfigID = $op_act_sForceApiCall.sForceQuery($un, $pwd, $SET012_ConfigID_fetch,"query");
+
+var $set012_ID;
+
+	
+$set012_ID = $SET012_ConfigID[0].Id ;
+_wait(10000);
+
+
+//To change the setting value to TRUE
+
+var $set012_changevalue = "SVMXC__ServiceMax_Config_Data__c AttachRate_SET = new SVMXC__ServiceMax_Config_Data__c(Id = '"+$set012_ID+"',SVMXC__Display_Value__c = 'True' );update AttachRate_SET;";
+var $result  = $op_act_sForceApiCall.sForceQuery($un, $pwd, $set012_changevalue , "create");
+_wait(5000);
+$set012_attachrate.end();
+
+
+
+
+

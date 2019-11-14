@@ -1,0 +1,16 @@
+
+
+/**
+ * Search page object repository
+ */
+
+var $bo_pg_search = new function bo_pg_search(){
+	this.btn_search = _button("phSearchButton");
+	this.txt_searchText = _textbox("secondSearchText");
+	this.btn_searchAgain = _submit("Search Again");
+	this.btn_delete = _button("Delete");
+	
+};
+
+
+

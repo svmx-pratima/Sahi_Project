@@ -1,0 +1,165 @@
+var $RS_3828 = _testcase("RS_3828", "Verify launching of DC from Work Order SFDC page");
+$RS_3828.start();
+/*
+$url = "https://test.salesforce.com";
+$un = "vansys@pqtpart1.com";
+$pwd = "servicemax2";
+_setSpeed($g_stepSpeed);
+
+$bo_act_login.login($url, $un, $pwd);
+var $loginStatus = $dc_sfApiDataCreation.login($un,$pwd);
+_log($loginStatus);
+_log("Returned Login Status" + $loginStatus);
+_log("Returned Login Status.session Id" + $loginStatus.sessionId);
+
+// Creation of Account
+var $accountId;
+$accountId = $dc_sfApiDataCreation.createAccount();
+_log("Returned Account Id" + $accountId);
+
+//Creation of Work Order
+var $workOrderName;
+$workOrderName = $dc_sfApiDataCreation.createWorkOrder();
+_log("Returned Work Order Name "+$workOrderName);
+
+//Creation of Service Team
+var $serviceTeamId;
+$serviceTeamId = $dc_sfApiDataCreation.createServiceTeam();
+_log("ServiceTeam Id "+$serviceTeamId);
+
+var $serviceTechnicianName="";
+$serviceTechnicianName = $dc_sfApiDataCreation.create_Technician($serviceTeamId,$userId);
+_log("Returned Technician Name "+$serviceTechnicianName);
+
+var $url= "http://test.salesforce.com" ;
+var $un="vansys@pqtpart1.com" ;
+var $pwd= "servicemax2";
+$bo_act_login.login($url, $un, $pwd);
+
+//author 
+/*
+_navigateTo("http://test.salesforce.com");
+_setValue(_emailbox("username"), "vansys@pqtpart1.com");
+_setValue(_password("pw"), "servicemax2");
+_click(_submit("Log In to Sandbox"))
+_wait(50000);
+
+//creation of Account
+/*
+_click(_link("Accounts"));
+_click(_button(" New "));
+var $accName= $bo_act_accounts.createAccount();
+_log("accName");
+
+$sf_login.sfLogin();
+
+//_click(_div("ServiceMax Setup"));
+*/
+/*
+_click(_link("ServiceMax Setup"));
+_click(_div("Dispatch Management"));
+_click(_div("Event Subject Rules"));
+_click(_button("New Rule"));
+_setValue(_textbox(1), "Event_SubjectRule_PQT");
+_setValue(_textarea(0), "Event Subject Rule for PQT"); 
+_setSelected(_select(0), "Order Status");
+_setSelected(_select(1), "Equals");
+_setValue(_textbox(2), "Open");
+*/
+//Choose a value from left list
+/*
+_click(_button("New Rule"));
+_setValue(_textbox(1), "Event_SubjectRule_PQT");
+_setValue(_textarea(0), "Event Subject Rule for PQT"); 
+_setSelected(_select(0), "Order Status");
+_setSelected(_select(1), "Equals");
+_setValue(_textbox(2), "Open");
+$woNumber ="Work Order Number"
+$city="City"
+$Priority="Priority"
+_setSelected(_select("page1:form1:block1:WOflds:j_id147:j_id151"), [$woNumber]);
+_click(_imageSubmitButton("page1:form1:block1:WOflds:j_id147:j_id156"));
+_setSelected(_select("page1:form1:block1:WOflds:j_id147:j_id151"), [$city]);
+_click(_imageSubmitButton("page1:form1:block1:WOflds:j_id147:j_id156"));
+_setSelected(_select("page1:form1:block1:WOflds:j_id147:j_id151"), [$Priority]);
+_click(_imageSubmitButton("page1:form1:block1:WOflds:j_id147:j_id156"));
+_click(_button("Save"));
+_wait(5000, _isVisible(_button("Save")));
+
+_click(_link("Home"));
+_click(_link("Work Orders"));
+_click(_button(" New "));
+_click(_submit("Continue"));
+_setValue(_textbox("CF00Nq0000001Pvp6"), "Acc111201765245");
+_click(_submit(" Save "));
+_wait(30000);
+*/
+ 
+var $url= "http://test.salesforce.com" ;
+var $un="vansys@pqtpart1.com" ;
+var $pwd= "servicemax2";
+
+
+var $RS_9362 = _testcase("RS_9362", "Creation of Event Subject Rule");
+$RS_9362.start();
+
+$bo_act_login.login($url, $un, $pwd);
+ 
+
+//Creation of Account, Work Order, Service Team, Technician
+
+var $accName = $bo_act_accounts.createAccount();
+var $proName = $bo_act_products.createProduct("pro12", "--None--");
+var $IBName = $bo_act_installedProduct.createInstalledProduct($proName,$accName,"");
+var $contactName = $bo_act_contacts.createContact($accName); 
+var $caseNumber = $bo_act_installedProduct.createSupportCase("New");
+
+//Creation of Service Team
+var $serviceTeamId;
+$serviceTeamId = $dc_sfApiDataCreation.createServiceTeam();
+_log("ServiceTeam Id "+$serviceTeamId);
+
+var $serviceTechnicianName="";
+$serviceTechnicianName = $dc_sfApiDataCreation.create_Technician($serviceTeamId,$userId);
+_log("Returned Technician Name "+$serviceTechnicianName);
+
+var $loggedInUserName="commonuser@svmxpqt.com";
+var $loggedInUserFullName = $dc_sfApiDataCreation.fetchSFUserId($loginStatus.sessionId,$loggedInUserName);
+_log("Outside function" + $loggedInUserFullName);
+
+var $WONumber = $bo_act_installedProduct.createWOFromIB($IBName);
+this.txt_caseNumber = _heading2("pageDescription");
+
+var $ruleName= "PQT Rule1";
+var $ruleDescription= "PQT Rule Creation";
+$dc_act_eventSubjectRule.createEventSubjectRule($ruleName, $ruleDescription);
+$dc_act_navigation.navigateToDispatchConsole();
+
+_selectWindow("New Event");
+//var $windows = _getWindows();
+//_focusWindow();
+_setValue(_f("DispatchConsole").textinput("subject"), "WO-00000218;High;Testing");
+//
+/*
+_click(_link("Home"));
+_click(_link("Dispatch Console"));
+_wait(30000);
+_selectWindow("Dispatch Console");
+_focusWindow();
+_click(_f("DispatchConsole").label("/Expand all/"));
+_wait(10000);
+//_click(_f("DispatchConsole").label("/Collapse all/"));
+
+_click(_f("DispatchConsole").uitextfield("/Van Tech/"));
+var $pos = _position(_f("DispatchConsole").uitextfield("/Van Tech/"));
+_log($pos);
+var $xPos = parseInt($pos[0])+350;
+_log($xPos);
+var $yPos = parseInt($pos[1]);
+_log($yPos);
+var $wNo = "WO-00000532";
+_dragDrop(_f("DispatchConsole").uitextfield($wNo), _xy(_f("DispatchConsole").timescale("timeScale"), $xPos, $yPos));
+_wait(3000);
+
+*/
+

@@ -1,0 +1,53 @@
+//Author Mamata Rout
+var $RS_5434 = _testcase("RS_5434", "Verify Each device is allowed to support 1000 process ID per device type");
+$RS_5434.start();
+_setSpeed($g_stepSpeed);
+
+	var $sfmName = $bo_act_common.generateRandomName("5434SFM");
+	var $wizardname=$bo_act_common.generateRandomName("5434SFW");
+	var $sfmTemplateSaveAsName=$bo_act_common.generateRandomName("5434Temp");
+	var $wizardID=$wizardname;
+	var $objName="Work Order";	
+	var $fieldActnType="SFM";
+	var $actnName=$sfmName;	
+	var $executionMode = "Interactive";
+	var $processType="SFM Transactions";
+	var $sfmToBeCloned="Add/Edit Products Serviced";
+	
+
+
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+	//-----------Navigate to SFM Designer->Create Custom SFM -------------
+$bo_act_navigation.navigateToSfmTransactionDesigner();
+_wait(60000, _isVisible($bo_pg_sfmTransactionAndDesigner.btn_newSFM));
+$bo_act_SFM.clnStandardSFM($sfmToBeCloned,$sfmName,$sfmTemplateSaveAsName);
+
+
+//************Navigating SFM wizard and Creating Wizard ,Adding custom Wizard created above , verify wizard display online***************
+
+$bo_act_navigation.navigateToSfmWizard();
+	$bo_act_SFW.createWizardGeneralInfo($objName,$wizardname,$wizardID);
+	$bo_act_SFW.createWizardStep($fieldActnType,$actnName,$executionMode);
+	$bo_act_sfmVerifyWorkOrder.verifyWizardOnWOObj($sfmName);
+	_wait(2000);
+	$bo_act_sfmVerifyWorkOrder.wizardButtonVisible($sfmName);
+	
+
+//*****************************************************************
+
+//**************Navigating to App Permission and Disable the permission for online and verify if wizard display,delete wizard finally************
+	$bo_act_navigation.navigateToSfmAppPermission();
+	$bo_act_SFMAppPermission.genericSearchInAppPermission($processType,$objName,$sfmName);
+	$bo_act_SFMAppPermission.disableAppPermission();
+	$bo_act_sfmVerifyWorkOrder.verifyWizardOnWOObj($sfmName);
+	$bo_act_sfmVerifyWorkOrder.wizardButtonNotVisible($sfmName);
+	$bo_act_SFW.deleteWizards( $objName,$wizardID);
+
+//$bo_act_navigation.navigateToSfmTransactionDesigner();  //Bhupendra Taken care in deleteSFM function
+//_wait(60000, _isVisible($bo_pg_sfmTransactionAndDesigner.btn_newSFM));;
+$bo_act_SFM.deleteSFM($sfmName);
+_setSpeed($g_stepSpeed);
+
+
+
+$RS_5434.end();

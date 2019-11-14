@@ -1,0 +1,67 @@
+/**
+ * Function to perform SFM work flows
+ */
+var $sfm_act_createProcess = new function sfm_act_createProcess() {
+
+	/**
+	 * Function to Clone SFM
+	 * @param $sfmNameToBeCloned
+	 * @param $sfmName
+	 * @param $isCustom
+	 * @param $sfmTemplate
+	 * @param $sfmTemplateSaveAsName
+	 * @param $fieldName
+	 * @param $containerName
+	 */
+
+	this.cloneSFM = function($sfmNameToBeCloned, $sfmName,$sfmMapping, $isCustom, $sfmTemplate, $sfmTemplateSaveAsName, $fieldName, $containerName) {
+
+		$sfm_act_SFM.selectSFM($sfmNameToBeCloned, $isCustom);
+		_click($bo_pg_sfmTransactionAndDesigner.btn_clone);
+		_wait(3000);
+		_wait(60000, _isVisible($bo_pg_sfmTransactionAndDesigner.txt_name));
+		_setValue($bo_pg_sfmTransactionAndDesigner.txt_name, $sfmName);
+		_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmTransactionId, "");
+		_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmTransactionId, $sfmName);
+
+		_click($bo_pg_sfmTransactionAndDesigner.btn_qualifyingCriteriaAndFieldMapping);
+		
+		_click($bo_pg_sfmTransactionAndDesigner.btn_mappings);  // add 1
+		_setSelected($bo_pg_sfmTransactionAndDesigner.selMapping, $sfmMapping); //add 2
+		_wait(3000);
+		
+		_click($bo_pg_sfmTransactionAndDesigner.btn_screenDesigner);
+		_wait(60000, _isVisible($bo_pg_sfmTransactionAndDesigner.lbl_workOrder));
+
+		_setSelected($bo_pg_sfmTransactionAndDesigner.sel_sfmTemplate, $sfmTemplate);
+		_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmSavePageLayoutAs, $sfmTemplateSaveAsName);
+		_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmSavePageLayoutAsId, $sfmTemplateSaveAsName);
+		_wait(3000);
+		//$bo_pg_sfmTransactionAndDesigner.addField($fieldName, $containerName);
+
+		_click($bo_pg_sfmTransactionAndDesigner.btn_quickSave);
+		_wait(3000);
+		_click($bo_pg_sfmTransactionAndDesigner.btn_saveAndclose);
+		_wait(3000);
+	/*
+		if (_exists($bo_pg_sfmTransactionAndDesigner.alert_sfm)) {
+			_focusWindow();
+			_takeScreenShot();
+			_click($bo_pg_sfmTransactionAndDesigner.btn_ok);
+			_logExceptionAsFailure("Page not saved, refer screenshot for error");
+			_click($bo_pg_sfmTransactionAndDesigner.btn_backToList);
+			_click($bo_pg_sfmTransactionAndDesigner.btn_yes);
+			$result = false;
+		} else {
+			//_click($bo_pg_sfmTransactionAndDesigner.btn_saveAndclose);
+			$result = true;
+		}
+
+		return $callBack.returnResult($result, "","cloneSfm");
+
+		_setSpeed($g_stepSpeed);  
+		*/
+	
+	};
+	
+}

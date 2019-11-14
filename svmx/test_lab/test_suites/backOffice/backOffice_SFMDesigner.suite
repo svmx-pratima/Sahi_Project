@@ -1,0 +1,30 @@
+../../../test_lab/test_cases/backOffice/SFM_Designer_TCs/RS_10023.sah
+../../../test_lab/test_cases/backOffice/SFM_Designer_TCs/RS_10026.sah
+../../../test_lab/test_cases/backOffice/SFM_Designer_TCs/RS_10029.sah
+../../../test_lab/test_cases/backOffice/SFM_Designer_TCs/RS_5157.sah
+../../../test_lab/test_cases/backOffice/SFM_Designer_TCs/RS_5374.sah
+../../../test_lab/test_cases/backOffice/SFM_Designer_TCs/RS_5379.sah
+../../../test_lab/test_cases/backOffice/SFM_Designer_TCs/RS_5380.sah
+../../../test_lab/test_cases/backOffice/SFM_Designer_TCs/RS_5381.sah
+../../../test_lab/test_cases/backOffice/SFM_Designer_TCs/RS_5415.sah
+../../../test_lab/test_cases/backOffice/SFM_Designer_TCs/RS_5422.sah
+../../../test_lab/test_cases/backOffice/SFM_Designer_TCs/RS_5425.sah
+../../../test_lab/test_cases/backOffice/SFM_Designer_TCs/RS_5426.sah
+../../../test_lab/test_cases/backOffice/SFM_Designer_TCs/RS_5427.sah
+../../../test_lab/test_cases/backOffice/SFM_Designer_TCs/RS_5428.sah
+../../../test_lab/test_cases/backOffice/SFM_Designer_TCs/RS_5430.sah
+../../../test_lab/test_cases/backOffice/SFM_Designer_TCs/RS_5431.sah
+../../../test_lab/test_cases/backOffice/SFM_Designer_TCs/RS_5433.sah
+../../../test_lab/test_cases/backOffice/SFM_Designer_TCs/RS_5434.sah
+../../../test_lab/test_cases/backOffice/SFM_Designer_TCs/RS_5435.sah
+../../../test_lab/test_cases/backOffice/SFM_Designer_TCs/RS_5440.sah
+../../../test_lab/test_cases/backOffice/SFM_Designer_TCs/RS_5441.sah
+../../../test_lab/test_cases/backOffice/SFM_Designer_TCs/RS_5520.sah
+../../../test_lab/test_cases/backOffice/SFM_Designer_TCs/RS_5524.sah
+../../../test_lab/test_cases/backOffice/SFM_Designer_TCs/RS_5536.sah
+../../../test_lab/test_cases/backOffice/SFM_Designer_TCs/RS_5566.sah
+../../../test_lab/test_cases/backOffice/SFM_Designer_TCs/RS_9833.sah
+
+//Commenting below because of Webservices
+//../../../test_lab/test_cases/backOffice/SFM_Designer_TCs/RS_10028.sah 	//Removed Because of web service TCs Need to run Manually please see TC in JIRA
+// ../../../test_lab/test_cases/backOffice/SFM_Designer_TCs/RS_10025.sah	//Removed Because of web service TCs Need to run Manually please see TC in JIRA

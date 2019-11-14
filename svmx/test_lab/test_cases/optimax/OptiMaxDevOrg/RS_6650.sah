@@ -1,0 +1,134 @@
+var $user_credentials = $excel.readFromCustomExcel("../op_excleData/automation.xlsx", "User_Details","","");
+var $Dispatch_Process = $excel.readFromCustomExcel("../op_excleData/automation.xlsx", "Dispatch_Process","","");
+//var $nArr;
+//Calling the sforce API
+for(var $i=0;$i<$user_credentials.length;$i++)
+{
+var $g_un = $user_credentials[$i][0];
+var $g_pwd = $user_credentials[$i][1];
+var $g_url = $user_credentials[$i][2];
+}
+
+//for(var $i=0;$i<$Dispatch_Process.length;$i++)
+//{
+var $dp_Name = $Dispatch_Process[0][0];
+var $dp_Id = $Dispatch_Process[0][1];
+var $dp_Terr_Id = $Dispatch_Process[0][2];
+//}
+
+
+var $RS_6650 = _testcase("RS_6650", "Scheduled Technician has Required and Optional Skill");
+var $team = null;
+$RS_6650.start();
+
+var $sfdc_sessionId = null;
+
+$bo_act_login.login($g_url, $g_un, $g_pwd);
+
+_set($login_result, _fetch(login($g_un,$g_pwd)));
+_log($login_result);
+
+//deleting existing Work Order
+
+$op_utility.delete_WO($dp_Id,$login_result.sessionId);
+
+_set($create_team, _fetch(create_Team($dp_Terr_Id)));
+_log($create_team);
+
+$op_utility.run_Job_Now($dp_Name);
+
+_wait(5000);
+
+//validating the job is success
+if($op_utility.validate_Job_Success($dp_Id,$login_result.sessionId,120000)=== true){
+	_log("job is successfully completed");
+	_set($validate_Skill_Vio_WO, _fetch(validate_Skill_Violation($dp_Id)));
+	_log($validate_Skill_Vio_WO);
+	if($validate_Skill_Vio_WO === true){
+		_log("Skill Violation is populated ");
+		                           	}
+	else{
+		_logExceptionAsFailure("Skill is not populated");
+	}
+}
+else{
+	_log("job is failed in 1st verification.. so starting the 2nd verification after 5 min");
+	if($op_utility.validate_Job_Success($dp_Id,$login_result.sessionId,120000)=== true){
+		_log("job is successfully completed in 2nd verification");
+		_set($validate_Skill_Vio_WO, _fetch(validate_Skill_Violation($dp_Id)));
+		_log($validate_Skill_Vio_WO);
+		if($validate_Skill_Vio_WO === true){
+			_log("Skill is populated");
+		}
+		else{
+			_logExceptionAsFailure(" Skill is not populated")
+		}
+	}
+	else{
+		_log("job is failed in 2nd verification");
+	}
+}
+	
+
+
+
+//<browser>
+
+
+function login($g_un,$g_pwd){
+	
+	var $login_result = sforce.connection.login($g_un,$g_pwd);
+	$sfdc_sessionId = $login_result.sessionId;
+	_log("$sfdc_sessionId = "+$sfdc_sessionId);
+	return $login_result;
+}
+
+function create_Team ($dp_Terr_Id){
+	
+
+	// Creating Work order's with Satisfying Skill Match Rule
+	   var CreateRecords=[];
+	   for(var $i=0;$i<10;$i++)
+		{
+	   var WO = new sforce.SObject("SVMXDEV__Service_Order__c");
+	   WO.SVMXDEV__Primary_Territory__c=$dp_Terr_Id;
+	   WO.SVMXDEV__Order_Type__c="Cleaning";
+	   WO.SVMXDEV__Order_Status__c='Open';
+	   WO.SVMXDEV__State__c="TX";
+	   WO.SVMXDEV__Zip__c='75024';
+	   WO.SVMXDEV__Country__c="United States";
+	   CreateRecords.push(WO);
+		}
+	   var result_WO = sforce.connection.create(CreateRecords);
+	   _log(" Work order = "+result_WO.length);
+	   
+	   
+	   
+return result_WO[0].id;
+
+}
+function validate_Skill_Violation($dp_Id){
+	var $isSuccess = false;
+	var $i = 0;
+	var WO_List = _call(sforce.connection.query("Select Id, SVMXDEV__Violation_Message__c from SVMXDEV__Service_Order__c Where SVMXDEV__Dispatch_Process__c = '"+$dp_Id+"'"));
+	var WO_arr = WO_List.getArray("records");
+	_log("WO_arr.length="+WO_arr.length);
+	for(var $x=0;$x<WO_arr.length;$x++){
+		var WO = WO_arr[$x];
+		var violation_str = WO.SVMXDEV__Violation_Message__c;
+		_log("Violation message="+WO.SVMXDEV__Violation_Message__c+",violation_st =" +violation_str);
+		if(violation_str.includes(" Skill")){
+			 
+			$i = $i + 1;
+			_log("$i="+$i);
+		}
+	}
+	if($i === 10){
+		$isSuccess = true;
+	}
+	return $isSuccess;
+}
+
+
+//</browser>
+$RS_6650.end();

@@ -1,0 +1,111 @@
+var $user_credentials = $excel.readFromCustomExcel("../optimax/op_excleData/automation.xlsx", "User_Details","","");
+var $ONS_policy = $excel.readFromCustomExcel("../optimax/op_excleData/automation.xlsx", "RS_9547","","");
+
+
+//var $nArr;
+//Calling the sforce API
+for(var $i=0;$i<$user_credentials.length;$i++)
+{
+var $g_un = $user_credentials[$i][0];
+var $g_pwd = $user_credentials[$i][1];
+var $g_url = $user_credentials[$i][2];
+}
+
+
+var $sunday = $ONS_policy[0][1];
+var $monday = $ONS_policy[0][2];
+var $tuesday = $ONS_policy[0][3];
+var $wednesday = $ONS_policy[0][4];
+var $thursday = $ONS_policy[0][5];
+var $friday = $ONS_policy[0][6];
+var $saturday = $ONS_policy[0][7];
+var $totalONS = $ONS_policy[0][8];
+var $consecutiveONS = $ONS_policy[0][9];
+var $driveTimeThreshold = $ONS_policy[0][10];
+var $driveDistanceThreshold = $ONS_policy[0][11];
+var $policyOverride = $ONS_policy[0][12];
+var $active = $ONS_policy[0][13];
+
+var $RS_9548 = _testcase("RS_9548", "Field Validation(Total Overnight stays)");
+
+$RS_9548.start();
+
+/*var $g_url = "https://test.salesforce.com/";
+var $g_un = "govendhan@svmx-cct5.org.cct5part1";
+var $g_pwd = "maxpl0re2";*/
+
+var $date = "" + new Date();
+var $ONSName = "ONS_Policy_" + $date;
+
+
+$bo_act_login.login($g_url, $g_un, $g_pwd);
+		
+_click(_link("ServiceMax Setup"));
+_wait(20000,_isVisible(_div("Service Organization")));
+_click(_div("Service Organization"));
+_wait(20000,_isVisible(_div("Overnight Policy Set up")));
+_click(_div("Overnight Policy Set up"));
+_wait(20000,_isVisible(_button("New Overnight Stay Policy")));
+_click(_button("New Overnight Stay Policy"));
+
+_wait(30000,_isVisible(_label("Overnight Stay Policy")));
+
+_setValue(_textbox("Name:"), $ONSName);
+
+if($active == "Yes")
+	{
+		_click(_button("Active:"));
+	}
+_setValue(_textbox("Total Overnight Stays:"), "8");
+_setValue(_textbox("Consecutive Overnight Stays:"), $consecutiveONS);
+_setValue(_textbox("Drive Distance Threshold (miles or kms):"), $driveDistanceThreshold);
+_setValue(_textbox("Drive Time Threshold (in minutes):"), $driveTimeThreshold);
+
+if($policyOverride == "Yes")
+	{
+		_click(_button("Policy Override:"));
+	}
+
+if($sunday == "Yes")
+	{
+		_click(_button("Allow Sunday Overnight Stay:"));
+	}
+
+if($monday == "Yes")
+{
+	_click(_button("Allow Monday Overnight Stay:"));
+}
+
+if($tuesday == "Yes")
+{
+	_click(_button("Allow Tuesday Overnight Stay:"));
+}
+
+if($wednesday == "Yes")
+{
+	_click(_button("Allow Wednesday Overnight Stay:"));
+}
+
+if($thursday == "Yes")
+{
+	_click(_button("Allow Thursday Overnight Stay:"));
+}
+
+if($friday == "Yes")
+{
+	_click(_button("Allow Friday Overnight Stay:"));
+}
+
+if($saturday == "Yes")
+{
+	_click(_button("Allow Saturday Overnight Stay:"));
+}
+
+_click(_span("sfm-button-1076-btnIconEl"));
+
+_assertExists(_div("Total Overnight Stays per week cannot be more than seven"));
+_assertVisible(_div("Total Overnight Stays per week cannot be more than seven"));
+_assertEqual("Total Overnight Stays per week cannot be more than seven", _getText(_div("Total Overnight Stays per week cannot be more than seven")));
+
+$bo_act_login.logOut();
+$RS_9548.end();

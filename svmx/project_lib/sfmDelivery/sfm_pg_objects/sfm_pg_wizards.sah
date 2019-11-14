@@ -1,0 +1,66 @@
+/**
+* SFM  Wizard page object repository
+*/
+
+var $sfm_pg_wizards = new function sfm_pg_wizards() {
+	this.loginresult = "";
+	this.woName = "";
+	
+	this.selectObject = _select(0,_rightOf(_cell("Select Object")));
+	//Standard SFM Wizards objects
+	this.btn_stdView = _submit("View",_near(_heading2("Standard SFM Wizards")));
+	this.btn_stdClone = _submit("Clone",_near(_heading2("Standard SFM Wizards")));
+	this.btn_stdLayoutConf = _submit("Layout Configuration",_near(_heading2("Standard SFM Wizards")));
+	this.btn_stdBackToSetupHome = _submit("Back To Setup Home",_near(_heading2("Standard SFM Wizards")));
+	
+	//Custom SFM Wizards objects
+	this.btn_customNew = _submit("New",_near(_heading2("Custom SFM Wizards")));
+	this.btn_customEdit = _submit("Edit",_near(_heading2("Custom SFM Wizards")));
+	this.btn_customClone  = _submit("Clone[2]",_near(_heading2("Custom SFM Wizards")));
+	this.btn_customLayoutConf = _submit("Layout Configuration[2]",_near(_heading2("Custom SFM Wizards")));
+	this.btn_customDelete = _button("Delete",_near(_heading2("Custom SFM Wizards")));
+	this.btn_customBackToSetupHome= _submit("Back To Setup Home[2]",_near(_heading2("Custom SFM Wizards")));
+	
+	//create SFM wizard objects
+	this.txt_wizardTitle = _textbox(0,_rightOf(_span("Wizard Title"))); //,_rightOf(_span("Wizard Title")));
+	this.txt_wizardID = _textbox(0,_rightOf(_label("Wizard ID"))); //,_rightOf(_label("Wizard ID")));
+	this.txt_wizardDescription = _textarea(0); //,_rightOf(_label("Description")));
+	this.btn_showCriteria = _select(0,_rightOf(_label("Criteria To Show Wizard"))); //,_rightOf(_label("Criteria To Show Wizard")));
+	this.txt_activeCheckbox = _checkbox(0,_rightOf(_label("Active?"))); //,_rightOf(_label("Active?")));
+	
+	//tabs & buttons in Create SFM Wizard
+	this.txt_manageWizSteps = _cell("Manage Wizard Steps");
+	this.txt_generalInfo = _cell("General Information");
+	this.txt_managePermission = _cell("Manage Permissions");
+	this.btn_quickSave = _button("Quick Save"); //,_near(_heading2("Create SFM Wizard")));
+	this.btn_saveClose = _button("Save & Close"); //,_near(_heading2("Create SFM Wizard")));
+	this.btn_cancelWizard = _button("Cancel"); //,_near(_heading2("Create SFM Wizard")));
+	this.btn_edit = _submit("Edit");
+	//Manage wizard steps objects
+	this.btn_newStep = _button("New Step");
+//	this.btn_wizStepType = _select(2); //,_rightOf(_label("Wizard Step Type[1]")));
+	this.btn_wizStepType = _select(0,_rightOf(_label("Wizard Step Type[1]")));
+//	this.btn_stepName = _select(3); //,_rightOf(_label("Step Name[1]")));
+	this.btn_stepName = _select(0,_rightOf(_label("Step Name[1]")));
+	this.btn_checkboxHandover = _checkbox("on",_rightOf(_label("Handover"))); //,_rightOf(_label("Handover")));
+	this.txt_confirmMessage = _textbox(4); //,_rightOf(_label("Confirmation Message")));
+	this.btn_modeOfExec = _select(4); //,_rightOf(_label("Mode Of Execution"));
+	this.btn_stepCriteria = _select(5); //_rightOf(_label("Criteria To Enable This Step")));
+	this.btn_saveStep = _button("Save");
+	this.btn_cancleStep = _button("Cancel[1]");
+	this.chk_runtimeTemplate = _checkbox("on",_rightOf(_label("Select Template At Runtime")));
+	
+	//Anand
+	this.lbl_searchWindowLabel=_div("/lookupslidingwindow/");//general search window
+	this.btn_objectSearch=_span("/search-icon/");
+	this.txt_searchObj=_textbox("/sfm-text/",_near(this.btn_objectSearch));
+	this.div_searchWindow = _parentNode(_div("Recent Items: Cases"),"DIV",5);
+	this.btn_cancelCaseWindow=_div("Cancel",_near(_div("SelectCancel")));
+
+	
+	//Added By Harish
+	this.select_availableGrpProfiles =_select(0,_near(_cell("Available ServiceMax Group Profiles")));
+	this.btn_add = _image("Add");
+	this.chk_firstCustomCheckBox = _checkbox(0,_near(_heading2("Custom SFM Wizards")));
+	this.txt_title = _textbox(0,_rightOf(_label("Title[1]")));
+};

@@ -1,0 +1,47 @@
+// Author Meghana Rao P
+/*
+ * This test case verifies the quick save of SFM search and checking the SFM Search Delivery
+ */
+var $RS_10131 = _testcase("RS_10131", "quick save and checking the delivery");
+$RS_10131.start();
+
+// To generate Random names for SearchTitle and Search ID
+var $searchTitle = $bo_act_common.generateRandomName("Search");
+var $searchId = $bo_act_common.generateRandomName("SearchId");
+
+var $data = _readExcelFile("../../backOffice/bo_excleData/BORegressionDatasheet.xlsx",$orgtype,true);
+var $createwoquery = $data[1]["CreateWorkOrderOpen"];
+var $fetchwo = $data[1]["fetchwo"];
+
+
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+
+// to set the User to 24 hour format
+var $userapexscript = "User user_edit = [Select ID , LocaleSidKey from User Where Id =:UserInfo.getUserId() LIMIT 1];user_edit.LocaleSidKey = 'en_GB';update user_edit;";
+var $user_query = $op_act_sForceApiCall.sForceQuery($bac_un, $bac_pwd, $userapexscript ,"create");
+
+
+// Create Work Order
+var $rs_10131_result = $op_act_sForceApiCall.sForceQuery($bac_un, $bac_pwd, $createwoquery ,"create");
+var $rs_10131_query_wo = $fetchwo;
+var $rs_10131_fetch = $op_act_sForceApiCall.sForceQuery($bac_un, $bac_pwd, $rs_10131_query_wo ,"query");
+
+var $rs_10131_WO1 = $rs_10131_fetch[0].Name;
+var $rs_10131_actual_initial = $rs_10131_fetch[0].SVMXC__Actual_Initial_Response__c;
+var $rs_10131_actual_onsite = $rs_10131_fetch[0].SVMXC__Actual_Onsite_Response__c;
+
+
+// To create a Custom SFM Search value
+// createsfmsearch = For Single Expression
+$bo_act_sfmsearch.sfmsearch_advancedexpression($searchId, $searchTitle, "Work Order", "Actual Initial Response", "TODAY", "Equals", "Actual Onsite Response", "YESTERDAY", "10131");
+
+$bo_act_sfmsearch.sfmsearch_displayfields($searchTitle, "Work Orders", "Work Order", "Actual Initial Response", "Actual Onsite Response");
+$bo_act_sfmsearchdelivery.sfmsearchdelivery_dateformat($searchTitle,$rs_10131_WO1, "Actual Initial Response", $rs_10131_actual_initial);
+
+
+
+//to set the User to 12 hour format
+var $userapexscript = "User user_edit = [Select ID , LocaleSidKey from User Where Id =:UserInfo.getUserId() LIMIT 1];user_edit.LocaleSidKey = 'en_US';update user_edit;";
+var $user_query = $op_act_sForceApiCall.sForceQuery($bac_un, $bac_pwd, $userapexscript ,"create");
+
+$RS_10131.end();

@@ -1,0 +1,70 @@
+var $rs_7017 = _testcase("RS_7017","Verify Read only, Mandatory, Allow, Delete and multi add in SFM Delivery.");
+$rs_7017.start();
+$sfmName= $bo_act_common.generateRandomName("RS_7017_");
+var $sfmNameToBeCloned= "Manage Work Order Lines - Usage";
+var $isCustom = false;
+var $sfmTemplateSaveAsName = $sfmName;
+var $sfmTemplate = "SVMXSTD: Manage WO Usage Lines";
+var $containerNameArray = ["Order Status"];
+var $fieldNameArray = ["Account"];
+var $wizardObject ="Work Order";
+var $restAccName = "Acc_"+$sfmName;
+
+//Create Account through REST
+$objName= "Account";
+$obJson = "{\"Name\":\""+$restAccName+"\"}"; 
+$columnName = "Name";
+$filter="id";
+//create an account
+$account=$sfm_act_restApiMethods.postRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,$objName,$obJson,"POST");
+$accountName =$sfm_act_restApiMethods.getRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,"GET", $objName, $columnName, $filter, $account);
+
+//Create WO 
+var $woNumber = $sfm_act_createCustomWizard.createBlankWoFromRest($sfmdUsn, $sfmdPwd, $sfmClientId, $sfmConsumerSecret, $sfmOrgInstance);
+//login
+$bo_act_login.login($g_url,$sfmdUsn, $sfmdPwd);
+//clone tdm016 and set accout as required and billing type as readonly
+$sfm_act_SFM.cloneTDM016($sfmNameToBeCloned, $sfmName, $isCustom, $sfmTemplateSaveAsName,$sfmTemplate, $fieldNameArray, $containerNameArray);
+_wait(2000);
+$sfm_act_SFM.setReadOnlyOrRequired("Account", "Required","true");
+$sfm_act_SFM.setReadOnlyOrRequired("Billing Type", "Read Only","true");
+_click($sfm_pg_sfmDesigner.btn_saveSFM); 
+$sfm_act_wizards.addToWizard($wizardObject, $sfmd_wizardName[2], $sfmd_wizardType[1], $sfmName); 
+
+//Navigate to the WO for validation
+$bo_act_navigation.navigateToCreatedRecordUsingGlobalSearch($woNumber);
+
+$sfm_act_createCustomWizard.clickWizardBtn($sfmName);
+//Validate billing type is read only or not
+_assertEqual(true,_getAttribute($sfm_pg_sfmDesigner.txt_billingType,"readOnly"), "Billing type is not readonly");
+
+//validate for required field error message when left blank
+_click($sfm_pg_sfmDesigner.btn_deliveryQuickSave);
+_assertVisible(_div("Required field is blank: Account",_near(_span("Error Details"))),"Required field on Account is not shown");
+
+_setValue($sfm_pg_sfmDesigner.txt_Account,$accountName);
+ 
+//validate allow multi add
+_click($sfm_pg_sfmDesigner.btn_deliveryAddMultiParts);
+_click($sfm_pg_sfmDesigner.btn_searchProductLookUp);
+
+//count the number of elements added in multi add
+var $count1 =  _count("_div","/grid-cell-inner/",_under(_parentNode(_span("/Name/",_near(_div("/Product search/"))), "DIV", 2)));
+//add all the product in the list 
+_click($sfm_pg_sfmDesigner.chk_allProductLookUp);
+_click($sfm_pg_sfmDesigner.btn_selectProductLookUp);
+
+//count the number of parts added and check $count1== $count2 . If $count1=$count2 then multiadd is working as expected
+var $count2 = _count("_div","/grid-cell-inner/",_in(_div("/grid-view/")));
+_assertEqual($count1, $count2, "Multi add is working as expected");
+
+//validate allow delete by deleting all child lines and then save to check allow zero lines
+for(var $i=0;$i<$count2;$i++){
+	_click($sfm_pg_sfmDesigner.btn_deliveryDeleteChildRow);
+}
+_click($sfm_pg_sfmDesigner.btn_deliveryQuickSave);
+if(_exists($sfm_pg_sfmDesigner.txt_priceAlert)){
+	_click($sfm_pg_sfmDesigner.btn_priceAlertOk);
+}
+//$sfm_act_createCustomWizard.verify7017();
+$rs_7017.end();

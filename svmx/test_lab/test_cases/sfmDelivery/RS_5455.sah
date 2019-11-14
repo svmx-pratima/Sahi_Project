@@ -1,0 +1,238 @@
+var $rs_5455 = _testcase("RS_5455","Verify Advanced expression on multiple child tabs");
+$rs_5455.start();
+	
+		//RS_5455,RS_5447,RS_5446,RS_5445.sah
+		//Create Product
+		var $wdPartName=new Array;
+		var $wdPartID=new Array;
+		var $objName= "Product2";
+		for (var $i = 0; $i < 4; $i++) {
+			$prodName=$bo_act_common.generateRandomName("Pro_RS_5455_");
+			$obJson = "{\"Name\":\""+$prodName+"\"}";
+			$filterValue=$sfm_act_restApiMethods.postRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,$objName,$obJson,"POST");
+			_log($prodName);
+			$wdPartID[$i]=$filterValue;
+			$wdPartName[$i]=$prodName;
+		}
+		
+		//Work Order Creation
+		var $woStatus=["Open","Closed"];
+		var $WONumber=new Array;
+		var $WOID=new Array;
+		$objName= $orgnamespace+"__Service_Order__c";
+		var $today=getDBDate(0,"-",0);
+		var $resolutionDate;
+		var $restorationDate;
+		for (var $i = 0; $i < $woStatus.length; $i++) {
+			if ($i==0) {
+				$resolutionDate=getDBDate(0,"-",3);
+				$restorationDate=getDBDate(0,"-",4);
+				$obJson = "{\""+$orgnamespace+"__Order_Status__c\":\""+$woStatus[$i]+"\",\""+$orgnamespace+"__Order_Type__c\":\"Field Service\",\""+$orgnamespace+"__Actual_Initial_Response__c\":\""+$today+"\",\""+$orgnamespace+"__Actual_Onsite_Response__c\":\""+$today+"\",\""+$orgnamespace+"__Actual_Resolution__c\":\""+$resolutionDate+"\",\""+$orgnamespace+"__Actual_Restoration__c\":\""+$restorationDate+"\"}";
+			}else {
+				$resolutionDate=getDBDate(0,"-",6);
+				$restorationDate=getDBDate(0,"-",7);
+				$obJson = "{\""+$orgnamespace+"__Order_Status__c\":\""+$woStatus[$i]+"\",\""+$orgnamespace+"__Order_Type__c\":\"Field Service\",\""+$orgnamespace+"__Actual_Initial_Response__c\":\""+$today+"\",\""+$orgnamespace+"__Actual_Onsite_Response__c\":\""+$today+"\",\""+$orgnamespace+"__Actual_Resolution__c\":\""+$resolutionDate+"\",\""+$orgnamespace+"__Actual_Restoration__c\":\""+$restorationDate+"\"}";
+			}
+			$columnName = "Name";
+			$filter="id";
+			$filterValue=$sfm_act_restApiMethods.postRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,$objName,$obJson,"POST");
+			$WO =$sfm_act_restApiMethods.getRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,"GET", $objName, $columnName, $filter, $filterValue);
+			_log("WO number with Order status "+$woStatus[$i]+" is : "+$WO);
+			$WOID[$i]=$filterValue;
+			$WONumber[$i]=$WO;
+		}
+
+		$objName="RecordType";
+		$filter=["DeveloperName","SobjectType"];
+		$filterValue=["UsageConsumption",$orgnamespace+"__Service_Order_Line__c"];
+		$columnName = "id";
+		$recTypeID =$sfm_act_restApiMethods.getRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,"GET", $objName, $columnName, $filter, $filterValue);
+		_log("Record Type ID: "+$recTypeID);
+		
+		//Create WD(parts) under Open WO
+		var $lineType=["Parts","Labor","Parts","Labor"];
+		var $canceledOn;
+		var $closedOn;
+		for (var $i = 0; $i < 4; $i++) {
+			$objName= $orgnamespace+"__Service_Order_Line__c";
+			if ($i<2) {
+				$canceledOn=getDBDate(0,"-",1);
+				$closedOn=getDBDate(0,"-",2);
+				$obJson = "{\""+$orgnamespace+"__Line_Type__c\":\""+$lineType[$i]+"\",\"RecordTypeId\":\""+$recTypeID+"\",\""+$orgnamespace+"__Product__c\":\""+$wdPartID[$i]+"\",\""+$orgnamespace+"__Start_Date_and_Time__c\":\""+$today+"\",\""+$orgnamespace+"__End_Date_and_Time__c\":\""+$today+"\",\""+$orgnamespace+"__Actual_Quantity2__c\":\"20\",\""+$orgnamespace+"__Canceled_On__c\":\""+$canceledOn+"\",\""+$orgnamespace+"__Closed_On__c\":\""+$closedOn+"\",\""+$orgnamespace+"__Service_Order__c\":\""+$WOID[0]+"\"}";
+			}else {
+				$canceledOn=getDBDate(0,"-",8);
+				$closedOn=getDBDate(0,"-",9);
+				$obJson = "{\""+$orgnamespace+"__Line_Type__c\":\""+$lineType[$i]+"\",\"RecordTypeId\":\""+$recTypeID+"\",\""+$orgnamespace+"__Product__c\":\""+$wdPartID[$i]+"\",\""+$orgnamespace+"__Start_Date_and_Time__c\":\""+$today+"\",\""+$orgnamespace+"__End_Date_and_Time__c\":\""+$today+"\",\""+$orgnamespace+"__Actual_Quantity2__c\":\"8\",\""+$orgnamespace+"__Canceled_On__c\":\""+$canceledOn+"\",\""+$orgnamespace+"__Closed_On__c\":\""+$closedOn+"\",\""+$orgnamespace+"__Service_Order__c\":\""+$WOID[0]+"\"}";
+			}
+
+			$columnName = "Name";
+			$filter="id";
+			$filterValue=$sfm_act_restApiMethods.postRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,$objName,$obJson,"POST");
+			$WDNumber =$sfm_act_restApiMethods.getRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,"GET", $objName, $columnName, $filter, $filterValue);
+			_log("WD number: "+$WDNumber+" with line type: "+$lineType[$i]);
+		}
+
+
+		//Login to App
+		$bo_act_login.login($g_url,$sfmdUsn,$sfmdPwd);
+		//$bo_act_navigation.navigateToSfmTransactionDesigner();
+		
+		//clone standard SFM
+		var $sfmNameToBeCloned="Create Usage Lines from Estimates";
+		var $sfmName=$bo_act_common.generateRandomName("rs_5455_");
+		var $sfmTemplateSaveAsName=$bo_act_common.generateRandomName("SFM_Page_");
+		var $sfmTemplate="SVMXSTD: Manage WO Usage Lines";
+		var $fieldName="";
+		var $containerName="";
+		$sfm_act_SFM.cloneTDM016($sfmNameToBeCloned, $sfmName, false, $sfmTemplateSaveAsName, $sfmTemplate, $fieldName, $containerName);
+		
+		//adding qualifying criteria for parent object
+		var $comboField=["Actual Initial Response","Actual Onsite Response","Actual Resolution","Actual Restoration","Order Status"];
+		var $comboConditions=["Equals","Equals","Equals","Equals","Equals"];
+		var $toggleButton=["Yes","Yes","Yes","Yes",""];
+		var $comboInput=["Now","Today","Tomorrow","Yesterday","Open"];
+		var $advExpr="1 and ((2 or 3) and (4 or 5))";
+		var $errMsg="This record does not satisfy the qualification criteria.";
+		var $exprsnName = $bo_act_common.generateRandomName("RS_5455_expr_");
+		var $ExprFieldsDetails=[$comboField,$comboConditions,$toggleButton,$comboInput,$advExpr,$errMsg,$exprsnName];
+		$sfm_act_Transactions.sfmQualifyingCriteriaieldMappings("Work Order", $ExprFieldsDetails, "", "","");
+			
+		//adding qualifying criteria for child object - part
+		var $childcomboField=["Start Date and Time","End Date and Time","Canceled On","Closed On","Line Qty","Line Type"];
+		var $childcomboConditions=["Equals","Equals","Equals","Equals","Equals","Equals"];
+		var $childtoggleButton=["Yes","Yes","Yes","Yes","",""];
+		var $childcomboInput=["Now","Today","Tomorrow","Yesterday","20","Parts"];
+		var $childadvExpr="1 and ((2 or 3) and (4 or 5)) AND 6";
+		var $childerrMsg="";
+		var $childexprsnName = $bo_act_common.generateRandomName("RS_5455_exprPart_");
+		var $childExprFieldsDetails=[$childcomboField,$childcomboConditions,$childtoggleButton,$childcomboInput,$childadvExpr,$childerrMsg,$childexprsnName];
+		$sfm_act_Transactions.sfmQualifyingCriteriaieldMappings("Parts", $childExprFieldsDetails, "", "","");
+		
+		//adding qualifying criteria for child object - Labor
+		var $childcomboField=["Start Date and Time","End Date and Time","Canceled On","Closed On","Line Qty","Line Type"];
+		var $childcomboConditions=["Equals","Equals","Equals","Equals","Equals","Equals"];
+		var $childtoggleButton=["Yes","Yes","Yes","Yes","",""];
+		var $childcomboInput=["Now","Today","Tomorrow","Yesterday","20","Labor"];
+		var $childadvExpr="1 and ((2 or 3) and (4 or 5)) AND 6";
+		var $childerrMsg="";
+		var $childexprsnName = $bo_act_common.generateRandomName("RS_5455_exprLabor_");
+		var $childExprFieldsDetails=[$childcomboField,$childcomboConditions,$childtoggleButton,$childcomboInput,$childadvExpr,$childerrMsg,$childexprsnName];
+		$sfm_act_Transactions.sfmQualifyingCriteriaieldMappings("Labor", $childExprFieldsDetails, "", "","");
+		
+		_click($bo_pg_sfmTransactionAndDesigner.btn_saveAndclose);
+		
+		var $wizardObject="Work Order";
+		var $sfmd_wizardName1 =$sfmd_wizardName[6];
+		var $sfmd_wizardType="SFM";
+		var $profile="";
+		var $handOver=false;
+		$sfm_act_wizards.addToWizard($wizardObject, $sfmd_wizardName1, $sfmd_wizardType, $sfmName, $handOver, $profile);  
+			
+			
+		//Assert SFM is launched and able to view childlines
+		$sfm_act_common.globalSearchOnce($WONumber[0]);
+		_wait(10000);
+		_setStrictVisibilityCheck(true);
+		$sfm_act_createCustomWizard.clickWizardBtn($sfmName);
+		_assertExists(_link($sfmName+" (Work Order Number: "+$WONumber[0]+")"));
+		_click($sfm_pg_screenDesigner.btn_Parts);
+		_assertExists(_cell($wdPartName[0]));
+		_assertNotExists(_cell($wdPartName[2]));
+		_click($sfm_pg_screenDesigner.btn_Labor);
+		_assertExists(_cell($wdPartName[1]));
+		_assertNotExists(_cell($wdPartName[3]));
+		_setStrictVisibilityCheck(false);
+		
+		//Assert sfm should not be launched
+		$sfm_act_common.globalSearchOnce($WONumber[1]);
+		_wait(10000);
+		$sfm_act_createCustomWizard.clickWizardBtn($sfmName);
+		_assertExists(_div($errMsg));
+		
+		
+
+//** function to create Work**'
+		
+function getDBDate($futureYear, $seperator,$futureDay){
+		var $retDate=$bo_act_common.getfutureDate($futureYear, $seperator, $futureDay);
+		var $dateDetails=$retDate.split("-");
+		var $retDate=$dateDetails[2]+$seperator+$dateDetails[0]+$seperator+$dateDetails[1];
+		//_log("Formated Date: "+$retDate);
+		return $retDate;
+}
+		
+function createWO_RS5455($orderStatus,$WOactualResoFD,$WOactualRestoFD){
+	var $wo= $bo_act_workOrders.createWorkOrder("", "", "", "",$orderStatus, "High", "Field Service");
+	_click($bo_pg_workOrders.btn_editWorkOrder);
+	addWOfieldValue($orderStatus, $WOactualResoFD, $WOactualRestoFD);
+	_click($bo_pg_workOrders.btn_saveWorkOrder);
+	_wait(10000,_isVisible($bo_pg_workOrders.txt_workOrderDetails));
+	return $wo;
+};
+
+function addWOfieldValue($orderStatus,$WOactualResoFD,$WOactualRestoFD){
+	_setStrictVisibilityCheck(true);
+	_setSelected($bo_pg_workOrders.sel_orderStatus,$orderStatus);
+	_setValue($sfm_pg_wo.txt_actualInitialResponse,$bo_act_common.getfutureDate(0, "\/", 0)+" 12:00 AM");
+	_click($sfm_pg_wo.label_wo);
+	_setValue($sfm_pg_wo.txt_actualOnsiteResponse,$bo_act_common.getfutureDate(0, "\/", 0)+" 12:00 AM");
+	_click($sfm_pg_wo.label_wo);
+	_setValue($sfm_pg_wo.txt_actualResolution,$bo_act_common.getfutureDate(0, "\/", $WOactualResoFD)+" 12:00 AM");
+	_setValue($sfm_pg_wo.txt_actualRestoration,$bo_act_common.getfutureDate(0, "\/", $WOactualRestoFD)+" 12:00 AM");
+	_setStrictVisibilityCheck(false);
+}
+
+function addWorkDetailLine($recordType,$lineType,$lineQTY,$WDcancelFD, $WDcloseFD,$WDpartName){
+	_click($bo_pg_workOrders.btn_newWD);
+	_wait(10000,_isVisible($bo_pg_workDetails.sel_workDetailsRecordType));
+	_setSelected($bo_pg_workDetails.sel_workDetailsRecordType,$recordType);
+	_click($bo_pg_workDetails.btn_WDcontinue);
+	_wait(10000,isVisible($bo_pg_workDetails.sel_WDLineType));
+	_setStrictVisibilityCheck(true);	
+	addWDfiledValues($lineType, $lineQTY, $WDcancelFD, $WDcloseFD,$WDpartName);
+	_click($bo_pg_workDetails.btn_saveWorkDetails);
+	_wait(15000,_isVisible($bo_pg_workDetails.btn_editWD));
+	var $WorkDetailName=_getText(_heading2("/WL-.*/"));
+	_setStrictVisibilityCheck(false);
+	return $WorkDetailName;
+}
+
+function addWDfiledValues($lineType,$lineQTY,$WDcancelFD,$WDcloseFD,$WDpartName){
+	_setStrictVisibilityCheck(true);
+	_setSelected($bo_pg_workDetails.sel_WDLineType,$lineType);
+	_setValue($bo_pg_workDetails.txt_WDstartDate,$bo_act_common.getfutureDate(0, "\/",0)+" 12:00 AM");
+	//_click($bo_pg_workDetails.link_today);
+	_click($bo_pg_workDetails.label_WDStartDate);
+	_setValue($bo_pg_workDetails.txt_WDendDate,$bo_act_common.getfutureDate(0, "\/",0)+" 12:00 AM");
+	//_click($bo_pg_workDetails.link_today);
+	_click($bo_pg_workDetails.label_WDStartDate);
+	_setValue($bo_pg_workDetails.txt_WDcanceledOn,$bo_act_common.getfutureDate(0, "\/",$WDcancelFD)+" 12:00 AM");
+	_setValue($bo_pg_workDetails.txt_WDclosedOn, $bo_act_common.getfutureDate(0, "\/",$WDcloseFD)+" 12:00 AM");
+	_setValue($bo_pg_workDetails.txt_WDlineQTY, $lineQTY);
+
+if ($WDpartName!="" && $WDpartName!==null) {
+	_setValue($bo_pg_workDetails.txt_part,$WDpartName);
+	_click($bo_pg_workDetails.link_partSearchIcon);
+	_wait(10000);
+	_selectWindow("/Search/");
+	_click(_link($WDpartName));
+	_selectWindow();
+	_wait(5000,_isVisible($bo_pg_workDetails.txt_part));
+}
+_setStrictVisibilityCheck(false);
+}
+
+function editWorkDetailLine($WorkDetail,$lineType,$lineQTY,$WDcancelFD,$WDcloseFD){
+_setStrictVisibilityCheck(true);
+_click(_link($WorkDetail));
+_wait(10000,_isVisible(_heading2($WorkDetail)));
+_click($bo_pg_workDetails.btn_editWD);
+_wait(10000,_isVisible($bo_pg_workDetails.sel_WDLineType));
+addWDfiledValues($lineType, $lineQTY,$WDcancelFD,$WDcloseFD,"");
+_click($bo_pg_workDetails.btn_saveWorkDetails);
+_wait(15000,_isVisible($bo_pg_workDetails.btn_editWD));
+_setStrictVisibilityCheck(false);
+}
+
+
+$rs_5455.end();

@@ -1,0 +1,10 @@
+var $data = _readExcelFile("../../analytics/an_excleData/an_Datasheet1.xlsx","Sheet1",true);
+var $un =$bac_un ;
+var $pwd =$bac_pwd;
+var $url = "https://test.salesforce.com";
+$bo_act_login.login($url, $un, $pwd);
+$an_act_AttachRate.attachrate_installed_IB("ATTACH RATE 1");
+$an_act_AttachRate.attachrate_custom_IB("CUSTOM ATATCH RATE 2");
+$an_act_AttachRate.attachrate_custom_CP2("CUSTOM ATATCH RATE 3");
+
+

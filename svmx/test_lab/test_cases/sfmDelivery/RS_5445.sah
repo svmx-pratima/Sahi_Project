@@ -1,0 +1,70 @@
+var $rs_5445 = _testcase("RS_5445","Verify Date and DateTime literals as expressions in Header.");
+$rs_5445.start();
+$sfmName = $bo_act_common.generateRandomName("SFM_Auto_");
+//$sfmName = "SFM_Auto_27122017162526";
+$processName = "Create Usage Lines from Estimates";
+$sfmPgLayoutName = $bo_act_common.generateRandomName("SFM Wiz");
+$wizTitle = $bo_act_common.generateRandomName("SFM Wiz");
+var $firstFieldValue="Actual Initial Response";
+var $fieldOptions = ["Actual Onsite Response","Actual Resolution","Actual Restoration","Order Status"];
+var $clickToggle = 4;
+var $firstValueOptions = "Today";
+var $valueOptions = ["Today","Tomorrow","Yesterday","Open"];
+var $exprsnName = $bo_act_common.generateRandomName("Header_Exprsn");
+var $advancedExprsn = "1 and ((2 or 3) and (4 or 5))";
+var $err = "This record does not satisfy the qualification criteria.";
+$bo_act_login.login($g_url,$sfmdUsn, $sfmdPwd);
+$bo_act_navigation.navigateToSfmTransactionDesigner();
+$sfm_act_SFM.selectSFM($processName,false);
+_click($bo_pg_sfmTransactionAndDesigner.btn_clone);
+_wait(60000, _isVisible($bo_pg_sfmTransactionAndDesigner.txt_name));
+//_wait(3000);
+_setValue($bo_pg_sfmTransactionAndDesigner.txt_name, $sfmName);
+_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmTransactionId, "");
+_click($bo_pg_sfmTransactionAndDesigner.btn_qualifyingCriteriaAndFieldMapping);
+$sfm_act_Transactions.addQualificationCriteria(3, $firstFieldValue, $fieldOptions, $clickToggle, $firstValueOptions, $valueOptions, $exprsnName, $advancedExprsn, $err);
+_click(_f("main").s_button("Save"));
+_wait(3000);
+_click($bo_pg_sfmTransactionAndDesigner.btn_screenDesigner);
+_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmSavePageLayoutAs, $sfmPgLayoutName);
+_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmSavePageLayoutAsId, "");
+_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmSavePageLayoutAsId, $sfmPgLayoutName);
+_wait(3000);
+_click($bo_pg_sfmTransactionAndDesigner.btn_pageLayoutSave);
+_wait(3000, _isVisible(_f("main").label("Page saved")));
+_wait(3000);
+_click($bo_pg_sfmTransactionAndDesigner.btn_finalQuickSave);
+$bo_act_navigation.navigateToSfmWizard();
+$sfm_act_createCustomWizard.chooseObject("Work Order");
+$sfm_act_createCustomWizard.addManageWizSteps($wizTitle, "SFM", $sfmName);
+$sfm_act_createCustomWizard.createWoWithValues();
+_selectDomain($g_domain);
+$sfm_act_createCustomWizard.clickWizardBtn($sfmName);
+_selectDomain();
+if(_isVisible(_link("/"+$sfmName+"/"))){
+	_log("Pass");
+}
+else{
+	_fail("Fail");
+}
+_click($sfm_pg_wizardWindow.btn_cancel);
+_click($sfm_pg_wizardWindow.btn_proceed);
+_click($sfm_pg_wo.btn_wo_edit);
+// Modifying Actual Onsite Response and verifying error message, modify to any date other than today or tomorrow
+_click($sfm_pg_wo.txt_actualOnsiteResponse);
+var $today = _getText($sfm_pg_wo.link_today);
+var $yesterday = new Date($today);
+$yesterday.setDate($yesterday.getDate()-1);
+var $dd = $yesterday.getDate();
+_click(_cell("/"+$dd+"/",_leftOf(_cell("/todayDate/"))));
+_click($sfm_pg_wo.btn_wo_save);
+_selectDomain($g_domain);
+$sfm_act_createCustomWizard.clickWizardBtn($sfmName);
+_selectDomain();
+if(_isVisible(_div("/"+$err+"/"))){
+	_log("Pass");
+}
+else{
+	_fail("Fail");
+}
+$rs_5445.end();

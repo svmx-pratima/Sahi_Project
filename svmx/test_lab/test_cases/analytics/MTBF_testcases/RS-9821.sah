@@ -1,0 +1,125 @@
+var $an_ana_9821 = _testcase("ANA-9821","SCON within Coverage of Covered Product with Work Order");
+$an_ana_9821.start();
+var $cred = _readExcelFile("../../analytics/an_excleData/credentials.xlsx","Sheet1",true);
+var $un =$bac_un ;
+var $pwd =$bac_pwd;
+var $url =$cred[1]["url"];
+var $user =$cred[1]["User"];
+var $data = _readExcelFile("../../analytics/an_excleData/MTTC_data.xlsx","Sheet1",true);
+var $Account = $data[1]["Account"];
+var $Technician = $data[1]["Technician"];
+var $Product = $data[1]["Product"];
+var $OrderStatus = $data[1]["OrderStatus"];
+var $Component = $data[4]["Component"];
+var $PreferredStartDate = $data[5]["PreferredStartDate"];
+var $PreferredEndDate = $data[5]["PreferredEndDate"];
+$bo_act_login.login($url, $un, $pwd);
+
+//delete WO
+$delete1 = "delete [Select Id from SVMXC__Service_Order__c ];";
+var $delete_data = $op_act_sForceApiCall.sForceQuery($un, $pwd, $delete1 , "create");
+
+$delete2 = "delete [Select Id from SVMXC__SPM_Mean_Time_Between_Failure__c ];";
+var $delete_data1 = $op_act_sForceApiCall.sForceQuery($un, $pwd, $delete2 , "create");
+
+
+var $IB= "Select CreatedDate from SVMXC__Installed_Product__c where SVMXC__Installed_Product__c.Id = '"+$Component+"' Order by CreatedDate DESC Limit 1";
+var $IB_fetch = $op_act_sForceApiCall.sForceQuery($un, $pwd, $IB,"query");
+var $IB_created_date ;
+$IB_created_date = $IB_fetch[0].CreatedDate;
+_log($IB_created_date);	
+
+
+
+// Create Work Order for the IB and SCON
+
+	var $ana_9821_create_WO = "SVMXC__Service_Order__c WO1 = new SVMXC__Service_Order__c(SVMXC__Company__c='"+$Account+"',custom_Installed_Product__c = '"+$Component+"',Custom_Start_Time__c = DateTime.valueOf("+$PreferredStartDate+"+0.025), Custom_End_Time__c = DateTime.valueOf("+$PreferredEndDate+"+0.085)); insert WO1;";
+	var $ana_9821_result_WO = $op_act_sForceApiCall.sForceQuery($un, $pwd, $ana_9821_create_WO , "create");
+	var $ana_9821_get_WO = "Select Id,Custom_Start_Time__c,Custom_End_Time__c  from SVMXC__Service_Order__c where Createdby.Id = '"+$user+"' Order by CreatedDate DESC Limit 1";
+	var $ana_9821_fetch_WO = $op_act_sForceApiCall.sForceQuery($un, $pwd, $ana_9821_get_WO,"query");
+	var $ana_9821_WO_ID ;
+
+$ana_9821_WO_ID = $ana_9821_fetch_WO[0].Id;
+var $starttime=$ana_9821_fetch_WO[0].Custom_Start_Time__c;
+var $endtime=$ana_9821_fetch_WO[0].Custom_End_Time__c;
+_log($ana_9821_WO_ID);	
+//_wait(30000);
+
+var $stdate_diff = new Date($starttime);
+var $enddate_diff=new Date($endtime);
+var $Downtime=Math.round((($enddate_diff-$stdate_diff)/1000)/(60));
+_log($Downtime);
+
+
+//$an_act_MTBF.mtbf_closed_wo_calc();
+_click($an_pg_rv.link_home);
+_click($an_pg_rv.link_servicemaxSetup);
+_click($an_pg_rv.btn_serviceperformancemetrics);
+_click($an_pg_rv.btn_serviceperformancemetricsetup);
+$an_act_MTBF.MTBF_runEngine("vinaya.v@ge.com");
+
+	
+
+
+
+var $ana_9821_IB ;
+var $ana_9821_Expected_uptime;
+var $ana_9821_downtime;
+var $ana_9821_wo_count;
+var $ana_9821_Actual_uptime;
+var $ana_9821_MTBF;
+var $ana_9821_run_on;
+var $ana_9821_cal_method;
+
+var $ana_9821_query= "Select SVMXC__Installed_Product__c,SVMXC__Actual_Uptime__c, SVMXC__Downtime__c,SVMXC__Expected_Uptime__c,SVMXC__MTBF__c,SVMXC__Product__c,SVMXC__Run_On__c,SVMXC__Workorder_Count__c,SVMXC__Calculation_Method__c from SVMXC__SPM_Mean_Time_Between_Failure__c where SVMXC__Installed_Product__c = '"+$Component+"'";
+var $ana_9821_result = $op_act_sForceApiCall.sForceQuery($un, $pwd, $ana_9821_query,"query");
+
+$ana_9821_result.forEach(function($var) {
+	
+	$ana_9821_IB = $var.SVMXC__Installed_Product__c;
+	$ana_9821_Expected_uptime = $var.SVMXC__Expected_Uptime__c;
+	$ana_9821_downtime = $var.SVMXC__Downtime__c;
+	$ana_9821_wo_count = $var.SVMXC__Workorder_Count__c;
+	$ana_9821_Actual_uptime=$var.SVMXC__Actual_Uptime__c;
+    $ana_9821_MTBF=$var.SVMXC__MTBF__c;
+    $ana_9821_run_on=$var.SVMXC__Run_On__c;
+    $ana_9821_cal_method=$var.SVMXC__Calculation_Method__c;
+    
+});
+
+var $stdate = new Date($IB_created_date);
+_log($stdate);
+var $rundate=new Date($ana_9821_run_on);
+_log($rundate);
+var $datevalue = Math.round((($stdate.getTime() - $rundate) / 1000) / (-60)); 
+_log($datevalue);
+
+if($datevalue!=$ana_9821_Expected_uptime)
+{
+$datevalue=$datevalue+1;
+}
+
+var $Actual_Uptime=$datevalue-$Downtime;
+var $MTBF=$Actual_Uptime/1;
+
+
+
+_log($ana_9821_IB);
+_log($ana_9821_Expected_uptime);
+_log($ana_9821_downtime); 
+_log($ana_9821_wo_count);
+
+_assertNull($ana_9821_IB);
+_assertNull($ana_9821_Expected_uptime);
+_assertNull($ana_9821_downtime);
+_assertNull($ana_9821_wo_count);
+_assertNull($ana_9821_Actual_uptime);
+_assertNull($ana_9821_MTBF);
+_assertNull($ana_9821_cal_method);
+
+$an_ana_9821.end();
+
+
+
+
+

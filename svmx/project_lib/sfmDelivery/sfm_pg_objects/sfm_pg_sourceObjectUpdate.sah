@@ -1,0 +1,75 @@
+var $sfm_pg_sourceObjectUpdate = new function sfm_pg_sourceObjectUpdate(){
+	
+	this.lbl_selectSrcObject = _f("main").s_label("Select source object(s) to be updated from target(s)");
+	this.lbl_fieldUpdates = _f("main").s_label("/Field updates required for/");
+	this.btn_addSOU = _f("main").s_button("Add a row").rightOf(this.lbl_fieldUpdates);
+	this.btn_clearAllUpdates = _f("main").s_button("Clear All Updates For This Object").rightOf(this.lbl_fieldUpdates);
+	this.btn_yesSOU = _f("main").button("Yes").near(_f("main").uiftetextfield("SFM Transaction Designer"));
+	this.btn_noSOU = _f("main").button("No").near(_f("main").uiftetextfield("SFM Transaction Designer"));
+	this.btn_addSOURow = _f("main").s_button("+");
+	this.btn_delSOURow = _f("main").s_button("-");
+	this.lbl_clickToAddField = _f("main").s_label("Click to add field");
+	this.btn_AddFieldSOU = _f("main").s_button("Add Field");
+	this.txt_quickFindSOU = _f("main").s_textinput("searchText").near(this.btn_AddFieldSOU);
+	this.sel_conditionCombo = _f("main").s_dropdownlist("conditionsCombo");
+	this.sel_operandTypeCombo = _f("main").s_dropdownlist("operandTypeCombo");
+	this.sel_valuesCombo = _f("main").s_combobox("valuesCombo");
+	this.tab_SOU = _f("main").tab("Source Object Update");
+	this.btn_toggleValueSOU = _f("main").s_togglebutton("I want to enter a specific value for this field");
+	this.btn_toggleFieldSOU =_f("main").s_togglebutton("I want to choose a field from the list");
+	
+	
+	/**
+	 * Function		: 	To create source object update on the selected source object
+	 * Parameter	:	$souObject = Source object
+	 * 					$field = Field to be updated
+	 * 					$condition = Set as dropdown has only one valuse
+	 * 					$operand = Field/Function/Value/Question
+	 * 					$value = Value to be set for the field
+	 * 					$processType = Checklist/Others
+	 * Returns		:	Nothing
+	 * Example		:	Refer RS_7080.sah file for function usage
+	 */
+	this.createSOU = function($souObject,$field, $condition, $operand, $value,$processType){
+		//_selectDomain($g_domain);
+		_click($sfm_pg_sourceObjectUpdate.tab_SOU);
+		_setStrictVisibilityCheck(true);
+		_click(_f("main").s_label($souObject).near($sfm_pg_sourceObjectUpdate.lbl_selectSrcObject));
+		_wait(3000);
+		_click($sfm_pg_sourceObjectUpdate.btn_addSOU);
+		for(var $i=0; $i<$field.length; $i++){		
+			if($i == 0){
+				//donothing
+			}else{
+				_click($sfm_pg_sourceObjectUpdate.btn_addSOURow.near($sfm_pg_sourceObjectUpdate.lbl_selectSrcObject));
+			}
+			_click($sfm_pg_sourceObjectUpdate.lbl_clickToAddField);
+			_wait(2000);
+			_setValue($sfm_pg_sourceObjectUpdate.txt_quickFindSOU,$field[$i]);
+			_doubleClick(_f("main").s_label($field[$i]).near($sfm_pg_sourceObjectUpdate.btn_AddFieldSOU));
+			if($processType=='Checklist'){
+				_setSelected(_f("main").s_dropdownlist("operandTypeCombo"+"["+$i+"]"),$operand[$i]);
+				if($operand[$i]=='Value'){
+					if(_getValue(_f("main").s_combobox("valuesCombo"+"["+$i+"]").near($sfm_pg_sourceObjectUpdate.lbl_fieldUpdates))!=""){
+						_setSelected(_f("main").s_combobox("valuesCombo"+"["+$i+"]").near($sfm_pg_sourceObjectUpdate.lbl_fieldUpdates),$value[$i]);
+					}else{
+					_setValue(_f("main").s_textinput("textInput").rightOf(_f("main").s_dropdownlist("operandTypeCombo"+"["+$i+"]")),$value[$i]);
+					}
+				}else{
+					_setSelected(_f("main").s_combobox("valuesCombo"+"["+$i+"]").near($sfm_pg_sourceObjectUpdate.lbl_fieldUpdates),$value[$i]);
+				}
+			}else{
+				if($operand[$i]=='Field'){
+					_setSelected(_f("main").s_combobox("valuesCombo"+"["+$i+"]"),$value[$i]);			
+				}else if($operand[$i]=='Function'){
+					_click($sfm_pg_sourceObjectUpdate.btn_toggleValueSOU.near(_f("main").s_label($field[$i])));
+					_setSelected(_f("main").s_combobox("valuesCombo"+"["+$i+"]"),$value[$i]);
+				}else{
+					_click($sfm_pg_sourceObjectUpdate.btn_toggleValueSOU.near(_f("main").s_label($field[$i])));
+					_setValue(_f("main").s_textinput("textInput").near(_f("main").s_label($field[$i])),$value[$i]);		
+				}				
+			}
+		}
+		_setStrictVisibilityCheck(false);
+	};
+};

@@ -1,0 +1,181 @@
+/**
+ * Functions for the Accounts Object
+ */
+var $bo_act_installedProduct = new function bo_act_installedProduct() {
+
+	/**
+	 * Create an Account
+	 * 
+	 */
+	this.createInstalledProduct = function($productName,$accountName,$contactName) {
+		var $serialNum = $bo_act_common.generateRandomName("IB_");
+		//var $IBName = $bo_act_common.generateRandomName("IB_");
+		 $bo_act_navigation.navigateToInstalledProductPage();
+		_wait(5000,_isVisible($bo_pg_installedProducts.btn_new));
+		 _click($bo_pg_installedProducts.btn_new);
+		if(_condition(_heading2("Select Installed Product Record Type") != null))
+			_click($bo_pg_installedProducts.btn_continue); 
+			_setValue($bo_pg_installedProducts.txt_productName,$productName);
+			_setValue($bo_pg_installedProducts.txt_serialNumber, $serialNum);
+		_setValue($bo_pg_installedProducts.txt_accountName, $accountName);
+		_setValue($bo_pg_installedProducts.txt_contactName, $contactName);
+		_setValue($bo_pg_installedProducts.txt_installedProductName, $serialNum);
+		_setValue($bo_pg_installedProducts.txt_installedDate);
+		_setValue(_textbox("/City/"),"Bangalore");
+		_click($bo_pg_installedProducts.btn_save);
+		_assertNotVisible(_div("/Error: Invalid Data/"));
+		_logOutput($serialNum+ " IB is created");
+		_wait(15000, _isVisible(_heading2($serialNum)));
+		return $serialNum;
+	};
+	
+	this.createIBWithSameSerialAndIB_ID = function($productName,$accountName,$contactName,$locationName) {
+		//var $serialNum = $bo_act_common.generateRandomName("Ser");
+		var $IBName = $bo_act_common.generateRandomName("IB_");
+		 $bo_act_navigation.navigateToInstalledProductPage();
+		_wait(5000,_isVisible($bo_pg_installedProducts.btn_new));
+		 _click($bo_pg_installedProducts.btn_new);
+		if(_condition(_heading2("Select Installed Product Record Type") != null))
+			_click($bo_pg_installedProducts.btn_continue); 
+			_setValue($bo_pg_installedProducts.txt_productName,$productName);
+			_setValue($bo_pg_installedProducts.txt_serialNumber, $IBName);
+		_setValue($bo_pg_installedProducts.txt_accountName, $accountName);
+		_setValue($bo_pg_installedProducts.txt_contactName, $contactName);
+		_setValue($bo_pg_installedProducts.txt_installedProductName, $IBName);
+		_setValue($bo_pg_installedProducts.txt_locationName, $locationName);
+		_setValue($bo_pg_installedProducts.txt_installedDate);
+		_setValue(_textbox("/City/"),"Bangalore");
+		_click($bo_pg_installedProducts.btn_save);
+		_assertNotVisible(_div("/Error: Invalid Data/"));
+		_logOutput($IBName+ " IB is created");
+		_wait(15000, _isVisible(_heading2($IBName)));
+		return $IBName;
+	};
+	
+	// Added By Bhupendra Singh for APM Integration Testing
+	this.createIBWithExternalRecordID = function($Prefix,$productName,$ExternalRecordID_IB,$Ext_accountID,$Ext_locationID,$Ext_ParentID,$Ext_TopLevelID,$city) {
+		var $IBName = $bo_act_common.generateRandomName($Prefix);
+		 $bo_act_navigation.navigateToInstalledProductPage();
+		_wait(5000,_isVisible($bo_pg_installedProducts.btn_new));
+		 _click($bo_pg_installedProducts.btn_new);
+		if(_condition(_heading2("Select Installed Product Record Type") != null))
+			_click($bo_pg_installedProducts.btn_continue); 
+			_setValue($bo_pg_installedProducts.txt_productName,$productName);
+			_setValue($bo_pg_installedProducts.txt_serialNumber, $IBName);
+			_setValue($bo_pg_installedProducts.txt_installedProductName, $IBName);
+			_setValue($bo_pg_installedProducts.txt_ExternalRecordID_IB, $ExternalRecordID_IB);
+			_setValue($bo_pg_installedProducts.txt_externalAccountID_IB, $Ext_accountID);
+			_setValue($bo_pg_installedProducts.txt_externalLocationID_IB, $Ext_locationID);
+			_setValue($bo_pg_installedProducts.txt_externalParentID_IB, $Ext_ParentID);
+			_setValue($bo_pg_installedProducts.txt_externalTopLevelID_IB, $Ext_TopLevelID);
+			_setValue($bo_pg_installedProducts.txt_installedDate);
+			_setValue($bo_pg_installedProducts.txt_city,$city);
+			_click($bo_pg_installedProducts.btn_save);
+			_assertNotVisible(_div("/Error: Invalid Data/"));
+			_logOutput($IBName+ " IB is created");
+			_wait(15000, _isVisible(_heading2($IBName)));
+		return $IBName;
+	};
+	
+	this.createIB_Statusvalue =  function($productName,$accountName,$contactName, $status) {
+		var $serialNum = $bo_act_common.generateRandomName("Ser");
+		var $IBName = $bo_act_common.generateRandomName("IB_");
+		 $bo_act_navigation.navigateToInstalledProductPage();
+		_wait(5000,_isVisible($bo_pg_installedProducts.btn_new));
+		 _click($bo_pg_installedProducts.btn_new);
+		if(_condition(_heading2("Select Installed Product Record Type") != null))
+			_click($bo_pg_installedProducts.btn_continue); 
+		_setValue($bo_pg_installedProducts.txt_productName,$productName);
+		_setValue($bo_pg_installedProducts.txt_serialNumber, $serialNum);
+		_setValue($bo_pg_installedProducts.txt_accountName, $accountName);
+		_setValue($bo_pg_installedProducts.txt_contactName, $contactName);
+		_setSelected($bo_pg_installedProducts.editStatus, $status);
+		_setValue($bo_pg_installedProducts.txt_installedProductName, $IBName);
+		_setValue($bo_pg_installedProducts.txt_installedDate);
+		_setValue(_textbox("/City/"),"Bangalore");
+		_click($bo_pg_installedProducts.btn_save);
+		_assertNotVisible(_div("/Error: Invalid Data/"));
+		_logOutput($IBName+ " IB is created");
+		_wait(15000, _isVisible(_heading2($IBName)));
+		return $IBName;
+	
+	};
+	
+	this.createIB_DistributorAccount = function($productName,$distributoraccountName,$contactName, $accountName){
+		
+		var $serialNum = $bo_act_common.generateRandomName("Ser");
+		var $IBName = $bo_act_common.generateRandomName("IB_");
+		 $bo_act_navigation.navigateToInstalledProductPage();
+		_wait(5000,_isVisible($bo_pg_installedProducts.btn_new));
+		 _click($bo_pg_installedProducts.btn_new);
+		if(_condition(_heading2("Select Installed Product Record Type") != null))
+		_click($bo_pg_installedProducts.btn_continue); 
+		_setValue($bo_pg_installedProducts.txt_productName,$productName);
+		_setValue($bo_pg_installedProducts.txt_serialNumber, $serialNum);
+		_setValue($bo_pg_installedProducts.txt_distributor_account, $distributoraccountName);
+		_setValue($bo_pg_installedProducts.txt_accountName, $accountName);
+		_setValue($bo_pg_installedProducts.txt_contactName, $contactName);
+		_setValue($bo_pg_installedProducts.txt_installedProductName, $IBName);
+		_setValue($bo_pg_installedProducts.txt_installedDate);
+		_setValue(_textbox("/City/"),"Bangalore");
+		_click($bo_pg_installedProducts.btn_save);
+		_assertNotVisible(_div("/Error: Invalid Data/"));
+		_logOutput($IBName+ " IB is created");
+		_wait(15000, _isVisible(_heading2($IBName)));
+		return $IBName;
+		
+
+	};
+	this.deleteInstalledProduct = function($IBName){
+		 $bo_act_navigation.navigateToInstalledProductPage();
+		 _click(_link($IBName));
+		  _click($bo_pg_installedProducts.btn_delete);
+	};
+	this.openInstalledProductRecord = function($IBName){
+		 $bo_act_navigation.navigateToInstalledProductPage();
+		 _click(_link($IBName));
+	};
+
+	this.createWOFromIB = function($IBName){
+		$bo_act_navigation.navigateToInstalledProductPage();
+		_click(_link($IBName));
+		_selectDomain("/svmx/");
+		_wait(60000,_isVisible($bo_pg_installedProducts.btn_createWorkOrder));
+		_click($bo_pg_installedProducts.btn_createWorkOrder);
+		_selectDomain();
+		_wait(60000,_isVisible($bo_pg_installedProducts.btn_sfmSave));
+		_click($bo_pg_installedProducts.btn_sfmSave);
+		_wait(60000,_isVisible(txt_workOrderNumber));
+		return _getText($bo_pg_installedProducts.txt_workOrderNumber);
+	};
+	
+	this.createSupportCase = function($status){
+		$bo_act_navigation.navigateToInstalledProductPage();
+		_click(_link($IBName));
+		_selectDomain($g_domain);
+		_click($bo_pg_installedProducts.btn_SFWcreateSupportCase);
+		_selectDomain();
+		_wait(60000,_isVisible($bo_pg_installedProducts.txt_SFMcreateSupportCaseStatus));
+		_wait(9000);
+		_setValue($bo_pg_installedProducts.txt_SFMcreateSupportCaseStatus,$status);
+		_click($bo_pg_installedProducts.btn_sfmSave);
+		_wait(10000);
+		return _getText($bo_pg_installedProducts.txt_caseNumber);
+	};
+	// Added By Bhupendra Singh
+	this.createSupportCaseFromIB = function($IBName,$status,$priority,$caseOrigin){
+		$bo_act_navigation.navigateToInstalledProductPage();
+		_click(_link($IBName));
+		_selectDomain($g_domain);
+		_click($bo_pg_installedProducts.btn_SFWcreateSupportCase);
+		_selectDomain();
+		_wait(60000,_isVisible($bo_pg_installedProducts.txt_SFMcreateSupportCaseStatus));
+		_setValue($bo_pg_installedProducts.txt_SFMcreateSupportCaseStatus,$status);
+		_setValue($bo_pg_installedProducts.txt_SFMcreateSupportCasePriority,$priority);
+		_setValue($bo_pg_installedProducts.txt_SFMcreateSupportCaseOrigin,$caseOrigin);
+		_click($bo_pg_installedProducts.btn_sfmSave);
+		_wait(6000);
+		return _getText($bo_pg_installedProducts.txt_caseNumber);
+	};
+
+};

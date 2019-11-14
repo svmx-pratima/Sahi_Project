@@ -1,0 +1,9 @@
+/*SFM Delivery page Objects */
+
+var $swat_pg_SFM = new function swat_pg_SFM(){
+	
+	this.btn_quickSave1 = _f("main").s_button("Quick Save");
+    this.btn_saveAndclose = _f("main").s_button("Save & Close");
+    this.btn_SfmSaved = _f("main").uiftetextfield("SFM Transaction saved");
+	
+};

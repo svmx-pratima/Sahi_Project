@@ -1,0 +1,12 @@
+var $RS_User = _testcase("First time users opt in as Servicemax user.");
+$RS_User.start();
+_setSpeed(100);
+// Just login to the org and run this script it will create users 
+/*for(var i =1; i<=50; i++){
+var $userName = $bo_act_salesforcePageSetUp.createUser("Salesforce", "TS Sys Admin");
+}*/
+$bo_act_interactiveEntitlement_WO.performInteractiveEntitlementWO_UsingScon("WO-00000003", "Scon3042019122140");
+
+
+
+$RS_User.end();

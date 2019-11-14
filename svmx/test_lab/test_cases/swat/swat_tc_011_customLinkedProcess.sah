@@ -1,0 +1,92 @@
+//Author - Shashikala Kamath
+//Modifed By :- Ashwini Holagi
+
+var $swat_tc_011_customLinkedProcess = _testcase("swat_tc_011_customLinkedProcess","Verify linked Process.");
+	
+	$swat_tc_011_customLinkedProcess.start();
+
+	var $sfmToBeCloned1 = "Manage Work Details for Products Serviced";
+	var $LinkedsfmName = $bo_act_common.generateRandomName("Manage_WD_ProductServiced");
+	var $LinkedsfmPgLayoutName = $LinkedsfmName;	
+	var $LinkedsfmTemplate = "SVMXSTD: Manage Usage Lines for Products Serviced";
+		
+	var $sfmToBeCloned = "Add/Edit Products Serviced";
+	var $sfmName = $bo_act_common.generateRandomName("SFM_Auto_");
+	var $sfmTemplateSaveAsName = $sfmName;	
+	var $sfmTemplate = "SVMXSTD: Add/Edit Products Serviced";  
+	var $isCustom = false;
+		
+	var $wizardObjectName = "Work Order";
+	var $wizardTitleName = $bo_act_common.generateRandomName("SFWTitle");
+	var $wizardIDName = $bo_act_common.generateRandomName("SFWId");
+	var $wizardStepType = "SFM";
+	var $executionMode = "Interactive";
+	var $handOver = false;
+		
+	// Login to App
+	$bo_act_login.login($swat_Url,$swat_un,$swat_pwd);
+		
+	//Create Work Order, Product through API
+	var $Product = $swat_act_createDataUsingApi.createProduct($swat_un, $swat_pwd, $swat_ClientId, $swat_ConsumerSecret, $swat_OrgInstance);
+	var $workOrderNo = $swat_act_createDataUsingApi.createWorkOrder($swat_un, $swat_pwd, $swat_ClientId, $swat_ConsumerSecret, $swat_OrgInstance);
+		
+	//Clone SFM Process
+	$sfm_act_SFM.cloneTDM016($sfmToBeCloned1, $LinkedsfmName, $isCustom, $LinkedsfmPgLayoutName, $LinkedsfmTemplate, "", "");
+	$swat_act_SFM.quickSaveSfmTransaction();
+		
+	$swat_act_SFM.createCustomLinkedProcess($sfmToBeCloned,$sfmName, $sfmTemplateSaveAsName);
+		
+	//Steps to create SFM Wizard and Add Step of type SFM
+	$swat_act_sfmWizard.createSfmWizardWithStepSFM($wizardObjectName,$wizardTitleName, $wizardIDName,$wizardStepType,$sfmName, $executionMode, $handOver);
+		
+	global_clearBrowserCache();
+	
+	//Global Search WorkOrder
+	$sfm_act_common.globalSearch($workOrderNo);
+	_wait(10000);
+		
+	//Click 'Add/Edit Products Serviced' in SFM Wizard
+	$swat_act_sfmDelivery.launchSfmDelivery($sfmName,$wizardTitleName);
+	_wait(10000,_isVisible(_label("Site:")));
+		
+	// Add a Product Serviced Child Line	
+	$swat_act_sfmDelivery.addProductServiced("Products Serviced", $Product);
+		
+	//Click on Linked SFM Process
+	_click($swat_pg_sfmDelivery.btn_downArrow);
+	_wait(3000);
+	_click(_span($LinkedsfmName));
+	_wait(10000);
+		
+	//Add Parts Child Line
+	var $lineQty= 10;
+	var $searchValue=$Product;
+	$bo_act_getPrice.addPartsLineToSFMDelivery($searchValue, $lineQty);
+	_wait(2000);
+		
+	//Add Labor Child Line
+	$bo_act_getPrice.addLaborLineToSFMDelivery($searchValue, "Service", "03", "05");
+	_wait(2000);
+		
+	//Add Expense Child Line
+	$bo_act_getPrice.addExpensesLineToSFMDelivery("Phone", "03", "3000");
+	_wait(2000);
+		
+	//Add Travel Child Line
+	$bo_act_getPrice.addTravelLineToSFMDeliveryUsingStartEndDate("01", "03");
+	_wait(2000);
+	
+	//Click on Save button in Work Detail
+	$swat_act_sfmDelivery.saveSfmDelivery();
+		
+	//Click on Save button in 'Add/Edit Products Serviced' in SFM Delivery
+	$swat_act_sfmDelivery.saveSfmProductServiced();
+		
+	//Verify Record type of Work Details
+	$swat_act_workOrders.verifyRecordTypeofLineItem("Usage/Consumption", "Parts");
+	$swat_act_workOrders.verifyRecordTypeofLineItem("Usage/Consumption", "Labor");
+	$swat_act_workOrders.verifyRecordTypeofLineItem("Usage/Consumption", "Expenses");
+	$swat_act_workOrders.verifyRecordTypeofLineItem("Usage/Consumption", "Travel");
+	$swat_act_workOrders.verifyRecordTypeofLineItem("Products Serviced", "");
+		
+	$swat_tc_011_customLinkedProcess.end();

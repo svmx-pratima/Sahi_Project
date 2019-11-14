@@ -1,0 +1,49 @@
+/**
+ * Functions for the Accounts Object
+ */
+var $bo_act_salesforcePages = new function bo_act_salesforcePages() {
+
+	
+this.editObject = function(){
+		_click($bo_pg_salesforcePages.btn_edit);
+};
+
+this.selectOptionFromDropdown = function($object,$objectValue){
+	_setSelected($object,$objectValue);
+};
+
+this.saveObject = function(){
+	_click($bo_pg_salesforcePages.btn_save);
+};
+this.checkNameSpace = function(){
+$bo_act_navigation.navigateToSetUpAndSearch("Installed Packages");
+_wait(60000,_isVisible(_heading1("Installed Packages")));
+_click(_link("/ServiceMax/"));
+_wait(3000);
+if(_getText(_cell(0,_rightOf(_cell("Namespace Prefix"))))!="SVMXDEV")
+var $nameSpace = "SVMXC";
+else
+$nameSpace = "SVMXDEV";
+return $nameSpace;
+};
+
+
+//Lightning Methods
+
+this.LightningSalesforceSearch = function($value){
+_setValue(_textbox("Search Salesforce"),$value);
+_click(_div("Search"));
+_click(_link($value));
+};
+
+//Classic Community Search
+this.ClassicCommunitySearch = function($value){
+_setValue(_textbox("phSearchInput"), $value);
+_click(_button("Search"));
+_wait(1000);
+_click(_link("Search All"));
+_click(_link($value));
+};
+
+
+};

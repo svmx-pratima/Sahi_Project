@@ -1,0 +1,98 @@
+//Author: Shashikala Kamath
+
+var $BVT_TC_006_WebService = _testcase("$BVT_TC_006_WebService","Configure standard and custom webservice and launch in delivery");
+$BVT_TC_006_WebService.start();
+
+// Pre-requsite: Create a custom webservice in the org: TestWebServices
+
+var $rs_5486 = _testcase("RS_5486","");
+$rs_5486.start();
+var $customActionObject = "Work Order";
+var $actionType="Web Service";
+var $actionId = $bo_act_common.generateRandomName("RS-5486WebServices_CA");
+var $actionId1 = "Generate Invoice"; 
+var $className = "TestWebServices";
+var $methodName = "test_WS";
+var $paramName="Name";
+var $paramValueType="Value";
+var $paramValue=$actionId;
+var $processingMessage = "Account creation under process";
+var $successMessage = "Accounts inserted sucessfully";
+
+var $wizardName_swat = "SFM Delivery Auto";
+var $wizardType="Others";
+var $orderStatus_value = "Closed";
+//var $woName="WO-00000872";
+//var $domainName = "/visual.force.com/";
+
+
+_setSpeed($g_stepSpeed);
+//$bo_act_login.login($g_url, $sfmUsn, $sfmPwd);
+$bo_act_login.login("https://test.salesforce.com","spr18admin@servicemax.com", "svmx1234");
+
+$sfm_act_navigation.navigateToSfmCustomActions();
+//$sfm_act_customActions.webServiceCustomAction($customActionObject, $actionType, $actionId, $className, $methodName,$processingMessage,$paramName, $paramValueType, $paramValue);
+//remove below comment
+$sfm_act_customActions.webServiceCustomAction($customActionObject, $actionType, $actionId, $className, $methodName, $processingMessage, $paramName, $paramValueType, $paramValue);
+$sfm_act_wizards.addToWizard($customActionObject, $wizardName_swat, $wizardType, $actionId);
+$sfm_act_wizards.addToWizard($customActionObject, $wizardName_swat, $wizardType, $actionId1);
+
+//Create WO through UI for the validatiion
+$sfm_act_createCustomWizard.createBlankWo();
+_wait(5000);
+//_selectDomain($domainName);
+_selectDomain("/svmx/");
+_click(_button($actionId));
+//_call(_button($actionId).scrollIntoView()); 	
+//_click(_button($ac qtionId));
+_selectDomain(); 	
+_wait(3000);
+//_span("Account creation under process")
+// if(_isVisible(_div($processingMessage))){
+// 	_log("Pass ::: Account creating under process");
+// }else{                      
+// 	_fail("Fail","FAILURE");
+// }
+
+if(_isVisible(_div($successMessage))){
+	_log("Pass ::: Account created successfully");
+	_click(_submit("Return"));
+}
+	_wait(3000);
+	
+	_doubleClick(_div("Open"));
+	//_setSelected(_select(0,_rightOf(_span("/Order Status/"))),"Closed");
+	_setSelected($bo_pg_workOrders.sel_orderStatus,$orderStatus_value);
+	 //_doubleClick(_div("Open"));
+	//_setSelected(_doubleClick(_div("Open")),"Closed");
+	//_setSelected(_select(0,_rightOf(_span("/Order Status/"))),"Closed");
+	_click(_button(" Save "));
+	
+	
+//	_wait(5000);
+//	_selectDomain("/svmx/");
+//	_click(_button($actionId));
+//	_selectDomain(); 	
+//	_wait(3000);
+//	if(_isVisible(_div($successMessage))){
+//		_log("Pass ::: Account created successfully");
+//		_click(_submit("Return"));
+//	}
+
+	_wait(30000);
+	_selectDomain("/svmx/");
+	_click(_button($actionId1));
+	_selectDomain(); 	
+	_wait(30000);
+	if(_isVisible(_cell("Invoice Number"))){
+		
+		_log("Pass :: Successfully");
+	}
+	else
+		_log("Fail :: Not successful");
+		
+
+$rs_5486.end();
+
+
+$BVT_TC_006_WebService.end();

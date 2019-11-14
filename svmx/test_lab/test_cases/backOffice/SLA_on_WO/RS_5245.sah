@@ -1,0 +1,82 @@
+
+//author - Noor Salma Sharieff
+
+var $RS_5245 = _testcase("$RS_5245","RESTORATION response on WO:Clock paused/resumed without extending SLA commitment");
+$RS_5245.start();
+_setSpeed($g_stepSpeed);
+
+//Pre - Condition 
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+$bo_act_navigation.navigateToConfigurationProfilesPage();
+$bo_act_configurationProfiles.editGlobalProfileForBooleanSettings("Service Level Agreement", "SLA Clock on Work Order", "SET003", true);
+$bo_act_configurationProfiles.editGlobalProfileForBooleanSettings("Service Level Agreement", "SLA Clock on Work Order", "SET005", true);
+
+var $accName = $bo_act_accounts.createAccount();
+var $proName = $bo_act_products.createProduct("pro12", "--None--");
+var $IBName = $bo_act_installedProduct.createInstalledProduct($proName,$accName,"");
+var $contactName = $bo_act_contacts.createContact($accName); 
+var $caseNumber = $bo_act_installedProduct.createSupportCase("New");
+var $WONumber = $bo_act_installedProduct.createWOFromIB($IBName);
+
+var $slaterm = $bo_act_slaTerms.createSlaTerms("Default");
+$bo_act_slaTerms.addRestorationToSLA($slaterm, "WorkOrder","All", "High", "Created Date", 30, 60, "SLA");
+
+$bo_act_workOrders.editWorkOrder($WONumber);
+$bo_act_workOrders.updateTextBoxFields($bo_pg_workOrders.txt_slaTerms, $slaterm);
+$bo_act_workOrders.updateTextBoxFields($bo_pg_workOrders.txt_case, $caseNumber);
+$bo_act_workOrders.updateTextBoxFields($bo_pg_workOrders.txt_contact, $contactName);
+$bo_act_workOrders.updateDropDownFields($bo_pg_workOrders.sel_priority, "High");
+$bo_act_workOrders.saveWorkOrder();
+
+//Validations
+_selectDomain($g_domain);
+_wait(3000,_isVisible(_table("/timer/")));
+_assertNotContainsText("Restoration 00:00:00:00",$bo_pg_workOrders.txt_slaClock,"SLA Clock Issue");
+_selectDomain();
+_assertNotEqual(_getText($bo_pg_workOrders.txt_RestorationInternalBy)," ","Issue in Initial Response Internal By field");
+_assertNotEqual(_getText($bo_pg_workOrders.txt_RestorationCustomerBy)," ","Issue in Initial Response Customer By field");
+
+$bo_act_workOrders.pauseSLAClock();
+_wait(60000);
+$bo_act_workOrders.resumeSLAClock("No");
+
+_selectDomain($g_domain);
+_assertNotContainsText("Restoration 00:00:00:00",$bo_pg_workOrders.txt_slaClock,"SLA Clock Issue");
+_selectDomain();
+
+_call(location.reload());
+_assertExists($bo_pg_workOrders.link_SLAClockStop);
+_assertExists($bo_pg_workOrders.link_SLAClockStart);
+
+
+$bo_act_workOrders.editWorkOrder($WONumber);
+$bo_act_workOrders.clickLinktoUpdateTextfields($bo_pg_workOrders.txt_actualRestorationOnEditWO);
+$bo_act_workOrders.saveWorkOrder();
+_assertNotEqual(_getText($bo_pg_workOrders.txt_TimeToRestore),"", "issue in Time to Onsite Response");
+
+//Clean up function
+
+//var $datacreated = [$proName,$IBName,$contactName,$WONumber,$slaterm,$caseNumber,$accName];
+//for (var i = 0; i < $datacreated.length; i++) {
+//	$bo_act_common.cleanUpfunction($datacreated[i]);
+//}
+
+var $Workbenchurl = "https://workbench.developerforce.com/login.php";
+var $nameSpace = $bo_act_salesforcePages.checkNameSpace();
+
+var $delscript =
+	"DELETE[SELECT id FROM Contact WHERE Name = '"+$contactName+"'];\n"+
+	"DELETE[SELECT id FROM Case WHERE CaseNumber = '"+$caseNumber+"'];\n"+
+	"DELETE[SELECT id FROM Account WHERE Name = '"+$accName+"'];\n"+
+	"DELETE[SELECT id FROM Product2 WHERE Name = '"+$proName+"'];\n"+
+	"DELETE[SELECT id FROM "+$nameSpace+"__Installed_Product__c WHERE Name = '"+$IBName+"'];\n"+
+	"DELETE[SELECT id FROM "+$nameSpace+"__Service_Order__c WHERE Name = '"+$WONumber+"'];\n"+
+	"DELETE[SELECT id FROM "+$nameSpace+"__Service_Level__c WHERE Name = '"+$slaterm+"'];\n";
+
+$bo_act_login.loginToWorkBench($Workbenchurl,"Sandbox", $bac_un, $bac_pwd);
+$bo_act_login.runApexScriptinWB($delscript);
+
+$RS_5245.end();
+
+
+

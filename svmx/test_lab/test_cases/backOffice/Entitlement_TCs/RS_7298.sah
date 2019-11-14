@@ -1,0 +1,244 @@
+//Tests are to be written here [Bhupendra Singh Chouhan]
+//==============
+
+//Pre - Condition Test Data
+var $recordType = ["Depot","Depot Child","Depot Parent","Standard Location"];
+var $productFamily = ["--None--","GeneralSolution","AdvSolution","Accessory", "Storage"];
+var $productCode = "";
+var $exchangeType = ["--None--","Advance Exchange","Return Exchange"];
+var $unitOfTimeForCoverage = ["--None--","Days","Weeks","Months","Years"];
+var $coverageEffectiveFrom = ["--None--","Date Installed","Date Ordered","Date Shipped","Last Activity Date","Last Date Shipped","Warranty Start Date","Warranty End Date"];
+var $materialPercentCovered = 10;
+var $laborPercentCovered = 20;
+var $expensesPercentCovered = 30;
+var $durationOfCoverage = 5;
+var $seperator = "/";
+
+var $RS_7298 = _testcase("$RS_7298","Auto Entitlement based on Product:- Entitlement on a WO using Service Contract.");
+$RS_7298.start();
+_setSpeed($g_stepSpeed);
+/**
+* Login to the Sandbox Org
+*/
+
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+
+/**
+ * Create Account, Contact, Location, Product and Installed Product
+ */
+var $accountName = $bo_act_accounts.createAccount();
+var $contactName = $bo_act_contacts.createContact($accountName);
+var $locationName = $bo_act_locations.createLocation($recordType[3],$accountName,"#007","India","560001");
+var $productName = $bo_act_products.createProduct($productCode, $productFamily[0]);
+var $IBName = $bo_act_installedProduct.createInstalledProduct($productName, $accountName, $contactName);
+
+/**
+ * Create 5 Year WN Template
+ */
+/*var $warrantyName = $bo_act_warrantyTerms.createWarrantyTerms($exchangeType[2],"10","5",$unitOfTimeForCoverage[4],"20","5",$unitOfTimeForCoverage[4],"30","5",$unitOfTimeForCoverage[4],$coverageEffectiveFrom[1]);
+$bo_act_warrantyTerms.createApplicableProducts($productName, $warrantyName); //Create Applicable product for warranty Terms
+$bo_act_navigation.navigateToCreatedRecordUsingGlobalSearch($IBName); 	//Navigate to Installed Product Page using global search
+$bo_act_warrantyTerms.createWarranty($warrantyName);
+
+$bo_act_navigation.navigateToCreatedRecordUsingGlobalSearch($IBName);	//Navigate to Installed Product Page using global search
+
+var $materialPercentCoveredActulOn_IB = _getText(_cell(0,_under(_tableHeader("Material % Covered"))));
+var $timePercentCoveredActulOn_IB = _getText(_cell(0,_under(_tableHeader("Time % Covered"))));
+var $expensesPercentCoveredActulOn_IB = _getText(_cell(0,_under(_tableHeader("Expenses % Covered"))));
+
+//validation
+//Validating the Material Labor and Expenses Percent
+_assertEqual($materialPercentCovered,$materialPercentCoveredActulOn_IB,"Actual and expected Material % covered are not same");
+_assertEqual($laborPercentCovered,$timePercentCoveredActulOn_IB,"Actual and expected Time % covered are not same");
+_assertEqual($expensesPercentCovered,$expensesPercentCoveredActulOn_IB,"Actual and expected Expenses % covered are not same");
+
+var $startDateExpectedOn_IB = _getText(_div(0,_rightOf(_cell("/Date Installed/"))));
+_logOutput($startDateExpectedOn_IB);
+
+var $endDateExpectedOn_IB =  $bo_act_common.endDateCalculationForIB($startDateExpectedOn_IB, $durationOfCoverage, $seperator);
+_logOutput($endDateExpectedOn_IB);
+
+var $startDateActulOn_IB = _getText(_cell(0,_under(_tableHeader("Start Date"))));
+var $endDateActulOn_IB = _getText(_cell(0,_under(_tableHeader("End Date"))));
+
+//Validating the Actual and expected Start/End Dates on IB
+_assertEqual($startDateExpectedOn_IB,$startDateActulOn_IB,"Actual and expected Start Dates are not same");
+_assertEqual($endDateExpectedOn_IB,$endDateActulOn_IB,"Actual and expected End Dates are not same");*/
+
+/**
+ * Create SLA Terms
+ */
+
+//Create 1st SLA Term SLA01 [Platinum SLA]
+var $slaName01 = $bo_act_slaTerms.createSlaTerms("Default");
+$bo_act_slaTerms.addInitialResponseToSLA($slaName01,"WorkOrder","Field Service","Medium","Created Date","5","10","SLA");
+//$bo_act_slaTerms.addOnsiteResponseToSLA($slaName01,"WorkOrder","Field Service","Medium","Created Date","10","15","SLA");
+
+//validation of SLA creation
+_assertExists(_span($slaName01));
+
+//Create 2nd SLA Term SLA02 [Gold SLA]
+var $slaName02 = $bo_act_slaTerms.createSlaTerms("Default");
+$bo_act_slaTerms.addInitialResponseToSLA($slaName02,"WorkOrder","Field Service","Medium","Created Date","5","10","SLA");
+//$bo_act_slaTerms.addOnsiteResponseToSLA($slaName02,"WorkOrder","Field Service","Medium","Created Date","10","15","SLA");
+
+//validation of SLA creation
+_assertExists(_span($slaName02));
+
+//Create 3rd SLA Term SLA03 [Silver SLA]
+var $slaName03 = $bo_act_slaTerms.createSlaTerms("Default");
+$bo_act_slaTerms.addInitialResponseToSLA($slaName03,"WorkOrder","Field Service","Medium","Created Date","5","10","SLA");
+//$bo_act_slaTerms.addOnsiteResponseToSLA($slaName03,"WorkOrder","Field Service","Medium","Created Date","10","15","SLA");
+
+//validation of SLA creation
+_assertExists(_span($slaName03));
+
+/**
+ * Create Service Contract(With child lines) and Activate it
+ */
+var $pastYear = 2;  // Start Date for Service Contract
+var $futureYear = 2;  // End Date for Service Contract
+
+// Creation of Service Contracts
+var $serviceConractName = $bo_act_serviceMaintenanceContracts.createServiceMaintenanceContract($accountName, $slaName01, $futureYear, $pastYear);
+
+//Activating Created Service Contract
+$bo_act_serviceMaintenanceContracts.activateServiceContract($serviceConractName);
+
+// Add Covered Product to Service Contract 
+
+var $pastYear = 3;  			// Start Date 'TODAY's' Date - 3 YEARS
+var $futureYear = 3;			// End Date 'TODAY's' Date + 3 YEARS
+
+$bo_act_serviceMaintenanceContracts.AddCoveredProducToServiceContract($serviceConractName, $IBName, $slaName02, $pastYear, $futureYear);
+
+//Add Covered Location to Service Contract 
+
+var $pastYear = 5;  			// Start Date 'TODAY's' Date - 5 YEARS
+var $futureYear = 5;			//End Date 'TODAY's' Date + 5 YEARS
+
+$bo_act_serviceMaintenanceContracts.addCoveredLocationToServiceContract($serviceConractName, $locationName, $slaName03, $pastYear, $futureYear);
+
+//Add Entitled Contact to Service Contract 
+
+$bo_act_serviceMaintenanceContracts.addEntitledContactsToServiceContract($serviceConractName, $contactName);
+
+
+/**
+ * Create Auto Entitlement Rules for Work Order
+ */
+
+var $WOField = "Order Type";
+var $Operator = "Equals";
+var $Value = "Depot Repair";
+var $EntitSetting = "Product";
+var	$p1 = "No";		        	// $p1 = Yes/No for Select should Entitlement Be Performed On Products Serviced?
+var	$p2 = "No";			    	// $p2 = Yes/No for Select should Parent IB Of Component Be Included for Entitlement check?
+var	$p3 = "No";					// $p3 = Yes/No for Select should Top-Level IB Of Component Be Included for Entitlement check?
+var	$p4 = "Service Contracts";	// $p4 = Warranties/Scon/Both for Entitlement check?
+var	$p5 = "No";					// $p5 = Yes/No Account on WO matched to Scon			
+var	$p6 = "No";					// $p6 = Yes/No Contact on WO matched to Scon
+var	$p7 = "No";					// $p7 = Yes/No Location included for Entitlement
+var	$p8 = "Validity dates";     // $p8 = Validity dates/Counters/Both
+var	$p9 = "No";					// $p9 = Yes/No SLA Coverage for Entitlement
+
+//Navigate to Auto Entitlement Rules - Work Order
+$autoEntitlementRuleName = $bo_act_autoEntitlementRule_WO.createAutoEntitlementRuleWithSCON_WO($WOField, $Operator, $Value, $EntitSetting, $p1, $p2, $p3, $p4, $p5, $p6, $p7, $p8, $p9);
+_wait(3000);
+
+//Changing the Rule Sequence
+$bo_act_autoEntitlementRule_WO.changingAutoEntitlementRule_SequenceTop($autoEntitlementRuleName);
+
+/**
+ * Configure the Global Profile SET001
+ */
+// Global Setting SET001 - Enable Auto Entitlement For Work Order is set to True for Auto Entitlement process to trigger 
+//(This is a Global Setting and is available under Module "Entitlement Verification" and Submodule "Auto-Entitlement - Work Order") 
+
+var $Module = "Entitlement Verification";
+var $SubModule = "Auto-Entitlement-Work Order";
+var $Setting = "SET001";
+var $value = true;
+$bo_act_configurationProfiles.editGlobalProfileForBooleanSettings($Module, $SubModule, $Setting, $value);
+
+/**
+ * Configure the Group Profile SET002
+ */
+//Ensure that the Group Setting SET002 - Auto Calculate Billing Type is set to True 
+// (This is a Group setting and is available under Module 'Entitlement Verification' and Submodule 'Auto- Entitlement-Work Order) 
+
+//var $groupProfileName = "AutoBACGroup";
+var $Module1 = "Entitlement Verification";
+var $SubModule1 = "Auto-Entitlement-Work Order";
+var $Setting1 = "SET002";
+var $value1 = true;
+$bo_act_configurationProfiles.editGroupProfileForBooleanSettings($groupProfileName, $Module1, $SubModule1, $Setting1, $value1);
+
+/**
+ * Create Case record
+ */
+var $caseStatus = "Escalated";
+var $casePriority = "Medium";
+var $caseOrigin = "Phone";
+var $caseNumber = $bo_act_Cases.createCase($caseStatus, $casePriority, $caseOrigin);
+
+//Edit the above case for Account, Contact and IB information
+var $caseSite = "";
+$bo_act_Cases.editCase($caseNumber,$accountName,$contactName,$IBName,$caseSite);
+
+/**
+ * Create Work Order record
+ */
+var $orderStatus = "Open";
+var $priority = "Medium";
+var $orderType = "Depot Repair";
+var $WONumber = $bo_act_workOrders.createWorkOrder($caseNumber,$accountName,$contactName,$IBName,$orderStatus,$priority,$orderType);
+
+//Perform Auto Entitlement on Work Order
+$bo_act_autoEntitlementRule_WO.performAutoEntitlement_WO($WONumber);
+
+//validate the Auto Entitlement Parameters 
+var $actual_AutoEntitlementStatus = _getText(_div(0,_rightOf(_cell("Auto Entitlement Status"))));
+//var $actual_IsEntitlementPerformed = "";
+var $actual_EntitlementNotes = _getText(_div(0,_rightOf(_cell("Entitlement Notes"))));
+
+var $actual_ServiceContract = _getText(_link(0,_rightOf(_cell("Service Contract"))));
+var $actual_EntitlementType = _getText(_div(0,_rightOf(_cell("Entitlement Type"))));
+var $actual_BillingType = _getText(_div(0,_rightOf(_cell("/Billing Type/"))));
+var $actual_SLATerms = _getText(_div(0,_rightOf(_cell("SLA Terms"))));
+
+_assertEqual($actual_ServiceContract,$serviceConractName,"Actual and expected Service Contract are not same");
+_assertEqual($actual_SLATerms,$slaName02,"Actual and expected SLA Terms are not same");
+_assertEqual($actual_EntitlementType,"AUTO","Actual and expected Entitlement Type are not same");
+_assertEqual($actual_BillingType,"Contract","Actual and expected Billing Type are not same");
+_assertEqual("Success",$actual_AutoEntitlementStatus,"Auto Entitlement is failed");
+_assertNotNull($actual_EntitlementNotes, "Entitlement Notes is Null");
+
+// Delete the Auto Entitlemet Rule created on WO
+$bo_act_autoEntitlementRule_WO.deleteAutoEntitlementRule_WO($autoEntitlementRuleName);
+
+//Clean up function
+
+$bo_act_common.deleteCase($bac_un, $bac_pwd,$caseNumber);
+$bo_act_common.deleteAccount($bac_un, $bac_pwd, $accountName);
+$bo_act_common.deleteContact($bac_un, $bac_pwd, $contactName);
+$bo_act_common.deleteIB($bac_un, $bac_pwd, $orgnamespace,$IBName);
+$bo_act_common.deleteProduct($bac_un, $bac_pwd,$productName);
+$bo_act_common.deleteWorkOrder($bac_un, $bac_pwd, $orgnamespace,$WONumber);
+$bo_act_common.deleteSLA($bac_un, $bac_pwd, $orgnamespace, $slaName03);
+$bo_act_common.deleteSLA($bac_un, $bac_pwd, $orgnamespace, $slaName02);
+$bo_act_common.deleteSLA($bac_un, $bac_pwd, $orgnamespace, $slaName01);
+$bo_act_common.deleteSCON($bac_un, $bac_pwd, $orgnamespace,$serviceConractName);
+$bo_act_common.deleteLocation($bac_un, $bac_pwd, $orgnamespace,$locationName);
+//$bo_act_common.deleteWarranty($bac_un, $bac_pwd, $orgnamespace,$warrantyName);
+
+
+//var $datacreated = [$WONumber,$caseNumber,$serviceConractName,$slaName03,$slaName02,$slaName01,$IBName,$productName,$locationName,$contactName,$accountName,$warrantyName];
+//for (var i = 0; i < $datacreated.length; i++) {
+//	$bo_act_common.cleanUpfunction($datacreated[i]);
+//}
+
+$bo_act_login.logOut(); 
+
+$RS_7298.end();
+

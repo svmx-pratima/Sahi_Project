@@ -1,0 +1,65 @@
+
+//Author - Noor Salma Sharieff
+
+var $RS_10328 = _testcase("RS_10328","Verify navigation in the Feature Administrator Set up page");
+$RS_10328.start();
+_setSpeed(100);
+
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+
+//$bo_act_servicemaxSetup.enableFeaturePermissionToUser($bac_un);
+
+// clikc on Feature Admin page
+$bo_act_navigation.navigateTofeatureAdministrationPage();
+//_assertExists($bo_pg_servicemaxSetup.btn_checklistDesigner);
+//_assertExists($bo_pg_servicemaxSetup.btn_checklistQuestionLibrary);
+//_assertExists($bo_pg_servicemaxSetup.btn_checklistImport);
+//_click($bo_pg_servicemaxSetup.btn_checklistDesigner);
+//_wait(60000,_isVisible(_f("main").tab("Checklist Transactions")));
+//_assertExists(_f("main").tab("Checklist Transactions"));
+//_click(_f("main").s_label("< Back to Feature Administration"));
+//_assertExists($bo_pg_servicemaxSetup.btn_checklistDesigner);
+//_click($bo_pg_servicemaxSetup.btn_checklistQuestionLibrary);
+//_wait(60000,_isVisible(_span("Checklist Question Library")));
+//_assertExists(_span("Checklist Question Library"));
+//_click(_span("Back to Feature Administration"));
+//_assertExists($bo_pg_servicemaxSetup.btn_checklistDesigner);
+_click($bo_pg_servicemaxSetup.btn_checklistImport);
+_selectWindow("ServiceMax Checklist Import");
+_setSelected(_select("orgType"),"Sandbox");
+_click(_submit("Next: Salesforce Sign In"));
+
+if(_isVisible(_span($bac_un))){
+	_click(_span($bac_un));
+}
+//_setValue($bo_pg_login.txt_email, $bac_un);
+//_setValue($bo_pg_login.txt_password, $bac_pwd);
+//_click($bo_pg_login.btn_login);
+if(_isVisible(_submit(" Allow "))){
+	_click(_submit(" Allow "));
+}
+_assertExists(_label("/ServiceMax Checklist Export/"));
+
+_selectWindow("/Salesforce/");
+_setValue($bo_pg_login.txt_email, $bac_un);
+_setValue($bo_pg_login.txt_password, $bac_pwd);
+_click($bo_pg_login.btn_login);
+_wait(3000);
+_click(_submit(" Allow "));
+_wait(5000);
+_selectWindow("/Checklist Export/");
+_assertExists(_label("/ServiceMax Checklist Export/"));
+_click(_link("Log out of source and target orgs to log in as different user"));
+_selectWindow();
+_selectWindow("/ServiceMax Checklist Import/");
+
+_closeWindow();
+_selectWindow();
+$bo_act_login.logOut(); 
+
+$RS_10328.end();
+
+
+
+
+

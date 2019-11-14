@@ -1,0 +1,28 @@
+var $user_credentials = $excel.readFromCustomExcel("../op_excleData/automation.xlsx", "User_Details","","");
+for(var $i=0;$i<$user_credentials.length;$i++)
+{
+var $g_un = $user_credentials[$i][0];
+var $g_pwd = $user_credentials[$i][1];
+var $g_url = $user_credentials[$i][2];
+}
+
+var $RS_9316 = _testcase("RS_9316", "Validate Alert message while editing the time window");
+
+$RS_9316.start();
+
+$bo_act_login.login($g_url, $g_un, $g_pwd);
+
+
+_click(_link("ServiceMax Setup"));
+_wait(20000, _isVisible(_div("Dispatch Management")));
+_click(_div("Dispatch Management"));
+_wait(20000, _isVisible(_div("Ranked Appointment Booking")));
+_click(_div("Ranked Appointment Booking"));
+_click(_submit("Manage Time Windows"));
+_check(_checkbox("j_id0:form:pageblock1:j_id36:j_id46:j_id47:0:j_id49"));
+_click(_button("Edit Time Window"));
+_click(_div("messageText"));
+_click(_button("Cancel"));
+
+
+$RS_9316.end();

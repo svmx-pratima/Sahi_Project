@@ -1,0 +1,112 @@
+var $user_credentials = $excel.readFromCustomExcel("../optimax/op_excleData/automation.xlsx", "User_Details","","");
+
+//var $nArr;
+//Calling the sforce API
+for(var $i=0;$i<$user_credentials.length;$i++)
+{
+var $g_un = $user_credentials[$i][0];
+var $g_pwd = $user_credentials[$i][1];
+var $g_url = $user_credentials[$i][2];
+}
+
+
+var $RS_6314 = _testcase("RS_6314", "Creating a Skill Match Rule");
+
+$RS_6314.start();
+
+$bo_act_login.login($g_url, $g_un, $g_pwd);
+
+_set($login_result, _fetch(login($g_un,$g_pwd)));
+_log($login_result);
+
+_set($skill, _fetch(create_Skill("Repair", "Repair")));
+_log($skill);
+
+_set($skill, _fetch(create_Skill("Installation", "Installation")));
+_log($skill);
+
+
+
+//<browser>
+function login($g_un,$g_pwd){
+	
+	var $login_result = sforce.connection.login($g_un,$g_pwd);
+	return $login_result;
+}
+
+function create_Skill($s_Category, $s_Name)
+{
+	var skills_List = sforce.connection.query("SELECT Name,SVMXC__Active__c FROM SVMXC__Skill__c Where SVMXC__Skill_Category__c = '"+$s_Category+"' AND Name = '" + $s_Name+"'");
+	var skills_arr = skills_List.getArray("records");
+	if(skills_arr.length > 0)
+		{
+		return "Skill Exists";
+		}
+	else
+		{
+		var newskill = new sforce.SObject("SVMXC__Skill__c");
+		newskill.Name = $s_Name;
+		newskill.SVMXC__Active__c = true;
+		newskill.SVMXC__Skill_Category__c = $s_Category;
+		result = sforce.connection.create([newskill]);
+		return result;
+		}
+	
+}
+
+//</browser>
+
+$bo_act_login.login($g_url, $g_un, $g_pwd);
+
+var $date = "" + new Date();
+var $skillRuleName = "SkillMatchRule_" + $date;
+var $rowIndex = 1;
+
+_click(_link("ServiceMax Setup"));
+_wait(20000,_isVisible(_div("Dispatch Management")));
+_click(_div("Dispatch Management"));
+_wait(20000,_isVisible(_div("Skill Match Rules")));
+_click(_div("Skill Match Rules"));
+_click(_button("New Rule"));
+_setValue(_textbox("j_id0:SVMX_FORM:SMXC_PageBLOCK1:j_id88:j_id94:j_id97:j_id98"), $skillRuleName);
+_setValue(_textarea("j_id0:SVMX_FORM:SMXC_PageBLOCK1:j_id88:j_id99:j_id102:j_id103"), "Skill Match Rule Automation");
+_setSelected(_select("j_id0:SVMX_FORM:SMXC_PageBLOCK1:Pageblck1Sec4:SVMX_table1:0:j_id108"), "Order Status");
+_setSelected(_select("j_id0:SVMX_FORM:SMXC_PageBLOCK1:Pageblck1Sec4:SVMX_table1:0:j_id112"), "Equals");
+_setValue(_textbox("j_id0:SVMX_FORM:SMXC_PageBLOCK1:Pageblck1Sec4:SVMX_table1:0:j_id116"), "Open");
+_setSelected(_select("j_id0:SVMX_FORM:SMXC_PageBLOCK1:Pageblck1Sec4:SVMX_table1:1:j_id108"), "Order Type");
+_setSelected(_select("j_id0:SVMX_FORM:SMXC_PageBLOCK1:Pageblck1Sec4:SVMX_table1:1:j_id112"), "Equals");
+_setValue(_textbox("j_id0:SVMX_FORM:SMXC_PageBLOCK1:Pageblck1Sec4:SVMX_table1:1:j_id116"), "Cleaning");
+_click(_imageSubmitButton("Add Row"));
+_setSelected(_select("j_id0:SVMX_FORM:SMXC_PageBLOCK1:Pageblck1Sec4:SVMX_table1:2:j_id108"), "Order Type");
+_setSelected(_select("j_id0:SVMX_FORM:SMXC_PageBLOCK1:Pageblck1Sec4:SVMX_table1:2:j_id112"), "Equals");
+_setValue(_textbox("j_id0:SVMX_FORM:SMXC_PageBLOCK1:Pageblck1Sec4:SVMX_table1:2:j_id116"), "Repair");
+_setValue(_textbox("j_id0:SVMX_FORM:SMXC_PageBLOCK1:Pageblck1Sec5:HdrAdvOption"), "1 AND (2 OR 3)");
+_setSelected(_select("j_id0:SVMX_FORM:SMXC_PageBLOCK1:DetailSection:j_id119:PanelBarsearch:j_id121:j_id124"), "Repair");
+_click(_button("Search[1]"));
+_setSelected(_select("j_id0:SVMX_FORM:SMXC_PageBLOCK1:DetailSection:j_id119:j_id134:j_id136"), ["Repair"]);
+_click(_imageSubmitButton("Add"));
+_check(_checkbox("j_id0:SVMX_FORM:SMXC_PageBLOCK1:DetailSection:j_id119:j_id145:SVMX_table2:0:j_id150"));
+_check(_checkbox("j_id0:SVMX_FORM:SMXC_PageBLOCK1:DetailSection:j_id119:j_id145:SVMX_table2:0:stdselected"));
+_setValue(_textbox("j_id0:SVMX_FORM:SMXC_PageBLOCK1:DetailSection:j_id119:j_id145:SVMX_table2:0:SkillLevel1"), "5");
+_setSelected(_select("j_id0:SVMX_FORM:SMXC_PageBLOCK1:DetailSection:j_id119:PanelBarsearch:j_id121:j_id124"), "Installation");
+_click(_button("Search[1]"));
+_setSelected(_select("j_id0:SVMX_FORM:SMXC_PageBLOCK1:DetailSection:j_id119:j_id134:j_id136"), ["Installation"]);
+_click(_imageSubmitButton("Add"));
+_click(_button("Save"));
+
+
+if(_exists($skillRuleName))
+{
+_log("Skill Match Rule Created Successfully");
+//$excel.writeToExcel("insertAtIndex", "../optimax/op_excleData/automation.xlsx", "SkillRule", $skillRuleName, $rowIndex);
+$excel.insertUnderColumn("../optimax/op_excleData/automation.xlsx", "Rules", "Skill Match Rule", $skillRuleName, $rowIndex);
+}
+else
+{
+_fail("Error in Creating Skill Match Rule");
+}
+
+$bo_act_login.logOut();
+
+
+$RS_6314.end();

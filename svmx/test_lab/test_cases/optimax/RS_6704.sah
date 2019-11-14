@@ -1,0 +1,108 @@
+var $user_credentials = $excel.readFromCustomExcel("../optimax/op_excleData/automation.xlsx", "User_Details","","");
+var $DPData = $excel.readFromCustomExcel("../optimax/op_excleData/automation.xlsx", "RTO_DispatchProcess","","");
+
+//var $nArr;
+//Calling the sforce API
+for(var $i=0;$i<$user_credentials.length;$i++)
+{
+var $g_un = $user_credentials[$i][0];
+var $g_pwd = $user_credentials[$i][1];
+var $g_url = $user_credentials[$i][2];
+}
+
+var $RS_6704 = _testcase("RS_6704", "Select Territory which dosen't have business hour");
+
+$RS_6704.start();
+
+/*var $g_url = "https://test.salesforce.com/";
+var $g_un = "govendhan@svmx-cct5.org.cct5part1";
+var $g_pwd = "maxpl0re2";*/
+
+$bo_act_login.login($g_url, $g_un, $g_pwd);
+		
+var $PrimaryTerr = $DPData[0][4];
+var $horizon = $DPData[0][1];
+var $threshold = $DPData[0][2];
+var $syncInterval = $DPData[0][3];
+var $date = "" + new Date();
+var $DPName = "Eco_DPName_" + $date;
+var $rowCount = 0;
+var $rowIndex = "2";
+
+
+_set($login_result, _fetch(login($g_un,$g_pwd)));
+_log($login_result);
+
+_set($email, _fetch(get_Email($g_un)));
+_log($email);
+
+_click(_link("ServiceMax Setup"));
+_wait(20000,_isVisible(_div("Dispatch Management")));
+_click(_div("Dispatch Management"));
+_wait(20000,_isVisible(_div("Dispatch Processes")));
+_click(_div("Dispatch Processes"));
+_click(_submit("New Process"));
+_setValue(_textbox("page1:form1:block1:tab1block1:j_id77:j_id78:name"), $DPName);
+_setSelected(_select("page1:form1:block1:tab1block1:j_id77:j_id85:j_id89"), "Real Time Optimization");
+_setSelected(_select("page1:form1:block1:tab1block1:j_id114:j_id115:tab1table1:0:j_id120"), "Order Status");
+_setSelected(_select("page1:form1:block1:tab1block1:j_id114:j_id115:tab1table1:0:j_id124"), "Equals");
+_setValue(_textbox("page1:form1:block1:tab1block1:j_id114:j_id115:tab1table1:0:j_id128"), "Open");
+_setSelected(_select("page1:form1:block1:tab1block1:j_id114:j_id115:tab1table1:1:j_id120"), "Order Type");
+_setSelected(_select("page1:form1:block1:tab1block1:j_id114:j_id115:tab1table1:1:j_id124"), "Equals");
+_setValue(_textbox("page1:form1:block1:tab1block1:j_id114:j_id115:tab1table1:1:j_id128"), "Cleaning");
+_setSelected(_select("page1:form1:block1:tab1block1:j_id114:j_id115:tab1table1:2:j_id120"), "Order Type");
+_setSelected(_select("page1:form1:block1:tab1block1:j_id114:j_id115:tab1table1:2:j_id124"), "Equals");
+_setValue(_textbox("page1:form1:block1:tab1block1:j_id114:j_id115:tab1table1:2:j_id128"), "Repair");
+_setValue(_textbox("page1:form1:block1:tab1block1:j_id136:HdrAdvOption"), "1 AND (2 OR 3)");
+_click(_button("Next >>"));
+_click(_button("Add Territory"));
+_setValue(_textbox("page1:form1:block1:tab3block1:tab3block2:j_id322:0:j_id328"), $PrimaryTerr);
+_click(_image("Territory Lookup (New Window)"));
+_selectWindow("lookup");
+_click(_link($PrimaryTerr));
+_selectWindow();
+_setValue(_textbox("page1:form1:block1:tab3block1:tab3block2:j_id322:0:j_id328"), $PrimaryTerr);
+_click(_button("Prioritization >>"));
+_click(_button("Constraints >>"));
+_click(_div("dhxsl_runner[1]"));
+_click(_div("dhxsl_runner[3]"));
+_click(_button("Cost Factors >>"));
+_setSelected(_select("page1:form1:block1:tab6block1:j_id490:j_id492:j_id493"), "Minimize Overall Cost");
+_click(_div("dhxsl_runner[4]"));
+_click(_button("Scheduling >>"));
+_setValue(_textbox("page1:form1:block1:tab8block1:LeadTimeSection:LeadTimeItem:LeadTime"), $threshold);
+_setValue(_textbox("page1:form1:block1:tab8block1:LeadTimeSection:OptimizerSyncIntervalItem:SyncTime"), $syncInterval);
+_setValue(_textbox("page1:form1:block1:tab8block1:j_id668:j_id669:j_id674"), $horizon);
+_setValue(_textbox("page1:form1:block1:tab8block1:SuccessSection:SuccessItem:SuccessEmail"), $email);
+_setValue(_textbox("page1:form1:block1:tab8block1:SuccessSection:ErrorItem:ErrorEmail"), $email);
+_click(_submit("Save And Close[1]"));
+_assertExists(_div("message errorM3"));
+_assertVisible(_div("message errorM3"));
+_assertEqual("Error:This territory does not have associated Business Hours.", _getText(_div("message errorM3")));
+
+
+//<browser>
+
+function login($g_un,$g_pwd){
+	
+	var $login_result = sforce.connection.login($g_un,$g_pwd);
+	return $login_result;
+}
+
+
+function get_Email ($g_un)
+{
+var Email_List = sforce.connection.query("SELECT Email,Username FROM User WHERE Username = '" + $g_un + "'");
+var Email_Arr = Email_List.getArray("records");
+var Email_Id = Email_Arr[0];
+
+return Email_Id.Email;
+}
+
+
+
+//</browser>
+
+$bo_act_login.logOut();
+
+$RS_6704.end();

@@ -1,0 +1,84 @@
+var $user_credentials = $excel.readFromCustomExcel("../optimax/op_excleData/automation.xlsx", "User_Details","","");
+var $RTO_DispatchProcess = $excel.readFromCustomExcel("../optimax/op_excleData/automation.xlsx", "TestAppts","","");
+var $DP_Data = $excel.readFromCustomExcel("../optimax/op_excleData/automation.xlsx", "Dispatch_Process","","");
+
+
+for(var $i=0;$i<$user_credentials.length;$i++)
+{
+var $g_un = $user_credentials[$i][0];
+var $g_pwd = $user_credentials[$i][1];
+var $g_url = $user_credentials[$i][2];
+}
+
+var $dp_Id = $DP_Data[1][1];
+
+var $RS_9404 = _testcase("RS_9404", "Validate Appointment list page if the work order Optimax Status is OPT_TENTATIVE or OPT_ERROR");
+
+$RS_9404.start();
+	
+	
+$bo_act_login.login($g_url, $g_un, $g_pwd);
+
+_set($login_result, _fetch(login($g_un,$g_pwd)));
+_log($login_result);
+
+_set($number, _fetch(get_WO ($dp_Id)));
+_log($number);
+
+var $url;
+_set($url, window.document.location.href);
+_log($url);
+var $string1=$url.substring(0,$url.lastIndexOf(".com")+5);
+
+var $wopage = $string1 + $number;
+_log($wopage);
+
+//Getting domain from the Page URL
+var $string=$url.substring($url.lastIndexOf("//")+2,$url.lastIndexOf(".salesforce"));
+_log($string);
+
+_navigateTo($wopage);
+
+var $WOName = _getText(_heading2("pageDescription"));
+_log($WOName);
+
+//Clicking Appointments SFM
+_selectDomain("svmxc."+$string+".visual.force.com");
+_click(_button($RTO_DispatchProcess[0][13]));
+_selectDomain();
+_selectWindow("Ranked Appointment Booking");
+
+_assertExists(_label($WOName));
+_assertVisible(_label($WOName));
+_assertEqual($WOName, _getText(_label($WOName)));
+_assertExists(_textbox("Start Date"));
+_assertVisible(_textbox("Start Date"));
+_assertExists(_textbox("End Date"));
+_assertVisible(_textbox("End Date"));
+_assertExists(_div("svmx-grid-cell-inner [1]"));
+_assertVisible(_div("svmx-grid-cell-inner [1]"));
+_closeWindow(); //Closing the selected window
+_selectWindow();
+
+$bo_act_login.logOut();
+
+//<browser>
+function login($g_un,$g_pwd){
+	
+	var $login_result = sforce.connection.login($g_un,$g_pwd);
+	$sfdc_sessionId = $login_result.sessionId;
+	_log("$sfdc_sessionId = "+$sfdc_sessionId);
+	return $login_result;
+}
+
+function get_WO ($dp_Id)
+{
+		var WO_List = _call(sforce.connection.query("Select Id, Name, SVMXC__Dispatch_Process__c, SVMXC__SM_Appointment_Type__c, SVMXC__OptiMax_Status__c From SVMXC__Service_Order__c Where SVMXC__Dispatch_Process__c = '"+$dp_Id+"' AND SVMXC__OptiMax_Status__c IN ('OPT_ERROR' , 'OPT_TENTATIVE') AND SVMXC__SM_Appointment_Type__c != null ORDER BY Id DESC limit 1"));
+		var WO_arr = WO_List.getArray("records");
+		var $number = WO_arr[0].Id;
+		_log($number);
+		return $number;
+}
+//</browser>
+
+$RS_9404.end();

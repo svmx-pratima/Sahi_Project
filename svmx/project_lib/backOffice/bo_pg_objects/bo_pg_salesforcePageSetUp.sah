@@ -1,0 +1,105 @@
+var $bo_pg_salesforcePageSetUp = new function bo_pg_salesforcePageSetUp(){
+	
+		this.lnk_salesforceSetUp=_link("Setup");
+		this.txt_salesforceSetUpSrch=_textbox("setupSearch");
+		this.lnk_customLabels=_link("Custom Labels");
+		this.lnk_appPermissionProcessIDTag=_link("APFT002_TAG008");
+		this.btn_newLocalTrans=_button("New Local Translations / Overrides");
+		this.sel_language=_select("Language");
+		this.txt_newTranslatedValue=_textarea("Value");
+		this.btn_save1=_submit(" Save ");
+		this.lnk_deleteNewTranslatedValue=_link("Del");
+		this.lnk_apexJobs=_link("Apex Jobs");
+		this.lbl_status2=_cell(" dataCell  [1]");
+		this.lbl_status1=_cell(" dataCell  [9]");
+		this.lnk_createNewView=_link("Create New View");
+		
+		
+	this.txt_apexClasscode = _textarea("textarea");
+	this.btn_quickSave = _button("Quick Save");
+	this.btn_save = _button("Save");
+	this.btn_delete = _submit("Delete");
+	this.btn_newUser = _button("New User");
+	this.txt_lastName = _textbox(0,_rightOf(_label("*Last Name")));
+	this.txt_alias = _textbox(0,_rightOf(_label("*Alias")));
+	this.txt_email = _textbox(0,_rightOf(_label("*Email")));
+	this.txt_userName = _textbox(0,_rightOf(_label("*Username")));
+	this.txt_nickName = _textbox(0,_rightOf(_label("*Nickname")));
+	this.btn_submitSave = _submit(" Save ");
+	this.txt_Name = _cell(0,_rightOf(_cell("Name")));
+	
+//Edit Layout Fields on WO
+	this.btn_SLAVisualPage = _span("SLAT_SLAClockOnWO");
+	this.btn_SLAVisualPageCase = _span("SLAT_SLAClockOnCase");
+	this.btn_timeToRestore = _span("/Time to Restore/");
+	this.btn_timeToResolve = _span("/Time to Resolve/");
+	this.btn_timeToOnsiteResponse = _span("/Time to Onsite Re/");
+	this.btn_timeToInitialResponse = _span("Time to Initial R...");
+	this.btn_InitialResponseInternalBy = _span("Initial Response ...");
+	this.btn_InitialResponseCustomerBy = _span("Initial Response ...[1]");
+	this.btn_OnsiteResponseCustomerBy = _span("Onsite Response C...");
+	this.btn_OnsiteResponseInternalBy = _span("Onsite Response I...");
+	this.btn_resolutionCustomerBy = _span("Resolution Custom...");
+	this.btn_resolutionInternalBy = _span("Resolution Intern...");
+	this.btn_restorationInternalBy = _span("Restoration Inter...");
+	this.btn_restorationCustomerBy = _span("Restoration Custo...");
+	 this.btn_totalBillableAmount = _span("Total Billable Am...");
+	 this.btn_actualInitialResponse = _span("Actual Initial Re...");
+	 this.btn_actualOnsiteResponse = _span("Actual Onsite Res...");
+	 this.btn_actualResolution = _span("Actual Resolution");
+	 this.btn_actualRestoration = _span("Actual Restoration");
+	 this.btn_slaTerm = _span("SLA Terms");
+	 this.btn_entitlementType = _span("Entitlement Type");
+	 this.btn_acknowledgedByTech = _span("/Acknowledged By T/");
+	 
+	//Edit Page Layout for get Price Fields on WO
+	 this.btn_RatePricingRule = _span("Rate (Pricing Rule)");
+	  this.btn_RateType = _span("Rate Type (Pricin...");
+	 this.btn_TravelRate = _span("Travel Rate");
+	 this.btn_TravelUnit = _span("Travel Unit");
+	 this.btn_ProformaInvoceAmount = _span("Proforma Invoice ...");
+	 this.btn_TotalBillableAmount = _span("Total Billable Am...");
+	 
+	 
+	//Edit Page Layout for get Price Fields on SCON
+	 this.btn_zone = _span("Zone");
+	 
+	//Edit Page Layout for Entitlement Fields on SCON
+	 this.btn_autoEntitlement = _span("Auto Entitlement ...");
+	 this.btn_performAutoEntitlement = _span("Perform Auto Enti...");
+	 this.btn_AutoEntitlementStatus = _span("Auto Entitlement ...")
+	 this.btn_isEntitlementPerform = _span("Is Entitlement Pe...");
+	 this.btn_entitlementType = _span("Entitlement Type");
+	 this.btn_entitlementNotes = _span("Entitlement Notes");
+	 this.btn_ServiceContract = _span("Service Contract");
+	 this.btn_Warranty = _span("Warranty");
+	 this.btn_currency = _span("Currency");
+	 this.btn_billingType = _span("Billing Type");
+	 this.btn_scheduledDuration = _span("Scheduled Duration");
+	
+//Edit Layout - PM coverage
+	 this.btn_locationName = _span("Location Name");
+	 
+//Edit Layout SCON - Covered Location
+	 this.btn_startDate = _span("End Date");
+	 this.btn_endDate = _span("Start Date");
+	 
+//Edit Layout Warranty Terms
+	 this.btn_exchangeType = _span("Exchange Type");
+
+//Edit Layout Product
+	 this.btn_stockable = _span("Stockable");
+	 this.btn_enableSerialized = _span("Enable Serialized...")
+	 
+//PM Plan
+	 this.btn_startDateDelay = _span("Start Date Delay");
+	 this.btn_startDateDelayUnit = _span("Start Date Delay Unit");
+
+//CASE
+	 this.btn_componentSN = _span("Component SN");
+	 this.btn_serviceMain = _span("/Service\\/Mainten.../");
+};
+
+
+
+

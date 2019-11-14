@@ -1,0 +1,54 @@
+var $rs_4979 = _testcase("RS_4979","Verify Interactive Handover Functionality SFM->Webservice");
+$rs_4979.start();
+var $customActionObject = "Work Order";
+var $actionType="Web Service";
+var $actionId = $bo_act_common.generateRandomName("RS_4979WS_CA_HO_");
+var $className = "TestWebServices";
+var $methodName = "test_WS";
+var $paramName="Name";
+var $paramValueType="Value";
+var $paramValue=$actionId;
+var $processingMessage = "Account creation under process";
+var $successMessage = "Accounts inserted sucessfully";
+
+//Create WO through REST API
+var $woNumber = $sfm_act_createCustomWizard.createBlankWoFromRest($sfmdUsn, $sfmdPwd, $sfmClientId, $sfmConsumerSecret, $sfmOrgInstance);
+
+_setSpeed($g_stepSpeed);
+$bo_act_login.login($g_url, $sfmdUsn, $sfmdPwd);
+
+$sfm_act_navigation.navigateToSfmCustomActions();
+//$sfm_act_customActions.webServiceCustomAction($customActionObject, $actionType, $actionId, $className, $methodName,$processingMessage,$paramName, $paramValueType, $paramValue);
+$sfm_act_customActions.webServiceCustomAction($customActionObject, $actionType, $actionId, $className, $methodName, $processingMessage, $paramName, $paramValueType, $paramValue);
+
+$sfm_act_wizards.addToWizard($customActionObject, $sfmd_wizardName[1], $sfmd_wizardType[3], $actionId,"true");
+$sfm_act_wizards.addToWizard($customActionObject, $sfmd_wizardName[1], $sfmd_wizardType[1], "Create RMA from Work Order" );
+
+//Navigate to the WO for validation
+$bo_act_navigation.navigateToCreatedRecordUsingGlobalSearch($woNumber);
+
+_selectDomain($g_domain);
+_call(_button($actionId).scrollIntoView());
+_click(_button($actionId));
+_selectDomain();
+_wait(3000);
+/*if(_exists(_span($processingMessage))){
+	_log("Pass ::: Account creating under process");
+}else{
+	_log("Fail","FAILURE");
+}*/
+
+if(_exists(_div($successMessage))){
+	_log("Pass ::: Account created successfully");
+	_click(_submit("Continue"));
+	_wait(25000);
+}
+
+if (_exists(_link("Create RMA from Work Order (Work Order Number: "+$woNumber+")"))){
+   _log("Pass ::: Handover has happened to Create RMA from Work order process");
+}
+else{
+	_log("Fail ::: Handover has not happened to Create RMA from Work order process","FAILURE");
+}
+
+$rs_4979.end();

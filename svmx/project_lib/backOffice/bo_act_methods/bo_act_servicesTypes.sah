@@ -1,0 +1,31 @@
+/**
+ * Functions for the Accounts Object
+ */
+// var = $trackedOn = case/Work order;
+
+var $bo_act_servicesTypes = new function bo_act_servicesTypes() {
+
+	this.createServicesTypes = function($trackedOn, $dataType, $qualifyingCriteria) {
+		var $serviceTypeName = $bo_act_common.generateRandomName("SerType");
+        $bo_act_navigation.navigateToServiceType();
+       // _wait(5000, _isVisible($bo_pg_servicesTypes.btn_newAvailableService));
+		_click($bo_pg_servicesTypes.btn_newAvailableService);
+		_wait(30000, _isVisible($bo_pg_servicesTypes.link_createService));
+	    _setValue($bo_pg_servicesTypes.txt_serviceName, $serviceTypeName);
+	    _setValue($bo_pg_servicesTypes.txt_trackedOn, $trackedOn);
+	    _setValue($bo_pg_servicesTypes.txt_dataType, $dataType);
+	    _click($bo_pg_servicesTypes.btn_activeServiceType);
+	    _setValue($bo_pg_servicesTypes.txt_qualifyingCriteria, $qualifyingCriteria);
+	    _click($bo_pg_servicesTypes.btn_saveServiceType);
+		_wait(15000, _isVisible($bo_pg_servicesTypes.txt_availableServiceDetail));
+	    _logOutput($serviceTypeName+ " Service Type is created");
+    return $serviceTypeName;
+	};
+
+	this.deleteServiceType = function($serviceTypeName){
+		  $bo_act_navigation.navigateToServiceType();
+		  _click(_span($serviceTypeName));
+		  _wait(15000, _isVisible($bo_pg_servicesTypes.txt_availableServiceDetail));
+		  _click($bo_pg_servicesTypes.btn_deleteServiceType);
+	};
+};

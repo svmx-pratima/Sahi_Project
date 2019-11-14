@@ -1,0 +1,29 @@
+// Author Meghana Rao P
+/*
+ * This test case verifies the quick save of SFM search and checking the SFM Search Delivery
+ */
+var $RS_10130 = _testcase("RS_10130", "quick save and checking the delivery");
+$RS_10130.start();
+
+// To generate Random names for SearchTitle and Search ID
+var $searchTitle = $bo_act_common.generateRandomName("Search");
+var $searchId = $bo_act_common.generateRandomName("SearchId");
+
+var $data = _readExcelFile("../../backOffice/bo_excleData/BORegressionDatasheet.xlsx",$orgtype,true);
+var $createwoquery = $data[1]["CreateWorkOrderOpen"];
+var $fetchwo = $data[1]["fetchwo"];
+
+// create a Work Order
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+
+var $rs_10130_result = $op_act_sForceApiCall.sForceQuery($bac_un, $bac_pwd, $createwoquery ,"create");
+var $rs_10130_query_wo = $fetchwo;
+var $rs_10130_fetch = $op_act_sForceApiCall.sForceQuery($bac_un, $bac_pwd, $rs_10130_query_wo ,"query");
+
+$rs_10130_WO1 = $rs_10130_fetch[0].Name;
+
+// To create a Custom SFM Search value
+// createsfmsearch = For Single Expression
+$bo_act_sfmsearch.sfmsearch_advancedexpression($searchId, $searchTitle, "Work Order", "Priority", "High", "Equals", "Order Status", "Open", "10130");
+$bo_act_sfmsearchdelivery.sfmsearch_clickwizards($searchTitle, $rs_10130_WO1, "Cancel Work Order","Field Service","Work Order Toolbox", "Generate Invoice");
+$RS_10130.end();

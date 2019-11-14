@@ -1,0 +1,95 @@
+var $user_credentials = $excel.readFromCustomExcel("../optimax/op_excleData/automation.xlsx", "User_Details","","");
+var $Dispatch_Process = $excel.readFromCustomExcel("../optimax/op_excleData/automation.xlsx", "Dispatch_Process","","");
+
+for(var $i=0;$i<$user_credentials.length;$i++)
+{
+var $g_un = $user_credentials[$i][0];
+var $g_pwd = $user_credentials[$i][1];
+var $g_url = $user_credentials[$i][2];
+}
+
+
+var $dp_Name = $Dispatch_Process[0][0];
+var $dp_Id = $Dispatch_Process[0][1];
+var $dp_Terr_Id = $Dispatch_Process[0][2];
+
+
+
+var $RS_6714 = _testcase("RS_6714", "Abort In Progress Job & check the status of the Job");
+
+$RS_6714.start();
+
+var $sfdc_sessionId = null;
+
+$bo_act_login.login($g_url, $g_un, $g_pwd);
+
+_set($login_result, _fetch(login($g_un,$g_pwd)));
+_log($login_result);
+
+$op_utility.delete_WO($dp_Id,$login_result.sessionId);
+
+_set($WO,_fetch(create_WO ($dp_Terr_Id)));
+
+$op_utility.run_Job_Now($dp_Name);
+
+_wait(15000);
+
+var $rowCount = 0;
+_set($rowCount, _table("page1:form1:block1:j_id81:j_id82").rows.length);
+_log("$rowCount = " + $rowCount);
+for (var $i = 0; $i < $rowCount; $i++) {
+	var $temp = _getText(_cell("page1:form1:block1:j_id81:j_id82:" + $i
+			+ ":j_id86"));
+	//_log("$dp_Name_utility temp = " + $dp_Name);
+	//_log("$rowCount2 = " + $rowCount);
+	//_log("$temp = " + $temp);
+	if (_areEqual($dp_Name, $temp)) {
+		$rowCount = $i;
+		//_log("$rowCount3 = " + $rowCount);
+	}
+}
+
+_check(_checkbox("page1:form1:block1:j_id81:j_id82:" + $rowCount
+		+ ":j_id85"));
+
+_click(_submit("Show Jobs"));
+_check(_radio("Checkbox"));
+
+
+/*_click(_cell("dataCell  [30]"));
+_wait(20000, _isVisible(_div("Show Jobs")));
+_click(_submit("Show Jobs"));
+_check(_radio("Checkbox"));*/
+_wait(20000, _isVisible(_div("Abort Job Now")));
+_click(_submit("Abort Job Now"));
+_click(_cell("rich-tab-bottom-line "));
+_click(_submit("Abort Job Now"));
+_click(_submit("Show Jobs"));
+_wait(30000, _isVisible(_div("Aborted")));
+_click(_span("Aborted"));
+_doubleClick(_span("Aborted"));
+
+//<browser>
+
+function login($g_un,$g_pwd){
+	
+	var $login_result = sforce.connection.login($g_un,$g_pwd);
+	$sfdc_sessionId = $login_result.sessionId;
+	_log("$sfdc_sessionId = "+$sfdc_sessionId);
+	return $login_result;
+}
+
+function create_WO ($dp_Terr_Id){
+	var WO = new sforce.SObject("SVMXC__Service_Order__c");
+	WO.SVMXC__Primary_Territory__c=$dp_Terr_Id;
+	WO.SVMXC__Order_Type__c="Cleaning";
+	WO.SVMXC__Order_Status__c='Open';
+	WO.SVMXC__State__c="TX";
+	WO.SVMXC__Zip__c='75024';
+	WO.SVMXC__Country__c="United States";
+	var result_WO = sforce.connection.create([WO]);
+	_log(" Work order= "+result_WO[0].id);
+	}
+
+//</browser>
+$RS_6714.end();

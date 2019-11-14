@@ -1,0 +1,32 @@
+/**
+ * Functions for the Activity Master
+ */
+//var $activityType = "Repair";["--None--","Calibration","Cleanup","Installation","Repair","Service"];
+
+var $bo_act_activityMaster = new function bo_act_activityMaster() {
+	
+	this.createActivityMasterUsingProduct = function($activityType, $activityProductName) {
+        $bo_act_navigation.navigateToActivityMaster();
+		_click($bo_pg_activityMaster.btn_newActivityMaster);
+		_wait(30000, _isVisible($bo_pg_activityMaster.txt_activityType));
+		_setValue($bo_pg_activityMaster.txt_activityType, $activityType);
+		_setStrictVisibilityCheck(true);
+		_click($bo_pg_activityMaster.btn_editFirstRowOfActivityProduct);
+		_wait(3000,_isVisible($bo_pg_activityMaster.btn_update));
+		$bo_act_common.searchfunction($activityProductName);	//Search Values like Parts/Product Name
+		_click($bo_pg_activityMaster.btn_update);
+		_setStrictVisibilityCheck();
+		_click($bo_pg_activityMaster.btn_saveActivityMaster);
+		_wait(15000, _isVisible($bo_pg_activityMaster.txt_ActivityMasterPage));
+		var $activityMasterNumber = _getText(_heading2("pageDescription"));
+		_logOutput($activityMasterNumber+ " Activity Master is created");
+   return $activityMasterNumber;
+	};
+
+	this.deleteActivityMaster = function($activityMasterNumber){
+		 $bo_act_navigation.navigateToActivityMaster();
+		 _click(_div("Record Number"));
+		  _click(_link($activityMasterNumber));
+		  _click($bo_pg_activityMaster.btn_deleteActivityMaster);
+	};
+};

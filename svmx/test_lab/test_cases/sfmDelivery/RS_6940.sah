@@ -1,0 +1,243 @@
+var $rs_6940 = _testcase("RS_6940","Verify Lookup auto resolve with override context in Child line");
+$rs_6940.start();
+
+		//RS_6940,RS_6939.sah
+		//Pre_Requesite 
+		//Create Account
+		var $Account=new Array();
+		$Account[0]=$bo_act_common.generateRandomName("GlobalInc_AccountRS_6940_");
+		$Account[1]=$bo_act_common.generateRandomName("GlobalMedia_AccountRS_6940_");
+		$AccountID=new Array();
+		for (var $i = 0; $i < $Account.length; $i++) {
+			$objName= "Account";
+			$obJson = "{\"Name\":\""+$Account[$i]+"\"}";
+			$filterValue=$sfm_act_restApiMethods.postRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,$objName,$obJson,"POST");
+			$AccountID[$i]=$filterValue;
+		}
+		_log("Account1: "+$Account[0]+" and Account2: "+$Account[1]);
+		
+		//create Contact for above created accounts
+		$contactNameList = ["Leanne Tomlin","Howard Jones","Jason Smith","Jason David","Jon Amos","Howard White","Geoff Minor"];
+		var $lastName;
+		var $userName=new Array();
+		for (var $i = 0; $i <=6; $i++) {
+			$objName= "Contact";
+			if ($i<4) {
+				$lastName=$bo_act_common.generateRandomName($contactNameList[$i]+"_");
+				$obJson="{\"LastName\":\""+$lastName+"\",\"AccountId\":\""+$AccountID[0]+"\"}";
+			}else {
+				$lastName=$bo_act_common.generateRandomName($contactNameList[$i]+"_");
+				$obJson="{\"LastName\":\""+$lastName+"\",\"AccountId\":\""+$AccountID[1]+"\"}";
+			}
+			$filterValue=$sfm_act_restApiMethods.postRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,$objName,$obJson,"POST");
+			$userName[$i]=$lastName;
+		}		
+		//create Work orders
+		$objName= ""+$orgnamespace+"__Service_Order__c";
+		$obJson = "{\""+$orgnamespace+"__Order_Status__c\":\"Open\",\""+$orgnamespace+"__Order_Type__c\":\"Field Service\"}";
+		$columnName = "Name";
+		$filter="id";
+		$filterValue=$sfm_act_restApiMethods.postRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,$objName,$obJson,"POST");
+		$WONumber =$sfm_act_restApiMethods.getRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,"GET", $objName, $columnName, $filter, $filterValue);
+		_log("WO number: "+$WONumber);
+		
+		//Create Product
+		$objName= "Product2";
+		$productName=$bo_act_common.generateRandomName("Pro_RS_6940_");
+		$obJson = "{\"Name\":\""+$productName+"\"}";
+		$filterValue=$sfm_act_restApiMethods.postRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,$objName,$obJson,"POST");
+		
+		// Login to App
+		$bo_act_login.login($g_url,$sfmdUsn, $sfmdPwd);
+		
+		//clone standard SFM
+		var $sfmNameToBeCloned="Manage Work Order Lines - Usage";
+		var $sfmName=$bo_act_common.generateRandomName("rs_6940_");
+		var $sfmTemplateSaveAsName=$bo_act_common.generateRandomName("SFM_Page_");
+		var $sfmTemplate="SVMXSTD: Manage WO Usage Lines";
+		var $fieldName=["Account","AutoContact","Account","Contact"];
+		var $containerName=["Parts","Parts","Order Status","Order Status"];
+		$sfm_act_SFM.cloneTDM016($sfmNameToBeCloned, $sfmName, false, $sfmTemplateSaveAsName, $sfmTemplate, $fieldName, $containerName);
+		
+		//remove multiadd for part childline
+		$sfm_act_SFM.partsMultiAdd("--None--");
+		
+		//Context lookup setting up on Work Order Header objectt
+		_click(_f("main").s_textinput("/.*/").near(_f("main").uiftetextfield("Contact")));
+		$sfm_act_Transactions.addLookupContext("", true,"Account", "Account ID");
+		
+		//Context lookup setting up on Parts childline
+		_click(_f("main").s_richtext($fieldName[1]).near(_f("main").s_richtext("Parts")));
+		$sfm_act_Transactions.addLookupContext("Parts", true,"Account", "Account ID");
+		
+		//Save SFM after adding context lookup
+		_setStrictVisibilityCheck(true);
+		_click($bo_pg_sfmTransactionAndDesigner.btn_pageLayoutSave);
+		_wait(5000,_isVisible($bo_pg_sfmTransactionAndDesigner.btn_sfmpageSaveConfirmMsg));
+		_click($bo_pg_sfmTransactionAndDesigner.btn_saveAndclose);
+		_setStrictVisibilityCheck(false);
+		
+		//add sfm to wizard
+		var $wizardObject="Work Order";
+		var $sfmd_wizardName1 =$sfmd_wizardName[3];
+		var $sfmd_wizardType="SFM";
+		var $profile="";
+		var $handOver=false;
+		_log("Wizard Name: "+$sfmd_wizardName1);
+		$sfm_act_wizards.addToWizard($wizardObject, $sfmd_wizardName1, $sfmd_wizardType, $sfmName, $handOver, $profile); 
+
+	
+		$sfm_act_common.globalSearchOnce($WONumber);
+		_wait(10000);
+		_setStrictVisibilityCheck(true);
+		$sfm_act_createCustomWizard.clickWizardBtn($sfmName);
+		_wait(5000,_isVisible(_div("/"+$sfmName+"/")));
+		
+		_log("Work Order Header validation: Start");
+		//***Work Order Header validation***/
+		
+		//Assert "No matching record" DVR
+		_wait(3000,_isVisible($sfm_pg_sfmDesigner.txt_headerAccount));
+		_setValue($sfm_pg_sfmDesigner.txt_headerAccount,$Account[0]+"   ");
+		_click($sfm_pg_sfmDesigner.link_quickSave);
+		_wait(5000);
+		_assertExists(_div("Account: No matching record(s) found for this keyword: "+$Account[0]));
+		//_wait(3000);
+		
+		//assert Multiple item found DVR
+		_setValue($sfm_pg_sfmDesigner.txt_headerAccount,"AccountRS_6940_");
+		_wait(2000);
+		_click($sfm_pg_sfmDesigner.link_quickSave);
+		_wait(5000,_isVisible(_div("Account: Multiple items found. Select from drop-down or click lookup icon to refine search.")));
+		_assertExists(_div("Account: Multiple items found. Select from drop-down or click lookup icon to refine search."));
+		//_wait(3000);
+		_click($sfm_pg_sfmDesigner.btn_hideMsg);
+		
+		//Select from search
+		_click($sfm_pg_sfmDesigner.txt_headerAccount);
+		_wait(3000,_isVisible(_listItem("--None--")));
+		_click(_listItem($Account[0]));
+		_wait(5000);
+		
+		//assert Multiple item found DVR on AutoContact Field
+		_setValue($sfm_pg_sfmDesigner.txt_headerContact,"Jason");
+		_wait(2000,_isVisible($sfm_pg_sfmDesigner.link_quickSave));
+		_click($sfm_pg_sfmDesigner.link_quickSave);
+		_wait(5000,_isVisible(_div("Contact: Multiple items found. Select from drop-down or click lookup icon to refine search.")));
+		_assertExists(_div("Contact: Multiple items found. Select from drop-down or click lookup icon to refine search."));
+		_wait(5000);
+		
+		//Select from search
+		_click($sfm_pg_sfmDesigner.txt_headerContact);
+		_wait(3000,_isVisible(_listItem("--None--")));
+		_assertExists(_listItem($userName[2]));
+		_assertExists(_listItem($userName[3]));
+		_click(_listItem($userName[2]));
+		_click($sfm_pg_sfmDesigner.link_quickSave);
+		_wait(10000,_isVisible($sfm_pg_sfmDesigner.btn_entitlementError));
+		if (_exists($sfm_pg_sfmDesigner.btn_entitlementError)) {
+			_click($sfm_pg_sfmDesigner.btn_ok);
+		}
+		_wait(10000);
+		_assertEqual($userName[2],_getText($sfm_pg_sfmDesigner.txt_headerContact));
+
+		//Clear cache
+		_click($sfm_pg_sfmDesigner.btn_cacheClear);
+		_click($sfm_pg_sfmDesigner.btn_proceed);
+		_wait(10000,_isVisible($sfm_pg_sfmDesigner.txt_headerAccount));
+		
+		
+		//assert Multiple item found DVR on Contact Field
+		_setValue($sfm_pg_sfmDesigner.txt_headerAccount,$Account[1]);
+		_setValue($sfm_pg_sfmDesigner.txt_headerContact,"Howard");
+		_click($sfm_pg_sfmDesigner.link_quickSave);
+		_wait(10000,_isVisible($sfm_pg_sfmDesigner.btn_entitlementError));
+		if (_exists($sfm_pg_sfmDesigner.btn_entitlementError)) {
+			_click($sfm_pg_sfmDesigner.btn_ok);
+		}
+		_wait(10000);
+		_assertEqual($userName[5],_getText($sfm_pg_sfmDesigner.txt_headerContact));
+		_setStrictVisibilityCheck(false);
+		_log("Work Order Header validation: End");
+		
+
+		//*********************
+		$sfm_act_sfmDesigner.addChildLine("Parts");
+		
+		_log("Part childline validation: Start");
+		//***Part childline validation***/
+		//Assert "No matching record" DVR
+		_wait(10000,_isVisible($sfm_pg_sfmDesigner.txt_partTextbox));
+		_setValue($sfm_pg_sfmDesigner.txt_partTextbox,$productName);
+		_click($sfm_pg_sfmDesigner.searchPartIcon);
+		_wait(10000,_isVisible($sfm_pg_sfmDesigner.lbl_recentItemProducts));
+		_click(_cell($productName));
+		_click($sfm_pg_sfmDesigner.btn_selectProductLookUp);
+		_wait(3000);
+		_setValue($sfm_pg_sfmDesigner.txt_accountTextbox,$Account[0]+"   ");
+		_click($sfm_pg_sfmDesigner.link_Update);
+		_wait(2000);
+		_click($sfm_pg_sfmDesigner.link_quickSave);
+		_wait(5000);
+		_assertExists(_div("Account: No matching record(s) found for this keyword: "+$Account[0]));
+		_wait(3000);
+
+		//assert Multiple item found DVR
+		$sfm_act_sfmDesigner.navToExtendedEdit();
+		_wait(10000,_isVisible($sfm_pg_sfmDesigner.txt_partTextbox));
+		_setValue($sfm_pg_sfmDesigner.txt_accountTextbox,"AccountRS_6940_");
+		_click($sfm_pg_sfmDesigner.link_Update);
+		_wait(2000);
+		_click($sfm_pg_sfmDesigner.link_quickSave);
+		_wait(5000,_isVisible(_div("Account: Multiple items found. Select from drop-down or click lookup icon to refine search.")));
+		_assertExists(_div("Account: Multiple items found. Select from drop-down or click lookup icon to refine search."));
+		_wait(3000);
+		
+		
+		//Select from search
+		$sfm_act_sfmDesigner.navToExtendedEdit();
+		_wait(10000,_isVisible($sfm_pg_sfmDesigner.txt_partTextbox));
+		_setValue($sfm_pg_sfmDesigner.txt_accountTextbox,$Account[0]);
+		_wait(2000);
+			
+		_setValue($sfm_pg_sfmDesigner.txt_autoContactTextbox,"Jason");
+		_click($sfm_pg_sfmDesigner.link_Update);
+		_wait(2000,_isVisible($sfm_pg_sfmDesigner.link_quickSave));
+		_click($sfm_pg_sfmDesigner.link_quickSave);
+		_wait(5000,_isVisible(_div("AutoContact: Multiple items found. Select from drop-down or click lookup icon to refine search.")));
+		_assertExists(_div("AutoContact: Multiple items found. Select from drop-down or click lookup icon to refine search."));
+		_click($sfm_pg_sfmDesigner.btn_hideMsg);
+		_wait(2000);
+		
+		_click($sfm_pg_sfmDesigner.sel_AutoContact);
+		_wait(3000,_isVisible(_listItem("--None--")));
+		_assertExists(_listItem($userName[2]));
+		_assertExists(_listItem($userName[3]));
+		_click(_listItem($userName[2]));
+		_click($sfm_pg_sfmDesigner.link_quickSave);
+		_wait(10000,_isVisible($sfm_pg_sfmDesigner.btn_entitlementError));
+		if (_exists($sfm_pg_sfmDesigner.btn_entitlementError)) {
+			_click($sfm_pg_sfmDesigner.btn_ok);
+		}
+		_wait(10000);
+		_assertEqual($userName[2],_getText($sfm_pg_sfmDesigner.cell_AutoContact));
+		
+		//assert Multiple item found DVR on AutoContact Field
+		$sfm_act_sfmDesigner.navToExtendedEdit();
+		_wait(10000,_isVisible($sfm_pg_sfmDesigner.txt_partTextbox));
+		_setValue($sfm_pg_sfmDesigner.txt_accountTextbox,$Account[1]);
+		_setValue($sfm_pg_sfmDesigner.txt_autoContactTextbox,"Howard");
+		_click($sfm_pg_sfmDesigner.link_Update);
+		_wait(2000);
+		_click($sfm_pg_sfmDesigner.link_quickSave);
+		_wait(10000,_isVisible($sfm_pg_sfmDesigner.btn_entitlementError));
+		if (_exists($sfm_pg_sfmDesigner.btn_entitlementError)) {
+			_click($sfm_pg_sfmDesigner.btn_ok);
+		}
+		_wait(10000);
+		_assertEqual($userName[5],_getText($sfm_pg_sfmDesigner.cell_AutoContact));
+		
+		_setStrictVisibilityCheck(false);
+		_log("Part childline validation: End");
+
+$rs_6940.end();

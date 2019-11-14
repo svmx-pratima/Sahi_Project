@@ -1,0 +1,449 @@
+/**
+ * Cloning TDM016/Manage Work Order Lines - Usage process and adding fields to screen
+ */
+
+var $sfm_act_SFM = new function sfm_act_SFM() {
+
+	this.cloneTDM016 = function($sfmNameToBeCloned, $sfmName, $isCustom,
+			 $sfmTemplateSaveAsName,$sfmTemplate, $fieldName, $containerName) {
+		$bo_act_navigation.navigateToSfmTransactionDesigner();
+		$sfm_act_SFM.selectSFM($sfmNameToBeCloned, $isCustom);
+		_click($bo_pg_sfmTransactionAndDesigner.btn_clone);
+		_wait(50000, _isVisible($bo_pg_sfmTransactionAndDesigner.txt_name));
+		_wait(5000);
+		_setValue($bo_pg_sfmTransactionAndDesigner.txt_name, $sfmName);
+		_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmTransactionId, "");
+		_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmTransactionId, $sfmName);
+		_setValue($bo_pg_sfmTransactionAndDesigner.txt_name, "");
+		_setValue($bo_pg_sfmTransactionAndDesigner.txt_name, $sfmName);
+		if ($sfmTemplateSaveAsName.length!==0) {
+			_click($bo_pg_sfmTransactionAndDesigner.btn_screenDesigner);
+			_wait(2000);
+			_setSelected($bo_pg_sfmTransactionAndDesigner.sel_sfmTemplate,
+					$sfmTemplate);
+			_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmSavePageLayoutAs,
+					$sfmTemplateSaveAsName);
+			_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmSavePageLayoutAsId,
+					$sfmTemplateSaveAsName);
+			_wait(2000);
+			_click($bo_pg_sfmTransactionAndDesigner.btn_quickSave);
+			_wait(10000);
+		}
+		if ($fieldName.length!==0) {
+			$sfm_act_SFM.addFieldToScreen($fieldName, $containerName);
+		}
+	};
+		/**
+	 * Author		:	Anand Kakhandaki
+	 * Function		:	To edit custom process
+	 * Parameters	:	$sfmName: Process name
+	 * Examples		:	Refer RS_10499.sah
+	 */
+	this.editCustomProcess=function($sfmName){
+		$bo_act_navigation.navigateToSfmTransactionDesigner();
+		_wait(20000,_isVisible($bo_pg_sfmTransactionAndDesigner.btn_yourCustomSfmTransactions));
+		_click($bo_pg_sfmTransactionAndDesigner.btn_yourCustomSfmTransactions);
+		_setValue($bo_pg_sfmTransactionAndDesigner.lbl_searchSFM, $sfmName);
+		_wait(10000);
+		_click(_f("main").s_label($sfmName).near(_f("main").processlistitemrenderer($sfmName)));
+		_wait(20000,_isVisible($sfm_pg_screenDesigner.btn_propoties));
+	};
+	/**
+	 * Based on the number of items passed in array(ContainerName), fields gets added to either header or child
+	 * If Container is Order Status then field is added to header otherwise to Child lines
+	 */
+	this.addFieldToScreen = function($fieldName, $containerName) {
+		for (var $i = 0; $i < $fieldName.length; $i++) {
+			if ($containerName[$i] == 'Order Status') {
+				//$bo_pg_sfmTransactionAndDesigner.addField($fieldName[$i],$containerName[$i]);
+				_click(_f("main").fieldrenderer("[object Object]").near(_f("main").formitemlabel($containerName[$i])));
+			} else if($containerName[$i] == 'Parts' || $containerName[$i] == 'Labor' || $containerName[$i] == 'Expenses' || $containerName[$i] == 'Travel'  ){
+				if(_isVisible(_f("main").s_hscrollbar("horizontalScrollBar").near(_f("main").s_richtext($containerName[$i])))){
+				_setValue(_f("main").s_hscrollbar("horizontalScrollBar").near(_f("main").s_richtext($containerName[$i])),"00");
+			    }
+				_click(_f("main").s_datagroup("dataGroup").near(_f("main").s_richtext($containerName[$i])));
+			}else{
+				_click(_f("main").s_datagroup("dataGroup").near(_f("main").s_richtext($containerName[$i])));				
+				}	
+			_setValue($bo_pg_sfmTransactionAndDesigner.txt_quickFindField, $fieldName[$i]);
+
+			//Below logic is used for selecting object from multi match list
+			var $elementName=$fieldName[$i];
+			var $searchString=null;
+			if($elementName.includes("\(")){
+				$searchString=$elementName.substring(0,$elementName.indexOf("\("));
+				_log($searchString);
+			}else{
+				$searchString=$elementName;
+			}
+				var $find=true;
+				var $k=0;
+				var $element=null;
+				while ($find && $k<10) {
+					_log("search element name: "+$elementName);
+					$element=_getValue(_f("main").s_label("/"+$searchString+"/["+$k+"]").near(_f("main").s_textinput($elementName)));
+					_log("$element: "+$element);
+					if ($elementName===$element) {
+						$find=false;
+						_click(_f("main").s_label($k).near(_f("main").s_textinput($elementName)));
+					}else {
+						$k++;
+					}
+				}
+			_click(_f("main").s_button("/Add Field/"));
+		}
+		_click($bo_pg_sfmTransactionAndDesigner.btn_pageLayoutSave);
+		_wait(3000, _isVisible($bo_pg_sfmTransactionAndDesigner.lbl_pageLayoutSaved));
+		_click($bo_pg_sfmTransactionAndDesigner.btn_quickSave1);
+	};
+
+	this.selectSFM = function($sfmName, $isCustom) {
+		if ($isCustom) {
+			_wait(10000);
+			_click($bo_pg_sfmTransactionAndDesigner.btn_yourCustomSfmTransactions);
+			_setValue(
+					$bo_pg_sfmTransactionAndDesigner.txt_yourCustomSfmTransactionsQuickFind,
+					$sfmName);
+
+		} else {
+			_setValue(
+					$bo_pg_sfmTransactionAndDesigner.txt_standardSfmTransactionQuickFind,
+					$sfmName);
+		}
+//		_setStrictVisibilityCheck(true);
+//		_click(_f("main").s_checkbox("/CheckBox/").leftOf(_f("main").processlistitemrenderer($sfmName)),10,10);
+//		_setStrictVisibilityCheck(false);
+		_setStrictVisibilityCheck(true);
+//		if (_isVisible(_f("main").s_checkbox(0).leftOf(_f("main").s_label($sfmName),10,10))) {
+//			_wait(3000);
+//			_click(_f("main").s_checkbox(0).leftOf(_f("main").s_label($sfmName), 10, 10));
+//
+//		} 
+//		
+//		else {
+//			_setValue(
+//					$bo_pg_sfmTransactionAndDesigner.txt_standardSfmTransactionQuickFind,
+//					$sfmName);
+//		}
+		 
+		if (_isVisible(_f("main").s_checkbox("/chk/i").leftOf(_f("main").s_label($sfmName), 10, 10))) {
+			_wait(3000);
+			_click(_f("main").s_checkbox("/chk/i").leftOf(_f("main").s_label($sfmName), 10, 10));
+
+		} else if (_isVisible(_f("main").s_checkbox(2).leftOf(_f("main").s_label($sfmName), 10, 10))) {
+			_wait(3000);
+			_click(_f("main").s_checkbox(2).leftOf(_f("main").s_label($sfmName), 10, 10));
+
+		} else {
+			_click(_f("main").s_checkbox("/CheckBox/").leftOf(_f("main").s_label($sfmName), 10, 10));
+		}
+		 _setStrictVisibilityCheck(false);
+
+	};
+	
+	/**
+	 * This function is mark the Parts field in Parts tab as Mandatory or Non Mandatory
+	 */
+	this.partsNotMandatory = function() {
+		_setValue(_f("main").s_hscrollbar("horizontalScrollBar[2]"), "00");
+		_click(_f("main").s_textinput("lblData").near(_f("main").s_richtext("Part")));
+		_check(_f("main").s_checkbox("Required"));
+		_click($bo_pg_sfmTransactionAndDesigner.btn_pageLayoutSave);
+		_wait(3000, _isVisible($bo_pg_sfmTransactionAndDesigner.lbl_pageLayoutSaved));
+
+	};
+	/**
+	 * This function is mark the Parts line multi add to none or select 
+	 */	
+	this.partsMultiAdd = function($multiAdd){
+		_click(_f("main").s_richtext("Parts"));
+		_setSelected(_f("main").s_combobox("/ComboBox/").near(_f("main").uiftetextfield("Allow Multi Add Using")),$multiAdd);
+		/*_setValue(_f("main").s_textinput(0).rightOf(_f("main").uiftetextfield("Allow Multi Add Using")), "");
+		_setValue(_f("main").s_textinput(0).rightOf(_f("main").uiftetextfield("Allow Multi Add Using")), "Select");
+		if($multiAdd =="Case"){
+			_click(_f("main").s_label("Case[2]"));
+		}else{
+			_click(_f("main").s_label($multiAdd));
+		}*/
+		_click($bo_pg_sfmTransactionAndDesigner.btn_pageLayoutSave);
+		_wait(3000, _isVisible($bo_pg_sfmTransactionAndDesigner.lbl_pageLayoutSaved));	
+	};
+	
+	/**
+	 * This function is select/unselect a field read only/required
+	 * Eg : 7017.sah  
+	 */	
+	this.setReadOnlyOrRequired = function($object,$attribute,$value){
+		_click(_f("main").uiftetextfield($object));
+		if($attribute=='Read Only'){
+			if(_getValue($bo_pg_sfmTransactionAndDesigner.chk_readOnly)== $value){
+				//do nothing
+			}else{
+				_click($bo_pg_sfmTransactionAndDesigner.chk_readOnly);
+			}
+			
+		}else{
+			if(_getValue($bo_pg_sfmTransactionAndDesigner.chk_required)== $value){
+				//do nothing
+			}else{
+				_click($bo_pg_sfmTransactionAndDesigner.chk_required);
+			}
+			
+		}
+		_click($bo_pg_sfmTransactionAndDesigner.btn_pageLayoutSave);
+		_wait(3000, _isVisible($bo_pg_sfmTransactionAndDesigner.lbl_pageLayoutSaved));
+	};
+	
+	/**
+	 * This function is set form fill on a field
+	 * $fieldName - field on which formfill to be set
+	 * $objMapping - name of the mapping
+	 * $nearBy - near which the object is present
+	 * Eg : 6951.sah  
+	 */	
+	this.setFormFill = function($fieldName,$objMapping,$nearBy){
+		if($nearBy == 'Parts' || $nearBy == 'Labor' || $nearBy == 'Expense' || $nearBy == 'Travel'){
+			_click(_f("main").s_richtext($fieldName).near(_f("main").s_richtext($nearBy)));
+		}else{
+			_click(_f("main").s_textinput("txtIp").inside(_f("main").fieldrenderer($fieldName)));
+		}
+		_setSelected(_f("main").s_combobox("/ComboBox/").rightOf(_f("main").uiftetextfield("Object Mapping")),$objMapping);
+		_click($bo_pg_sfmTransactionAndDesigner.btn_pageLayoutSave);
+		_wait(3000, _isVisible($bo_pg_sfmTransactionAndDesigner.lbl_pageLayoutSaved));
+	};
+
+	/**
+	 * Author		:	Anand Kakhandaki
+	 * Function		:	To search items on header object lookup field
+	 * Parameters	:	$object= Name of object on the header. Ex: case on the Work order 
+	 * 					$searchObject= Name of the item need to be searched
+	 * Returns		: 	Nothing
+	 * Example		: 	Refer RS_10431.sah for funtion usage
+	 */
+	this.searchHeaderField=function($object,$searchObject){
+		_click(_span("/svmx_lookup_icon/",_near(_label($object+":"))));
+		_wait(5000,_isVisible($sfm_pg_wizards.lbl_searchWindowLabel));
+		_setValue($sfm_pg_wizards.txt_searchObj,$searchObject);
+		_click($sfm_pg_wizards.btn_objectSearch);
+		_wait(5000,_isVisible(_cell($searchObject)));
+		if (_exists(_cell($searchObject))) {
+			_log("Pass");
+		}
+		else{
+			_log("Fail");
+		}
+	};
+	
+	
+	//Fill text values in SFM Lightning Delivery screen
+	this.fillHeaderTextValues = function($labelsArray,$valuesArray) {
+		var $i = 0;
+		for($i=0;$i<$labelsArray.length;$i++){
+			_setValue(_textbox(0,_near(_label("/"+$labelsArray[$i]+"/"))),$valuesArray[$i]);
+			
+		}	
+	};
+	
+	
+	
+	//Fills picklist values in SFM Lightning Delivery screen.Author: Janaki
+	this.fillHeaderPicklistValues = function($labelsArray,$valuesArray){
+		var $i = 0;
+		for($i=0;$i<$labelsArray.length;$i++){
+			_click(_div("/svmx-trigger/",_near(_label("/"+$labelsArray[$i]+"/"))));
+			_click(_listItem($valuesArray[$i]));
+		}	
+	};
+	
+	//Select checkboxes for header. Author : Janaki
+	//Note: Checkbox values should be true or false
+	this.selectHeaderCheckBox = function($checkBoxLabels,$checkBoxValues){
+		var $i = 0;
+		for($i = 0;$i<$checkBoxLabels.length;$i++){
+			if($checkBoxValues[$i] === "true"){
+				_check(_checkbox(0,_near(_label($checkBoxLabels[$i]))));
+			
+			}
+			else if($checkBoxValues[$i] === "false"){
+				_uncheck(_checkbox(0,_near(_label($checkBoxLabels[$i]))));
+			}
+		}		
+	};
+	
+	//Fill text values in Extended Edit window for given text fields (Child Line Item) Author: Janaki
+	this.fillChildTextValues = function($labelsArray,$valuesArray){
+		var $i = 0;
+		for($i=0;$i<$textLabels.length;$i++){
+			_setValue(_textbox(0,_near(_label("/"+$labelsArray[$i]+"/"))),$valuesArray[$i]);
+		}
+	};
+	
+	//Fill text area values in Extended Edit for Child Line Item. Author : Janaki.
+	this.fillChildTextArea = function($labelsArray,$valuesArray){
+		var $i = 0;
+		for($i=0;$i<$textLabels.length;$i++){
+			_setValue(_textarea(0,_near(_label("/"+$labelsArray[$i]+"/"))),$valuesArray[$i]);
+		}
+	};
+	
+	//Fill picklist values in Extended Edit for Child line item. Author : Janaki.
+	this.fillChildPicklists =  function($pickListLabels,$pickListValues){
+	var $i = 0;
+	for($i = 0;$i<$pickListLabels.length;$i++){
+		_click(_div("/svmx-trigger/",_near(_label("/"+$pickListLabels[$i]+"/"))));
+		if(!_isVisible(_listItem($pickListValues[$i]))) {
+			_click(_div("/svmx-trigger/",_near(_label("/"+$pickListLabels[$i]+"/"))));
+		}
+		_click(_listItem($pickListValues[$i]));
+	}
+	};
+	
+	//Select checkboxes in Extended Edit window. Author : Janaki
+	//Note: Checkbox values should be true or false
+	this.selectChildCheckBox = function($checkBoxLabels,$checkBoxValues){
+		var $i = 0;var $actual = true;
+		for($i = 0;$i<$checkBoxLabels.length;$i++){
+			var $pvalue=_parentTable(_button("/"+$checkBoxLabels+"/"));
+			var $value=_getAttribute($pvalue,"className");
+			 if($value.indexOf("checked")!=-1)
+			{
+				 $actual = true;
+			}
+			else{
+				 $actual = false;
+				}
+			 if($actual && !$checkBoxValues[$i]){
+				 _click(_button("/"+$checkBoxLabels+"/"));
+			 }
+			 else if(!$actual && checkBoxValues[$i]){
+				 _click(_button("/"+$checkBoxLabels+"/"));
+			 }
+		}		
+	};
+	
+	//Fill values for Date/Time fields for Child Line items. Author : Janaki
+	this.fillDateTimeFields = function($dateLabels,$dateValues,$timeValues){
+		for($i = 0;$i<$dateLabels.length;$i++){
+			_setValue(_textbox(0,_near(_label("/"+$dateLabels+"/"))),$dateValues[$i]);
+			//Split the time into hour , minute and AM/PM
+			var $time = $timeValues[$i];
+			var $temp = $time.split(":");
+			var $hour  = $temp[0];
+			$temp = $time.split(" ");
+			var $ampm = $temp[1];
+			var $min = $temp[0].split(":");
+			$min = $min[1];
+			_click(_textbox(1,_near(_label("/"+$dateLabels[$i]+"/"))));
+			_setStrictVisibilityCheck(true);
+			_click(_listItem("/"+$hour+"/"));
+			_setStrictVisibilityCheck(false);
+			_click(_textbox(2,_near(_label("/"+$dateLabels[$i]+"/"))));
+			_setStrictVisibilityCheck(true);
+			_click(_listItem("/"+$min+"/"));
+			_setStrictVisibilityCheck(false);
+			_click(_textbox(3,_near(_label("/"+$dateLabels[$i]+"/"))));
+			_setStrictVisibilityCheck(true);
+			_click(_listItem($ampm));
+			_setStrictVisibilityCheck(false);
+		}
+	};
+	
+  //Fill values for Date fields for Child Line items. Author: Janaki
+	this.fillDateFields = function($dateLabels,$dateValues){
+		for($i = 0;$i<$dateLabels.length;$i++){
+			_setValue(_textbox("/svmx-date/",_near(_label($dateLabels[$i]))),$dateValues[$i]);		
+		}
+	};
+	
+	
+	//Add new child line for Parts,labor,travel and expense.
+	//Author: Janaki
+	//This function can add new child line based on the input values given.
+	//The fields given here should already be given in the screen designer.
+	//Please use "performLookupInChild" function to perform lookups
+	//Pass empty array as paramater "[]" if there are no such fields in that data type that needs to be filled
+		this.addChildLine = function($lineType,$productName,$textLabels,$textValues,$pickListLabels,$pickListValues,$textAreaLabels,$textAreaValues,$checkBoxLabels,$checkBoxValues,$dateLabels,$dateValues,$dateTimeLabels,$dateTimeDateValues,$timeValues){
+			_click(_span($lineType));
+			_click($sfm_pg_commonSfdc.btn_addLine);
+			_wait(2000);
+			$sfm_act_SFM.openLatestExtEdit();
+			_setStrictVisibilityCheck(true);
+			//Input values in Extended Edit window.
+			_setStrictVisibilityCheck(true);
+			//Text values first
+			if($textLabels.length > 0) {
+				this.fillChildTextValues($textLabels,$textValues);
+			}
+			//Picklist values next..
+			if($pickListLabels.length > 0){
+				this.fillChildPicklists($pickListLabels, $pickListValues);
+			}
+			//Textarea fields
+			if($textAreaLabels.length > 0){
+				this.fillChildTextArea($textAreaLabels,$textAreaValues);
+			}
+			//Checkboxes
+			if($checkBoxLabels.length > 0){
+				this.selectChildCheckBox($checkBoxLabels, $checkBoxValues)
+			}
+			//Date fields
+			if($dateLabels.length > 0){
+				this.fillDateFields($dateLabels, $dateValues);
+			}
+			//Date/Time fields
+			if($dateTimeLabels.length > 0){
+				this.fillDateTimeFields($dateTimeLabels,$dateTimeDateValues,$timeValues);
+			}					
+		 _click($sfm_pg_commonSfdc.btn_updateExtEdit);	
+		};
+
+	
+		this.addUserLookupInScreenDesigner = function($fieldName,$containerName){
+			//This function adds a user lookup which needs special handling in the screen designer
+			//to an existing page layout
+			_click($bo_pg_sfmTransactionAndDesigner.btn_screenDesigner);
+			_click(_f("main").s_datagroup("dataGroup").near(_f("main").s_richtext($containerName)));
+			_click(_f("main").s_label($fieldName));
+			_click($bo_pg_sfmTransactionAndDesigner.btn_addFieldToPage);
+			_click($bo_pg_sfmTransactionAndDesigner.btn_pageLayoutSave);
+			_wait(3000, _isVisible($bo_pg_sfmTransactionAndDesigner.label_pageSaved));
+			
+		};
+	this.openLatestExtEdit = function(){
+		var $x = _count("_row", "/.*/", _in(_table("/svmx-grid-table/")));
+		$x = $x-2;
+		_click(_image("svmx-action-col-icon svmx-action-col-0   svmx-sfmd-edit-icon["+$x+"]"));
+	};	
+	
+	//Performs Search in WO child lines.This takes care of Multi line add as well.
+	this. performLookupInChild = function($lookupName,$productName){
+		_setStrictVisibilityCheck(true);
+		_setValue(_textbox(0,_near(_label("/"+$lookupName+"/"))),$productName);
+		_click(_span("/svmx-btn-icon svmx_lookup_icon/",_near((_label("/"+$lookupName+"/")))));
+		_click(_div($productName));
+		_click($sfm_pg_commonSfdc.btn_selectProdSearch);
+		 _click($sfm_pg_commonSfdc.btn_updateExtEdit);
+	};
+	/**
+	 * This function is set webservice on a header/child base on the parameter passed
+	 * $object - Object on which webservice is to be enabled. Work Order for header/Parts incase of Parts and so on
+	 * $event - On Load or Before Save/Update or After Save/Update or On Change or After Add Record
+	 * $eventType - Webservice/JavaScript
+	 * $methodName - webservice name along with class name
+	 * Eg : 4996.sah  
+	 */	
+	this.setWebservice = function($object, $event, $eventType, $methodName ){
+		if($object=='Work Order'){
+			_click($bo_pg_sfmTransactionAndDesigner.txt_sfmSavePageLayoutAsId);
+		}else if($object=='Parts' || $object=='Labor' || $object=='Expenses' || $object=='Travel'){
+			_click(_f("main").s_richtext($object));
+		}else{
+			_click(_f("main").uiftetextfield($object));
+		}
+		_setSelected(_f("main").s_combobox("/ComboBox/").under(_f("main").uiftetextfield($event)), $eventType);
+		_wait(2000);
+		_setValue(_f("main").s_textinput("/txtip/").under(_f("main").uiftetextfield($event)),$methodName);
+		_click($bo_pg_sfmTransactionAndDesigner.btn_pageLayoutSave);
+		_wait(3000, _isVisible($bo_pg_sfmTransactionAndDesigner.lbl_pageLayoutSaved));
+	   };
+};

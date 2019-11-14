@@ -1,0 +1,32 @@
+var $user_credentials = $excel.readFromCustomExcel("../optimax/op_excleData/automation.xlsx", "User_Details","","");
+for(var $i=0;$i<$user_credentials.length;$i++)
+{
+var $g_un = $user_credentials[$i][0];
+var $g_pwd = $user_credentials[$i][1];
+var $g_url = $user_credentials[$i][2];
+}
+
+var $RS_6311 = _testcase("RS_6311", "Add Cost for technician");
+
+$RS_6311.start();
+
+$bo_act_login.login($g_url, $g_un, $g_pwd);
+
+_click(_link("ServiceMax Setup"));
+_wait(20000,_isVisible(_div("Service Organization")));
+_click(_div("Service Organization"));
+_wait(20000,_isVisible(_div("Service Org")));
+_click(_div("Service Org"));
+_click(_image("radio_chk0.gif[1]"));
+_wait(20000,_isVisible(_div("Cost")));
+_click(_cell("Cost"));
+_wait(20000,_isVisible(_div("Add Cost Record"))); 
+_click(_button("Add Cost Record"));
+_setSelected(_select("TrackTechTeam:selected_ID:SVMXPageBlock:PbCost:LaborCostList:0:j_id359"), "On Call");
+_setValue(_textbox("TrackTechTeam:selected_ID:SVMXPageBlock:PbCost:LaborCostList:0:j_id362"), "80.0");
+_setValue(_textbox("TrackTechTeam:selected_ID:SVMXPageBlock:PbCost:LaborCostList:0:j_id365"), "100.0");
+_click(_button("Save"));
+_wait(30000,_isVisible(_div("Success:")));
+_click(_heading4("Success:"));
+
+$RS_6311.end();

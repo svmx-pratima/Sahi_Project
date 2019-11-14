@@ -1,0 +1,127 @@
+var $an_act_Contract_Uptime = new function an_act_Contract_Uptime() {
+	
+	this.contract_uptime_wo = function($Calculationmethodname)
+	
+	{
+		
+		_click($an_pg_rv.link_home);
+		_click($an_pg_rv.link_servicemaxSetup);
+		_click($an_pg_rv.btn_serviceperformancemetrics);
+		_click($an_pg_rv.btn_serviceperformancemetricsetup);
+		_click($an_pg_rv.btn_click_metrics);
+		_click($an_pg_contractuptime.btn_contractuptimemetric);
+		_click($an_pg_contractuptime.btn_Add);
+		_click($an_pg_contractuptime.btn_active);
+		_setValue($an_pg_contractuptime.txt_description, $Calculationmethodname);
+		_click($an_pg_contractuptime.btn_settings);
+		_click($an_pg_contractuptime.list_consider_downtime);
+		_click($an_pg_contractuptime.btn_work_order);
+		_click($an_pg_contractuptime.list_choose_start_Date);
+		_click($an_pg_contractuptime.btn_preferred_start_time);
+		_click($an_pg_contractuptime.list_choose_endDate);
+		_click($an_pg_contractuptime.btn_preferred_end_time);
+		_click($an_pg_contractuptime.list_select_component);
+		_click($an_pg_contractuptime.btn_component);
+		_click($an_pg_contractuptime.list_business_hours);
+		_click($an_pg_contractuptime.btn_business_hours);
+		_click($an_pg_contractuptime.btn_criteria);
+		_click($an_pg_contractuptime.list_Contract_qualification_criteria);
+		_click($an_pg_contractuptime.btn_std_service_contract_expr);
+		_click($an_pg_contractuptime.list_qualifying_covered_product);
+		_click($an_pg_contractuptime.btn_std_covered_product_expr);
+		_click($an_pg_contractuptime.list_workOrder_downtime);
+		_click($an_pg_contractuptime.btn_closed_workorders);
+		_click($an_pg_contractuptime.btn_save);
+		_click($an_pg_contractuptime.btn_OK);
+	};
+	
+	
+	this.contract_uptime_downtime = function($Calculationmethodname)
+	
+	{
+                _click($an_pg_rv.link_home);
+		_click($an_pg_rv.link_servicemaxSetup);
+		_click($an_pg_rv.btn_serviceperformancemetrics);
+		_click($an_pg_rv.btn_serviceperformancemetricsetup);
+		_click($an_pg_rv.btn_click_metrics);
+		_click($an_pg_contractuptime.btn_contractuptimemetric);
+		_click($an_pg_contractuptime.btn_Add);
+		_click($an_pg_contractuptime.btn_active);
+		_setValue($an_pg_contractuptime.txt_description, $Calculationmethodname);
+		_click($an_pg_contractuptime.btn_settings);
+		_click($an_pg_contractuptime.list_consider_downtime);
+		_click($an_pg_contractuptime.btn_downtime);
+		_click($an_pg_contractuptime.list_select_component);
+		_click($an_pg_contractuptime.btn_component);
+		_click($an_pg_contractuptime.list_business_hours);
+		_click($an_pg_contractuptime.btn_business_hours);
+		_click($an_pg_contractuptime.btn_criteria);
+		_click($an_pg_contractuptime.list_Contract_qualification_criteria);
+		_click($an_pg_contractuptime.btn_std_service_contract_expr);
+		_click($an_pg_contractuptime.list_qualifying_covered_product);
+		_click($an_pg_contractuptime.btn_custom_covered_product);
+		_click($an_pg_contractuptime.list_workOrder_downtime);
+		_click($an_pg_contractuptime.btn_closed_workorders);
+		_click($an_pg_contractuptime.btn_save);
+		_click($an_pg_contractuptime.btn_OK);
+		
+		
+	};
+	
+	this.contract_uptime_advanced_downtime = function($Calculationmethodname)
+	
+	{
+		_click($an_pg_contractuptime.btn_contractuptimemetric);
+		_click($an_pg_contractuptime.btn_Add);
+		_click($an_pg_contractuptime.btn_active);
+		_setValue($an_pg_contractuptime.txt_description, $Calculationmethodname);
+		_click($an_pg_contractuptime.btn_settings);
+		_click($an_pg_contractuptime.list_consider_downtime);
+		_click($an_pg_contractuptime.btn_downtime);
+		_click($an_pg_contractuptime.list_select_component);
+		_click($an_pg_contractuptime.btn_component);
+		_click($an_pg_contractuptime.list_business_hours);
+		_click($an_pg_contractuptime.btn_business_hours);
+		_click($an_pg_contractuptime.btn_criteria);
+		_click($an_pg_contractuptime.list_Contract_qualification_criteria);
+		_click($an_pg_contractuptime.btn_std_service_contract_expr);
+		_click($an_pg_contractuptime.list_qualifying_covered_product);
+		_click($an_pg_contractuptime.btn_advanced_custom_expr);
+		_click($an_pg_contractuptime.list_workOrder_downtime);
+		_click($an_pg_contractuptime.btn_closed_workorders);
+		_click($an_pg_contractuptime.btn_save);
+		_click($an_pg_contractuptime.btn_OK);
+		
+		
+	};
+	
+	
+	
+	
+	
+	this.schedule_notifications = function($EmailID)
+	
+	{
+		_click($an_pg_rv.link_home);
+		_click($an_pg_rv.link_servicemaxSetup);
+		_click($an_pg_rv.btn_serviceperformancemetrics);
+		_click($an_pg_rv.btn_serviceperformancemetricsetup);
+		_click($an_pg_rv.btn_click_metrics);
+		_click($an_pg_contractuptime.btn_contractuptimemetric);
+		_click($an_pg_contractuptime.btn_schedule_notifications);
+		_click($an_pg_contractuptime.list_timezone);
+		_click($an_pg_contractuptime.btn_ist_timezone);
+		_click($an_pg_contractuptime.list_period);
+		_click($an_pg_contractuptime.btn_daily);
+		_click($an_pg_contractuptime.list_time);
+		_click($an_pg_contractuptime.btn_choose_time);
+		_setValue($an_pg_contractuptime.txt_emailOnSuccess, "meghana.rao@servicemax.com");
+		_click($an_pg_contractuptime.btn_sn_save);
+		_click($an_pg_contractuptime.btn_sn_OK);
+		_click($an_pg_contractuptime.btn_Run_Now);
+		_click($an_pg_contractuptime.btn_sn_OK);
+	
+	};
+	
+	
+};

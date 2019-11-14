@@ -1,0 +1,44 @@
+//Author	:- 	Shashikala Kamath
+//Modified By :- Ashwini Holagi
+
+var $swat_tc_005_output_document = _testcase("swat_tc_005_output_document","Verify the functionality of OPDOC");
+
+	$swat_tc_005_output_document.start();
+	
+	_setSpeed($g_stepSpeed);
+	
+	var $wizardObjectName = "Work Order";
+	var $wizardTitleName = $bo_act_common.generateRandomName("SFWTitle");
+	var $wizardIDName = $bo_act_common.generateRandomName("SFWId");
+	var $wizardStepType = "Output Document";
+	var $wizardStepName = "Work Order Service Report";
+	var $selectTemplateAtRunTime = false;
+	
+	//Login to App
+	$bo_act_login.login($swat_Url,$swat_un,$swat_pwd);
+	
+	//Create Work Order with Order Status, Order Type through API
+	var $workOrderNo = $swat_act_createDataUsingApi.createWorkOrder($swat_un, $swat_pwd, $swat_ClientId, $swat_ConsumerSecret, $swat_OrgInstance);
+	
+	//Steps to create SFM Wizard and Add Step of type SFM
+	$swat_act_sfmWizard.createSfmWizardWithStepOutputDoc($wizardObjectName,$wizardTitleName, $wizardIDName,$wizardStepType,$wizardStepName,$selectTemplateAtRunTime);
+	
+	global_clearBrowserCache();
+	
+	//Global Search WorkOrder
+	$sfm_act_common.globalSearch($workOrderNo);
+	_wait(10000);
+	
+	//Click 'Work Order Service Report' in SFM Wizard
+	$swat_act_sfmDelivery.launchSfmDelivery($wizardStepName,$wizardTitleName);
+	
+	//Verify Service Report is attached to Work Order
+	$swat_act_sfmDelivery.verifyServiceReportAttchedToWO($workOrderNo);
+	
+	//Delete Work Order
+	//$swat_act_deleteData.deleteData($workOrderNo);
+	
+	//Delete SFM Wizard 
+	$bo_act_SFW.deleteSFMWizard($wizardObjectName, $wizardIDName);
+	
+	$swat_tc_005_output_document.end();

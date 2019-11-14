@@ -1,0 +1,65 @@
+var $rs_6343 = _testcase("RS_6343","Verify confirmation type on Header when simple expressions is configured - Source to Target");
+$rs_6343.start();
+$sfmName = $bo_act_common.generateRandomName("RS_6343_");
+var $sfmNameToBeCloned = "Create Usage Lines from Estimates";
+var $isCustom = false;
+var $sfmTemplate = "SVMXSTD: Manage WO Usage Lines";
+var $containerName = ["Order Status"];
+var $fieldName = ["No Of Times Assigned"];
+var $targetObject="Work Order";
+var $rulename =$sfmName;
+var $ruleDescription ="No Of Times Assigned is less than 60";
+var $fieldArray = ["No Of Times Assigned"];
+var $conditionArray = ["Equals"];
+var $operandArray =["Value"];
+var $valueArray =["45"];
+var $advExpr= "";
+var $messageType = "Confirmation";
+var $wizardObject ="Work Order";
+
+//Create WO through REST API
+var $woNumber = $sfm_act_createCustomWizard.createBlankWoFromRest($sfmdUsn, $sfmdPwd, $sfmClientId, $sfmConsumerSecret, $sfmOrgInstance);
+
+//login
+$bo_act_login.login($g_url,$sfmdUsn,$sfmdPwd); 
+
+//clone tdm016 and add dvr
+$sfm_act_SFM.cloneTDM016($sfmNameToBeCloned,$sfmName,$isCustom, $sfmName, $sfmTemplate, $fieldName, $containerName);
+$sfm_pg_dvr.newRule($targetObject, $rulename, $ruleDescription, $fieldArray, $conditionArray, $operandArray, $valueArray, $advExpr, $messageType);
+_click($sfm_pg_sfmDesigner.btn_saveSFM); 
+
+//add to wizard
+$sfm_act_wizards.addToWizard($wizardObject, $sfmd_wizardName[0], $sfmd_wizardType[1], $sfmName); 
+
+//Navigate to the WO for validation
+$bo_act_navigation.navigateToCreatedRecordUsingGlobalSearch($woNumber);
+
+$sfm_act_createCustomWizard.clickWizardBtn($sfmName);
+
+_selectDomain();
+//Validate DVR when condition is met
+_setValue($sfm_pg_sfmDesigner.txt_noOfTimesAssigned, "45");
+_click($sfm_pg_sfmDesigner.btn_deliverySave);
+_assertExists(_label($ruleDescription),"DVR confirmation on header is not working");
+_click($sfm_pg_sfmDesigner.btn_eeCancel);
+_wait(3000);
+
+//Check Save button works on confirmation
+_click($sfm_pg_sfmDesigner.btn_deliverySave);
+_assertExists(_label($ruleDescription),"Save on DVR confirmation on header is not working");
+_click($sfm_pg_sfmDesigner.btn_saveConfirmation);
+if(_exists($sfm_pg_sfmDesigner.txt_priceAlert)){
+	_click($sfm_pg_sfmDesigner.btn_priceAlertOk);
+	_wait(15000);
+}
+//Validate DVR when condition is not met
+$sfm_act_createCustomWizard.clickWizardBtn($sfmName);
+_setValue($sfm_pg_sfmDesigner.txt_noOfTimesAssigned, "");
+_click($sfm_pg_sfmDesigner.btn_deliverySave);
+_assertNotExists(_label($ruleDescription),"DVR confirmation on header is triggered when not supposed to be");
+
+if(_exists($sfm_pg_sfmDesigner.txt_priceAlert)){
+	_click($sfm_pg_sfmDesigner.btn_priceAlertOk);
+}
+
+$rs_6343.end();

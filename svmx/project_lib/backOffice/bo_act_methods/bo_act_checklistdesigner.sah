@@ -1,0 +1,580 @@
+/**
+ * Function for Checklist Designer
+ * 
+ * Owner is Meghana Rao P
+ */
+var $bo_act_checklistdesigner = new function bo_act_checklistdesigner() {
+
+	this.newChecklistTypeSFM = function($checklistName, $sfmType, $objName) {
+		_click($bo_pg_sfmTransactionAndDesigner.btn_newSFM);
+		$bo_pg_sfmTransactionAndDesigner.setSfmName($checklistName);
+		_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmTransactionId, "");
+		_setSelected($bo_pg_sfmTransactionAndDesigner.lbl_checklistOb, $sfmType);
+		_wait(60000,_isVisible($bo_pg_sfmTransactionAndDesigner.lbl_checklistOb));
+		_setValue($bo_pg_sfmTransactionAndDesigner.selectSourceObj, "");
+		_wait(10000);
+		_setValue($bo_pg_sfmTransactionAndDesigner.selectSourceObj, $objName);
+		_wait(20000);
+		_setSelected($bo_pg_sfmTransactionAndDesigner.sourceComboBox, $objName);
+		_wait(5000);
+
+		_click($bo_pg_sfmTransactionAndDesigner.btn_popUpOK);
+		_wait(6000);
+	};
+	
+	this.createChecklistProcess = function($sfmName){
+		$bo_act_navigation.navigateToSfmTransactionDesigner();
+		_wait(15000,_isVisible($bo_pg_sfmTransactionAndDesigner.btn_newSFM));
+		_click($bo_pg_sfmTransactionAndDesigner.btn_newSFM);
+		_wait(5000,_isVisible($bo_pg_sfmTransactionAndDesigner.txt_name));
+		_setValue($bo_pg_sfmTransactionAndDesigner.txt_name, "");
+		_setValue($bo_pg_sfmTransactionAndDesigner.txt_name, $sfmName);
+		_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmTransactionId, "");
+		_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmTransactionId, $sfmName);
+		_setSelected($sfm_pg_screenDesigner.sel_createSFMTransaction, "to generate a Checklist/Survey type of Process");
+		_setStrictVisibilityCheck(true);
+		_setValue($sfm_pg_screenDesigner.txt_srcObject,"");
+		_setValue($sfm_pg_screenDesigner.txt_srcObject,"Wo");
+		_wait(5000);
+		_click($sfm_pg_screenDesigner.lbl_workOrder);
+		_click($sfm_pg_screenDesigner.lbl_btnok);
+		_setStrictVisibilityCheck(false);
+	};
+	
+	// Added By Bhupendra Singh
+	this.newChecklistProcessFromChecklistDesigner = function($checklistName, $objName) {
+		$bo_act_navigation.navigateToChecklistDesigner();
+		_wait(1000);
+		_wait(30000, _isVisible($bo_pg_sfmTransactionAndDesigner.btn_newSFMTransaction));
+		_click($bo_pg_sfmTransactionAndDesigner.btn_newSFMTransaction);
+		_wait(3000);
+		$bo_pg_sfmTransactionAndDesigner.setSfmName($checklistName);
+		_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmTransactionId, "");
+		_setValue($bo_pg_sfmTransactionAndDesigner.selectSourceObj, "");
+		_wait(10000);
+		_setValue($bo_pg_sfmTransactionAndDesigner.selectSourceObj, $objName);
+		_wait(20000);
+		_setSelected($bo_pg_sfmTransactionAndDesigner.sourceComboBox, $objName);
+		_wait(5000);
+		_click($bo_pg_sfmTransactionAndDesigner.btn_popUpOK);
+		_wait(6000);
+	};
+	
+	this.editChecklistProcessFromChecklistDesigner = function($checklistProcess) {
+		$bo_act_navigation.navigateToChecklistDesigner();
+		_wait(30000, _isVisible($bo_pg_sfmTransactionAndDesigner.btn_newSFMTransaction));
+		_setValue($bo_pg_sfmTransactionAndDesigner.txt_searchChecklistProcess,$checklistProcess);
+		_wait(3000);
+		$bo_pg_sfmTransactionAndDesigner.sel_spcecificChecklistProcess($checklistProcess);
+		_wait(6000);
+	};
+	
+	this.cloneChecklistProcessFromChecklistDesigner = function($checklistProcess, $cloned_checklistProcess) {
+		$bo_act_navigation.navigateToChecklistDesigner();
+		_wait(30000, _isVisible($bo_pg_sfmTransactionAndDesigner.btn_newSFMTransaction));
+		_setValue($bo_pg_sfmTransactionAndDesigner.txt_searchChecklistProcess,$checklistProcess);
+		_wait(3000);
+		this.selectChecklistProcess($checklistProcess);
+		_wait(6000,_isVisible($bo_pg_formDesigner.btn_cloneButtonOnChecklistDesigner));
+		_click($bo_pg_formDesigner.btn_cloneButtonOnChecklistDesigner);
+		_setValue($bo_pg_sfmTransactionAndDesigner.txt_name, $cloned_checklistProcess);
+		_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmTransactionId, "");
+		_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmTransactionId, $cloned_checklistProcess);
+	};
+	
+	this.create_newquestion_tag_in_designer = function($questionText, $tag1)
+
+	{
+		_click($bo_pg_formDesigner.tab_clickFormDesigner);
+		_click($bo_pg_formDesigner.btn_addNewQuestion);
+		_click($bo_pg_formDesigner.btn_selectQuestionDataType);
+		_setValue($bo_pg_formDesigner.lbl_questionText, $questionText);
+		_wait(10000);
+		/*_focusWindow();
+		_setValue($bo_pg_formDesigner.txt_data_entry, $tag1);
+		_focusWindow();
+		_typeKeyCodeNative(java.awt.event.KeyEvent.VK_SPACE);
+		_wait(1000);
+		*/
+		_setValue($bo_pg_formDesigner.txt_data_entry, $tag1);
+		_keyDown($bo_pg_formDesigner.txt_data_entry, [13, 13]);
+		_keyUp($bo_pg_formDesigner.txt_data_entry, [13, 13]);
+		_wait(10000);
+		_click($bo_pg_formDesigner.btn_addQuestionToLibraryAndForm);
+		_click($bo_pg_formDesigner.btn_closeQuestionPopUp);
+		_wait(3000);
+		_click($bo_pg_formDesigner.btn_delete1);
+		_click($bo_pg_formDesigner.btn_quickSave);
+		_wait(10000);
+	};
+	
+	this.verifythequestionsonUI = function($question,$tagname)
+	{
+		_click($bo_pg_formDesigner.tab_clickFormDesigner);
+		_click($bo_pg_formDesigner.btn_groupbytag);
+		_setValue($sfm_pg_checklistTransaction.txt_formDesignerSearch, $tagname);
+		_focusWindow();
+		_lockWindow();
+		_clickNative(_xy(_f("main").questionlisttreeitemrendererm($tagname),10, 10));
+		_unlockWindow();
+		_wait(10000);
+		//_click(_f("main").s_label($question));
+		_click(_f("main").questionlisttreeitemrendererm($question)); // Added By Bhupendra Singh
+		_assertEqual(true,_isVisible(_f("main").s_label($question)));
+		_click($bo_pg_formDesigner.btn_groupbytag);
+	};
+	
+	this.verifyquestionnotpresent = function($question, $tagname)
+	{
+
+		_click($bo_pg_formDesigner.tab_clickFormDesigner);
+		_click($bo_pg_formDesigner.btn_groupbytag);
+		_setValue($sfm_pg_checklistTransaction.txt_formDesignerSearch, $tagname);
+		_focusWindow();
+		_lockWindow();
+		if(_isVisible(_f("main").questionlisttreeitemrendererm($tagname))){
+			_focusWindow();
+			_lockWindow();
+			_clickNative(_xy(_f("main").questionlisttreeitemrendererm($tagname),10, 10));	
+			_unlockWindow();
+		}
+		_wait(10000);
+		_assertEqual(false,_isVisible(_f("main").s_label($question)));
+	};
+	
+
+	// This method is to verify the questions on the UI and then add them to the FORM
+	this.verifythechanges_addquestion_toform = function($question,$tagname) {
+		_click($bo_pg_formDesigner.tab_clickFormDesigner);
+		_click($bo_pg_formDesigner.btn_groupbytag);
+		_setValue($sfm_pg_checklistTransaction.txt_formDesignerSearch, $tagname);
+		_focusWindow();
+		_lockWindow();
+		_clickNative(_xy(_f("main").questionlisttreeitemrendererm($tagname),10, 10));
+		_unlockWindow();
+		_wait(10000);
+		//_click(_f("main").s_label($question));
+		_click(_f("main").questionlisttreeitemrendererm($question));
+		_click($bo_pg_formDesigner.btn_addquestion_toform);
+		_click($bo_pg_formDesigner.btn_groupbytag);
+		_click($bo_pg_formDesigner.btn_quickSave);
+
+	};
+	this.verifythechangesinchecklistformdesigner = function(
+			$changedquestiontext, $answer1, $answer2, $answertype)
+
+	{
+		_click($bo_pg_formDesigner.tab_clickFormDesigner);
+		_assertEqual(true, _isVisible(_f("main").s_label($changedquestiontext)));
+		_assertEqual(true, _isVisible(_f("main").s_label($answer1)));
+		_assertEqual(true, _isVisible(_f("main").s_label($answer2)));
+		_assertEqual(true, _isVisible(_f("main").s_label($answertype)));
+
+	};
+
+	this.re_openChecklistTypeSFM = function($checklistName, $isCustom)
+
+	{
+		_call(top.location.reload());
+		$bo_pg_sfmTransactionAndDesigner.clickSFM($checklistName, $isCustom);
+
+	};
+
+	this.addQuestionToChecklist1 = function($questionText, $tag1) {
+		_click($bo_pg_formDesigner.tab_clickFormDesigner);
+		_click($bo_pg_formDesigner.btn_addNewQuestion);
+		_click($bo_pg_formDesigner.btn_selectQuestionDataType);
+		/*
+		 * To create a particular Tag under the given Question
+		 */
+
+		_setValue($bo_pg_formDesigner.lbl_questionText, $questionText);
+		if ($tag1 == "") {
+			_setValue($bo_pg_formDesigner.txt_data_entry, $tag1);
+
+		}
+
+		else
+
+		{
+			_setValue($bo_pg_formDesigner.txt_data_entry, $tag1);
+			_typeKeyCodeNative(java.awt.event.KeyEvent.VK_SPACE);
+			_focusWindow();
+			_typeKeyCodeNative(java.awt.event.KeyEvent.VK_SPACE);
+			_click($bo_pg_formDesigner.tagbutton);
+
+		}
+		_click($bo_pg_formDesigner.btn_addQuestionToLibraryAndForm);
+		_click($bo_pg_formDesigner.btn_closeQuestionPopUp);
+		_click($bo_pg_formDesigner.btn_quickSave);
+		_wait(10000);
+		_click($bo_pg_formDesigner.btn_save_close);
+
+	};
+
+	// To verify if a Given question is present under the particular Tag
+	this.verifyquestion_undertags = function($questionText, $tagname) {
+		_click($bo_pg_formDesigner.tab_clickFormDesigner);
+		_click($bo_pg_formDesigner.btn_delete1);
+		_click($bo_pg_formDesigner.btn_groupbytag);
+		// To click under the Untagged list of questions
+		_focusWindow();
+		_lockWindow();
+		_clickNative(_xy(_f("main").questionlisttreeitemrendererm($tagname),10, 10));
+		_unlockWindow();
+		_wait(10000);
+		_assertEqual(true, _isVisible(_f("main").s_label($questionText)));
+
+	};
+
+	// Find the values in the Checklist fields pop window.
+	this.findthevaluesinChecklist = function($questionText, $helpurl255) {
+
+		_click($bo_pg_formDesigner.tab_clickFormDesigner);
+		_click($bo_pg_formDesigner.btn_addNewQuestion);
+		_click($bo_pg_formDesigner.btn_selectQuestionDataType);
+		_assertEqual(true,_isVisible($sfm_pg_checklistTransaction.txt_questionText1));
+		_assertEqual(true,_isVisible($sfm_pg_checklistTransaction.txt_helpURL2));
+		_assertEqual(true,_isVisible($sfm_pg_checklistTransaction.txt_tagName2));
+
+		_assertEqual("Attachment",_getValue($sfm_pg_checklistTransaction.picklist_answertype2));
+		_setValue($bo_pg_formDesigner.lbl_questionText, $questionText);
+		_setValue($sfm_pg_checklistTransaction.txt_helpurltextfield,
+				$helpurl255);
+		_click($bo_pg_formDesigner.btn_addQuestionToLibraryAndForm);
+		_assertEqual(true,
+				_isVisible($sfm_pg_checklistTransaction.field_stringtoolong));
+
+	};
+
+	this.addQuestionToChecklist2 = function($questionText, $tag1) {
+		_click($bo_pg_formDesigner.tab_clickFormDesigner);
+		_click($bo_pg_formDesigner.btn_addNewQuestion);
+		_click($bo_pg_formDesigner.btn_selectQuestionDataType);
+		_setValue($bo_pg_formDesigner.lbl_questionText, $questionText);
+		_setValue($bo_pg_formDesigner.txt_data_entry, $tag1);
+		_wait(300);
+		_click($bo_pg_formDesigner.btn_addQuestionToLibraryAndForm);
+		_click($bo_pg_formDesigner.btn_closeQuestionPopUp);
+		// _click($bo_pg_formDesigner.btn_quickSave);
+		_click($bo_pg_formDesigner.btn_save_close);
+	};
+
+	// Add the same Question into the Checklist Question set
+
+	this.addsamequestion_tochecklist = function($questiontext) {
+		var $questin_txt = $questiontext;
+		_click($bo_pg_formDesigner.tab_clickFormDesigner);
+		_setValue(_f("main").s_textinput("searchText"),$questin_txt);
+		_assertEqual(true, _isVisible(_f("main").s_label($questin_txt)));
+		//_click(_f("main").s_label($questin_txt+""+"[1]"));
+		_click(_f("main").questionlisttreeitemrendererm($questin_txt)); // Added By Bhupendra Singh
+		_click($bo_pg_formDesigner.btn_addquestion_toform);
+		_wait(10000);
+		_click($bo_pg_formDesigner.btn_quickSave);
+		_wait(10000);
+		_click($bo_pg_formDesigner.btn_save_close);
+		_wait(10000);
+		_call(top.location.reload());
+		_wait(40000);
+	};
+
+	this.searchthevaluesinchecklist_groupbytagoff = function($questiontext,
+			$tagname, $commonvalue) {
+		_click($bo_pg_formDesigner.tab_clickFormDesigner);
+		_setValue($sfm_pg_checklistTransaction.txt_formDesignerSearch, $tagname);
+		// No Tag name must be visible - For Tag search
+		_assertEqual(false, _isVisible(_f("main").s_label($tagname)));
+		_setValue($sfm_pg_checklistTransaction.txt_formDesignerSearch, "");
+		_setValue($sfm_pg_checklistTransaction.txt_formDesignerSearch,
+				$questiontext);
+		// Only Question and no tag must be visible for the Question search
+		_assertEqual(false, _isVisible(_f("main").s_label($tagname)));
+		_assertEqual(true, _isVisible(_f("main").s_label($questiontext)));
+
+		_setValue($sfm_pg_checklistTransaction.txt_formDesignerSearch, "");
+		_setValue($sfm_pg_checklistTransaction.txt_formDesignerSearch,
+				$commonvalue);
+		// Only question and no tag must be visible for common search
+		_assertEqual(false, _isVisible(_f("main").s_label($tagname)));
+		_assertEqual(true, _isVisible(_f("main").s_label($questiontext)));
+
+	};
+
+	this.searchthevaluesinchecklist_groupbytagon = function($questiontext,
+			$tagname, $commonvalue) {
+		_click($bo_pg_formDesigner.tab_clickFormDesigner);
+		_click($bo_pg_formDesigner.btn_groupbytag);
+		_setValue($sfm_pg_checklistTransaction.txt_formDesignerSearch, $tagname);
+		// Tag header must be visible for the UI
+		_assertEqual(true, _isVisible(_f("main").s_label($tagname)));
+
+		_setValue($sfm_pg_checklistTransaction.txt_formDesignerSearch, "");
+		_setValue($sfm_pg_checklistTransaction.txt_formDesignerSearch,
+				$questiontext);
+		// Both Tag and Questions must be visible - For Question Search
+		_assertEqual(true, _isVisible(_f("main").s_label($tagname)));
+		_assertEqual(true, _isVisible(_f("main").s_label($questiontext)));
+
+		_setValue($sfm_pg_checklistTransaction.txt_formDesignerSearch, "");
+		_setValue($sfm_pg_checklistTransaction.txt_formDesignerSearch,
+				$commonvalue);
+
+		// Both Tag and question must be Visible for Common Search
+		_assertEqual(true, _isVisible(_f("main").s_label($tagname)));
+		_assertEqual(true, _isVisible(_f("main").s_label($questiontext)));
+
+	};
+
+	this.edit_checklist_process_checkbox = function($questiontext, $answertype) {
+		_click($bo_pg_formDesigner.tab_clickFormDesigner);
+		_assertEqual(true, _isVisible(_f("main").s_label($questiontext)));
+		_click($sfm_pg_checklistTransaction.btn_editQuestion);
+		if ($answertype == "Checkbox") {
+			_click($sfm_pg_checklistTransaction.btn_defaultcheckbox);
+			_click($sfm_pg_checklistTransaction.btn_defaultcheckbox2);
+
+		}
+		if ($answertype == "Radio Button") {
+
+			_click($sfm_pg_checklistTransaction.btn_defaultRadiobutton2);
+
+		}
+
+		_click($sfm_pg_checklistTransaction.btn_saveFilter);
+		_click($bo_pg_formDesigner.btn_quickSave);
+		_click($bo_pg_formDesigner.btn_save_close);
+
+	};
+
+	//added by Shruthi Shanthappa
+	this.addChecklistQuestionToForm = function($questionText) {
+		_click($bo_pg_formDesigner.tab_clickFormDesigner);
+		_setValue($bo_pg_formDesigner.txt_searchQuestion,$questionText);
+		_click(_f("main").listbasecontentholder(0).near(_f("main").s_textinput("searchText[2]")));
+		//_assertEqual(true, _isVisible(_f("main").s_label($questionText)));
+		_click(_f("main").s_label($questionText));
+		_click($bo_pg_formDesigner.btn_addquestion_toform);
+		_wait(2000);
+		_click($bo_pg_formDesigner.btn_quickSave);
+
+	};
+	
+	this.verifythechangesinquestion = function($questiontext, $answertype) {
+
+		_click($bo_pg_formDesigner.tab_clickFormDesigner);
+		_assertEqual(true, _isVisible(_f("main").s_label($questiontext)));
+		_click($sfm_pg_checklistTransaction.btn_editQuestion);
+		if ($answertype == "Checkbox") {
+			_assertEqual(true,
+					$sfm_pg_checklistTransaction.btn_defaultcheckbox2.get("selected"));
+			_assertEqual(true,
+					$sfm_pg_checklistTransaction.btn_defaultcheckbox2.get("selected"));
+
+		}
+		if ($answertype == "Radio Button") {
+			_assertEqual(true,
+					$sfm_pg_checklistTransaction.btn_defaultRadiobutton2.get("selected"));
+
+		}
+
+	};
+	//Added by Bhupendra Singh
+	this.addQuestionToChecklistProcess = function($questionText, $AnswerType) {
+		_click($bo_pg_formDesigner.tab_clickFormDesigner);
+		_click($bo_pg_formDesigner.btn_addNewQuestion);
+		_click($bo_pg_formDesigner.txt_selectNumberAnswerType);
+		_setSelected($bo_pg_formDesigner.sel_selectQuestionAnswerType, $AnswerType);
+		_setValue($bo_pg_formDesigner.lbl_questionText, $questionText);
+		_click($bo_pg_formDesigner.btn_addQuestionToLibraryAndForm);
+		_click($bo_pg_formDesigner.btn_closeQuestionPopUp);
+		_wait(6000);
+	};
+	
+	this.addNumberOrText_QuestionToChecklistProcessWithDefaultResponse = function($questionText, $AnswerType, $defaultAnswer) {
+		_click($bo_pg_formDesigner.tab_clickFormDesigner);
+		_click($bo_pg_formDesigner.btn_addNewQuestion);
+		_click($bo_pg_formDesigner.txt_selectNumberAnswerType);
+		_setSelected($bo_pg_formDesigner.sel_selectQuestionAnswerType, $AnswerType);
+		_setValue($bo_pg_formDesigner.lbl_questionText, $questionText);
+		_setValue($bo_pg_formDesigner.txt_defaultAnswerForQuestion, $defaultAnswer);
+		_click($bo_pg_formDesigner.btn_addQuestionToLibraryAndForm);
+		_click($bo_pg_formDesigner.btn_closeQuestionPopUp);
+		_wait(6000);
+	};
+			
+	this.editQuestionOfChecklistProcess = function($questionText, $AnswerType) {
+		_click($bo_pg_formDesigner.tab_clickFormDesigner);
+		_click($sfm_pg_checklistTransaction.btn_editQuestion);
+		_wait(3000);
+		_click($bo_pg_sfmTransactionAndDesigner.btn_ok);
+		_wait(3000);
+		_click($bo_pg_formDesigner.btn_closeQuestionPopUp);
+		_wait(3000);
+	};
+	
+	this.deleteQuestionOfChecklistProcess = function($questionText, $AnswerType) {
+		_click($bo_pg_formDesigner.tab_clickFormDesigner);
+		_click($sfm_pg_checklistTransaction.btn_removeQuestion);
+		_wait(3000);
+		_click($bo_pg_sfmTransactionAndDesigner.btn_ok);
+		_wait(3000);
+	};
+	
+	this.addQuestionWithResponseSetToChecklistProcess = function($questionText, $AnswerType, $responseSetName, $answerValue1, $answerValue2, $answerValue3) {
+		_click($bo_pg_formDesigner.tab_clickFormDesigner);
+		_click($bo_pg_formDesigner.btn_addNewQuestion);
+		_click($bo_pg_formDesigner.txt_selectNumberAnswerType);
+		_setSelected($bo_pg_formDesigner.sel_selectQuestionAnswerType, $AnswerType);
+		_setValue($bo_pg_formDesigner.lbl_questionText, $questionText);
+		_setValue($bo_pg_formDesigner.txt_responseSetName, $responseSetName);
+		_setValue($bo_pg_formDesigner.txt_answerValuesFirst, $answerValue1);
+		_click($bo_pg_formDesigner.btn_addNewAnswer);
+		_setValue($bo_pg_formDesigner.txt_answerValuesSecond, $answerValue2);
+		_click($bo_pg_formDesigner.btn_addNewAnswer);
+		_setValue($bo_pg_formDesigner.txt_answerValuesThird, $answerValue3);
+		_click($bo_pg_formDesigner.btn_addQuestionToLibraryAndForm);
+		_click($bo_pg_formDesigner.btn_closeQuestionPopUp);
+		_wait(6000);
+	};
+	
+	this.configureSOUToChecklistProcess = function($fieldName, $operandType, $operandValue) {
+		_click($bo_pg_formDesigner.tab_clickSourceObjectUpdateTab);
+		_click($bo_pg_formDesigner.txt_clickSourceObjToBeUpdated);
+		_wait(3000);
+		_click($bo_pg_formDesigner.btn_addRowForSourceObj);
+		_wait(3000);
+		$bo_pg_formDesigner.txt_addFieldToSOU($fieldName, $operandType, $operandValue);
+		
+	};
+	
+	this.configureSOUToChecklistProcessWithPicklistValues = function($fieldName, $operandType, $operandValue) {
+		_click($bo_pg_formDesigner.tab_clickSourceObjectUpdateTab);
+		_click($bo_pg_formDesigner.txt_clickSourceObjToBeUpdated);
+		_wait(3000);
+		_click($bo_pg_formDesigner.btn_addRowForSourceObj);
+		_wait(3000);
+		$bo_pg_formDesigner.sel_addFieldToSOUWithPicklist($fieldName, $operandType, $operandValue);
+		
+	};
+	
+	this.saveAndCloseChecklistProcess =function(){
+		_click($bo_pg_formDesigner.btn_quickSave);
+		_wait(6000);
+		_click($bo_pg_formDesigner.btn_save_close);
+		_wait(9000);
+	};
+	
+	this.invokeSpecificChecklistProcess = function($checklistProcessName){
+		_wait(10000);
+		$bo_pg_formDesigner.btn_clickChecklistProcess($checklistProcessName);
+		_wait(25000, _isVisible(_span("Submit")));
+	};
+	
+	this.answerNumberQuestionInSFD = function($answerValue, $questionText){
+		_setValue(_textbox("/sfm-number-/",_near(_label("/"+$questionText+"/"))),$answerValue);
+	};
+	
+	this.answerTextQuestionInSFD = function($answerValue, $questionText){
+		_setValue(_textbox("/sfm-text-/",_near(_label("/"+$questionText+"/"))),$answerValue);
+	};
+	
+	this.answerDateAndDateTimeQuestionInSFD = function($answerValue, $questionText){
+		_setValue(_textbox("/svmx-date/",_near(_label("/"+$questionText+"/"))), $answerValue);
+	};
+	
+	this.answerPicklistQuestionInSFD = function($answerValue, $questionText){
+		_setValue(_textbox("/sfm-picklist/",_near(_label("/"+$questionText+"/"))), $answerValue);
+	};
+	this.submitChecklistProcessInSFD = function() {
+		_click($sfm_pg_checklistQuestionLibrary.btn_submitChecklist);
+		_wait(25000, _isVisible(_link("Checklists")));
+		
+	};
+	
+	this.selectChecklistProcess = function($sfmName) {
+
+			_setValue($bo_pg_sfmTransactionAndDesigner.txt_searchChecklistProcess,$sfmName);
+			_setStrictVisibilityCheck(true);
+		 
+		if (_isVisible(_f("main").s_checkbox("/chk/i").leftOf(_f("main").s_label($sfmName), 10, 10))) {
+			_wait(3000);
+			_click(_f("main").s_checkbox("/chk/i").leftOf(_f("main").s_label($sfmName), 10, 10));
+
+		} else if (_isVisible(_f("main").s_checkbox(2).leftOf(_f("main").s_label($sfmName), 10, 10))) {
+			_wait(3000);
+			_click(_f("main").s_checkbox(2).leftOf(_f("main").s_label($sfmName), 10, 10));
+
+		} else {
+			_click(_f("main").s_checkbox("/CheckBox/").leftOf(_f("main").s_label($sfmName), 10, 10));
+		}
+		 _setStrictVisibilityCheck(false);
+
+	};
+	
+	//Added by Srinivasa to invoke Checklist attachment
+	
+	this.navigatetoChecklistAttachment = function()
+	{
+		_wait(10000, isVisible(_span("/Checklists/")));
+		_click(_span("/Checklists/"));
+		//_call(_heading3("Checklists").scrollIntoView());
+		_wait(10000, isVisible(_link(1, _under(_heading3("Checklists")))));
+		_click(_link(1, _under(_heading3("Checklists"))));
+		_wait(10000, isVisible(_link(2, _under(_heading3("Checklist Attachments")))));
+		_click(_link(2, _under(_heading3("Checklist Attachments"))));
+	};
+	
+	//Added by Srinivasa to attach a file for the checklist
+	
+	this.attachImagetoChecklist = function($fileValue, $imagePath)
+	{
+		var $dir = _userDataDir();
+		_setFile2(_file($fileValue),$dir+$imagePath, "", true, true);
+	};
+	
+	//Add question to checklist without closing the SFM. Cloning the function from above
+	this.addQuestionToChecklistMultipleTags = function($questionText, $tag1, $tag2) {
+		_click($bo_pg_formDesigner.tab_clickFormDesigner);
+		_click($bo_pg_formDesigner.btn_addNewQuestion);
+		_click($bo_pg_formDesigner.btn_selectQuestionDataType);
+		/*
+		 * To create a particular Tag under the given Question
+		 */
+
+		_setValue($bo_pg_formDesigner.lbl_questionText, $questionText);
+		if ($tag1 == "") {
+			_setValue($bo_pg_formDesigner.txt_data_entry, $tag1);
+			_typeKeyCodeNative(java.awt.event.KeyEvent.VK_SPACE);
+
+		}
+		else if ($tag2 == "") {
+			_setValue($bo_pg_formDesigner.txt_data_entry, $tag2);
+			_typeKeyCodeNative(java.awt.event.KeyEvent.VK_SPACE);
+		}
+
+		else
+
+		{
+			_setValue($bo_pg_formDesigner.txt_data_entry, $tag1);
+			_typeKeyCodeNative(java.awt.event.KeyEvent.VK_SPACE);
+			_focusWindow();
+			_setValue($bo_pg_formDesigner.txt_data_entry, $tag2);
+			_typeKeyCodeNative(java.awt.event.KeyEvent.VK_SPACE);
+			_click($bo_pg_formDesigner.tagbutton);
+
+		}
+		_click($bo_pg_formDesigner.btn_addQuestionToLibraryAndForm);
+		_click($bo_pg_formDesigner.btn_closeQuestionPopUp);
+		_click($bo_pg_formDesigner.btn_quickSave);
+		_wait(10000);
+
+	};
+	//Cloned the function and removed the OK button click.
+	this.deleteQuestionFromChecklistProcess = function($questionText, $AnswerType) {
+		_click($bo_pg_formDesigner.tab_clickFormDesigner);
+		_click($sfm_pg_checklistTransaction.btn_removeQuestion);
+		_wait(3000);
+	};
+
+};

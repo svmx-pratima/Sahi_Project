@@ -1,0 +1,8 @@
+var $data = _readExcelFile("../../analytics/an_excleData/an_Datasheet1.xlsx","Sheet1",true);
+var $un =$bac_un ;
+var $pwd =$bac_pwd;
+var $url = "https://test.salesforce.com";
+$bo_act_login.login($url, $un, $pwd);
+
+$an_act_tech_util.basic_util_calc("Technician Util Calculation method");
+$an_act_tech_util.custom_util_calc("Util calculation with Submitted");

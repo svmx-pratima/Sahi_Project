@@ -1,0 +1,47 @@
+var $rs_6960 = _testcase("RS-6960","Verify lookup form-fill functionality in Multi Add");
+$rs_6960.start();
+//Login to Servicemax Org
+//$bo_act_login.login("https://test.salesforce.com/","sysadmin01@sfdautomation.com","maxplore2");
+$bo_act_login.login($g_url,$sfmdUsn, $sfmdPwd);
+//Clone and add fields in Workdetail 
+var $SFMProcessName = $bo_act_common.generateRandomName("SFDProcess_Automation_RA");
+var $SFMPagelayouName = $bo_act_common.generateRandomName("Pagelayout_Automation_RA");
+var $SFMWizardName = $bo_act_common.generateRandomName("WOWizard_Automation_RA");
+var $mappingName = $bo_act_common.generateRandomName("Mapping");
+$sfm_act_configureSFMmapping.navigateToSfmMappings($mappingName);
+$sfm_act_cloneSfmAddNewFields.cloneAndAddchildFieldsSFM("Manage Work Order Lines - Usage",$SFMProcessName,false,$SFMPagelayouName,"SVMXSTD: Manage WO Usage Lines",$mappingName);
+//Create New SFM Wizard
+$bo_act_navigation.navigateToSfmWizard();
+_wait(3000);
+$sfm_act_createCustomWizard.chooseObject("Work Order");
+_wait(3000);
+$sfm_act_createCustomWizard.addManageWizSteps($SFMWizardName,"SFM",$SFMProcessName);
+_wait(3000);
+//Create a new Product
+$productCode="Prod001";
+$productFamily="Laptop";
+$productCost="75000";
+var $productDesc = $bo_act_common.generateRandomName("Product Description_Aumation");
+var $prodName=$sfm_act_configureSFMmapping.createNewProduct($productCode, $productFamily,$productDesc,$productCost);
+//Create new blank WO	
+$sfm_act_createCustomWizard.createBlankWo();
+_wait(10000);
+//Launch process
+$sfm_act_createCustomWizard.clickWizardBtn($SFMProcessName);
+//Select the created Product in workdetail
+_selectDomain();
+$sfm_act_verifySFDFormfill.verifyMultiAddFormfill($prodName);
+_wait(3000);
+var $workDes= _getText(_textarea(0,_rightOf(_label("Work Description:"))));
+var $billableprice=_getText(_textbox(0,_rightOf(_label("Billable Line Price:"))));
+//Verification steps
+if($workDes==$productDesc && $billableprice==$productCost)
+ 
+{
+	_log("Passed");
+}
+else{
+_log("Failed","FAILURE");
+}
+
+$rs_6960.end();

@@ -1,0 +1,161 @@
+var $sfm_act_restApiMethods= new function sfm_act_restApiMethods() {
+	
+	/**
+	 * This method generated the access token required for restApi calls
+	 * $username org username
+	 * $password org password
+	 * $clientId org clientid generated when remoteaccess is created
+	 * $consumerSecret generated when remoteaccess is created
+	 * $orgInstance like cs19 or cs21
+	 * Example RS_5024.sah to create WO
+	 */
+
+ this.getAccessToken = function($usnName, $usnPwd, $orgClientId, $orgConsumerSecret,$orgInstance){
+ 
+	 //Authorization endpoint
+	 var $authEndPoint = "https://"+$url_type+".salesforce.com/services/oauth2/token"; //THIS IS THE REST API CALL TO GET THE ACCESS TOKEN
+	 var $responseType = "token";
+	 //This is the callback URL from the connected app
+	 var $redirectURI = "https://"+$orgInstance+".salesforce.com"; // STANDARD REDIRECT URL
+	 //Construct the URL with the required parameters
+	 var $requestURL = ""+$authEndPoint+"?grant_type=password&client_id="+$orgClientId+"&client_secret="+$orgConsumerSecret+"&username="+$usnName+"&password="+$usnPwd+"&response_type="+$responseType+"&redirect_uri="+$redirectURI+"";
+	// _log($requestURL);
+	//MAKING THE POST REQUEST TO GET THE ACCESS TOKEN
+	$request = new RESTRequest();
+	$request.setURL($requestURL);
+	$response = $request.submit("post");
+	 
+	var $completeAuthCode = JSON.parse( $response.getBodyAsString()); //returns the content of the body using UTF-8 encoding	
+	//_log($completeAuthCode);
+	var $authCode = $completeAuthCode['access_token'];
+	_log("Authcode= "+$authCode);
+	return($authCode);
+ };
+ 
+	/**
+	 * This method creates/deletes the record on an object with given fields using restApi calls
+	 * $username org username
+	 * $password org password
+	 * $clientId org clientid generated when remoteaccess is created
+	 * $consumerSecret generated when remoteaccess is created
+	 * $orgInstance like cs19 or cs21
+	 * $objName object on which operation is performed
+	 * $obJson object's fields in json format
+	 * $reqType POST or DELETE 
+	 */
+ 
+ this.postRestApi = function($usnName, $usnPwd, $orgClientId, $orgConsumerSecret,$orgInstance,$objName,$obJson, $reqType){
+	 $AuthCode = this.getAccessToken($usnName, $usnPwd, $orgClientId, $orgConsumerSecret,$orgInstance);
+     // Sample Delete operation for the REST API
+     $request_post = new RESTRequest();   
+     $request_post.setURL("https://"+$orgInstance+".salesforce.com/services/data/v42.0/sobjects/"+$objName+"/");
+     $request_post.setCredentials($usnName,$usnPwd);
+     $request_post.setHeader("Content-Type", "application/json");
+     $request_post.setHeader("Authorization", "OAuth "+$AuthCode);
+     $request_post.setBody($obJson);
+     
+    
+     $response_post = $request_post.submit($reqType);
+     $respObj= JSON.parse($response_post.getBodyAsString());
+     _log($respObj);
+     $objCreated = $respObj['id'];
+     _log("Created record id = "+$objCreated);
+     return($objCreated);
+ } ;
+ 
+ 
+	/**
+	 * This method fetches the record of an object using restApi calls
+	 * $username org username
+	 * $password org password
+	 * $clientId org clientid generated when remoteaccess is created
+	 * $consumerSecret generated when remoteaccess is created
+	 * $orgInstance like cs19 or cs21
+	 * $objName object on which operation is performed
+	 * $obJson object's fields in json format
+	 * $reqType GET
+	 * $columnName column need to be fetched
+	 * $filter filter column
+	 * $filterValue filter value
+	 */
+this.getRestApi = function($usnName, $usnPwd, $orgClientId, $orgConsumerSecret,$orgInstance,$reqType,$objName,$columnName,$filter, $filterValue){
+	 $AuthCode = this.getAccessToken($usnName, $usnPwd, $orgClientId, $orgConsumerSecret,$orgInstance);
+	     
+	 var $query;
+	 if (typeof $filter!='string') {
+		 $query = "Select+"+$columnName+"+from+"+$objName+"+where+"+$filter[0]+"=+'"+$filterValue[0]+"'+"+"AND+"+$filter[1]+"=+'"+$filterValue[1]+"'";
+	}else {
+		 $query = "Select+"+$columnName+"+from+"+$objName+"+where+"+$filter+"=+'"+$filterValue+"'";
+ 
+ 	    //_log($query);
+ 	    //$request = new RESTRequest(); 
+ 
+
+	}
+   
+	    _log($query);
+
+	    $request = new RESTRequest(); 
+ 
+	    $request.setURL("https://"+$orgInstance+".salesforce.com/services/data/v20.0/query/?q="+$query+""); // Sample to pass the values
+	    $request.setCredentials($usnName, $usnPwd);
+	    $request.setHeader("Authorization", "OAuth "+$AuthCode);
+	    //$request1.setHeader("Content-Type", "application/json");
+	    $response = $request.submit($reqType);
+	 
+	var $getData = $response.getBodyAsString(); //returns the content of the body using UTF-8 encoding
+	//var $AuthCode_data2 = $response1.getBodyAsString("ISO-8859-1");
+	_log($getData);
+	var $json_value = JSON.parse($getData);
+	//_log($json_value);
+	var $objId = $json_value['records'];
+	 
+	var $strRecord = JSON.stringify($objId);
+	        var $idValue = $strRecord.replace(/\[|\]/g,"").substring($strRecord.lastIndexOf(":\"")+1,$strRecord.lastIndexOf("\"")-1);
+	        _log("Id = "+$idValue);  // The ID value is extracted.
+	        return($idValue);
+};
+
+
+
+this.updateRestApi = function($usnName, $usnPwd, $orgClientId, $orgConsumerSecret,$orgInstance,$objName,$obJson, $reqType,$id){
+	 $AuthCode = this.getAccessToken($usnName, $usnPwd, $orgClientId, $orgConsumerSecret,$orgInstance);
+    // Sample Delete operation for the REST API
+    $request_post = new RESTRequest();   
+    $request_post.setURL("https://"+$orgInstance+".salesforce.com/services/data/v42.0/sobjects/"+$objName+"/"+$id+"");
+    $request_post.setCredentials($usnName,$usnPwd);
+    $request_post.setHeader("Content-Type", "application/json");
+    $request_post.setHeader("Authorization", "OAuth "+$AuthCode);
+    $request_post.setBody($obJson);
+    _log($obJson);
+   
+    $response_post = $request_post.submit($reqType);
+    /*$respObj= JSON.parse($response_post.getBodyAsString());
+    _log($respObj);
+    $objCreated = $respObj['id'];
+    _log("updated record id = "+$objCreated);
+    return($objCreated);*/
+} ;
+
+this.upsertRecordsRestApi = function($usnName, $usnPwd, $orgClientId, $orgConsumerSecret,$orgInstance,$objName,$filterFieldName,$filterFieldValue,$obJson){
+	//This function checks whether a record satifying the given filter criteria is present or not.
+	//A new record is created only if the record is not existing
+	
+	var $result = this.getRestApi($usnName, $usnPwd, $orgClientId, $orgConsumerSecret, $orgInstance, "GET", $objName, "Id", $filterFieldName, $filterFieldValue);
+	var $id;
+	_log($result);
+	
+	if ($result=="") {
+		
+		$id = this.postRestApi($usnName, $usnPwd, $orgClientId, $orgConsumerSecret, $orgInstance, $objName, $obJson, "POST");
+		_log("Record of type "+$objName+"Created with Id"+$id);
+	}
+	else {
+		_log("Record already exists at "+$result);
+	}
+
+};
+
+
+};
+ 

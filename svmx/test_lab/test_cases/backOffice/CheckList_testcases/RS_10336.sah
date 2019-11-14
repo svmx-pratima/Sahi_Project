@@ -1,0 +1,35 @@
+// Author Bhupendra Singh Chouhan
+
+/*
+ * SOU For upgrade Scenario
+ */
+var $RS_10336 = _testcase("RS_10336", "Verify the behavior of Checklist Designer for a Checklist Admin user (who is having feature Access)");
+$RS_10336.start();
+
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+
+var $checklistProcessName = $bo_act_common.generateRandomName("ChecklistProcess_");
+var $objName = "Work Order";
+
+// Enable the CFeature Permission for the User
+
+$bo_act_servicemaxSetup.enableFeaturePermissionToUser($bac_un);
+
+// Navigate to checklist Designer Process 
+$bo_act_navigation.navigateToChecklistDesigner();
+
+//validate the checklist Designer components
+_assertExists(_f("main").s_label("< Back to Feature Administration"));
+_assertExists(_f("main").s_label("Checklist Designer"));
+_assertExists(_f("main").tab("Checklist Transactions"));
+_assertExists(_f("main").s_button("New Checklist Transaction"));
+_assertExists(_f("main").s_button("Help"));
+//_setSelected(_f("main").s_dropdownlist("purposeCombo[1]"),"Show All");
+
+_click($bo_pg_sfmTransactionAndDesigner.btn_newSFMTransaction);
+_wait(5000);
+_assertExists(_f("main").formitemlabel("Checklist Transaction ID"));
+
+$bo_act_login.logOut(); 
+
+$RS_10336.end();

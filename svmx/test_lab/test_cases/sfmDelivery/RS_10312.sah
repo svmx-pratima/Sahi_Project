@@ -1,0 +1,208 @@
+var $RS_10312 = _testcase("RS_10312","Verify Dependent picklist's values when Controlling picklist is not present in SFM process for child");
+$RS_10312.start();
+
+//Variables used
+var $objectName = "Work Order";
+var $childObject = "Work Detail";
+var $wo_picklist = "Activity Type";
+var $processName = "RS_10312";
+var $lineType = "Parts";
+var $containersArray = [];
+var $recordType = "Usage/Consumption";
+var $process_to_clone = "Manage Work Order Lines - Usage";
+var $dependentPicklist = "Cost Category";
+var $ctrl_unique_values = ["Repair","Installation"];
+var $ctrl_picklist_values = ["Repair","Repair","Repair","Installation"];
+var $dep_picklist_values = ["Straight","Double Time","On Call","Double Time"];
+var $ctr = 0;var $j,$z;
+var $fields_array = [];
+var $headerFields = ["Age"];
+$fields_array.push($dependentPicklist);
+$containersArray.push($lineType);
+var $currentWizardName = $sfmd_wizardName[2];
+var $success_message = "Work Order was saved.";
+var $productName = "Lenovo";
+var $expected_list = [];
+
+//Appending current timestamp to process name to make it unique.
+var $timeStamp = $sfm_act_common.getCurrentTimeStamp();
+$processName = $processName + "_" + $timeStamp;
+var $pageLayoutName = $processName + "pg";
+//Required when we set up a specific salesforce domain. Do not erase.
+////var $myDomain = "/lightning/";
+//**************************************************************************************
+//Login and switch to lightning
+//$bo_act_login.login($g_url,$bac_un,$bac_pwd);
+$bo_act_login.login($g_url,$sfmdUsn,$sfmdPwd);
+_wait(15000);
+
+//Navigate to Object manager and navigate to work order object.
+$sfm_act_common.navigateToObjectsInClassic($childObject);
+_click(_link($wo_picklist));
+
+//Delete existing dependencies and create new one.
+if(_isVisible(_tableHeader($dependentPicklist,_under(_div("/Field Dependencies/"))))){
+	_click(_link("Del",_leftOf(_tableHeader($dependentPicklist,_under(_div("/Field Dependencies/"))))));
+}
+_click($sfm_pg_commonSfdc.btn_new_field_dependency);
+_setSelected($sfm_pg_commonSfdc.picklist_controller, $wo_picklist);
+_setSelected($sfm_pg_commonSfdc.picklist_dependent, $dependentPicklist);
+_click($sfm_pg_commonSfdc.btn_continue);
+for(var $i=0;$i<$ctrl_picklist_values.length;$i++){
+	$sfm_act_common.addDependentControllingPicklistValues($wo_picklist,$ctrl_picklist_values[$i],$dep_picklist_values[$i]);
+}
+
+_expectConfirm($sfm_pg_commonSfdc.btn_save_dep_picklist);
+_click($sfm_pg_commonSfdc.btn_save_dep_picklist);
+_selectDomain();
+
+
+
+//Navigate to servicemax setup and setup required process.
+    _setSpeed(3000);
+	$bo_act_navigation.navigateToSfmTransactionDesigner();
+	//_selectDomain();
+	$sfm_act_SFM.selectSFM($process_to_clone,false);
+	_click($bo_pg_sfmTransactionAndDesigner.btn_clone);
+	_wait(60000, _isVisible($bo_pg_sfmTransactionAndDesigner.txt_name));
+	_setValue($bo_pg_sfmTransactionAndDesigner.txt_name,$processName);
+	_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmTransactionId,"");
+	_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmTransactionId,$processName);
+	_click($bo_pg_sfmTransactionAndDesigner.btn_finalQuickSave);
+	_click($bo_pg_sfmTransactionAndDesigner.btn_proceed_anyways);
+	_click($bo_pg_sfmTransactionAndDesigner.btn_qualifyingCriteriaAndFieldMapping);
+	//Edit existing Qualification criteria to support closed work orders as per test case.
+	//No separate function written as this is a one time setup.
+	_click($bo_pg_sfmTransactionAndDesigner.btn_newLineForQc);
+	_setSelected(_f("main").s_combobox("fieldCombo[1]"), "Order Status");
+	_setSelected(_f("main").s_combobox("valuesCombo[1]"), "Closed");
+	_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmSavePageLayoutAsId, "1 OR 2");
+	_setValue($bo_pg_sfmTransactionAndDesigner.txt_saveExprAs, $processName);;
+	_setValue($bo_pg_sfmTransactionAndDesigner.txt_inputIdAs, $processName);
+	_click($bo_pg_sfmTransactionAndDesigner.btn_saveAsExpr);
+	_wait(5000);
+	_assertVisible($bo_pg_sfmTransactionAndDesigner.label_exprSaved);
+	_click($bo_pg_sfmTransactionAndDesigner.btn_quickSave1);
+	if(_condition(_isVisible($bo_pg_sfmTransactionAndDesigner.btn_proceed_anyways))){
+		_click($bo_pg_sfmTransactionAndDesigner.btn_proceed_anyways);
+	}
+	_assertVisible($bo_pg_sfmTransactionAndDesigner.label_sfmTxnSaved);
+	_click($bo_pg_sfmTransactionAndDesigner.btn_screenDesigner);
+	_click($bo_pg_sfmTransactionAndDesigner.btn_newPageLayout);
+	$bo_act_navigation.designHeaderScreen($pageLayoutName,$headerFields);
+	$bo_act_navigation.designChildScreen($pageLayoutName, $fields_array, $containersArray);
+	_click(_f("main").s_richtext($lineType));
+	_click($bo_pg_sfmTransactionAndDesigner.chkbx_allowNew);
+	_click($bo_pg_sfmTransactionAndDesigner.chkbx_allowDelete);
+	_click($bo_pg_sfmTransactionAndDesigner.btn_savePage);
+	_click($bo_pg_sfmTransactionAndDesigner.btn_finalQuickSave);
+	$sfm_act_wizards.addToWizard($objectName,$currentWizardName,"SFM",$processName);
+	_selectDomain();
+	//test from here.
+	_setSpeed(1000);
+
+	var $wo_number = $sfm_act_common.createWoInClassic();
+	var $workDetailNumber = $sfm_act_common.createWorkDetail($lineType, $recordType);
+	
+	
+	_selectDomain();
+	//Launch SFM delivery
+
+	//$sfm_act_common.globalSearchOnce($workDetailNumber);
+	_selectDomain();
+	//Launch SFM delivery
+
+	//$sfm_act_common.globalSearchOnce($wo_number);
+	for($z=0;$z<$ctrl_unique_values.length;$z++){
+		
+		//Steps to edit wo and save
+		$sfm_act_common.globalSearchOnce($workDetailNumber);
+		_click($sfm_pg_commonSfdc.btn_editWo);
+		_setSelected(_select(0,_near(_label("/"+$wo_picklist+"/"))),$ctrl_unique_values[$z]);
+		_click($sfm_pg_commonSfdc.btn_saveWo);
+		_wait(2000);
+		$sfm_act_common.globalSearchOnce($wo_number);
+		$sfm_act_common.launchSFMProcessInClassic($processName);
+		var $actual_list = [];
+		$sfm_act_SFM.openLatestExtEdit();
+		//Verify the count of values first
+		_wait(10000);
+        _click(_div("/svmx-trigger/",_near(_label("/"+$dependentPicklist+"/"))));
+        _wait(1000);
+        _setStrictVisibilityCheck(true);
+    	$expected_list = [];
+    	
+    	 for ($j=0;$j<$ctrl_picklist_values.length;$j++) {
+    	 	if($ctrl_picklist_values[$j] === $ctrl_unique_values[$z]) {
+    	 		$i = $i+1;
+    	 		$expected_list.push($dep_picklist_values[$j]);
+    	 	}
+    	 }
+    	var $actual_list = [];
+    	var $x = _collect("_listItem","/.*/",_under(_div("/"+$dependentPicklist+":/")));
+    	_log($x);
+    	for($i=1;$i<$x.length;$i++){
+    		$actual_list.push(_getText($x[$i]));
+    	}
+    	_log($actual_list);
+    	 $i = 0;$j = 0;	 
+    	 _assertEqualArrays($expected_list, $actual_list,"Dependent picklist values are as expected for child line when controlling picklist is not present in screen designer");
+    	_click($sfm_pg_commonSfdc.btn_updateExtEdit);   
+		if(_assertEqualArrays($expected_list, $actual_list)){
+			_log("PASS: RS_10312 - Dependent picklist values for child when controlling picklist is not present - verified ");
+		}
+		else {
+			_log("FAIL: RS_10312 - Dependent picklist values for child when controlling picklist is not present - not verified");
+		}
+		
+		$sfm_act_common.saveClassicSfmProcess();
+	
+	}
+		_wait(4000);
+	_log("Starting execution of test case id RS_10279 - Dependent picklist values for child when controlling picklist is present");
+	_selectDomain();
+	$sfm_act_common.globalSearchOnce($wo_number);
+	$sfm_act_common.launchSFMProcessInClassic($processName);
+	$sfm_act_common.openSfmProcess($processName);
+	_click($bo_pg_sfmTransactionAndDesigner.btn_screenDesigner);
+	$sfm_act_SFM.addFieldToScreen([$wo_picklist], [$lineType]);
+	_click($bo_pg_sfmTransactionAndDesigner.btn_finalQuickSave);
+	_closeWindow();
+	_selectWindow();
+	$sfm_act_common.clearSvmxCache();
+	$sfm_act_SFM.openLatestExtEdit();
+	for($z=0;$z<$ctrl_unique_values.length;$z++){
+		_click(_div("/svmx-trigger/",_near(_label("/"+$wo_picklist+"/"))));
+		_click(_listItem($ctrl_unique_values[$z]));
+		_click(_div("/svmx-trigger/",_near(_label("/"+$dependentPicklist+"/"))));
+        _wait(1000);
+        _setStrictVisibilityCheck(true);
+    	$expected_list = [];
+    	for ($j=0;$j<$ctrl_picklist_values.length;$j++) {
+   	 	if($ctrl_picklist_values[$j] === $ctrl_unique_values[$z]) {
+   	 		$i = $i+1;
+   	 		$expected_list.push($dep_picklist_values[$j]);
+   	 	}
+   	 }
+   	var $actual_list = [];
+   	var $x = _collect("_listItem","/.*/",_under(_div("/"+$dependentPicklist+":/")));
+   	for($i=1;$i<$x.length;$i++){
+   		$actual_list.push(_getText($x[$i]));
+   	}
+   	_log($actual_list);
+   	 $i = 0;$j = 0;	 
+   	 _assertEqualArrays($expected_list, $actual_list,"Dependent picklist values are as expected for child line when controlling picklist is not present in screen designer");
+   	  
+		if(_assertEqualArrays($expected_list, $actual_list)){
+			_log("PASS: RS_10279 - Dependent picklist values for child when controlling picklist is present - verified ");
+		}
+		else {
+			_log("FAIL: RS_10279 - Dependent picklist values for child when controlling picklist is present - not verified");
+		}
+		
+	}
+_click($sfm_pg_commonSfdc.btn_updateExtEdit);	
+$sfm_act_common.saveClassicSfmProcess();
+$sfm_act_common.logoutInClassic();
+_setSpeed($g_stepSpeed);
+$RS_10312.end();

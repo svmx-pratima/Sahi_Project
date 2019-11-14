@@ -1,0 +1,218 @@
+var $RS_5027 = _testcase("RS_5027","Verify Value Map for new records - Header");
+$RS_5027.start();
+//Variables used
+var $objectName = "Work Order";
+var $processName = "RS_5027";
+var $process_to_clone = "Create New Support Case";
+var $sfmTemplate = "SVMXSTD: Manage WO Usage Lines";
+var $isCustom = false;
+var $ctr = 0;
+var $i = 0;
+var $success_message = "Work Order was saved.";
+var $containerName = [];
+var $fieldName=[];
+var $fieldsToMap = ["Account","Clock Paused Forever","Proforma Invoice Amount","Scheduled Date","Automation Date2","Automation Date3","First Queued DateTime","Started Driving To Location Date Time","Completed Date Time","Finished Onsite Date Time","Group Email","Automation multipicklist","Estimated Duration","Automation Percent","Automation Phone","Order Status","City","Street","Problem Description","Automation URL"];
+var $containerName = ["Order Status","Order Status","Order Status","Order Status","Order Status","Order Status","Order Status","Order Status","Order Status","Order Status","Order Status"];
+var $currentWizardName = $sfmd_wizardName[4];
+var $productName = "Chrome";
+var $lineType = "Parts";
+var $fieldsAbsentInPage = [];
+var $missingStdDataTypes = ["URL","Picklist (Multi-Select)","Percent","Phone","Date","Date"];
+var $customFieldsNames = ["Automation URL","Automation multipicklist","Automation Percent","Automation Phone","Automation Date2","Automation Date3"];
+var $pageLayoutForProfile = "SVMX Work Order - Admin";
+var $myDomain = "/lightning/";
+var $multiPicklistValues = ["Multipicklist1","Multipicklist2","Multipicklist3"];
+var $tempFields = ["Age"];
+var $mapType = "Value Map For New Records";
+
+//Appending current timestamp to process name to make it unique.
+var $timeStamp = $bo_act_navigation.getCurrentTimeStamp();
+$processName = $processName + "_" + $timeStamp;
+var $pageLayoutName = $processName + "pg";
+var $mapName = $processName + "mp";
+
+//Login and switch to classic
+$bo_act_login.login($g_url,$sfmdUsn,$sfmdPwd);
+
+_wait(15000);
+
+//Create work order
+var $wo_number = $sfm_act_common.createWoInClassic();
+var $x = $fieldsToMap.indexOf("Record Type ID");
+if($x != -1) {
+		$fieldsToMap[$x] = "Record Type";
+};
+
+
+//Find missing fields in Work Order Page Layout and them to the layout
+for($i=0;$i<$fieldsToMap.length;$i++){
+	if(!$sfm_act_common.findIfFieldPresentInPageLayout($fieldsToMap[$i])){
+		$fieldsAbsentInPage.push($fieldsToMap[$i]);
+	}	
+}
+_log($fieldsAbsentInPage);
+
+if($fieldsAbsentInPage.length > 0){
+	$sfm_act_common.navigateToObjectsInClassic($objectName);
+	$sfm_act_common.addFieldsToLightningPageLayout($objectName,$pageLayoutForProfile,$fieldsAbsentInPage,$myDomain);
+}
+
+
+var $x = $fieldsToMap.indexOf("Record Type");
+if($x != -1) {
+		$fieldsToMap[$x] = "Record Type ID";
+}
+
+$sfm_act_common.logoutInClassic();
+//Login and switch to lightning
+$bo_act_login.login($g_url,$sfmdUsn,$sfmdPwd);
+
+_wait(15000);
+
+//**************************************************************************************************
+
+
+//Navigate to servicemax setup and setup required process.
+//Clone standard process and add the dependent picklist in the screen designer
+_setSpeed(3000);
+$bo_act_navigation.navigateToSfmTransactionDesigner();
+$sfm_act_SFM.selectSFM($process_to_clone,$isCustom);
+_click($bo_pg_sfmTransactionAndDesigner.btn_clone);
+_wait(60000, _isVisible($bo_pg_sfmTransactionAndDesigner.txt_name));
+_setValue($bo_pg_sfmTransactionAndDesigner.txt_name, $processName);
+_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmTransactionId,"");
+_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmTransactionId,$processName);
+_setSelected($bo_pg_sfmTransactionAndDesigner.list_objComboBox,$objectName);
+if(_isVisible($bo_pg_sfmTransactionAndDesigner.btn_popUpOK)){
+	_click($bo_pg_sfmTransactionAndDesigner.btn_popUpOK);
+}
+_click($bo_pg_sfmTransactionAndDesigner.btn_screenDesigner);
+_click($bo_pg_sfmTransactionAndDesigner.btn_newPageLayout);
+$bo_act_navigation.designHeaderScreen($pageLayoutName,$tempFields);
+_click($bo_pg_sfmTransactionAndDesigner.btn_quickSave1);
+_wait(3000);
+
+$textLabels = ["Proforma Invoice Amount","Group Email","Estimated Duration","Automation Percent","Automation Phone","City","Street","Problem Description","Automation URL","Automation multipicklist"];
+$textValues = ["6600","group123@group.com","78.00","45","2785401","Bengaluru","123 somewhere somehow somewat","This washing machine stopped working","www.servicemax.com","Multipicklist1;Multipicklist3"];
+$picklistLabels = ["Account","Clock Paused Forever","Scheduled Date","Automation Date2","Automation Date3","First Queued DateTime","Started Driving To Location Date Time","Completed Date Time","Finished Onsite Date Time","Order Status"];
+$pickListValues = ["HCSAccountForTesting","true","Today","Tomorrow","Yesterday","Now","Today","Tomorrow","Yesterday","Open"];
+//Create mapping for all possible standard data types.
+_click($bo_pg_sfmTransactionAndDesigner.btn_qualifyingCriteriaAndFieldMapping);
+$bo_act_mappings.createMapping($objectName,$mapType,$picklistLabels,$pickListValues,$textLabels,$textValues,$mapName);
+_selectDomain();
+_setSpeed(1000);
+
+//Add the custom process to SFM wizard.
+$sfm_act_wizards.addToWizard($objectName,$currentWizardName,"SFM",$processName);
+_selectDomain();
+
+//Navigate to created work order and launch the process
+$bo_act_navigation.navigateToCreatedRecordUsingGlobalSearch($wo_number);
+//Launch the process in SFM Delivery
+$sfm_act_common.launchSFMProcessInClassic($processName);
+_wait(10000);
+//Setting up the date literal values
+var $current = new Date();
+var $todayDate = $sfm_act_common.addSubtractDates($current,0);
+var $tomorrowDate = $sfm_act_common.addSubtractDates($current,1);
+var $yesterdayDate = $sfm_act_common.addSubtractDates($current,-1);
+//Calculating current time
+var $now = $sfm_act_common.calculateNow();
+_log("Value for now is "+$now);
+//Removing preceding zeros in date fields to validate in work order object.
+$todayDate = $sfm_act_common.removePrecedingZeroInDate($todayDate);
+$tomorrowDate = $sfm_act_common.removePrecedingZeroInDate($tomorrowDate);
+$yesterdayDate = $sfm_act_common.removePrecedingZeroInDate($yesterdayDate);
+$sfm_act_common.saveClassicSfmProcess();
+_wait(14000,_isVisible($sfm_pg_wo.label_wo));
+$childWoId= _getText($sfm_pg_wo.label_wo);
+_log("New Work Order id "+ $childWoId);
+
+//Verify value map in the work order.
+var $lookUpLabels = ["Account"];
+var $lookUpValues = ["HCSAccountForTesting"];
+$textLabels = ["Proforma Invoice Amount","Estimated Duration","Automation Percent","City","Scheduled Date","Automation Date2","Automation Date3"];
+$textValues = ["6,600.000","78.00","45","Bengaluru",$todayDate,$tomorrowDate,$yesterdayDate];
+$pickListLabels = ["Order Status"];
+$pickListValues = ["Open"];
+$textAreaLabels = ["Street","Problem Description"];
+$textAreaValues = ["123 somewhere somehow somewat","This washing machine stopped working"];
+var $checkBoxLabels = ["Clock Paused Forever"];
+var $checkBoxValues = [true];
+var $emailLabels = ["Group Email"];
+var $emailValues = ["group123@group.com"];
+var $multiPickLabels = ["Automation multipicklist","Automation multipicklist"];
+var $multiPickValues = ["Multipicklist1","Multipicklist3"];
+var $telephoneLabels = ["Automation Phone"];
+var $telephoneValues = ["2785401"];
+var $urlLabels = ["Automation URL"];
+var $urlValues = ["www.servicemax.com"];
+var $dateTimeLabels = ["First Queued DateTime","Started Driving To Location Date Time","Completed Date Time","Finished Onsite Date Time"];
+var $dateTimeDateValues = [$todayDate,$todayDate,$tomorrowDate,$yesterdayDate];
+var $timeValues =[$now,"12:00 AM","12:00 AM","12:00 AM"];
+//Verify all values in the newly created Work order
+var $res = $sfm_act_common.verifyValues($textLabels, $textValues, $pickListLabels, $pickListValues, $textAreaLabels, $textAreaValues, $checkBoxLabels, $checkBoxValues, $dateTimeLabels, $dateTimeDateValues, $timeValues,$emailLabels,$emailValues,$lookUpLabels,$lookUpValues,$multiPickLabels,$multiPickValues,$urlLabels,$urlValues,$telephoneLabels,$telephoneValues);
+_assertTrue($res);
+if($res){
+	_log("PASS: Work order has values as per value mapping for new records for Header");
+}
+else {
+	_log("FAIL: Work order does not have values as per value mapping for new records for Header");
+}
+_selectDomain();
+//Add the fields in the Screen designer
+$sfm_act_common.launchSFMProcessInClassic($processName);
+$sfm_act_common.openSfmProcess($processName);
+_click($bo_pg_sfmTransactionAndDesigner.btn_screenDesigner);
+$bo_act_navigation.designHeaderScreen($pageLayoutName, $fieldsToMap);
+_wait(2000);
+_click($bo_pg_sfmTransactionAndDesigner.btn_finalQuickSave);
+_wait(2000);
+_closeWindow();
+_selectWindow();
+$sfm_act_common.clearSvmxCache();
+//Setting up the date literal values
+var $current = new Date();
+var $todayDate = $sfm_act_common.addSubtractDates($current,0);
+var $tomorrowDate = $sfm_act_common.addSubtractDates($current,1);
+var $yesterdayDate = $sfm_act_common.addSubtractDates($current,-1);
+//Calculating current time
+
+var $now = $sfm_act_common.calculateNow();
+_log("Value for now is "+$now);
+var $deliveryTextPickLabels = ["Account","Proforma Invoice Amount","Scheduled Date","Automation Date2","Automation Date3","First Queued DateTime","Started Driving To Location Date Time","Completed Date Time","Finished Onsite Date Time","Group Email","Estimated Duration","Automation Percent","Automation Phone","City","Automation URL"];
+var $deliveryTextPickValues =["HCSAccountForTesting","6600",$todayDate,$tomorrowDate,$yesterdayDate,$todayDate,$todayDate,$tomorrowDate,$yesterdayDate,"group123@group.com","78","45","2785401","Bengaluru","www.servicemax.com"];
+var $deliveryTimeLabels = ["First Queued DateTime","Started Driving To Location Date Time","Completed Date Time","Finished Onsite Date Time"];
+var $deliveryTimeValues = [$now,"12:00 AM","12:00 AM","12:00 AM"];
+//Verify same values in Work order after saving
+var $verifyResult = $sfm_act_common.verifyValuesInDelivery($deliveryTextPickLabels, $deliveryTextPickValues, $deliveryTimeLabels, $deliveryTimeValues, $textAreaLabels, $textAreaValues, $checkBoxLabels, $checkBoxValues, $multiPickLabels, $multiPickValues);
+$sfm_act_common.saveClassicSfmProcess();
+_wait(14000,_isVisible($sfm_pg_wo.label_wo));
+_assertTrue($verifyResult);
+if($verifyResult){
+	_log("PASS: Work order has values as per value mapping for new records for Header in delivery");
+}
+else {
+	_log("FAIL: Work order does not have values as per value mapping for new records for Header in delivery");
+}
+
+_selectDomain();
+_wait(14000,_isVisible($sfm_pg_wo.label_wo));
+//Removing preceding zeros in date fields to validate in work order object.
+$todayDate = $sfm_act_common.removePrecedingZeroInDate($todayDate);
+$tomorrowDate = $sfm_act_common.removePrecedingZeroInDate($tomorrowDate);
+$yesterdayDate = $sfm_act_common.removePrecedingZeroInDate($yesterdayDate);
+$timeValues =[$now,"12:00 AM","12:00 AM","12:00 AM"];
+var $res = $sfm_act_common.verifyValues($textLabels, $textValues, $pickListLabels, $pickListValues, $textAreaLabels, $textAreaValues, $checkBoxLabels, $checkBoxValues, $dateTimeLabels, $dateTimeDateValues, $timeValues,$emailLabels,$emailValues,$lookUpLabels,$lookUpValues,$multiPickLabels,$multiPickValues,$urlLabels,$urlValues,$telephoneLabels,$telephoneValues);
+_assertTrue($res);
+if($res){
+	_log("PASS: Work order has values as per value mapping for new records for Header");
+}
+else {
+	_log("FAIL: Work order does not have values as per value mapping for new records for Header");
+}
+
+
+_setSpeed($g_stepSpeed);
+$RS_5027.end();
+

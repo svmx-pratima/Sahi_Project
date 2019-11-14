@@ -1,0 +1,32 @@
+
+//Suite Level setup for basic test data
+//Product
+
+var $obJson = "{\"Name\":\"Chrome\"}";
+var $objName = "Product2";
+var $filterFieldName = "Name";
+var $filterFieldValue = "Chrome";
+
+$sfm_act_restApiMethods.upsertRecordsRestApi($sfmdUsn,$sfmdPwd, $sfmClientId, $sfmConsumerSecret, $sfmOrgInstance, $objName, $filterFieldName, $filterFieldValue, $obJson);
+
+//Account
+var $obJson = "{\"Name\":\"HCSAccountForTesting\"}";
+var $objName = "Account";
+var $filterFieldName = "Name";
+var $filterFieldValue = "HCSAccountForTesting";
+
+$sfm_act_restApiMethods.upsertRecordsRestApi($sfmdUsn,$sfmdPwd, $sfmClientId, $sfmConsumerSecret, $sfmOrgInstance, $objName, $filterFieldName, $filterFieldValue, $obJson);
+
+//Contact
+var $obJson = "{\"FirstName\":\"Lightning\",\"LastName\":\"Contact\"}";
+var $objName = "Contact";
+var $filterFieldName = "Name";
+var $filterFieldValue = "LightningContact";
+
+$sfm_act_restApiMethods.upsertRecordsRestApi($sfmdUsn,$sfmdPwd, $sfmClientId, $sfmConsumerSecret, $sfmOrgInstance, $objName, $filterFieldName, $filterFieldValue, $obJson);
+
+//enable checklist question library
+$bo_act_login.login($g_url,$sfmdUsn,$sfmdPwd);
+$bo_act_configurationProfiles.editGlobalProfileForBooleanSettings("Common", "Global Settings", "GBL029", true);
+// To show popup on on object seatrch even when only one object is found on delivery lookup field 
+$bo_act_configurationProfiles.editGlobalProfileForBooleanSettings("SFM Transaction Manager", "SFM Transaction Delivery Engine", "SET001", false); 

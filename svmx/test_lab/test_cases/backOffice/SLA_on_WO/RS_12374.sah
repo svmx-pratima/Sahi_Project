@@ -1,0 +1,23 @@
+//author - Srinivasa Murthy S
+
+var $RS_12374 = _testcase("$RS_12374","SLA Calculation: UI change to include Day measurement");
+$RS_12374.start();
+_setSpeed($g_stepSpeed);
+
+
+
+
+//Pre - Condition 
+
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+
+var $slaterm1 = $bo_act_slaTerms.createSlaTermsWithoutSave("Default");
+
+$bo_act_slaTerms.addAllTimes($slaterm1);
+
+_wait(2000);
+
+$bo_act_slaTerms.deleteSLATerminSLA($slaterm1);
+
+
+$RS_12374.end();

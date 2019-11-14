@@ -1,0 +1,151 @@
+function onScriptEnd(){
+ _selectDomain();
+ _focusWindow();
+ _takeScreenShot();
+ var $a=_scriptStatus();
+ 	 cleanUp();
+ }
+function cleanUp(){
+	_log("Performing clean up");
+	$sfm_act_search.deleteSfmSearch($searchName);
+	//Delete step from wizard
+		$sfm_act_common.deleteStepFromWizard($objectName,$currentWizardName, $processesList);
+		_log("Deleting step from wizard");
+	$sfm_act_common.logoutInClassic();
+}
+
+var $RS_5367= _testcase("RS_5367","For a Custom SFM Search - Verify Wizard for all SFM Types.");
+$RS_5367.start();
+//variables used
+var $processesList = ["Create Quote from Work Order","Manage Work Order Lines - Usage","Work Order Service Report"];
+var $sfmProcesses = ["Create Quote from Work Order","Manage Work Order Lines - Usage"];
+var $opDocProcess = "Work Order Service Report";
+var $processIds = ["TDM009","TDM016","WO_ServiceReport_001"];
+var $currentWizardName = $sfmd_wizardName[7];
+var $searchName = "RS_5367";
+var $i =0;
+var $objectName = "Work Order";
+var $expectedList = [];
+var $actualList = [];
+var $value = true;
+var $extracted;
+//Appending current timestamp to process name to make it unique.
+var $timeStamp = $bo_act_navigation.getCurrentTimeStamp();
+$searchName = $searchName + "_" + $timeStamp;
+
+//Work Order with open order status
+$objName= $orgnamespace+"__Service_Order__c";
+$obJson = "{\""+$orgnamespace+"__Order_Status__c\":\"Open\",\""+$orgnamespace+"__City__c\":\"Kashmir\"}";
+$columnName = "Name";
+$filter="id";
+var $filterValue =$sfm_act_restApiMethods.postRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,$objName,$obJson,"POST");
+$woName =$sfm_act_restApiMethods.getRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,"GET", $objName, $columnName, $filter, $filterValue);
+_log("Created Work order is" +$woName);
+
+//Work Order with open order status
+$objName= $orgnamespace+"__Service_Order__c";
+$obJson = "{\""+$orgnamespace+"__Order_Status__c\":\"Open\",\""+$orgnamespace+"__City__c\":\"Kashmir\"}";
+$columnName = "Name";
+$filter="id";
+var $filterValue =$sfm_act_restApiMethods.postRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,$objName,$obJson,"POST");
+var $woName2 =$sfm_act_restApiMethods.getRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,"GET", $objName, $columnName, $filter, $filterValue);
+_log("Created Work order is" +$woName2);
+
+//Work Order with open order status
+$objName= $orgnamespace+"__Service_Order__c";
+$obJson = "{\""+$orgnamespace+"__Order_Status__c\":\"Open\",\""+$orgnamespace+"__City__c\":\"Kashmir\"}";
+$columnName = "Name";
+$filter="id";
+var $filterValue =$sfm_act_restApiMethods.postRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,$objName,$obJson,"POST");
+var $woName3 =$sfm_act_restApiMethods.getRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,"GET", $objName, $columnName, $filter, $filterValue);
+_log("Created Work order is" +$woName3);
+
+//Work Order with open order status
+$objName= $orgnamespace+"__Service_Order__c";
+$obJson = "{\""+$orgnamespace+"__Order_Status__c\":\"Open\",\""+$orgnamespace+"__City__c\":\"Kashmir\"}";
+$columnName = "Name";
+$filter="id";
+var $filterValue =$sfm_act_restApiMethods.postRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,$objName,$obJson,"POST");
+var $woName4 =$sfm_act_restApiMethods.getRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,"GET", $objName, $columnName, $filter, $filterValue);
+_log("Created Work order is" +$woName4);
+
+//Login and switch to classic
+//**************************************************************************************
+$bo_act_login.login($g_url,$sfmdUsn,$sfmdPwd);
+
+_wait(15000);
+//Add the mentioned processes to the wizard
+for($i=0;$i<$sfmProcesses.length;$i++){
+	$sfm_act_wizards.addToWizard($objectName,$currentWizardName,"SFM",$sfmProcesses[$i]);
+}
+$sfm_act_wizards.addToWizard($objectName,$currentWizardName,"Output Document",$opDocProcess);
+//Setup the SFM Search as specified
+$bo_act_navigation.navigateToSfmSearchInDesigner();
+$sfm_act_search.createNewCustomSearch($searchName, $searchName);
+var $objectsArray = "Work Order";
+var $fieldNames = ["Order Status"];
+var $operatorList = ["Equals"];
+var $valueList = ["Open"];
+var $advExpression ="";
+var $displayObjects = ["Work Order - Product","Work Order - Component"];
+var $displayFields = ["Product Name","Installed Product ID"];
+var $appliedObjects = [];
+var $appliedFields = [];
+var $sortingObjects =["Work Order"];
+var $sortingFields = ["Work Order Number"];
+var $searchOrders = ["Ascending"];
+$sfm_act_search.configObjectInSearch($objectsArray, $fieldNames, $operatorList, $valueList, $advExpression, $displayObjects, $displayFields,$appliedObjects,$appliedFields,$sortingObjects, $sortingFields, $searchOrders);
+//Save the whole search after configs
+$sfm_act_search.saveAndCloseSearch();
+
+//Verify search results
+$sfm_act_search.launchGivenSearch($searchName,"");
+//Verify Sorting
+_setStrictVisibilityCheck(true);
+var $x = _collect("_link","/WO-/",_in(_div("/sfmsearch-resultviewpanel/")));
+var $actualList = [];
+var $i=0;var $y;
+for($i=0;$i<$x.length;$i++){
+		$y = _getText($x[$i]);
+	    $actualList.push($y);
+}
+_log("Work Order displayed is "+ $actualList);
+
+//Sort it in ascending order
+$expectedList = $actualList.sort();
+
+_log("Actual Sorted list is "+$expectedList);
+
+_assertEqualArrays($expectedList,$actualList,"Work Orders are sorted in ascending order as set in Search config");
+$actualList = [];
+//Try to launch the SFM wizards
+
+for($i=0;$i<$processesList.length;$i++){
+	 $sfm_act_search.checkAndReturnSearchResults([$woName],"Work Order");
+	_click(_div("/svmx-grid-radioheader/",_leftOf(_div($woName))));
+	_wait(3000);
+	_click(_emphasis($currentWizardName));
+	_click(_span($processesList[$i]));
+	_wait(8000);
+	_selectWindow("/ServiceMaxConsole/");  // Added by Janaki to accommodate the window title changes 
+	//Extract process id and verify if the exact process is launched
+	 var $str;
+	_set($str, window.location.href); 
+	var $pattern = "/SVMX_processId=(.*)&SVMX_recordId=(.*)&SVMX_retURL/";
+	$extracted = _extract($str, $pattern);
+	var $title = $processesList[$i]+" \(Work Order Number: "+$woName+"\)";
+	$actualList.push($extracted[1]);
+	if($processesList[$i] === "Work Order Service Report"){
+		_wait(80000,_isVisible(_button("Finalize")));
+		_assertVisible(_button("Finalize"),"Finalize button is not present");
+	}
+	else {
+		_assertVisible(_span($title));
+	}
+	_closeWindow();
+	_selectWindow();
+}
+_assertEqualArrays($processIds,$actualList,"Not able to launch the correct processes from SFM Search Widgets");
+
+
+$RS_5367.end();

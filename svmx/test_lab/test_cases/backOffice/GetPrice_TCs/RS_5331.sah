@@ -1,0 +1,194 @@
+//Tests are to be written here [Bhupendra Singh Chouhan]
+
+// THIS TEST CASE NEED TO RUN INTO THE MULTI CURRENCY ORG.
+
+var $RS_5331 = _testcase("$RS_5331","Get Price - when Header currency is different.");
+$RS_5331.start();
+_setSpeed($g_stepSpeed);
+
+/**
+ * Login to the Sandbox Org
+ */
+
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+
+//Pre - Condition Test Data
+var $productFamily = ["--None--","GeneralSolution","AdvSolution","Accessory", "Storage"];
+var $productCode = "";
+var $seperator = "/";
+
+/**
+* Create Account, Contact, Location, Product and Installed Product
+*/
+var $accountName = $bo_act_accounts.createAccount();
+var $contactName = $bo_act_contacts.createContact($accountName);
+var $productName = $bo_act_products.createProduct($productCode, $productFamily[0]);
+var $IBName = $bo_act_installedProduct.createInstalledProduct($productName, $accountName, $contactName);
+
+/**
+ * Configure the Group Profile SET025
+ */
+//var $groupProfileName = "AutoBACGroup";
+var $Module = "Entitlement Verification";
+var $SubModule = "Work Order Entitlement VF";
+var $Setting = "SET025";
+var $value = true;
+$bo_act_configurationProfiles.editGroupProfileForBooleanSettings($groupProfileName, $Module, $SubModule, $Setting, $value);
+
+/**
+* Create Service Type with QC
+*/
+var $trackedOn = "Work Order";
+var $dataType = "Text";
+var $qualifyingCriteria = "SVMXSTD: Open Work Orders";
+var $serviceName = $bo_act_servicesTypes.createServicesTypes($trackedOn, $dataType, $qualifyingCriteria);
+
+/**
+ * Create SLA Terms
+ */
+var $slaName = $bo_act_slaTerms.createSlaTerms("Default");
+$bo_act_slaTerms.addInitialResponseToSLA($slaName,"WorkOrder","Field Service","Medium","Created Date","5","10","SLA");
+//$bo_act_slaTerms.addOnsiteResponseToSLA($slaName,"WorkOrder","Field Service","Medium","Created Date","10","15","SLA");
+
+//validation of SLA creation
+_assertExists(_span($slaName));
+
+/**
+ * Create Service Contract(With child lines) and Activate it
+ */
+var $pastYear = 2;  // Start Date for Service Contract
+var $futureYear = 2;  // End Date for Service Contract
+
+// Creation of Service Contracts
+var $sconName = $bo_act_serviceMaintenanceContracts.createServiceMaintenanceContract($accountName, $slaName, $futureYear, $pastYear);
+
+//Activating Created Service Contract
+$bo_act_serviceMaintenanceContracts.activateServiceContract($sconName);
+
+// Add Covered Product to Service Contract 
+
+var $pastYear = 3;  			// Start Date 'TODAY's' Date - 3 YEARS
+var $futureYear = 3;			// End Date 'TODAY's' Date + 3 YEARS
+
+$bo_act_serviceMaintenanceContracts.AddCoveredProducToServiceContract($sconName, $IBName, $slaName, $pastYear, $futureYear);
+
+//Add Entitled Contact to Service Contract 
+$bo_act_serviceMaintenanceContracts.addEntitledContactsToServiceContract($sconName, $contactName);
+
+
+// Edit Scon to add Tow Travel Policy lines
+var $defaultTravelPrice = 350;
+var $defaultTravelUnit = "Flat Rate";
+var $travelRoundingType = "Actuals";
+var $travelPolicyUnit = "Flat Rate";
+var $travelPolicyRate = 150;
+var $travelPolicyUnit1 = "Per Hour";
+var $travelPolicyRate1 = 550;
+var $currencyType = "Indian Rupee";
+$bo_act_serviceMaintenanceContracts.addTravelPolicyToSCONWithTwoLines($sconName,$defaultTravelPrice,$defaultTravelUnit,$travelRoundingType,$travelPolicyUnit,$travelPolicyRate,$travelPolicyUnit1,$travelPolicyRate1,$serviceName,$currencyType);
+
+/**
+* Create Case record
+*/
+var $caseStatus = "New";
+var $casePriority = "Medium";
+var $caseOrigin = "Phone";
+var $caseNumber = $bo_act_Cases.createCase($caseStatus, $casePriority, $caseOrigin);
+
+/**
+* Create SFM Wizard for WO with two Steps 1st-Check Entitlement and 2nd- Manage Work Order Lines - Usage(TDM016)
+*/
+var $wizardTitleName = $bo_act_common.generateRandomName("SFWTitle");
+var $wizardIDName = $bo_act_common.generateRandomName("SFWId");
+var $fieldActnType = "Others";
+var $actnName = "Check Entitlement WO";
+
+$bo_act_navigation.navigateToSfmWizard();
+$bo_act_SFW.createWizardGeneralInfo("Work Order", $wizardTitleName, $wizardIDName);
+$bo_act_SFW.createWizardStep("SFM", "Manage Work Order Lines - Usage", "Interactive");
+$bo_act_SFW.addCustomActionToWizard($fieldActnType, $actnName);
+$bo_act_SFW.quickSaveSFWizard();
+
+//Navigate to IB and Create WO from IB
+var $WONumber = $bo_act_installedProduct.createWOFromIB($IBName);
+
+//Edit The Above created WO for few fields
+$bo_act_workOrders.editWorkOrder($WONumber);
+
+// Edit WO for Case 
+var $object = _textbox("/\\*Case|^Case/");
+var $objectValue = $caseNumber;
+$bo_act_workOrders.updateTextBoxFields($object, $objectValue);
+
+// Edit WO for Priority
+var $object = _select(0,_rightOf(_label("/\\*Priority|^Priority/")));
+var $objectValue = "Medium";
+$bo_act_workOrders.updateDropDownFields($object, $objectValue);
+
+// Edit WO for Billing Type
+var $object = _select("CurrencyIsoCode");
+var $objectValue = "INR - Indian Rupee";
+$bo_act_workOrders.updateDropDownFields($object, $objectValue);
+$bo_act_workOrders.saveWorkOrder();     		// Save the Edited WO
+
+/**
+*Perform Interactive Entitlement on WO using Service Contract
+*/
+$bo_act_interactiveEntitlement_WO.performInteractiveEntitlementWO_UsingScon($WONumber, $sconName);
+var $actual_EntitlementType = _getText(_div(0,_rightOf(_cell("/Entitlement Type/"))));
+var $ServiceContract_actual = _getText(_link(0,_rightOf(_cell("Service Contract"))));
+_assertEqual($actual_EntitlementType,"INTERACTIVE","Actual and expected Entitlement Type are not same");
+_assertEqual($ServiceContract_actual,$sconName,"Actual and expected entitlement Service Conract are not same");
+
+//validation of Entitlement Parameters On Case
+
+if(_isVisible(_image("Checked",_rightOf(_cell("/Is Entitlement Performed/"))))){
+	_logOutput("Entitlement is Performed Successfully = PASS");
+	}else{
+	_fail("Entitlement is Not Performed = Failed");
+	}
+//--------------------------------
+/**
+*Invoke TDM016 SFM for Get Price Calculation
+*/
+$bo_act_getPrice.navigateToSFMDeliveryPageFor_TDM016($WONumber);
+
+//Add Travel Line to Above invoke TDM016 SFM
+var $lineQty = 5;
+
+$bo_act_getPrice.addTravelLineUsingLintQtyToSFMDelivery($lineQty);
+$bo_act_getPrice.calculateGetPrice();
+$bo_act_getPrice.saveSFMDelivery();
+
+var $actualProformaInvoiceAmountOnWorkOrder = _getText(_div(0,_rightOf(_cell("/Proforma Invoice Amount/"))));
+var $actualTotalBillableAmountOnWorkOrder = _getText(_div(0,_rightOf(_cell("/Total Billable Amount/"))));
+
+/**
+*For Total Billable Amount on WO 
+*/
+
+_assertEqual($actualProformaInvoiceAmountOnWorkOrder,"INR 2,750.00 (USD 42.31)","Actual and expected Proforma Invoice Amount On Work Order are not same");
+_assertEqual($actualTotalBillableAmountOnWorkOrder,"INR 2,750.00 (USD 42.31)","Actual and expected Total Billable Amount On Work Order are not same");
+
+//Delete SFM Wizard 
+$bo_act_SFW.deleteSFMWizard("Work Order", $wizardIDName);
+
+/**
+*Clean up function
+*/
+
+$bo_act_common.deleteCase($bac_un, $bac_pwd,$caseNumber);
+$bo_act_common.deleteAccount($bac_un, $bac_pwd, $accountName);
+$bo_act_common.deleteContact($bac_un, $bac_pwd, $contactName);
+$bo_act_common.deleteIB($bac_un, $bac_pwd, $orgnamespace,$IBName);
+$bo_act_common.deleteProduct($bac_un, $bac_pwd,$productName);
+$bo_act_common.deleteWorkOrder($bac_un, $bac_pwd, $orgnamespace,$WONumber);
+$bo_act_common.deleteSLA($bac_un, $bac_pwd, $orgnamespace, $slaName);
+//var $datacreated = [$WONumber,$caseNumber,$IBName,$productName,$contactName,$accountName,$slaName,$serviceName];
+//for (var i = 0; i < $datacreated.length; i++) {
+//$bo_act_common.cleanUpfunction($datacreated[i]);
+//}
+
+$bo_act_login.logOut(); 
+
+$RS_5331.end();

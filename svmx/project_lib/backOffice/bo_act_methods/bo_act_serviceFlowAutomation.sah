@@ -1,0 +1,87 @@
+/**
+ * Functions for the service Flow Automation Rules
+ */
+var $bo_act_serviceFlowAutomation = new function bo_act_serviceFlowAutomation() {
+	/**
+	 * Create a New service Flow Automation Rule WO
+	 */
+	this.createServiceFlowAutomationProcess_SalesforceEvent = function($eventType, $object, $filterCriteria, $updatedFieldName, $recipientsField,$notificationTitle,$pushNotificationText,$inserField,$sfmName) {
+		var $sfaProcessName = $bo_act_common.generateRandomName("SFAPro_");
+		$bo_act_navigation.navigateToServiceFlowAutomation();
+		_wait(30000, _isVisible($bo_pg_serviceFlowAutomation.btn_newAutomation));
+		_click($bo_pg_serviceFlowAutomation.btn_newAutomation);
+		_click(_span($groupProfileName),$groupProfileName);
+		_setValue($bo_pg_serviceFlowAutomation.txt_automationName, $sfaProcessName);
+		_setValue($bo_pg_serviceFlowAutomation.txt_automationDescription, $sfaProcessName);
+		_click($bo_pg_serviceFlowAutomation.btn_enableAutomation);
+		_click($bo_pg_serviceFlowAutomation.btn_nextTabOnAutomation);
+		_click($bo_pg_serviceFlowAutomation.rdbtn_selectSalesforceEventForAutomation);
+		_click(_span($eventType),$eventType);
+		_click($bo_pg_serviceFlowAutomation.btn_nextTabOnAutomation);
+		_click(_span($object),$object);
+		_click(_span($filterCriteria),$filterCriteria);
+		if($eventType=="Record Field Updated"){
+			_click(_span($updatedFieldName),$updatedFieldName);
+		}
+		_click($bo_pg_serviceFlowAutomation.btn_nextTabOnAutomation);
+		_click($bo_pg_serviceFlowAutomation.btn_nextTabOnAutomation); // Click Next on Action Service Tab
+		_wait(30000, _isVisible(_label("* Recipients")));
+		_click(_span($recipientsField),$recipientsField);
+		_setValue($bo_pg_serviceFlowAutomation.txt_notificationTitle, $notificationTitle);
+		_setValue($bo_pg_serviceFlowAutomation.txt_pushNotificationText, $pushNotificationText);
+		_click($bo_pg_serviceFlowAutomation.lnk_insertFields);
+		_assertVisible(_heading2("ModalHeader__title slds-text-heading--medium"));
+		_click(_link($inserField));
+		_click(_span($sfmName),$sfmName);
+		_click($bo_pg_serviceFlowAutomation.btn_finishOnAutomation);
+		
+		return $sfaProcessName;	
+	};
+	this.createServiceFlowAutomationProcess_GeolocationEvent = function($eventType, $object, $filterCriteria, $sortRecordsBy,$locationField,$fenceRadius,$notificationTitle,$pushNotificationText,$inserField,$sfmName) {
+		var $sfaProcessName = $bo_act_common.generateRandomName("SFAPro_");
+		$bo_act_navigation.navigateToServiceFlowAutomation();
+		_wait(30000, _isVisible($bo_pg_serviceFlowAutomation.btn_newAutomation));
+		_click($bo_pg_serviceFlowAutomation.btn_newAutomation);
+		_click(_span($groupProfileName),$groupProfileName);
+		_setValue($bo_pg_serviceFlowAutomation.txt_automationName, $sfaProcessName);
+		_setValue($bo_pg_serviceFlowAutomation.txt_automationDescription, $sfaProcessName);
+		_click($bo_pg_serviceFlowAutomation.btn_enableAutomation);
+		_click($bo_pg_serviceFlowAutomation.btn_nextTabOnAutomation);
+		_click($bo_pg_serviceFlowAutomation.rdbtn_selectGeolocationEventForAutomation);
+		_click(_span($eventType),$eventType);
+		_click($bo_pg_serviceFlowAutomation.btn_nextTabOnAutomation);
+		//_click(_span($object),$object);
+		_click(_span($filterCriteria),$filterCriteria);
+		_click(_span($sortRecordsBy),$sortRecordsBy);
+		_click(_span($locationField),$locationField);
+		_click(_span($fenceRadius),$fenceRadius);
+		_click($bo_pg_serviceFlowAutomation.btn_nextTabOnAutomation);
+		_click($bo_pg_serviceFlowAutomation.btn_nextTabOnAutomation); // Click Next on Action Service Tab
+		_setValue($bo_pg_serviceFlowAutomation.txt_notificationTitle, $notificationTitle);
+		_setValue($bo_pg_serviceFlowAutomation.txt_localNotificationText, $pushNotificationText);
+		_click($bo_pg_serviceFlowAutomation.lnk_insertFields);
+		_assertVisible(_heading2("ModalHeader__title slds-text-heading--medium"));
+		_click(_link($inserField));
+		_click(_span($sfmName),$sfmName);
+		_click($bo_pg_serviceFlowAutomation.btn_finishOnAutomation);
+		
+		return $sfaProcessName;	
+	};
+		
+	this.deleteSFAProcess = function($sfaProcessName) {
+		$bo_pg_serviceFlowAutomation.sel_SFAProcess($sfaProcessName);
+		_click($bo_pg_serviceFlowAutomation.txt_deleteSFAProcess);
+		if(_assertVisible(_heading2("Delete Service Flow Automation"))){
+			_click($bo_pg_serviceFlowAutomation.btn_proceesToDeleteSFAProcess);
+		}
+	};
+	this.editSFAProcess = function($sfaProcessName) {
+		$bo_pg_serviceFlowAutomation.sel_SFAProcess($sfaProcessName);
+		_click($bo_pg_serviceFlowAutomation.txt_editSFAProcess);
+		_wait(5000, _isVisible(_heading1("Edit Automation")));
+		_assertVisible(_heading1("Edit Automation"));
+	};
+	
+};
+
+

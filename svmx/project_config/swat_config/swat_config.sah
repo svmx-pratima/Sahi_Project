@@ -1,0 +1,63 @@
+//Append "swat_" for all your variables
+/*
+//SWAT AUT 17
+var $swat_Url = "https://test.salesforce.com";
+var $swat_un = "deepa@12x.com.cfg3";
+var $swat_pwd = "svmx9898";
+var $swat_ClientId ="3MVG9zJJ_hX_0bb9ETUKGTdkp3TDOKNnnXLVxnHa_AELEt7LOXd7WJD8.dchVoa9kmYJdM7shZDOkL9yRU1Ak";
+var $swat_ConsumerSecret = "9D7546D0574872ACACBB9806EFFC0A554956A3CCC17DBF65A87FFE63082CBF9A";
+var $swat_OrgInstance = "cs16";
+//var $swatg_domain = "/visual.force.com/";
+
+*/
+
+
+//SWAT Global Variables : 19.1 Details
+var $swat_Url = "https://test.salesforce.com";
+var $swat_un = "ashwini.h@ge.com";
+var $swat_pwd = "svmx1010";
+var $swat_ClientId ="3MVG99E3Ry5mh4zpoRo8OgqPbqoqdWqWuDrwuPohH..J4zUrQMnuf3StIK1uvUnsQ4r09Pmcm4KYYRllMEtSr";
+var $swat_ConsumerSecret = "5656136115450032367";
+var $swat_OrgInstance = "cs67"; 
+
+/*
+// SWAT Global Variables : 18.2 Details 
+var $swat_Url = "https://test.salesforce.com";
+var $swat_un = "ashwinih09@ge.com";
+var $swat_pwd = "svmx9898";
+var $swat_ClientId ="3MVG9PbQtiUzNgN7ceiF1Xeh14xBX7kBOOuaofM0eY2DRxi9QyN6lyZ6N.7ok5nFRtsZ44Dr7Z.3WnG_UCLmt";
+var $swat_ConsumerSecret = "6C6DD9045DDCDD968E120E9229DE07A8D5EE2304281048544753606F7E59DE10";
+var $swat_OrgInstance = "cs51"; 
+
+
+//SWAT Global Variables : 18.3 Details
+var $swat_Url = "https://test.salesforce.com";
+var $swat_un = "ashwini.holagi1@ge.com";
+var $swat_pwd = "svmx1010";
+var $swat_ClientId ="3MVG9zJJ_hX_0bb8AwEPbr498NBA_R4NUs4ALuIEPlaF_eJzoA9eumlnd5XQMhSQhfwi6u3EkO46TZNmI2bUd";
+var $swat_ConsumerSecret = "8227054075140353068";
+var $swat_OrgInstance = "CS16";
+
+
+
+//New Automation Org Details
+
+//18.2 Server Details
+var $swat_Url = "https://test.salesforce.com";
+var $swat_un = "18.2classic@autoadmin.com";
+var $swat_pwd = "classic1";
+var $swat_ClientId ="3MVG9ahGHqp.k2_zM9EPRKP58tVsjxGffBYT6WE2bM5ljol0iZDDaHY2ohHOMi9jpBqGDhEZVkHXKaxpf5ftf";
+var $swat_ConsumerSecret = "098BC2C4EE5BA1C0602B646544244FDF964581FF656E9BF429FEDA9C6FE6202C";
+var $swat_OrgInstance = "cs17"; 
+var $swatg_domain = "/svmx/";
+
+
+//18.3 Server Details
+var $swat_Url = "https://test.salesforce.com";
+var $swat_un = "18.3classic@autoadmin.com";
+var $swat_pwd = "classic3";
+var $swat_ClientId ="3MVG9ahGHqp.k2_z9GYe2pGnvhTAXc2NOFmPTDtLXzJK0xCn7X9rte1qVGDzIydr4pSpoFqKtpC4RP9adiaGL";
+var $swat_ConsumerSecret = "D052397068D574DB73B3384516026FD70F37884239FD52A4815004CF14EB0E48";
+var $swat_OrgInstance = "cs17"; 
+var $swatg_domain = "/svmx/";
+*/

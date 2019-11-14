@@ -1,0 +1,55 @@
+
+var $swat_act_SFM= new function swat_act_SFM() {
+
+	/**
+	 * Author		:	Ashwini Holagi
+	 * Function		:	Click on Quick save button in SFM Transaction
+	 */
+	this.quickSaveSfmTransaction = function(){
+		_click($swat_pg_SFM.btn_quickSave1);
+		_wait(10000);
+		if(_assertVisible ($swat_pg_SFM.btn_SfmSaved)==true){
+		_log("SFM Transaction saved");
+		}else{
+			_log("SFM Transaction NOT saved");	
+		}
+		};
+		
+		
+		this.createCustomLinkedProcess = function($sfmToBeCloned,$sfmName,$sfmPgLayoutName ){
+			$bo_act_navigation.navigateToSfmTransactionDesigner();
+			_wait(10000,_isVisible($bo_pg_sfmTransactionAndDesigner.lbl_ServiceFlowManager));
+			$sfm_act_SFM.selectSFM($sfmToBeCloned,false);
+			_wait(5000,_isVisble($bo_pg_sfmTransactionAndDesigner.btn_clone));
+			_click($bo_pg_sfmTransactionAndDesigner.btn_clone);
+			_wait(60000, _isVisible($bo_pg_sfmTransactionAndDesigner.txt_name));
+			_setValue($bo_pg_sfmTransactionAndDesigner.txt_name, $sfmName);
+			_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmTransactionId, "");
+			_click($bo_pg_sfmTransactionAndDesigner.btn_screenDesigner);
+			_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmSavePageLayoutAs, $sfmPgLayoutName);
+			_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmSavePageLayoutAsId, "");
+			_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmSavePageLayoutAsId, $sfmPgLayoutName);
+			_wait(5000,_isVisible($bo_pg_sfmTransactionAndDesigner.btn_pageLayoutSave));
+			_click($bo_pg_sfmTransactionAndDesigner.btn_pageLayoutSave);
+			_wait(5000,_isVisible($bo_pg_sfmTransactionAndDesigner.tab_advancedOptions));
+			_click($bo_pg_sfmTransactionAndDesigner.tab_advancedOptions);
+			_wait(5000,_isVisible($bo_pg_sfmTransactionAndDesigner.btn_LinkedProcess));
+			_click(_f("main").tab("Linked Process"));
+			_wait(10000,_isVisble($bo_pg_sfmTransactionAndDesigner.lbl_productServiced));
+			_click(_f("main").s_label("Products Serviced[3]"));
+			
+			var $scollElement=_f("main").s_vscrollbar("verticalScrollBar").near(_f("main").s_label("Available SFM Processes"));
+			var $searchElement = _f("main").s_label($LinkedsfmName);
+            $sfm_act_Transactions.lookUpScrollIntoView($searchElement, $scollElement); 
+
+			_wait(5000,_isVisible(_f("main").s_label($LinkedsfmName)));
+			_click(_f("main").s_label($LinkedsfmName));
+			_wait(5000,_isVisible($bo_pg_sfmTransactionAndDesigner.btn_moveToRight));
+			_click($bo_pg_sfmTransactionAndDesigner.btn_moveToRight);
+			_wait(5000,_isVisible($bo_pg_sfmTransactionAndDesigner.btn_finalQuickSave));
+			_click($bo_pg_sfmTransactionAndDesigner.btn_finalQuickSave);
+			_wait(5000,_isVisible($bo_pg_sfmTransactionAndDesigner.btn_saveAndclose));
+			_click($bo_pg_sfmTransactionAndDesigner.btn_saveAndclose);
+			_wait(10000,_isVisible($bo_pg_sfmTransactionAndDesigner.lbl_ServiceFlowManager));
+		};
+};

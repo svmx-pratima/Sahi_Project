@@ -1,0 +1,120 @@
+var $user_credentials = $excel.readFromCustomExcel("../optimax/op_excleData/automation.xlsx", "User_Details","","");
+var $RTO_DispatchProcess = $excel.readFromCustomExcel("../optimax/op_excleData/automation.xlsx", "RTO_DispatchProcess","","");
+
+for(var $i=0;$i<$user_credentials.length;$i++)
+{
+var $g_un = $user_credentials[$i][0];
+var $g_pwd = $user_credentials[$i][1];
+var $g_url = $user_credentials[$i][2];
+}
+
+var $RS_6736 = _testcase("RS_6736", "Tech Enable Scheduling changes (Enable Scheduling = False)");
+
+$RS_6736.start();
+	
+	
+$bo_act_login.login($g_url, $g_un, $g_pwd);
+
+_set($login_result, _fetch(login($g_un,$g_pwd)));
+_log($login_result);
+
+_set($update_tech, _fetch(update_tech($RTO_DispatchProcess)));
+_log($update_tech);
+
+//<browser>
+function login($g_un,$g_pwd){
+	
+	var $login_result = sforce.connection.login($g_un,$g_pwd);
+	$sfdc_sessionId = $login_result.sessionId;
+	_log("$sfdc_sessionId = "+$sfdc_sessionId);
+	return $login_result;
+} 
+
+function update_tech($RTO_DispatchProcess){
+	
+var CreateRecords=[];
+	
+	for(var $i=0;$i<$RTO_DispatchProcess.length;$i++)
+	{
+		var tech = new sforce.SObject("SVMXC__Service_Group_Members__c");
+		tech.SVMXC__Service_Territory__c= $RTO_DispatchProcess[$i][5];
+		tech.SVMXC__Service_Group__c=$RTO_DispatchProcess[$i][13];
+		tech.Name='InvalidTech';
+		tech.SVMXC__Enable_Scheduling__c='True';
+		tech.SVMXC__Active__c='True';
+		tech.SVMXC__Street__c='Robin St';
+		tech.SVMXC__Zip__c='77591';
+		tech.SVMXC__Country__c='United States';
+	CreateRecords.push(tech);  
+	}
+	
+	var result_tech = sforce.connection.create([tech]);
+    _log("result_tech = "+result_tech);
+	 _log(" Technician= "+result_tech[0].id);
+	 
+// Wait for the technician creation
+	 
+	 var $count=0;
+	 while($count!=500){
+		 _log(500);
+		  $count++;
+	 }
+	 
+    var tech_result = sforce.connection.query("Select Id,Name FROM SVMXC__Service_Group_Members__c WHERE Id = '"+result_tech[0].id+"'");
+	var records = tech_result.getArray("records");
+	_log("records = "+records);
+	
+
+// Updating Technician's Scheduling
+	
+	for(var $i=0;$i<$RTO_DispatchProcess.length;$i++)
+	{
+	
+	tech.id=result_tech[0].id;
+	tech.SVMXC__Enable_Scheduling__c='False';
+	tech.SVMXC__Active__c='False';
+	result = sforce.connection.update([tech]);
+	_log("result "+result);
+	if (result[0].getBoolean("success")) {
+	_log("Technician with id " + result_tech[0].id + " updated");
+			} else {
+	 _log("failed to update account " + result[0]);
+			}
+
+	}
+		
+
+// Validating Optimizer Transactions update
+
+var teci = 'Technician';
+var tech_res = sforce.connection.query("Select SVMXC__WhatId__c,SVMXC__WhatType__c FROM SVMXC__SVMX_Optimizer__c WHERE SVMXC__WhatType__c = '"+teci+"'");
+_log("tech_res = "+tech_res);
+var rec = tech_res.getArray("records");
+_log("records1 = "+rec.length);
+for (var i=0; i< rec.length; i++) {
+var record = rec[i];
+var tech_token = record.SVMXC__WhatId__c;
+if(tech_token.includes("InvalidTech")){
+	_log("Technician update is updated");
+	}
+	else{
+		_log("Technician update is not updated");
+		}
+if(record.SVMXC__Optimizer_Status__c="OPT_COMPLETED"){
+	_log("Technician update is updated");
+}
+else{
+	_log("Technician update is not updated");
+	}
+if(record.SVMXC__Optimizer_Change_Token__c="CHANGE_UPDATE_TECH"){
+	_log("Technician update is updated");
+}
+else{
+	_log("Technician update is not updated");
+	}
+
+}
+}
+//</browser>
+
+$RS_6736.end();

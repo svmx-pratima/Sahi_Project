@@ -1,0 +1,86 @@
+//_includeOnce("../../../references/references.js");
+
+//author - Mamata Rout
+
+
+var $RS_5426 = _testcase("RS_5426", "On Editing a existing step for a SFW which is hidden");
+$RS_5426.start();
+_setSpeed($g_stepSpeed);
+
+
+	var $sfmName =$bo_act_common.generateRandomName("5426SFM");
+	var $wizardname=$bo_act_common.generateRandomName("5426SFW");
+	var	$wizardID=$wizardname;
+	//var $stndSFMName="Add/Edit Products Serviced";
+	var $searchText=$wizardname;
+	var $objName="Preventive Maintenance Plan";	
+	var $fieldActnType="SFM";
+	var $newSfmName="5426EditingWizardSteps";
+
+	var $actnName2=$sfmName;
+	var $actnName1=$sfmName;
+	var $actnName2=$sfmName;
+	var $executionMode = "Interactive";
+	var $processType="SFM Wizards";
+	_setSpeed($g_stepSpeed);
+	$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+	
+	var $SFMToBeCloned = "Activate Preventive Maintenance Plan";
+	var $isCustom = false;
+
+$bo_act_navigation.navigateToSfmTransactionDesigner();
+_wait(60000, _isVisible($bo_pg_sfmTransactionAndDesigner.btn_newSFM));
+$bo_act_SFM.renameClonesfm($sfmName,$SFMToBeCloned, $isCustom);
+_wait(60000, _isVisible($bo_pg_sfmTransactionAndDesigner.btn_backToList));
+	
+if (_assertExists($bo_pg_sfmTransactionAndDesigner.btn_backToList)){
+	
+	_log("SFm created successfully");
+} else {
+	_fail("SFM creation is unsuccessfull");
+	_stopTestCase();
+};
+
+	//***Navigate SFm Wizard->Create new Wizard->add standard SFM-*************
+	$bo_act_navigation.navigateToSfmWizard();
+	$bo_act_SFW.createWizardGeneralInfo($objName,$wizardname,$wizardID);
+	$bo_act_SFW.createWizardStep($fieldActnType,$actnName1,$executionMode);
+	_wait(2000);
+//*******Navigate to SFM App Permission and disable the permission for SFM wizard created above**********
+	$bo_act_navigation.navigateToSfmAppPermission();
+	 $bo_act_SFMAppPermission.genericSearchInAppPermission($processType,$objName,$searchText);
+if(_isVisible(_div("svmx-grid-checkheader"))){
+	_click(_div("svmx-grid-checkheader"));
+}
+	$bo_act_SFMAppPermission.disableAppPermission();
+
+//Navigate back to SFM Wizard and edit a new step to existing Wizard created above*****
+	$bo_act_SFW.editWizard($objName,$wizardID);
+	$bo_act_SFW.editWizardSteps($newSfmName);
+
+//*****Launch the Wizard in delivery and verify its visibility**********
+	$bo_act_sfmVerifyWorkOrder.verifyWizardOnWOObj($sfmName);
+	_wait(2000);
+	$bo_act_sfmVerifyWorkOrder.wizardButtonNotVisible($sfmName);
+//****SFM App Permission->Enable to App permission for the wizard created above****
+	$bo_act_navigation.navigateToSfmAppPermission();
+	 $bo_act_SFMAppPermission.genericSearchInAppPermission($processType,$objName,$searchText);
+	_click(_div("svmx-grid-checkheader"));
+	_click($bo_pg_sfmAppPermissionD.btn_clickSaveAppPermission);
+	_wait(3000);
+	_click($bo_pg_sfmAppPermissionD.popUpOK);
+	var $isvisible = _exists(_div("App Permissions saved successfully"));
+
+//Again Launch the Wizard in Delivery, verify the visibility*****8
+	$bo_act_sfmVerifyWorkOrder.verifyWizardOnWOObj($sfmName);
+	_wait(2000);
+	$bo_act_sfmVerifyWorkOrder.wizardButtonVisible($wizardname);
+//****Delete The Wizard Created*******
+	
+	/*
+	 $bo_act_SFW.deleteWizards( $objName,$wizardID);
+	 $bo_act_navigation.navigateToSfmTransactionDesigner();
+	_wait(60000, _isVisible($bo_pg_sfmTransactionAndDesigner.btn_newSFM));
+	$bo_act_SFM.deleteSFM($sfmName);*/
+_setSpeed($g_stepSpeed);
+$RS_5426.end();

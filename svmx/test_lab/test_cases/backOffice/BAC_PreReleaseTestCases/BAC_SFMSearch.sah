@@ -1,0 +1,42 @@
+
+//Author - Shashikala Kamath
+
+var $BVT_TC_001_SFMSearch = _testcase("$BVT_TC_001_SFMSearch","Create SFM Search in configuration screen");
+$BVT_TC_001_SFMSearch.start();
+_setSpeed($g_stepSpeed);
+
+$bo_act_login.login($PRT_url, $bac_PRTun, $bac_PRTpwd);
+
+var $objectName = "Work Order";
+var $fieldName ="Order Status";
+var $operator ="Equals";
+var $fieldName1="Order Type";
+
+var $workOrderNo;
+
+var $searchItem = $swat_act_sfmSearch.createSfmSearch($objectName,$fieldName,$operator,$fieldName1);
+
+
+//$searchItem = "Search12122017114624";
+var $caseNumber = $bo_act_Cases.createCase("New", "High", "Email");
+var $accountName = $bo_act_accounts.createAccount();
+var $contactName = $bo_act_contacts.createContact($accountName);
+var $productName =$bo_act_products.createProductSimple();
+
+var $IBName = $bo_act_installedProduct.createInstalledProduct($productName,$accountName,$contactName);
+
+
+$workOrderNo = $swat_act_workOrders.createWorkOrder($caseNumber, $accountName, $contactName, $IBName, "Open", "High", "Field Service");
+
+//$workOrderNo = "WO-00000056";
+$swat_act_sfmSearch.isSFMSearchAvailableonHomePage();
+$swat_act_sfmSearch.launchSfmSearch($searchItem,$workOrderNo);
+
+$bo_act_login.logOut(); 
+_closeWindow();
+$BVT_TC_001_SFMSearch.end();
+
+
+
+
+

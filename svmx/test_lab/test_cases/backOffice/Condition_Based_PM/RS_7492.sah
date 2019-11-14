@@ -1,0 +1,59 @@
+
+//author - Meghana Rao P
+
+var $RS_7492 = _testcase("$RS_7492","Display of Coverages on the new PM Plan Screen where Standard IB criteria is defined (Creating PM Plan from SCON)");
+$RS_7492.start();
+_setSpeed($g_stepSpeed);
+//Pre - Condition 
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+
+//Test Data Creation
+var $accName = $bo_act_accounts.createAccount();
+var $proName = $bo_act_products.createProduct("pro12", "--None--");
+var $contactName = $bo_act_contacts.createContact($accName);
+var $slaterm = $bo_act_slaTerms.createSlaTerms("Default");
+var $IBName1 = $bo_act_installedProduct.createIB_Statusvalue($proName, $accName, $contactName, "QA");
+var $IBName2 = $bo_act_installedProduct.createIB_Statusvalue($proName, $accName, $contactName, "Shipped");
+var $IBName3 = $bo_act_installedProduct.createIB_Statusvalue($proName, $accName, $contactName, "Installed");
+
+
+// Change the SET004 to TRUE
+
+var $Module = "Preventive Maintenance";
+var $SubModule = "PM Actions";
+var $Setting = "SET004";
+var $value = true;
+$bo_act_configurationProfiles.editGlobalProfileForBooleanSettings($Module, $SubModule, $Setting, $value);
+
+var $PMPTemplate = $bo_act_PMPlanTemplate.createUsageBasedConditionPMPTemplateNoSave_withIBCondition($proName, "SVMXSTD: Shipped, Installed, Loaned, Or Leased IBs");
+$bo_act_PMPlanTemplate.updateUsageConditionRulesGridWithAdjFields("Months", "Every", 1, $bo_act_common.currentDate("-"), $bo_act_common.getfutureDate(1,"-"),"Fixed", 1,100, 10,"Days");
+$bo_act_PMPlanTemplate.saveConditionBasedPM();
+
+var $sconName = $bo_act_serviceMaintenanceContracts.createServiceMaintenanceContract($accName, $slaterm,1,0);
+$bo_act_serviceMaintenanceContracts.AddCoveredProductToSCON($sconName, $IBName1);
+$bo_act_serviceMaintenanceContracts.AddCoveredProductToSCON($sconName, $IBName2);
+$bo_act_serviceMaintenanceContracts.AddCoveredProductToSCON($sconName, $IBName3);
+
+$bo_act_PMPlan.verify_conditionbasedPMPlan_SCON($sconName,$PMPTemplate,$IBName2);
+$bo_act_PMPlan.verify_conditionbasedPMPlan_SCON($sconName,$PMPTemplate,$IBName3);
+$bo_act_PMPlan.verify_conditionbasedPMPlan_negative($sconName,$PMPTemplate,$IBName1);
+
+
+//Clean up function
+
+
+$bo_act_common.deleteAccount($bac_un, $bac_pwd, $accName);
+$bo_act_common.deleteContact($bac_un, $bac_pwd, $contactName);
+$bo_act_common.deleteIB($bac_un, $bac_pwd, $orgnamespace,$IBName1);
+$bo_act_common.deleteIB($bac_un, $bac_pwd, $orgnamespace,$IBName2);
+$bo_act_common.deleteIB($bac_un, $bac_pwd, $orgnamespace,$IBName3);
+$bo_act_common.deleteProduct($bac_un, $bac_pwd,$proName);
+$bo_act_common.deleteSLA($bac_un, $bac_pwd, $orgnamespace, $slaterm);
+$bo_act_common.deleteSCON($bac_un, $bac_pwd, $orgnamespace, $sconName);
+$bo_act_common.deletePMPlantemplate($bac_un, $bac_pwd, $orgnamespace,$PMPTemplate);
+
+
+$RS_7492.end();
+
+
+

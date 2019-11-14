@@ -1,0 +1,54 @@
+// Author Bhupendra Singh Chouhan
+
+/*
+ * SOU For upgrade Scenario with QBM
+ */
+var $RS_10325 = _testcase("RS_10325", "Verify if user try to delete the question in QBM which is used in SOU.");
+$RS_10325.start();
+
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+
+//var $number1 = $bo_act_common.generateRandomName("num");
+var $QuestionName1 = $bo_act_common.generateRandomName("Number Question_");
+var $QuestionName2 = $bo_act_common.generateRandomName("Text Question_");
+var $checklistProcessName = $bo_act_common.generateRandomName("ChecklistProcess_");
+var $AnswerType1 = "Number";
+var $AnswerType2 = "Text";
+var $operandType = "Question"; 
+var $fieldName1 = "Scheduled Duration";
+var $fieldName2 = "Entitlement Notes";
+
+// To create a Checkbox Question with default checklist number
+
+$bo_act_navigation.navigateToSfmTransactionDesigner();
+_wait(60000, _isVisible($bo_pg_sfmTransactionAndDesigner.btn_newSFM));
+_wait(2000);
+
+// To create Checklist Process 
+$bo_act_checklistdesigner.newChecklistTypeSFM($checklistProcessName,"to generate a Checklist/Survey type of Process", "Work Order");
+
+$bo_act_checklistdesigner.addQuestionToChecklistProcess($QuestionName1, $AnswerType1);
+$bo_act_checklistdesigner.addQuestionToChecklistProcess($QuestionName2, $AnswerType2);
+
+//To create SOU configuration for Checklist Process
+//	SOU Row 1st
+$bo_act_checklistdesigner.configureSOUToChecklistProcess($fieldName1, $operandType, $QuestionName1);
+//SOU Row 2nd
+$bo_act_checklistdesigner.configureSOUToChecklistProcess($fieldName2, $operandType, $QuestionName2);
+
+//Save Checklist Process
+$bo_act_checklistdesigner.saveAndCloseChecklistProcess();
+
+//Naavigate to QBM and change the Answer type of the question
+$bo_act_questionlibrary.deleteQuestionFromQBM($QuestionName1);
+_assertEqual(true,_isVisible(_div("Unable To Delete")));
+
+var $ActualText = _getText(_div("/svmx-form-display-field/"));
+var $ExpectedText = "/This question cannot be deleted because it is in use by the following checklists/";
+_assertEqual($ExpectedText,$ActualText,"Actual and Expected result are not same");
+_click(_span("OK"));
+_assertEqual(true,_isVisible(_div("Checklist Question Library")));
+
+$bo_act_login.logOut(); 
+
+$RS_10325.end();

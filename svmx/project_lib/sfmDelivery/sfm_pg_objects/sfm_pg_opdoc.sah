@@ -1,0 +1,16 @@
+var $sfm_pg_opdoc=new function sfm_pg_opdoc(){
+	this.btn_dateOnOPDoc=_div("/DATE: /");
+	this.img_svmxLogo=_image("Servicemax Logo");
+	this.btn_totalBillableAmount=_cell(0,_rightOf(_cell("Total Billable Amount")));
+	this.btn_productName=_cell(0,_rightOf(_cell("Product")));
+	this.btn_orderType=_cell(0,_rightOf(_cell("Order Type")));
+	this.btn_billingType=_cell(0,_rightOf(_cell("Billing Type")));
+	this.btn_customerDown=_cell(0,_rightOf(_cell("Customer Down")));
+	this.btn_woNumber=_paragraph("/Work Order Number#: /");
+	this.btn_caseNumber=_paragraph("/Case Number#: /");
+	this.btn_partChildSection=_tableHeader("Part",_near(_tableHeader("Parts Used")));
+	this.btn_laborChildSection=_tableHeader("Part",_near(_tableHeader("Labor Details")));
+	this.btn_travelTotal=_cell(0,_rightOf(_cell("Total",_near(_tableHeader("Travel")))));
+	this.btn_otherExpenses=_cell(0,_rightOf(_cell("Total",_near(_tableHeader("Other Expenses")))));
+	this.btn_deleteOpdoc = _imageSubmitButton("Delete the generated document");
+};

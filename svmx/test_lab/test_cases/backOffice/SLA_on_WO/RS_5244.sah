@@ -1,0 +1,36 @@
+
+//author - Noor Salma Sharieff
+
+var $RS_5244 = _testcase("$RS_5244","Create SLA terms based on Case and Work Order");
+$RS_5244.start();
+_setSpeed($g_stepSpeed);
+
+//Pre - Condition 
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+var $slaterm = $bo_act_slaTerms.createSlaTerms("Default");
+$bo_act_slaTerms.addInitialResponseToSLA($slaterm, "Case","Problem", "High", "Created Date", 30, 60, "SLA");
+$bo_act_slaTerms.addOnsiteResponseToSLA($slaterm, "Case","Problem", "High", "Created Date", 30, 60, "SLA");
+$bo_act_slaTerms.addRestorationToSLA($slaterm, "Case","Problem", "High", "Created Date", 30, 60, "SLA");
+$bo_act_slaTerms.addResolutionToSLA($slaterm, "Case","Problem", "High", "Created Date", 30, 60, "SLA");
+
+var $slaterm1 = $bo_act_slaTerms.createSlaTerms("Default");
+$bo_act_slaTerms.addInitialResponseToSLA($slaterm1, "WorkOrder","All", "High", "Created Date", 30, 60, "SLA");
+$bo_act_slaTerms.addOnsiteResponseToSLA($slaterm1, "WorkOrder","All", "High", "Created Date", 30, 60, "SLA");
+$bo_act_slaTerms.addRestorationToSLA($slaterm1, "WorkOrder","All", "High", "Created Date", 30, 60, "SLA");
+$bo_act_slaTerms.addResolutionToSLA($slaterm1, "WorkOrder","All", "High", "Created Date", 30, 60, "SLA");
+
+
+//Clean up function
+
+//var $datacreated = [$slaterm,$slaterm1];
+//for (var i = 0; i < $datacreated.length; i++) {
+	//$bo_act_common.cleanUpfunction($datacreated[i]);
+//}
+$bo_act_slaTerms.deleteSLATerm($slaterm);
+$bo_act_slaTerms.deleteSLATerm($slaterm1);
+
+
+$RS_5244.end();
+
+
+

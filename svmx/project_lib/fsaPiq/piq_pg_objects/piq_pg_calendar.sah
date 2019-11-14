@@ -1,0 +1,16 @@
+//Calendar Page object repository
+
+var $piq_pg_calendar = new function piq_pg_calendar(){
+	this.btn_calendar = _span("/Calendar/");
+	this.btn_today = _div("Today");
+	this.btn_day = _div("Day");
+	this.btn_week = _div("Week");
+	this.btn_month = _div("Month");
+	this.btn_map = _div("Map");
+	this.btn_new = _div("+New");
+	this.btn_nextDate = _div({className:"/.* sfmevent-nav-next .*/"});
+	this.btn_prevDate = _div({className:"/.* sfmevent-nav-prev .*/"});
+	this.btn_friday = _div({id:"/ext-sfmevent-calendar-weekday-.*[1]/"});
+	this.btn_sunday = _div({className:"/.*weekend.*/"});
+	
+};

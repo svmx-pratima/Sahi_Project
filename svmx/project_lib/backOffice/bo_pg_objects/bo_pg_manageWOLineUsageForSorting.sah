@@ -1,0 +1,119 @@
+
+
+var $bo_pg_manageWOLineUsageForSorting=new function bo_pg_manageWOLineUsageForSorting(){
+		this.btn_screenDesignerNew=_f("main").s_button("New[3]");
+		this.sel_selHeaderOption = _f("main").fieldrenderer("[object Object]");
+		this.sel_selHeaderOption1=_f("main").fieldrenderer("[object Object][1]");
+		this.sel_selHeaderOption2=_f("main").fieldrenderer("[object Object][2]");
+		this.sel_selHeaderOption3=_f("main").fieldrenderer("[object Object][3]");
+		this.txt_searchItem=_f("main").s_textinput("Quick Find");
+		this.lbl_orderStatus=_f("main").s_label("Order Status");
+		this.lbl_drivingTime=_f("main").s_label("Driving Time (in Minutes)");
+	this.lbl_orderType=_f("main").s_label("Order Type");
+	this.lbl_zip=_f("main").s_label("Zip");
+	this.lbl_isEntitlementPrform=_f("main").s_label("Is Entitlement Performed");
+
+		this.sel_grpPart=_f("main").s_datagroup("dataGroup[3]");
+		this.lbl_dateReceived=_f("main").s_label("/Date Received/");
+
+		this.sel_grplabor=_f("main").s_datagroup("dataGroup[4]");
+		this.lbl_activityType = _f("main").s_label("/Activity Type/");
+		this.lbl_activityType1 = _f("main").s_label("Activity Type[1]");	// Added By Bhupendra Singh
+		this.sel_grpExpenses=_f("main").s_datagroup("dataGroup[5]");	
+		this.lbl_billableQty=_f("main").s_label("Billable Qty[1]");
+
+		this.sel_grpTravel=_f("main").s_datagroup("dataGroup[6]");
+		this.lbl_ConsumedFromLocation=_f("main").s_label("/Consumed From Location/").near(_f("main").s_button("Add Field"));
+		this.lbl_propertiesForPart=_f("main").s_richtext("Parts");
+		this.lbl_propertiesForLabor=_f("main").s_richtext("Labor");
+		this.lbl_propertiesForExpenses=_f("main").s_richtext("Expense");
+		this.lbl_propertiesForTravel=_f("main").s_richtext("Travel");
+		this.chk_allowNewLine=_f("main").s_checkbox("Allow New");
+		this.chk_allowDelete=_f("main").s_checkbox("Allow Delete");
+		this.btn_toggleASC=_f("main").s_togglebutton("ASC");
+		this.btn_toggleDESC=_f("main").s_togglebutton("DESC");
+	
+		this.tab_sorting=_f("main").tab("Sorting");
+		this.lbl_sortingPart=_f("main").s_label("Parts[4]");
+		this.lbl_sortingDateRec = _f("main").s_label("Date Received");  // added By Bhupendra Singh
+		this.lbl_sortingDateRec1 = _f("main").s_label("Date Received[1]"); 
+		this.btn_add = _f("main").s_button("selectBtn");   // Modified by Bhupendra Singh
+		this.lbl_sortingLabor=_f("main").s_label("Labor[4]");
+		this.lbl_sortingExps=_f("main").s_label("Expense[3]");
+		this.lbl_sortingBillQty = _f("main").s_label("Billable Qty");
+		this.lbl_sortingBillQty1 = _f("main").s_label("Billable Qty[1]");
+		this.lbl_sortingActivityType = _f("main").s_label("Activity Type");
+		this.lbl_sortingTravel = _f("main").s_label("Travel[1]");
+		this.lbl_sortingConsumedFromLoc=_f("main").s_label("Consumed From Location");
+	//part		
+		this.btn_addPartLine=_span("svmx-btn-icon svmx-sfmd-add-line-icon");
+		this.lbl_clkOnNewLine=_div("svmx-grid-cell-inner [1]")	;
+		this.txt_addDate=_textbox("/svmx-date-/");
+	//expenses
+		this.btn_addExpenseLine=_span("svmx-btn-icon svmx-sfmd-add-line-icon");
+		//this.txt_addActivity=_textbox("svmx-form-field svmx-form-text");
+		this.txt_addActivity=_textbox("/sfm-picklistcelleditor-/");
+		//this.sel_billQty=_textbox("svmx-form-field svmx-form-text[1]");
+		this.sel_billQty=_textbox("/sfm-numbercelleditor-/");
+		//this.btn_clkBillQtyLine1=_div("svmx-grid-cell-inner [8]");
+		this.btn_clkBillQtyLine1=_div("svmx-grid-cell-inner [3]");
+		this.sel_activityName=_listItem("Calibration");
+		this.sel_activityName1=_listItem("Installation");
+		this.sel_activityName2=_listItem("Cleanup");
+		this.btn_clkBillQtyLine2=_div("svmx-grid-cell-inner [7]");
+		this.btn_clkBillQtyLine3=_div("svmx-grid-cell-inner [11]");
+	//Travel
+		this.btn_addTravelLine=_span("svmx-btn-icon svmx-sfmd-add-line-icon");
+		this.btn_parentLookUp=_span("svmx-btn-icon svmx_lookup_icon");
+		this.btn_childLokkUp=_span("svmx-btn-icon svmx-sfmd-search-icon ");
+		this.sel_Europe=_div("Europe");
+		this.btn_select=_span("Select");
+		this.sel_BerlinDepot=_div("Berlin_Depot");
+		this.sel_AutodromoEnzoFerrari=_div("Autodromo Enzo e Dino Ferrari");
+	
+	//tabs
+	this.tab_labour=_span("Labor");
+		this.tab_expenses=_span("Expenses");
+		this.tab_travel=_span("Travel");
+	//Save 
+		this.btn_Save=_span("svmx-btn-icon svmx-sfmd-save-icon");
+	//Alert Message while saving
+		this.alert=_span("Ok");
+
+		this.txt_get1stLineValueOfPart=_div("svmx-grid-cell-inner [3]");
+		this.txt_get2ndLineValueOfPart=_div("svmx-grid-cell-inner [6]");
+		this.txt_get3rdLineValueOfPart=_div("svmx-grid-cell-inner [9]");
+
+		this.txt_get1stLineValueOfExpenses=_div("svmx-grid-cell-inner [4]");
+		this.txt_get2ndLineValueOfExpenses=_div("svmx-grid-cell-inner [7]");
+		this.txt_get3rdLineValueOfExpenses=_div("svmx-grid-cell-inner [10]");
+		this.txt_getBillQty1=_div("svmx-grid-cell-inner [5]");
+		this.txt_getBillQty2=_div("svmx-grid-cell-inner [8]");
+		this.txt_getBillQty3=_div("svmx-grid-cell-inner [11]");
+	
+		this.txt_get1stLineValueOfTravel=_div("svmx-grid-cell-inner [1]");
+		this.txt_get2ndLineValueOfTravel=_div("svmx-grid-cell-inner [3]");
+		this.txt_get3rdLineValueOfTravel=_div("svmx-grid-cell-inner [5]");
+		this.txt_getBillQty=_div("svmx-grid-cell-inner [5]");
+		
+		
+		
+	//narendra Edit work order for multi add 
+		this.btn_editWO = _button("EDIT WORK ORDER");
+		this.tab_parts = _span("Parts");
+		this.btn_Multiaddparts = _span("svmx-btn-icon svmx-sfmd-multi-add-line-icon");
+		this.txt_Search = _textbox(1,_near(_span("Product search")));
+	    this.icn_search = _span("svmx-btn-icon svmx-sfmd-search-icon ");
+	    this.chk_part1 = _div("svmx-grid-row-checker");
+	    this.chk_part2 = _div("svmx-grid-row-checker[1]");
+	    this.btn_select = _span("Select");
+	    this.img_extenedwindow1 = _image("svmx-action-col-icon svmx-action-col-0   svmx-sfmd-edit-icon");
+	    this.txt_lineqty = _textbox("Line Qty:");
+	    this.txt_linepriceunit = _textbox(0,_near(_label("Line Price Per Unit:")));
+	    this.btn_update = _span("Update");
+	    this.img_extenedwindow2 = _image("svmx-action-col-icon svmx-action-col-0   svmx-sfmd-edit-icon[1]");
+	    this.btn_Save = _span("svmx-btn-icon svmx-sfmd-save-icon");
+	
+	
+};
+		

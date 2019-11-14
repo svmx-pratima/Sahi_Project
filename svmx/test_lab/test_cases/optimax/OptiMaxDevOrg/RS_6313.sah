@@ -1,0 +1,34 @@
+var $user_credentials = $excel.readFromCustomExcel("../op_excleData/automation.xlsx", "User_Details","","");
+
+for(var $i=0;$i<$user_credentials.length;$i++)
+{
+var $g_un = $user_credentials[$i][0];
+var $g_pwd = $user_credentials[$i][1];
+var $g_url = $user_credentials[$i][2];
+}
+
+var $RS_6313 = _testcase("RS_6313", "Filter by Product/Expertise");
+
+$RS_6313.start();
+	
+	
+$bo_act_login.login($g_url, $g_un, $g_pwd);
+	
+_click(_link("ServiceMax Setup"));
+_wait(20000,_isVisible(_div("Service Organization")));
+_click(_div("Service Organization"));
+_wait(20000,_isVisible(_div("Service Org")));
+_click(_div("Service Org"));
+_check(_checkbox("TrackTechTeam:selected_ID:TTree:PanelBar:PBItem:ProChk"));
+_setValue(_textbox("TrackTechTeam:selected_ID:TTree:PanelBar:PBItem:searchText"), "Auto");
+_click(_button("Go!"));
+//_click(_div("Aerts Wim"));
+_click(_image("radio_chk0.gif"));
+_uncheck(_checkbox("TrackTechTeam:selected_ID:TTree:PanelBar:PBItem:ProChk"));
+_check(_checkbox("TrackTechTeam:selected_ID:TTree:PanelBar:PBItem:ExprtChk"));
+_setValue(_textbox("TrackTechTeam:selected_ID:TTree:PanelBar:PBItem:searchText"), "Repair");
+_click(_button("Go!"));
+_click(_image("radio_chk0.gif[1]"));
+
+
+$RS_6313.end();

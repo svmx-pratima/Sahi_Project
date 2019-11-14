@@ -1,0 +1,51 @@
+//Tests are to be written here [Srinivasa Murthy S]
+// Creating variable for the printing the test case number and name
+var $RS_9145 = _testcase("$RS_9146","Finalize the Output Document");
+$RS_9145.start();
+
+//Login to the Sandbox using the credentials from 
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+
+//Go to Work Order tab
+$bo_act_workOrders.navigateToWorkOrder("/WO-/");
+
+//Get the number of attachment present in the Work Order already
+_call(_heading3("Notes & Attachments").scrollIntoView());
+if(_isVisible (_button("View All")))
+{
+	_click(_button("View All",_near(_heading3("Notes & Attachments"))));
+}
+	var	$before = _count("_cell","/WO_ServiceReport/",_near(_cell("Title")));	
+_wait(2000);
+_click(_button("Cancel"));
+
+//Select any available Work Order and Click on the Work Order Service Report SFM button
+$sfm_act_createCustomWizard.clickWizardBtn("Work Order Service Report");
+
+//Wait for the Finalize button to shown and then click on it
+_wait(300000, _isVisible(_button("Finalize")));
+_click(_button("Finalize"));
+
+//Wait for the Service Report to be generated and go back to the WO
+_wait(30000, -isVisible(_link("/WO-/")));
+_click(_link("/WO-/"));
+
+//Get the number of attachment present in the Work Order after deletion
+_call(_heading3("Notes & Attachments").scrollIntoView());
+if(_isVisible (_button("View All")))
+{
+	_click(_button("View All",_near(_heading3("Notes & Attachments"))));
+}
+	var	$after = _count("_cell","/WO_ServiceReport/",_near(_cell("Title")));	
+_wait(2000);
+_click(_button("Cancel"));
+
+
+//Assert statement comparing attachments before and after
+_assert (($after == $before + 1), "Work Order Service Report is generated")
+
+
+
+
+
+$RS_9145.end();

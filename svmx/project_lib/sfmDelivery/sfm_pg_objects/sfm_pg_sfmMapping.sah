@@ -1,0 +1,66 @@
+var $sfm_pg_sfmMapping = new function sfm_pg_sfmMapping() {
+	
+	this.btn_mappingTab = _f("main").tab("Mapping(s)").rightOf(_f("main").tab("Qualification Criteria"));
+	this.btn_mappingTabWithoutQcTab = _f("main").tab("Mapping(s)");
+	this.btn_newMappingExistingRecord = _f("main").s_button("New").inside(_f("main").s_navigatorcontent("Value Map For New Records"));//Used Index as anchoring dint work during run time.
+	this.btn_newButtonFieldMap = _f("main").s_button("New").inside(_f("main").s_navigatorcontent("Field Map For Existing Records"));//Anchoring doesnt work for mapping.
+	this.btn_saveFieldMap = _f("main").s_button("Save[1]");
+	this.btn_saveMappingExistingRecord = _f("main").s_button("Save[2]");//Used Index as anchoring dint work during run time.
+	this.label_canceledBy = _f("main").s_label("Canceled By[3]");
+	this.btn_saveAsMappingExistingRecord = _f("main").s_button("Save As");
+	this.btn_resetMappingExistingRecord = _f("main").s_button("Reset").rightOf(_f("main").s_button("New").inside(_f("main").s_navigatorcontent("Value Map for Existing Records")));
+	this.btn_deleteMappingExistingRecord = _f("main").s_button("Delete").rightOf(_f("main").s_button("Reset").inside(_f("main").s_navigatorcontent("Value Map for Existing Records")));
+	this.btn_showMappedFields = _f("main").s_togglebutton("Show Mapped Fields").inside(_f("main").s_navigatorcontent("Value Map for Existing Records"));
+	this.btn_showAllFields = _f("main").s_togglebutton("Show All Fields").inside(_f("main").s_navigatorcontent("Value Map for Existing Records"));
+	this.txt_mappingNameForExisting = _f("main").s_textinput("Save this map as").inside(_f("main").s_navigatorcontent("Value Map for Existing Records"));
+	this.txt_mappingIdForExisting = _f("main").s_textinput("Input ID Here").inside(_f("main").s_navigatorcontent("Value Map for Existing Records"));
+	this.txt_mappingNameForNew = _f("main").s_textinput("Save this map as").inside(_f("main").s_navigatorcontent("Value Map For New Records"));
+	this.txt_mappingIdForNew = _f("main").s_textinput("Input ID Here").inside(_f("main").s_navigatorcontent("Value Map For New Records"));
+	this.txt_quickFindTxtBox = _f("main").s_textinput("filterInput").near(_f("main").s_label("Quick Find").inside(_f("main").s_navigatorcontent("Value Map for Existing Records")));
+	this.label_mapSavedMsg = _f("main").uiftetextfield("Map saved");
+	this.btn_selectExistingMap = _f("main").s_combobox("searchCombo").near(_f("main").tab("Field Map For Existing Records"));
+	this.btn_toggleMapOnOff = _f("main").s_togglebutton("Show All Fields");
+	this.btn_switchOnMapping = _f("main").s_togglebutton("Show Mapped Fields");
+	this.cmb_mappingComboBox = _f("SFMExpressionBuilderSWF").s_combobox("searchCombo").inside(_f("SFMExpressionBuilderSWF").s_navigatorcontent("Value Map For New Records"));
+	this.txt_mappingNameInBuilder = _f("SFMExpressionBuilderSWF").s_textinput("textInput").inside(_f("SFMExpressionBuilderSWF").s_navigatorcontent("Value Map For New Records"));
+	this.btn_deleteMappingOutsideProcess = _f("SFMExpressionBuilderSWF").s_button("Delete").inside(_f("SFMExpressionBuilderSWF").s_navigatorcontent("Value Map For New Records"));
+	this.btn_yesButtonDeleteOutsideProcess = _f("SFMExpressionBuilderSWF").button("Yes");
+	this.txt_mappingUsedWarning = _f("SFMExpressionBuilderSWF").uiftetextfield("/An error occurred when deleting the map: Cannot delete this mapping. Following the a list of entities which use this mapping:/");
+	this.btn_okButtonAfterWarning = _f("SFMExpressionBuilderSWF").button("OK");
+	this.label_mapDeleted = _f("SFMExpressionBuilderSWF").uiftetextfield("Map deleted");
+	this.tab_valueMapForExisting = _f("main").tab("Value Map for Existing Records");
+	this.tab_fieldMapForExisting = _f("main").tab("Field Map For Existing Records");
+	this.tab_valueMapForNew = _f("main").tab("Value Map For New Records");
+
+
+	this.tab_valueMapForNew = _f("main").s_navigatorcontent("Value Map For New Records");
+	this.txt_mappingNameFieldMap = _f("main").s_textinput("Save this map as").inside(_f("main").s_navigatorcontent("Field Map For Existing Records"));
+	this.txt_mappingIdFieldMap = _f("main").s_textinput("Input ID Here").inside(_f("main").s_navigatorcontent("Field Map For Existing Records"));
+	this.btn_deleteValueMappingExistingRecord = _f("main").s_button("Delete").inside(_f("main").s_navigatorcontent("Value Map for Existing Records"));
+	this.btn_deleteValueMapNewRecord = _f("main").s_button("Delete").inside(_f("main").s_navigatorcontent("Value Map For New Records"));
+	this.btn_deleteFieldMapExistingRecord = _f("main").s_button("Delete").inside(_f("main").s_navigatorcontent("Field Map For Existing Records"));
+	this.lkp_insideMapping = _f("main").s_button("/Button/").near(_f("main").s_textinput("lookUpSearchField"));
+	this.btn_selectForLookup = _f("main").s_button("Select");
+	
+	//page objects for Configure SFM Mappings page in SFM Mapping under SFM in SVMX Setup 
+	this.label_configureSFMMapping = _f("SFMExpressionBuilderSWF").s_label("Configure SFM Mapping");
+	this.txt_sourceObject_SFMMapping = _f("SFMExpressionBuilderSWF").s_combobox("sourceCombo");
+	this.txt_targetObject_SFMMapping = _f("SFMExpressionBuilderSWF").s_combobox("targetCombo");
+	this.btn_new_SFMMapping = _f("SFMExpressionBuilderSWF").s_button("New").inside(_f("SFMExpressionBuilderSWF").s_navigatorcontent("/Map For/"));
+	this.tab_fieldMapForExisting_SFMMapping = _f("SFMExpressionBuilderSWF").tab("Field Map For Existing Records");
+	this.tab_valueMapForNew_SFMMapping = _f("SFMExpressionBuilderSWF").tab("Value Map For New Records");
+	this.btn_useExistingMap_SFMMapping = _f("SFMExpressionBuilderSWF").s_combobox("searchCombo").inside(_f("SFMExpressionBuilderSWF").s_navigatorcontent("/Map For/"));
+	this.txt_mappingName_SFMMapping = _f("SFMExpressionBuilderSWF").s_textinput("Save this map as").inside(_f("SFMExpressionBuilderSWF").s_navigatorcontent("/Map For/")) ;
+	this.txt_mappingId_SFMMapping = _f("SFMExpressionBuilderSWF").s_textinput("Input ID Here").inside(_f("SFMExpressionBuilderSWF").s_navigatorcontent("/Map For/")) ;
+	this.btn_saveMapping_SFMMapping = _f("SFMExpressionBuilderSWF").s_button("Save").inside(_f("SFMExpressionBuilderSWF").s_navigatorcontent("/Map For/"));
+	this.btn_saveAsMapping_SFMMapping = _f("SFMExpressionBuilderSWF").s_button("Save As").inside(_f("SFMExpressionBuilderSWF").s_navigatorcontent("/Map For/"));
+	this.btn_resetMapping_SFMMapping = _f("SFMExpressionBuilderSWF").s_button("Reset").inside(_f("SFMExpressionBuilderSWF").s_navigatorcontent("/Map For/"));
+	this.btn_deleteMapping_SFMMapping = _f("SFMExpressionBuilderSWF").s_button("Delete").inside(_f("SFMExpressionBuilderSWF").s_navigatorcontent("/Map For/"));
+    this.label_mapSaved_SFMMapping = _f("SFMExpressionBuilderSWF").uiftetextfield("Map saved");
+    this.btn_showAllFields_SFMMapping =_f("SFMExpressionBuilderSWF").s_togglebutton("Show All Fields") ;
+    this.btn_showMappedFields_SFMMapping = _f("SFMExpressionBuilderSWF").s_togglebutton("Show Mapped Fields");
+    this.label_mapDeleted_SFMMapping = _f("SFMExpressionBuilderSWF").uiftetextfield("Map deleted");
+    this.txt_deletePopup_SFMMapping = _f("SFMExpressionBuilderSWF").uiftetextfield("This action cannot be reversed. Are you sure you want to delete this map?");
+    this.btn_deleteYes_SFMMapping = _f("SFMExpressionBuilderSWF").button("Yes");
+    this.btn_deleteNo_SFMMapping = _f("SFMExpressionBuilderSWF").button("No");
+};

@@ -1,0 +1,106 @@
+var $an_mttr_870 = _testcase("RS-7396","Work Order as Top level Object for Edit of Work Order");
+$an_mttr_870.start();
+var $data = _readExcelFile("../../../analytics/Pre-Release/Data_Meghana.xlsx","Sheet1",true);
+var $un = $data[1]["Username"];
+var $pwd = $data[1]["pwd"];
+var $url = "https://test.salesforce.com";
+var $Account2 = $data[2]["Account"];
+var $Technician = $data[2]["Technician"];
+var $Product = $data[2]["Product"];
+var $OrderStatus = $data[1]["OrderStatus"];
+var $Closedon = $data[1]["ClosedOn"];
+var $Site = $data[1]["Site"];
+var $Component = $data[2]["Component"];
+var $ScheduledDate = $data[1]["ScheduledDate"];
+var $user_meghana = $data[1]["user_meghana"];
+$bo_act_login.login($url, $un, $pwd);
+
+var $ana_870_insert_WO = "SVMXC__Service_Order__c  WO = new SVMXC__Service_Order__c ( SVMXC__Company__c ='"+ $Account2 +"', SVMXC__Product__c = '"+$Product+"' , SVMXC__Group_Member__c = '"+$Technician+"' ,SVMXC__Component__c = '"+$Component+"',SVMXC__Order_Status__c = '"+$OrderStatus+"' , SVMXC__Closed_On__c = "+$Closedon+",SVMXC__Country__c = 'United States', SVMXC__Sub_Status__c = 'Resolved', SVMXC__Priority__c = 'High', SVMXC__Site__c = '"+$Site+"', SVMXC__Scheduled_Date__c = Date.valueOf('"+$ScheduledDate+"') );insert WO;";
+var $ana_870_query_wo = "Select Name , Id  ,SVMXC__Company__c , SVMXC__Component__c , SVMXC__Closed_On__c from SVMXC__Service_Order__c where Createdby.Id = '"+$user_meghana+"' Order by CreatedDate DESC Limit 1";
+var $ana_870_result = $op_act_sForceApiCall.sForceQuery($un, $pwd, $ana_870_insert_WO , "create");
+
+var $ana_870_fetch = $op_act_sForceApiCall.sForceQuery($un, $pwd, $ana_870_query_wo,"query");
+var $ana_870_WO1 ;
+var $var3;
+var $varRV1;
+_wait(5000);
+
+	
+	$ana_870_WO1 = $ana_870_fetch[0].Id;
+
+
+_log($ana_870_WO1);
+
+var $StartDate = $data[1]['WDStartDate'];
+var $EndDate =  $data[1]['WDEndDate'];
+var $LineType = $data[1]['LineType'];
+var $RecordType = $data[1]['RecordType'];
+var $DeadTime = $data[1]['DeadTime'];
+var $ana_870_work_detail;
+
+var $ana_870_insert_WD = "SVMXC__Service_Order_Line__c  WD = new SVMXC__Service_Order_Line__c ( SVMXC__Line_Type__c = '"+$LineType+"' , SVMXC__Start_Date_and_Time__c = DateTime.valueOf ('"+$StartDate+"'), SVMXC__End_Date_and_Time__c = DateTime.valueOf('"+$EndDate+"') ,custom_dead_time__c = "+$DeadTime+" ,SVMXC__Service_Order__c = '"+$ana_870_WO1+"' );insert WD;";
+var $ana_870_query_wd = "Select Name , Id  , SVMXC__Start_Date_and_Time__c , SVMXC__End_Date_and_Time__c , SVMXC__Dead_Time__c from SVMXC__Service_Order_Line__c where Createdby.Id = '"+$user_meghana+"' Order by CreatedDate DESC Limit 1";
+var $ana_870_result = $op_act_sForceApiCall.sForceQuery($un, $pwd, $ana_870_insert_WD , "create");
+
+var $ana_870_fetch_wd = $op_act_sForceApiCall.sForceQuery($un, $pwd, $ana_870_query_wd,"query");
+
+var $ana_870_wd1 ;
+var $startdate ;
+var $enddate ;
+var $deadtime;
+var $var2;
+_wait(5000);
+
+	
+	$ana_870_wd1 = $ana_870_fetch_wd[0].Id ;
+	$startdate = $ana_870_fetch_wd[0].SVMXC__Start_Date_and_Time__c;
+	$enddate = $ana_870_fetch_wd[0].SVMXC__End_Date_and_Time__c;
+	$deadtime = $ana_870_fetch_wd[0].custom_dead_time__c;
+		
+
+
+// To calculate the time difference considering business hours is 24 hours
+
+var $stdate = new Date($startdate);
+var $edate = new Date($enddate);
+_log($stdate);
+_log($edate);
+var $datevalue = (($stdate.getTime() - $edate.getTime()) / 1000) / (-60) ; 
+//var $enddate = parseInt($enddate.getHours());
+_log($datevalue);
+
+$TopLevelWO.an_toplevelwo();
+//$an_act_MTTR.mttr_usa_calc("MTTR Calculation for USA");
+$an_act_MTTR.mttr_runEngine("meghana.rao@servicemax.com");
+
+var $ana_870_wo_id;
+var $an_870_primarywo1;
+var $ana_870_WO_Account1;
+var $ana_870_labortime;
+var $ana_870_deadtime;
+
+var $ana_870_query_RV1 = "Select Id , SVMXC__Work_Order__c ,SVMXC__Primary_Work_Order__c, SVMXC__Account__c, SVMXC__Configuration_Name__c , SVMXC__Labor_Time__c , SVMXC__Dead_Time__c from SVMXC__SPM_Mean_Time_To_Repair__c where SVMXC__Work_Order__c ='"+ $ana_870_WO1 +"'";
+
+
+var $ana_870_query_RV1 = "Select SVMXC__Work_Order__c ,SVMXC__Primary_Work_Order__c, SVMXC__Account__c, SVMXC__Configuration_Name__c , SVMXC__Labor_Time__c , SVMXC__Dead_Time__c from SVMXC__SPM_Mean_Time_To_Repair__c where SVMXC__Work_Order__c ='"+ $ana_870_WO1 +"'";
+
+var $ana_870_resultRV1 = $op_act_sForceApiCall.sForceQuery($un, $pwd, $ana_870_query_RV1,"query");
+_wait(5000);
+$ana_870_resultRV1.forEach(function($varRV1) {
+	
+	$ana_870_wo_id = $varRV1.SVMXC__Work_Order__c;
+	$ana_870_WO_Account1 = $varRV1.SVMXC__Account__c;
+	$ana_870_labortime = $varRV1.SVMXC__Labor_Time__c;	
+	$an_870_primarywo1 = $varRV1.SVMXC__Primary_Work_Order__c;
+	$ana_870_deadtime = $varRV1.SVMXC__Dead_Time__c;
+	
+});
+
+$an_870_deadtime = Math.round($ana_870_deadtime);
+$ana_870_labortime = Math.round($ana_870_labortime);
+
+_assertEqual($datevalue ,$ana_870_labortime);
+_assertEqual($DeadTime, $an_870_deadtime);
+_assertEqual($ana_870_WO1, $an_870_primarywo1);
+$an_mttr_870.end();
+

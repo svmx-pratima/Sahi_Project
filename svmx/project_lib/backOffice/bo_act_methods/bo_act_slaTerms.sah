@@ -1,0 +1,300 @@
+/**
+ * Functions for the Accounts Object
+ */
+var $bo_act_slaTerms = new function bo_act_slaTerms() {
+
+	/**
+	 * Create a SLA terms
+	 * 
+	 * @param $$slaName
+	 */
+	this.createSlaTerms = function($defaultBusinessHours) {
+			var $slaName = $bo_act_common.generateRandomName("sla");
+			$bo_act_navigation.navigateToSlaTerms();
+			_click($bo_pg_slaTerms.btn_newSlaTerms);
+			_setValue($bo_pg_slaTerms.txt_slaTermName, $slaName);
+			_setValue($bo_pg_slaTerms.txt_defaultBusinessHours, $defaultBusinessHours);
+			_check($bo_pg_slaTerms.chk_active);
+			_click($bo_pg_slaTerms.btn_save);
+			_assertNotVisible(_div("/Error: Invalid Data/"));
+			_logOutput($slaName+ " SLA Term is created");
+			return $slaName;
+		  _wait(30000, _isVisible(_span($SLAName)));
+          return $slaName;
+		//return $callBack.returnResult([_isVisible($accountName), "Account not created",$accountName] );
+	    // Need to return
+	};
+	
+	//Add Initial Response for existing SLA terms
+	this.addInitialResponseToSLA = function($slaName,$ResponseTrackedOn,$orderType,$priority,$clockStartsFrom,$internalGoal,$customerCommitment,$businessHoursFrom) {
+		$bo_act_slaTerms.editSLA($slaName);	
+		_click($bo_pg_slaTerms.btn_initialResponse);
+		_setSelected($bo_pg_slaTerms.sel_responseTrackedOn, $ResponseTrackedOn);
+		_wait(5000);
+		_wait(10000,_isVisible($bo_pg_slaTerms.btn_AddRecord));
+		_click($bo_pg_slaTerms.btn_AddRecord);
+		_wait(10000);
+		_wait(10000,_isVisible($bo_pg_slaTerms.sel_orderType));
+		_setSelected($bo_pg_slaTerms.sel_orderType, $orderType);
+		_setSelected($bo_pg_slaTerms.sel_priority, $priority);
+		_setSelected($bo_pg_slaTerms.sel_clockStartsFrom, $clockStartsFrom);
+		_setValue($bo_pg_slaTerms.sel_internalGoal, $internalGoal);
+		_setValue($bo_pg_slaTerms.sel_customerCommitment, $customerCommitment);
+		_setSelected($bo_pg_slaTerms.sel_businessHoursFrom, $businessHoursFrom);
+		_click($bo_pg_slaTerms.btn_save);
+		_assertNotVisible(_div("/Error: Invalid Data/"));
+		_logOutput($slaName+ " Initial Response To SLA is Added");
+		_wait(60000, _isVisible(_button("New SLA Terms")));
+		return $slaName;
+	//return $callBack.returnResult([_isVisible($accountName), "Account not created",$accountName] );
+	};
+	
+	//Add Onsite Response for existing SLA terms
+	this.addOnsiteResponseToSLA = function($slaName,$ResponseTrackedOn,$orderType,$priority,$clockStartsFrom,$internalGoal,$customerCommitment,$businessHoursFrom) {
+		$bo_act_slaTerms.editSLA($slaName);	
+		_click($bo_pg_slaTerms.btn_onsiteResponse);
+		_setStrictVisibilityCheck(true);
+		_setSelected($bo_pg_slaTerms.sel_responseTrackedOn, $ResponseTrackedOn);
+		_wait(5000);
+		_wait(10000,_isVisible($bo_pg_slaTerms.btn_AddRecord));
+		_setStrictVisibilityCheck(true);
+		_click($bo_pg_slaTerms.btn_AddRecord);
+		_wait(10000);
+		_wait(10000,_isVisible($bo_pg_slaTerms.sel_orderType));
+		_setSelected($bo_pg_slaTerms.sel_orderType, $orderType);
+		_setSelected($bo_pg_slaTerms.sel_priority, $priority);
+		_setSelected($bo_pg_slaTerms.sel_clockStartsFrom, $clockStartsFrom);
+		_setSelected($bo_pg_slaTerms.sel_businessHoursFrom, $businessHoursFrom);
+		_setValue($bo_pg_slaTerms.sel_internalGoal, $internalGoal);
+		_setValue($bo_pg_slaTerms.sel_customerCommitment, $customerCommitment);
+		_setStrictVisibilityCheck(false);
+		_click($bo_pg_slaTerms.btn_save);
+		_assertNotVisible(_div("/Error: Invalid Data/"));
+		_logOutput($slaName+ " Onsite Response To SLA is Added");
+		_wait(30000, _isVisible(_button("New SLA Terms")));
+		return $slaName;
+	//return $callBack.returnResult([_isVisible($accountName), "Account not created",$accountName] );
+	};
+	
+	//Add Restoration for existing SLA terms
+	this.addRestorationToSLA = function($slaName,$ResponseTrackedOn,$orderType,$priority,$clockStartsFrom,$internalGoal,$customerCommitment,$businessHoursFrom) {
+		$bo_act_slaTerms.editSLA($slaName);	
+		_click($bo_pg_slaTerms.btn_restoration);
+		_setStrictVisibilityCheck(true);
+		_setSelected($bo_pg_slaTerms.sel_responseTrackedOn, $ResponseTrackedOn);
+		_wait(10000,_isVisible($bo_pg_slaTerms.btn_AddRecord));
+		_setStrictVisibilityCheck(true);
+		_click($bo_pg_slaTerms.btn_AddRecord);
+		_setSelected($bo_pg_slaTerms.sel_orderType, $orderType);
+		_setSelected($bo_pg_slaTerms.sel_priority, $priority);
+		_setSelected($bo_pg_slaTerms.sel_clockStartsFrom, $clockStartsFrom);
+		_setSelected($bo_pg_slaTerms.sel_businessHoursFrom, $businessHoursFrom);
+		_setValue($bo_pg_slaTerms.sel_internalGoal, $internalGoal);
+		_setValue($bo_pg_slaTerms.sel_customerCommitment, $customerCommitment);
+		_setStrictVisibilityCheck(false);
+		_click($bo_pg_slaTerms.btn_save);
+		_assertNotVisible(_div("/Error: Invalid Data/"));
+		_logOutput($slaName+ " Onsite Response To SLA is Added");
+		_wait(30000, _isVisible(_button("New SLA Terms")));
+		return $slaName;
+	//return $callBack.returnResult([_isVisible($accountName), "Account not created",$accountName] );
+	};
+	
+	//Add Resolution for existing SLA terms
+	this.addResolutionToSLA = function($slaName,$ResponseTrackedOn,$orderType,$priority,$clockStartsFrom,$internalGoal,$customerCommitment,$businessHoursFrom) {
+		$bo_act_slaTerms.editSLA($slaName);	
+		_click($bo_pg_slaTerms.btn_resolution);
+		_setStrictVisibilityCheck(true);
+		_setSelected($bo_pg_slaTerms.sel_responseTrackedOn, $ResponseTrackedOn);
+		_wait(60000,_isVisible($bo_pg_slaTerms.btn_AddRecord));
+		_setStrictVisibilityCheck(true);
+		_click($bo_pg_slaTerms.btn_AddRecord);
+		_setSelected($bo_pg_slaTerms.sel_orderType, $orderType);
+		_setSelected($bo_pg_slaTerms.sel_priority, $priority);
+		_setSelected($bo_pg_slaTerms.sel_clockStartsFrom, $clockStartsFrom);
+		_setSelected($bo_pg_slaTerms.sel_businessHoursFrom, $businessHoursFrom);
+		_setValue($bo_pg_slaTerms.sel_internalGoal, $internalGoal);
+		_setValue($bo_pg_slaTerms.sel_customerCommitment, $customerCommitment);
+		_setStrictVisibilityCheck(false);
+		_click($bo_pg_slaTerms.btn_save);
+		_assertNotVisible(_div("/Error: Invalid Data/"));
+		_logOutput($slaName+ " Onsite Response To SLA is Added");
+		_wait(30000, _isVisible(_button("New SLA Terms")));
+		return $slaName;
+	//return $callBack.returnResult([_isVisible($accountName), "Account not created",$accountName] );
+	};
+
+this.editSLA = function($slaName) {
+	$bo_pg_slaTerms.selectSLA($slaName);
+	_click($bo_pg_slaTerms.btn_editSLA);
+	_wait(30000, _isVisible(_cell("Initial Response")));
+	//return $callBack.returnResult([_isVisible($$warrantyName), "Warranty Name created",$$warrantyName] );
+};
+
+this.deleteSLATerm = function($slaName){
+	$bo_act_navigation.navigateToSlaTerms();
+	$bo_pg_slaTerms.selectSLA($slaName);
+	_click($bo_pg_slaTerms.btn_deleteSLA);
+};
+
+//Added by Srinivasa Murthy for adding new UI components introduced in 19.2 Release for Daily Cutoff
+
+this.createSlaTermsWithoutSave = function($defaultBusinessHours) {
+	var $slaName = $bo_act_common.generateRandomName("sla");
+	$bo_act_navigation.navigateToSlaTerms();
+	_click($bo_pg_slaTerms.btn_newSlaTerms);
+	_setValue($bo_pg_slaTerms.txt_slaTermName, $slaName);
+	_setValue($bo_pg_slaTerms.txt_defaultBusinessHours, $defaultBusinessHours);
+	_check($bo_pg_slaTerms.chk_active);
+	_logOutput($slaName+ " SLA Term is created");
+	return $slaName;
+};
+//This function just checks for the new UI in all the clocks and saves without line details.
+this.addAllTimes = function($slaName,$ResponseTrackedOn) {
+	_click($bo_pg_slaTerms.btn_initialResponse);
+	
+	//Add assertion for field availability here
+	_assertExists (_label("Unit Of Measure"), "Unit of Measure Exists");
+	_assertNotExists(_label("SLA Daily Cutoff Time"), "SLA Daily Cutoff Time is NOT available");
+	_setSelected (_select(1), "/Day/", false);
+	_wait(2000);
+	_assertExists(_label("SLA Daily Cutoff Time"), "SLA Daily Cutoff Time is available");
+	//End of assertion
+	//Get values for the Unit of Measure and Assert for the Values
+	$bo_act_slaTerms.assertUnitOfMeasure(1);
+	$bo_act_slaTerms.assertTimeValues(2);
+	$bo_act_slaTerms.assertTimeUnits(3);
+	
+	
+	
+	//Add Onsite Response
+	_click($bo_pg_slaTerms.btn_onsiteResponse);
+	_wait(1000);
+	_setStrictVisibilityCheck(true);
+	_setSelected($bo_pg_slaTerms.sel_responseTrackedOn, $ResponseTrackedOn);
+	_wait(5000);
+	_wait(10000,_isVisible($bo_pg_slaTerms.btn_AddRecord));
+	_setStrictVisibilityCheck(true);
+	//Add assertion here
+	_assertExists (_label("Unit Of Measure"), "Unit of Measure Exists");
+	_assertNotExists(_label("SLA Daily Cutoff Time"), "SLA Daily Cutoff Time is NOT available");
+	_setSelected (_select(5), "/Day/", false);
+	_wait(2000);
+	_assertExists(_label("SLA Daily Cutoff Time"), "SLA Daily Cutoff Time is available");
+	//End of assertion
+	//Get values for the Unit of Measure and Assert for the Values
+	$bo_act_slaTerms.assertUnitOfMeasure(5);
+	$bo_act_slaTerms.assertTimeValues(6);
+	$bo_act_slaTerms.assertTimeUnits(7);
+	_setStrictVisibilityCheck(false);
+	
+	//Add Restoration Time
+	_click($bo_pg_slaTerms.btn_restoration);
+	_setStrictVisibilityCheck(true);
+	_setSelected($bo_pg_slaTerms.sel_responseTrackedOn, $ResponseTrackedOn);
+	_wait(10000,_isVisible($bo_pg_slaTerms.btn_AddRecord));
+	_setStrictVisibilityCheck(true);
+	//Add assertion here
+	_assertExists (_label("Unit Of Measure"), "Unit of Measure Exists");
+	_assertNotExists(_label("SLA Daily Cutoff Time"), "SLA Daily Cutoff Time is NOT available");
+	_setSelected (_select(9), "/Day/", false);
+	_wait(2000);
+	_assertExists(_label("SLA Daily Cutoff Time"), "SLA Daily Cutoff Time is available");
+	//End of assertion
+	//Get values for the Unit of Measure and Assert for the Values
+	$bo_act_slaTerms.assertUnitOfMeasure(9);
+	$bo_act_slaTerms.assertTimeValues(10);
+	$bo_act_slaTerms.assertTimeUnits(11);
+	_setStrictVisibilityCheck(false);
+	
+	
+	
+	//Add Resolution Time
+	_click($bo_pg_slaTerms.btn_resolution);
+	_setStrictVisibilityCheck(true);
+	_setSelected($bo_pg_slaTerms.sel_responseTrackedOn, $ResponseTrackedOn);
+	_wait(10000,_isVisible($bo_pg_slaTerms.btn_AddRecord));
+	_setStrictVisibilityCheck(true);
+	//Add assertion here
+	_assertExists (_label("Unit Of Measure"), "Unit of Measure Exists");
+	_assertNotExists(_label("SLA Daily Cutoff Time"), "SLA Daily Cutoff Time is NOT available");
+	_setSelected (_select(13), "/Day/", false);
+	_wait(2000);
+	_assertExists(_label("SLA Daily Cutoff Time"), "SLA Daily Cutoff Time is available");
+	//End of assertion
+	//Get values for the Unit of Measure and Assert for the Values
+	$bo_act_slaTerms.assertUnitOfMeasure(13);
+	$bo_act_slaTerms.assertTimeValues(14);
+	$bo_act_slaTerms.assertTimeUnits(15);
+	_setStrictVisibilityCheck(false);
+	_click($bo_pg_slaTerms.btn_save);
+	
+//return $callBack.returnResult([_isVisible($accountName), "Account not created",$accountName] );
+};
+
+//This function directly deletes the SLA Term when in the same page
+
+this.deleteSLATerminSLA = function($slaName){
+	$bo_pg_slaTerms.selectSLA($slaName);
+	_click($bo_pg_slaTerms.btn_deleteSLA);
+};
+
+this.assertUnitOfMeasure = function($selectNumber){
+	var $uom = new Array();
+	var $leng=0;
+	_set($leng, (_select($selectNumber).options.length));
+	for(var $i=0;$i<$leng; $i++){
+	                  _set($uom[$i],_select($selectNumber).options[$i].value);
+	            }
+	/*for(var $i=0;$i<$leng; $i++){
+	            _log($uom[$i]);
+
+	}*/
+
+	_assertEqual("Minute", $uom[0]);
+	_assertEqual("Day", $uom[1]);
+};
+
+this.assertTimeValues = function($selectNumber1){
+	var $time = new Array();
+	var $leng=0;
+	_set($leng, (_select($selectNumber1).options.length));
+	for(var $i=0;$i<$leng; $i++){
+	                  _set($time[$i],_select($selectNumber1).options[$i].value);
+	            }
+	/*for(var $i=0;$i<$leng; $i++){
+	            _log($time[$i]);
+
+	}*/
+
+	_assertEqual("1", $time[1]);
+	_assertEqual("2", $time[2]);
+	_assertEqual("3", $time[3]);
+	_assertEqual("4", $time[4]);
+	_assertEqual("5", $time[5]);
+	_assertEqual("6", $time[6]);
+	_assertEqual("7", $time[7]);
+	_assertEqual("8", $time[8]);
+	_assertEqual("9", $time[9]);
+	_assertEqual("10", $time[10]);
+	_assertEqual("11", $time[11]);
+	_assertEqual("12", $time[12]);
+};
+
+this.assertTimeUnits = function($selectNumber2){
+	var $ampm = new Array();
+	var $leng=0;
+	_set($leng, (_select($selectNumber2).options.length));
+	for(var $i=0;$i<$leng; $i++){
+	                  _set($ampm[$i],_select($selectNumber2).options[$i].value);
+	            }
+	/*for(var $i=0;$i<$leng; $i++){
+	            _log($ampm[$i]);
+
+	}*/
+
+	_assertEqual("AM", $ampm[1]);
+	_assertEqual("PM", $ampm[2]);
+};
+
+};

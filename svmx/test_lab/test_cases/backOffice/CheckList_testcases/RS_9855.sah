@@ -1,0 +1,52 @@
+//Created by Srinivasa Murthy S
+var $RS_9855 = _testcase("RS_9855", "CLONE - Verify the Checklist tag (s) behavior if we remove a question from form designer to question list when Group by Tags is Off.");
+$RS_9855.start();
+
+//Login to the org
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+
+//Create the checklist process
+var $Process1 = $bo_act_common.generateRandomName("A_RS_9855_Checklist_");
+$bo_act_navigation.navigateToSfmTransactionDesigner();
+$bo_act_checklistdesigner.newChecklistTypeSFM($Process1,"to generate a Checklist/Survey type of Process", "Work Order");
+
+//Add Question to the Checklist using Question text and tag. Since the tag is blank, using "" in the function for the second parameter
+var $QuestionName = $bo_act_common.generateRandomName("Question RS_9855");
+$bo_act_checklistdesigner.addQuestionToChecklistMultipleTags($QuestionName, "", "");
+
+//Remove the added question
+$bo_act_checklistdesigner.deleteQuestionFromChecklistProcess($QuestionName);
+
+//Create a question with a new tag
+var $QuestionName1 = $bo_act_common.generateRandomName("Question RS_9855");
+$bo_act_checklistdesigner.addQuestionToChecklistMultipleTags($QuestionName1, $QuestionName, "");
+
+//Remove the added question
+$bo_act_checklistdesigner.deleteQuestionFromChecklistProcess($QuestionName1);
+
+//Create a question with Multiple tags
+var $QuestionName2 = $bo_act_common.generateRandomName("Question RS_9855");
+$bo_act_checklistdesigner.addQuestionToChecklistMultipleTags($QuestionName2, $QuestionName1, $QuestionName2);
+
+//Remove the added question
+$bo_act_checklistdesigner.deleteQuestionFromChecklistProcess($QuestionName2);
+_click($bo_pg_formDesigner.btn_save_close);
+
+//Delete the SFM Created
+$bo_act_SFM.deleteSFM($Process1);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+$RS_9855.end();

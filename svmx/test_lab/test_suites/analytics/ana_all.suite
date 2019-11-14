@@ -1,0 +1,11 @@
+//../../../test_lab/test_suites/analytics/ana_deletecalculationmethod.suite
+../../../test_lab/test_suites/analytics/ana_MTTR.suite
+//../../../test_lab/test_suites/analytics/ana_Contract_Uptime.suite
+//../../../test_lab/test_suites/analytics/ana_FTF.suite
+//../../../test_lab/test_suites/analytics/ana_MTTC.suite
+//../../../test_lab/test_suites/analytics/ana_Repeat_Visit.suite
+//../../../test_lab/test_suites/analytics/ana_ART.suite
+//../../../test_lab/test_suites/analytics/ana_AttachRate.suite
+//../../../test_lab/test_suites/analytics/ana_TechUtil.suite
+//../../../test_lab/test_suites/analytics/ana_MTBF.suite 
+//../../../test_lab/test_suites/analytics/Account_summary.suite

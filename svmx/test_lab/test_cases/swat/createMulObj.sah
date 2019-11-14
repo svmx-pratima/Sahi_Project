@@ -1,0 +1,12 @@
+$bo_act_login.login("https://test.salesforce.com", "lohithaadmin@dcfull.com", "maxpl0re2");_click($sfm_pg_sfSetup.link_salesForceSetup);
+_setValue($sfm_pg_sfSetup.txt_quickFind,"object");
+_click($sfm_pg_sfSetup.link_objects);
+_click(_button("New Custom Object"));
+for(var $i=0;$i<15;$i++){
+	$label = $bo_act_common.generateRandomName("AutoCustObj");
+	$pluralLabel = $bo_act_common.generateRandomName("AutoCustObjs");
+	_setValue(_textbox("MasterLabel"),$label);
+	_setValue(_textbox("PluralLabel"),$pluralLabel);
+	_click(_submit("Save & New"));
+	_wait(3000);
+}

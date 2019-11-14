@@ -1,0 +1,36 @@
+var $an_pg_art = new function an_pg_mttc() {
+this.link_home = _link("Home");
+this.link_servicemaxSetup = _link("ServiceMax Setup");
+this.metrics=_span("Metrics");
+this.btn_art =_span("Average Response Time");
+this.btn_addart =_span("Add[1]");
+this.btn_activecheckboxart =__button("svmx-form-field svmx-form-checkbox");
+this.txt_art_description = _textarea("appliesTo");
+this.btn_settings = _span("Settings");
+this.source_Technician=_textbox("Select the source for Technician field");
+this.listitem_technician=_listItem("Technician");
+this.listitem_pre_technician=_listItem("Preferred Technician");
+this.source_product=_textbox("Select the source for Product field");
+this.listitem_product=_listItem("Product");
+this.source_service_deliver=_textbox("Select the source for Service Delivered On field");
+this.listitem_closed_on=_listItem("Closed On");
+this.source_Account=_textbox("Select the source for Account field");
+this.listitem_account=_listItem("Account");
+this.listitem_Customaccount=_listItem("Custom Account");
+this.listitem_partneraccount=_listItem("Partner Account");
+this.mapping=_textbox("Select an object mapping to store additional data for this metric");
+this.none=_listItem("--None--");
+this.Auto_lookup=_listItem("Auto_lookup");
+this.Criteria=_span("Criteria");
+this.WO_QC=_textbox("/processpanel_expression_QualificationCriteriafieldset/");
+this.Closed_Work_Orders=_listItem("SVMXSTD: Closed Work Orders");
+this.Contract_Field_service=_listItem("SVMXSTD: Contract Field Service Work Orders");
+this.Auto_exp=_listItem("Auto_exp");
+this.save=_span("Save");
+this.ok=_span("OK");
+this.btn_click_Schedule_Notifications = _span("Schedule & Notifications[1]");
+this.txt_Email_onSuccess = _textbox("emailOnSuccess");
+this.btn_click_run = _link("Run Now");
+
+};
+

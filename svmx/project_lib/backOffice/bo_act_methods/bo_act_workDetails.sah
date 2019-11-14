@@ -1,0 +1,43 @@
+/**
+ * Functions for the Work Details on Work Order
+ */
+var $bo_act_workDetails = new function bo_act_workDetails() {
+
+	/**
+	 * Create an Work Details with
+	 * 
+	 */
+	//var $WDrecordType =  ["Estimate","Products Serviced","Request/Receipt","Usage/Consumption"];
+	//var $WDActivityType =  ["--None--","Calibration","Cleanup","Installation","Repair","Service"];
+	//var $WDLineType = ["--None--","Parts","Labor","Expenses"];
+	
+	this.createWorkDetails = function($WO_Number,$WDrecordType,$IBName,$WDActivityType,$WDLineType){
+		$bo_act_navigation.navigateToWorkOrdersTab();
+		_click(_link($WO_Number));
+		_wait(15000, _isVisible($bo_pg_workOrders.txt_workOrderDetails));
+		_click($bo_pg_workDetails.btn_newWorkDetail);
+		_wait(15000, _isVisible($bo_pg_workDetails.txt_workDetailRecordTypePage));
+		_setSelected($bo_pg_workDetails.sel_workDetailsRecordType, $WDrecordType);
+		_click($bo_pg_workDetails.btn_WDcontinue);
+		_setValue($bo_pg_workDetails.txt_IBSerialNumber, $IBName);
+		_setSelected($bo_pg_workDetails.sel_WDActivityType, $WDActivityType);
+		_setSelected($bo_pg_workDetails.sel_WDLineType, $WDLineType);
+		_click($bo_pg_workDetails.btn_saveWorkDetails);
+		_assertNotVisible(_div("/Error: Invalid Data/"));
+		_wait(15000, _isVisible($bo_pg_workDetails.txt_getworkDetailsNumber));
+		var $workDetailNumber =  _getText($bo_pg_workDetails.txt_getworkDetailsNumber);
+		_logOutput($workDetailNumber+ " Work Detail is created");
+		$bo_pg_workDetails.clickOnWorkOrder($WO_Number);//Navigate back to the Work Order
+		return $workDetailNumber;
+	};
+	
+	this.navigateToWorkDetails = function($WO_Number, $workDetailNumber){
+		$bo_act_navigation.navigateToWorkOrdersTab();
+		_click(_link($WO_Number));
+		_wait(15000, _isVisible($bo_pg_workOrders.txt_workOrderDetails));
+		_click(_link($workDetailNumber));
+		_wait(15000, _isVisible($bo_pg_workDetails.txt_getworkDetailsNumber));
+		//return $callBack.returnResult([_isVisible($accountName), "Account not created",$accountName] );
+	};
+
+};

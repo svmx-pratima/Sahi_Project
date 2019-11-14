@@ -1,0 +1,194 @@
+//Assuming that dispatch process is already created & the criteria is Order Type = Cleaning or Repair
+
+var $user_credentials = $excel.readFromCustomExcel("../optimax/op_excleData/automation.xlsx", "User_Details","","");
+var $work_Orders_Xl = $excel.readFromCustomExcel("../optimax/op_excleData/automation.xlsx", "RS_6666_RS_6667","","");
+var $dispatch_Process_Xl = $excel.readFromCustomExcel("../optimax/op_excleData/automation.xlsx", "Dispatch_Process","","");
+
+for(var $i=0;$i<$user_credentials.length;$i++)
+{
+var $g_un = $user_credentials[$i][0];
+var $g_pwd = $user_credentials[$i][1];
+var $g_url = $user_credentials[$i][2];
+}
+
+
+var $dp_Name = $dispatch_Process_Xl[0][0];
+var $dp_Id = $dispatch_Process_Xl[0][1];
+var $dp_Territory_Id = $dispatch_Process_Xl[0][2];
+
+
+var $RS_6666 = _testcase("RS_6666", "Address verification (with Street, State & Country))");
+
+$RS_6666.start();
+
+var $sfdc_sessionId = null;
+
+$bo_act_login.login($g_url, $g_un, $g_pwd);
+
+_click(_link("ServiceMax Setup"));
+_wait(20000, _isVisible(_div("Configuration Profiles")));
+_click(_div("Configuration Profiles"));
+$op_utility.search_ActiveProfile();
+_click(_submit("Edit"));
+_setSelected(_select("conf_prof:F_conf_prof:Setting_Block:j_id114:j_id115:Modulelist"), "OptiMax");
+_setSelected(_select("conf_prof:F_conf_prof:Setting_Block:j_id114:j_id122:SubModulelist"), "Dispatch Calculations");
+_click(_link("Edit[13]"));
+_selectWindow("Servicemax_Conf_Prof");
+_click(_radio("disp_setting:disp_setting:j_id1:DispSection:j_id37:j_id40"));
+_click(_button("Save"));
+_click(_submit("Close"));
+_selectWindow();
+_click(_link("Edit[23]"));
+_selectWindow("Servicemax_Conf_Prof");
+_click(_radio("disp_setting:disp_setting:j_id1:DispSection:j_id37:j_id40"));
+_click(_button("Save"));
+_click(_submit("Close"));
+_selectWindow();
+_click(_button("Refresh"));
+_click(_submit("Save"));
+_click(_submit("Back To Setup Home"));
+_click(_link("Home"));
+
+
+_set($login_result, _fetch(login($g_un,$g_pwd)));
+_log($login_result);
+
+$op_utility.delete_WO($dp_Id,$login_result.sessionId);
+
+_set($create_WO, _fetch(create_WO($work_Orders_Xl , $dp_Territory_Id, $dp_Id)));
+_log($create_WO);
+
+$op_utility.run_Job_Now($dp_Name);
+
+_wait(5000);
+
+//validating the job is success
+if($op_utility.validate_Job_Success($dp_Id,$login_result.sessionId,200000)=== true){
+	_log("job is successfully completed");
+	_set($validate_Addr_Vio_WO, _fetch(validate_Addr_Violation($dp_Id)));
+	_log($validate_Addr_Vio_WO);
+	if($validate_Addr_Vio_WO === true){
+		_log("for 3 wo, Invalid Zip Code/Address is added ");
+		if($op_utility.read_file($dp_Id,$login_result.sessionId,"Not a valid address or zipcode","Invalid WorkOrders") === 3)
+		{
+			_log("3 Invalid Address violation is added in the attachment");
+		}
+		else{
+			_logExceptionAsFailure("Invalid Address violation count in Attachment is different")
+		}
+	}
+	else{
+		_logExceptionAsFailure("Invalid Address violation count in work order is not updated");
+	}
+}
+else{
+	_log("job is failed in 1st verification.. so starting the 2nd verification after 5 min");
+	if($op_utility.validate_Job_Success($dp_Id,$login_result.sessionId,200000)=== true){
+		_log("job is successfully completed");
+		_set($validate_Addr_Vio_WO, _fetch(validate_Addr_Violation($dp_Id)));
+		_log($validate_Addr_Vio_WO);
+		if($validate_Addr_Vio_WO === true){
+			_log("for 3 wo, Invalid Zip Code/Address is added ");
+			if($op_utility.read_file($dp_Id,$login_result.sessionId,"Not a valid address or zipcode","Invalid WorkOrders") === 3)
+			{
+				_log("3 Invalid Address violation is added in the attachment");
+			}
+			else{
+				_logExceptionAsFailure("Invalid Address violation count in Attachment is different")
+			}
+		}
+		else{
+			_logExceptionAsFailure("Invalid Address violation count in work order is not updated");
+		}
+	}
+	else{
+		_log("job is failed in 2nd verification");
+	}
+}
+
+
+//<browser>
+function login($g_un,$g_pwd){
+	
+	var $login_result = sforce.connection.login($g_un,$g_pwd);
+	$sfdc_sessionId = $login_result.sessionId;
+	_log("$sfdc_sessionId = "+$sfdc_sessionId);
+	return $login_result;
+} 
+
+
+function create_WO ($work_Orders_Xl , $dp_Territory_Id, $dp_Id)
+{
+	var CreateWO=[];
+	var UpdateWO=[];
+	var $isSuccess = false;
+	//creating wo from the excel sheet
+	for(var $i=0;$i<6;$i++)
+	{
+		var wo_list = new sforce.SObject("SVMXC__Service_Order__c");
+		wo_list.SVMXC__Order_Type__c = $work_Orders_Xl[$i][0];
+		wo_list.SVMXC__Order_Status__c = $work_Orders_Xl[$i][1];
+		wo_list.SVMXC__Street__c = $work_Orders_Xl[$i][2];
+		wo_list.SVMXC__State__c = $work_Orders_Xl[$i][3];
+		wo_list.SVMXC__City__c = $work_Orders_Xl[$i][4];
+		wo_list.SVMXC__Zip__c = $work_Orders_Xl[$i][5];
+		wo_list.SVMXC__Country__c = $work_Orders_Xl[$i][6];
+		wo_list.SVMXC__SM_Scheduling_Options__c = $work_Orders_Xl[$i][7];
+		wo_list.SVMXC__Primary_Territory__c = $dp_Territory_Id;
+		CreateWO.push(wo_list);
+	}
+	var result = _call(sforce.connection.create(CreateWO));
+	_log("Work Orders Created = "+ result.length);
+	if(result.length > 0)
+	{
+		var WO_List = _call(sforce.connection.query("Select Id, SVMXC__Dispatch_Process__c, SVMXC__City__c, SVMXC__Zip__c From SVMXC__Service_Order__c Where SVMXC__Dispatch_Process__c = '"+$dp_Id+"' Limit 3"));
+		_log(" Work Order size = "+WO_List.size);
+		var WO_arr = WO_List.getArray("records");
+		_log(" WO_arr = "+WO_arr);
+		for(var $x=0;$x<WO_arr.length;$x++)
+		{
+			var WO = WO_arr[$x];
+			WO.SVMXC__City__c = null;
+			WO.SVMXC__Zip__c = null;
+			UpdateWO.push(WO);
+			_log("result.updateRecords update = "+UpdateWO);
+		}
+	}
+	var update_result = _call(sforce.connection.update(UpdateWO));
+	_log("update result = "+update_result.length);
+	if(update_result.length > 0){
+		$isSuccess = true;
+	}
+	else{
+		$isSuccess = false;
+	}
+
+	_log("update $isSuccess = "+$isSuccess);
+	return $isSuccess;
+}
+
+function validate_Addr_Violation($dp_Id)
+{
+	var $isSuccess = false;
+	var $i = 0;
+	var WO_List = _call(sforce.connection.query("Select Id, SVMXC__Zip__c, SVMXC__Violation_Message__c, SVMXC__Violation_Status2__c From SVMXC__Service_Order__c Where SVMXC__Dispatch_Process__c = '"+$dp_Id+"' AND SVMXC__Zip__c = null"));
+	var WO_arr = WO_List.getArray("records");
+	for(var $x=0;$x<WO_arr.length;$x++){
+		var WO = WO_arr[$x];
+		var violation_str = WO.SVMXC__Violation_Message__c;
+		if(violation_str.includes("Dispatch Parameter Error:Not a valid address or zipcode")){
+			$i = $i + 1;
+		}
+	}
+	if($i === 3){
+		$isSuccess = true;
+	}
+	return $isSuccess;
+}
+
+
+//</browser>
+
+$bo_act_login.logOut();
+
+$RS_6666.end();

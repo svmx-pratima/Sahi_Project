@@ -1,0 +1,56 @@
+
+//author - Meghana Rao
+
+var $RS_7488 = _testcase("$RS_7488","Verify the sample PM schedule for multiple conditions and expression");
+$RS_7488.start();
+_setSpeed($g_stepSpeed);
+// Login to the given org
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+
+//Test Data Creation
+
+
+var $accName = $bo_act_accounts.createAccount();
+
+var $contactName = $bo_act_contacts.createContact($accName);
+var $proName = $bo_act_products.createProduct("pro12", "--None--");
+$bo_act_navigation.navigateToAccountsPage();
+_click(_link($accName));
+var $IBName1 = $bo_act_accounts.addIBtoAccounts($proName, $accName, $contactName);
+
+
+// To create PM Plan template and then adding advanced expression
+var $PMPTemplate = $bo_act_PMPlanTemplate.createCriteriaBasedPMTemplate($proName);
+$bo_act_PMPlanTemplate.firstCriteriaBasedCondition("Country", "Equals", "India");
+$bo_act_PMPlanTemplate.addpicklistvalues_advancedexpression("Status", "Equals", "Installed", "2");
+_wait(1000);
+$bo_act_PMPlanTemplate.adddatevalues_advancedexpression("Date Installed","Equals","3");
+$bo_act_PMPlanTemplate.saveadvancedexpression("1 AND (2 OR 3)");
+
+// To verify if the values are created correct in PM Plan templates
+var $pmplanIDfetch = "Select Id from "+$orgnamespace+"__PM_Plan_Template__c where Name = '"+$PMPTemplate+"'";
+var $pmplan_fetch_query1 = $op_act_sForceApiCall.sForceQuery($bac_un, $bac_pwd, $pmplanIDfetch,"query");
+
+var $PMPlantemplateID = $pmplan_fetch_query1[0].Id;
+
+var $pmplanquery = "Select Count(Id) mycount from "+$orgnamespace+"__PM_Schedule_Template__c where  "+$orgnamespace+"__PM_Plan_Template__c = '"+$PMPlantemplateID+"'";
+var $pmplan_fetch_query = $op_act_sForceApiCall.sForceQuery($bac_un, $bac_pwd, $pmplanquery,"query");
+
+var $valuecount = $pmplan_fetch_query[0].mycount;
+
+_assertEqual("3", $valuecount); // Verifying the number of expressions added to the PM Plan templates
+
+
+// CleanUp Function
+
+$bo_act_common.cleanUpfunctionold($PMPTemplate);
+
+$bo_act_common.deleteAccount($bac_un, $bac_pwd, $accName);
+$bo_act_common.deleteContact($bac_un, $bac_pwd, $contactName);
+$bo_act_common.deleteIB($bac_un, $bac_pwd, $orgnamespace,$IBName1);
+$bo_act_common.deleteProduct($bac_un, $bac_pwd,$proName);
+
+$RS_7488.end();
+
+
+

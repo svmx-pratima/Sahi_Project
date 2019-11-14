@@ -1,0 +1,469 @@
+/**
+ * Functions for the Accounts Object
+ */
+var $bo_act_PMPlanTemplate = new function bo_act_PMPlanTemplate() {
+
+	/**
+	 * Create a Time based PM Plan Template
+	 * 
+	 * @param 
+	 */
+	
+this.createTimeBasedPMPlanTemplate = function($ProductName,$coverage,$workOrderPurpose,$frequencyUnit){
+		var $PMTemplateName = $bo_act_common.generateRandomName("PMT");
+		$bo_act_navigation.navigateToPMPlanTemplatePage();
+		_wait(30000,_isVisible($bo_pg_PMPlanTemplate.btn_newPMPlanTemplate));
+		if(_condition($bo_pg_PMPlanTemplate.btn_newPMPlanTemplate == null))
+			window.reload();
+		_click($bo_pg_PMPlanTemplate.btn_newPMPlanTemplate);
+		_wait(60000,_isVisible($bo_pg_PMPlanTemplate.txt_PMPlanTemplateName));
+		_setValue($bo_pg_PMPlanTemplate.txt_PMPlanTemplateName,$PMTemplateName);
+		_setValue($bo_pg_PMPlanTemplate.txt_coverageType,$coverage);
+	   _setStrictVisibilityCheck(true);
+	   _wait(_10000, _isVisible($bo_pg_PMPlanTemplate.link_editIcon));
+	   _click($bo_pg_PMPlanTemplate.link_editIcon);
+	   _setStrictVisibilityCheck(false);
+	   _getRecentWindow();
+	   _setValue($bo_pg_PMPlanTemplate.txt_sequence,1);
+	   if($workOrderPurpose != null)
+	   $bo_act_common.searchfunction($workOrderPurpose);
+	   _setValue($bo_pg_PMPlanTemplate.txt_frequency,1);
+	   _setValue($bo_pg_PMPlanTemplate.txt_frequencyUnit,$frequencyUnit);
+	   _listItem($frequencyUnit);
+	   _check($bo_pg_PMPlanTemplate.btn_recurring);
+	   _click($bo_pg_PMPlanTemplate.btn_update);
+	   _click($bo_pg_PMPlanTemplate.btn_applicableProducts);
+	   _setStrictVisibilityCheck(true);
+	   _click($bo_pg_PMPlanTemplate.link_editIcon);
+	   _setStrictVisibilityCheck(false);
+	    $bo_act_common.searchfunction($ProductName);
+	   _click($bo_pg_PMPlanTemplate.btn_update);
+	    _click($bo_pg_PMPlanTemplate.btn_saveIcon);
+	   _wait(60000, _isVisible(_heading2($PMTemplateName)));
+		_logOutput($PMTemplateName+ " PM Plan Template is created");
+	   return $PMTemplateName;
+	};
+
+this.deletePMPlanTemplate = function($PMPTempName){
+	$bo_act_navigation.navigateToPMPlanTemplatePage();
+	_click(_span($PMPTempName));
+	_click($bo_pg_PMPlanTemplate.btn_delete);
+	
+};
+
+this.createUsageBasedConditionPMPTemplateNoSave = function($productName)
+{
+	var $PMTemplateName = $bo_act_common.generateRandomName("PMT");
+	$bo_act_navigation.navigateToPMPlanTemplatePage();
+	_click($bo_pg_PMPlanTemplate.btn_createConditionBasedPMPTemplate);
+	_wait(60000,_isVisible($bo_pg_PMPlanTemplate.txt_templateName));
+	_setValue($bo_pg_PMPlanTemplate.txt_templateName,$PMTemplateName);
+	_setValue($bo_pg_PMPlanTemplate.txt_product,$productName);
+	_click($bo_pg_PMPlanTemplate.img_filterIcon);
+	_click(_div(0,_rightOf($bo_pg_PMPlanTemplate.txt_product)));
+	_wait(5000);
+	_click(_listItem($productName));
+	return $PMTemplateName;
+};
+
+this.updateTaskTemplate = function($taskTemplate){
+	
+};
+
+
+this.createUsageBasedConditionPMPTemplateNoSave_withIBCondition = function($productName, $ib_criteria)
+{
+	var $PMTemplateName = $bo_act_common.generateRandomName("PMT");
+	$bo_act_navigation.navigateToPMPlanTemplatePage();
+	_click($bo_pg_PMPlanTemplate.btn_createConditionBasedPMPTemplate);
+	_wait(60000,_isVisible($bo_pg_PMPlanTemplate.txt_templateName));
+	_setValue($bo_pg_PMPlanTemplate.txt_templateName,$PMTemplateName);
+	_setValue($bo_pg_PMPlanTemplate.txt_product,$productName);
+	_click($bo_pg_PMPlanTemplate.img_filterIcon);
+	_click(_div(0,_rightOf($bo_pg_PMPlanTemplate.txt_product)));
+	_click(_listItem($productName));
+	_click($bo_pg_PMPlanTemplate.picklist_IB_filter);
+	_click(_listItem($ib_criteria));
+	return $PMTemplateName;
+};
+
+
+
+/*
+ * Author : Meghana Rao
+ * To create a PM Plan Template with different Date time in Activity Date
+ * 
+ */
+
+this.createUsageBasedCondition_DifferentDate = function($productName,$DateTime)
+{
+	
+	var $PMTemplateName = $bo_act_common.generateRandomName("PMT");
+	$bo_act_navigation.navigateToPMPlanTemplatePage();
+	_click($bo_pg_PMPlanTemplate.btn_createConditionBasedPMPTemplate);
+	_wait(60000,_isVisible($bo_pg_PMPlanTemplate.txt_templateName));
+	_setValue($bo_pg_PMPlanTemplate.txt_templateName,$PMTemplateName);
+	_setValue($bo_pg_PMPlanTemplate.txt_product,$productName);
+	_click($bo_pg_PMPlanTemplate.img_filterIcon);
+	_click(_div(0,_rightOf($bo_pg_PMPlanTemplate.txt_product)));
+	_click(_listItem($productName));
+	_click($bo_pg_PMPlanTemplate.txt_activitydate);
+	_click(_listItem($DateTime));
+	return $PMTemplateName;
+
+};
+
+this.updateUsageConditionRulesGridWithOutAdjFields = function($attribute,$operator,$frequency,$startAt,$stopAt){
+	_wait(5000);
+	_click($bo_pg_PMPlanTemplate.link_addRow);
+	_click($bo_pg_PMPlanTemplate.txt_attributebox);
+	_wait(3000,_isVisible($bo_pg_PMPlanTemplate.txt_attribute));
+	_click($bo_pg_PMPlanTemplate.txt_attribute);
+	_click(_div($attribute));
+
+	_click($bo_pg_PMPlanTemplate.txt_operatorbox);
+	_click($bo_pg_PMPlanTemplate.txt_operator);
+	_click($bo_pg_PMPlanTemplate._listItem($operator));
+
+	_click($bo_pg_PMPlanTemplate.txt_frequencybox);
+	_click($bo_pg_PMPlanTemplate.txt_frequency1);
+	_setValue($bo_pg_PMPlanTemplate.txt_frequencytxt,$frequency);
+	
+	_click($bo_pg_PMPlanTemplate.txt_startAtbox);
+	_click($bo_pg_PMPlanTemplate.txt_startAt);
+	_setValue($bo_pg_PMPlanTemplate.txt_startAt,$startAt);
+	
+	_click($bo_pg_PMPlanTemplate.txt_stopAtbox);
+	_click($bo_pg_PMPlanTemplate.txt_stopAt);
+	_setValue($bo_pg_PMPlanTemplate.txt_stopAt,$stopAt);
+	
+};
+
+this.updateUsageConditionRulesGridWithAdjFields = function($attribute,$operator,$frequency,$startAt,$stopAt,$adjType,$minAdj,$maxAdj,$adjValue,$adjUnit){
+	_wait(5000);
+	_setSpeed(1000);
+	_click($bo_pg_PMPlanTemplate.link_addRow);
+	_click($bo_pg_PMPlanTemplate.txt_attributebox);
+	_wait(3000,_isVisible($bo_pg_PMPlanTemplate.txt_attribute));
+	_click($bo_pg_PMPlanTemplate.txt_attribute);_click(_div($attribute));
+
+	_click($bo_pg_PMPlanTemplate.txt_operatorbox);
+	_click($bo_pg_PMPlanTemplate.txt_operator);
+	_click(_listItem($operator));
+
+	_click($bo_pg_PMPlanTemplate.txt_frequencybox);
+	_click($bo_pg_PMPlanTemplate.txt_frequency1);
+		_setValue($bo_pg_PMPlanTemplate.txt_frequency1,$frequency);
+	
+		_click($bo_pg_PMPlanTemplate.txt_startAtbox);
+		_click($bo_pg_PMPlanTemplate.txt_startAt);
+
+	_setValue($bo_pg_PMPlanTemplate.txt_startAt,$startAt);
+	
+	_wait(1000);
+	_click($bo_pg_PMPlanTemplate.txt_stopAtbox);
+	_click($bo_pg_PMPlanTemplate.txt_stopAt);
+	_setValue($bo_pg_PMPlanTemplate.txt_stopAt,$stopAt);
+	
+		_click($bo_pg_PMPlanTemplate.txt_adjustmentTypebox);
+	_click($bo_pg_PMPlanTemplate.txt_adjustmentType);
+	_click($bo_pg_PMPlanTemplate.img_arrow);
+	_click(_listItem($adjType));
+	
+	_click($bo_pg_PMPlanTemplate.txt_minAdjbox);
+	_click($bo_pg_PMPlanTemplate.txt_minAdj);
+	_setValue($bo_pg_PMPlanTemplate.txt_minAdj,$minAdj);
+	_click($bo_pg_PMPlanTemplate.txt_maxAdjbox);
+	_click($bo_pg_PMPlanTemplate.txt_maxAdj);
+	_setValue($bo_pg_PMPlanTemplate.txt_maxAdj,$maxAdj);
+	if($adjType == "Fixed")
+		{
+		_click($bo_pg_PMPlanTemplate.txt_adjValuebox);
+		_click($bo_pg_PMPlanTemplate.txt_adjValue);
+		_setValue($bo_pg_PMPlanTemplate.txt_adjValue,$adjValue);
+		}
+			
+	_click($bo_pg_PMPlanTemplate.txt_adjUnitbox);
+	_click($bo_pg_PMPlanTemplate.txt_adjUnit);
+	_click(_listItem($adjUnit));
+	_setSpeed($g_stepSpeed);
+};
+	
+this.saveConditionBasedPM = function(){
+	_click(_label("Advanced Expression"));
+	_wait(5000);
+	_click($bo_pg_PMPlanTemplate.btn_customUISave);	
+	_wait(5000);
+	//_assertNotVisible($bo_pg_PMPlanTemplate.img_messagebox);
+	//_wait(15000,_isVisible(_heading1("PM Plan Template:")));
+	//_assertExist(_heading1("PM Plan Template:"));
+};
+
+this.createCriteriaBasedPMTemplate = function($productName)
+	{
+		var $PMTemplateName = $bo_act_common.generateRandomName("PMT");
+		$bo_act_navigation.navigateToPMPlanTemplatePage();
+		_wait(60000,_isVisible(_submit("Create Condition Based PM Plan Template")));
+		_click(_submit("Create Condition Based PM Plan Template"));
+//		_wait(1000);
+//    	_call(top.location.reload());
+		_wait(80000,_isVisible($bo_pg_PMPlanTemplate.txt_templateName));
+		_setValue($bo_pg_PMPlanTemplate.txt_templateName,$PMTemplateName);
+		_click($bo_pg_PMPlanTemplate.txt_conditionType);
+		_click(_listItem("Criteria/Comparison Based"));
+		_setValue($bo_pg_PMPlanTemplate.txt_product,$productName);
+		_click($bo_pg_PMPlanTemplate.img_filterIcon);
+//		_click(_div(0,_rightOf($bo_pg_PMPlanTemplate.txt_product)));
+//		_click(_listItem($productName));
+		_click(_div("/svmx-trigger/",_in(_cell("Product*"))));
+		_setStrictVisibilityCheck(true);
+		_click(_listItem(0,_in(_div("svmx-boundlist-list-ct"))));
+		return $PMTemplateName;
+	};
+	this.addTaskTemplateToConditionBasedPMT = function($taskTemplate){
+		_click($bo_pg_PMPlanTemplate.txt_workOrderPurpose);
+		_click(_listItem($taskTemplate));
+		
+	};
+	this.firstCriteriaBasedCondition = function($attribute,$operator,$value){
+		_wait(5000);
+		_click($bo_pg_PMPlanTemplate.link_addRowCriteria);
+		_click(_div("svmx-grid-cell-inner [2]"));
+		_wait(3000,_isVisible($bo_pg_PMPlanTemplate.txt_attributeCriteria));
+		_click($bo_pg_PMPlanTemplate.txt_attributeCriteria);
+		_click(_div($attribute));
+
+		_click(_div("svmx-grid-cell-inner [3]"));
+		_click($bo_pg_PMPlanTemplate.txt_operatorCriteria);
+		_click(_listItem($operator));
+		
+		_click(_div("svmx-grid-cell-inner [4]"));
+		_click($bo_pg_PMPlanTemplate.txt_valueCriteria); // Changed by Meghana Rao
+		_click(_listItem($value));
+		//_setValue(_textbox(0,_under(_div("Value"))),$value);
+	};
+	/*
+	 * This is only for Picklist values to be added as Rows
+	 */
+	this.addRow = function($attribute,$operator,$value){
+		_click(_span("+ Add row"));
+		_click(_div("/svmx-grid-cell-inner/",_under(_div("Attribute"))));
+		_click(_div("/svmx-trigger-index/",_under(_div("Attribute"))));
+		_click(_div($attribute));
+		_click(_div("/svmx-grid-cell-inner/",_under(_div("Operator"))));
+		_click(_div("/svmx-trigger-index/",_under(_div("Operator"))));
+		_click(_listItem($operator));
+//		_doubleClick(_div("/svmx-grid-cell-inner/",_under(_div("Value"))));
+		_click(_div("/svmx-grid-cell-inner/",_under(_div("Value"))));
+//		_click(_div("/svmx-trigger-index/",_under(_div("Value"))));
+		if(_isVisible(_listItem($value))){
+			_click(_listItem($value));
+		}
+		else{
+			_setValue(_textbox(0,_under(_div("Value"))),"Bangalore");
+		}
+	
+	};
+	this.addRowUsageBased = function($attribute,$operator,$frequency,$adjType,$minAdj,$maxAdj,$adjUnit){
+	/*	$todayDate = new Date();
+		$date = $todayDate.getDate();
+		$month = $todayDate.getMonth()+1;
+		$year = $todayDate.getFullYear();
+		
+		$prevDate = $month+"-"+$date+"-"+($year-1);
+		$futureDate = $month+"-"+$date+"-"+($year+1);
+		_log($prevDate);
+		_log($futureDate);*/
+		var $prevDate = $bo_act_common.currentDate("-");	// Added by Bhupendra Singh
+		var $futureDate = $bo_act_common.getfutureDate(1,"-");
+		/*if($prevDate.length==9){
+			$prevDate = "0"+$prevDate;
+		}
+		if($futureDate.length==9){
+			$futureDate ="0"+$futureDate;
+		}*/
+		_log($prevDate);
+		_log($futureDate);
+		_setStrictVisibilityCheck(true);
+	//	_click(_span("+ Add row"));  // Commented by Bhupendra Singh
+		_click(_button("/addRowButton-btnEl/"));
+		_click(_div("/svmx-grid-cell-inner/",_under(_div("Attribute"))));
+		_click(_div("/svmx-trigger-index/",_under(_div("Attribute"))));
+		_click(_div($attribute));
+		_click(_div("/svmx-grid-cell-inner/",_under(_div("Operator"))));
+		_click(_div("/svmx-trigger-index/",_under(_div("Operator"))));
+		_click(_listItem($operator));
+		_setStrictVisibilityCheck(false);
+		_click(_div("/svmx-grid-cell-inner/",_under(_div("Frequency"))));
+		_setValue(_textbox(0,_under(_div("Frequency"))),$frequency);
+		_click(_div("/svmx-grid-cell-inner/",_under(_div("Start At"))));
+		_setValue(_textbox(0,_under(_div("Start At"))),$prevDate);
+		_click(_div("/svmx-grid-cell-inner/",_under(_div("Stop At"))));
+		_setValue(_textbox(0,_under(_div("Stop At"))),$futureDate);
+		_click(_div("/svmx-grid-cell-inner/",_under(_div("Adjustment Type"))));
+		_click(_div("/svmx-trigger-index/",_under(_div("Adjustment Type"))));
+		_click(_listItem($adjType));
+		_click(_div("/svmx-grid-cell-inner/",_under(_div("Minimum Adjustment"))));
+		_setValue(_textbox(0,_under(_div("Minimum Adjustment"))),$minAdj);
+		_click(_div("/svmx-grid-cell-inner/",_under(_div("Maximum Adjustment"))));
+		_setValue(_textbox(0,_under(_div("Maximum Adjustment"))),$maxAdj);
+		_click(_div("/svmx-grid-cell-inner/",_under(_div("Adjustment Unit"))));
+		_click(_div("/svmx-trigger-index/",_under(_div("Adjustment Unit"))));
+		_click(_listItem($adjUnit));
+		
+	};
+	
+	/*
+	 * Author : Meghana Rao
+	 * Adding multiple values to the Rows - For Picklsit Values
+	 */
+	
+	this.addpicklistvalues_advancedexpression= function($attribute,$operator,$value, $rownumber){
+		_click(_span("+ Add row"));
+		_click(_div("/svmx-grid-cell-inner/",_rightOf(_div($rownumber)),_under(_div("Attribute"))));
+		_click(_div("/svmx-trigger-index/",_rightOf(_div($rownumber)),_under(_div("Attribute"))));
+		_click(_div($attribute));
+		_click(_div("/svmx-grid-cell-inner/",_rightOf(_div($rownumber)),_under(_div("Operator"))));
+		_click(_div("/svmx-trigger-index/",_rightOf(_div($rownumber)),_under(_div("Operator"))));
+		_click(_listItem($operator));
+		
+		_click(_div("/svmx-grid-cell-inner/",_rightOf(_div($rownumber)),_under(_div("Value"))));
+		_click(_div("/svmx-trigger-index/",_rightOf(_div($rownumber)),_under(_div("Value"))));
+		_click(_listItem($value));
+	};
+	
+	/*
+	 * Author : Meghana Rao
+	 * Adding multiple values to the Rows - For Text Values
+	 */
+	this.adddatevalues_advancedexpression = function($attribute,$operator,$rownumber){
+		_click(_span("+ Add row"));
+		_click(_div("/svmx-grid-cell-inner/",_rightOf(_div($rownumber)),_under(_div("Attribute"))));
+		_click(_div("/svmx-trigger-index/",_rightOf(_div($rownumber)),_under(_div("Attribute"))));
+		_click(_div($attribute));
+		_click(_div("/svmx-grid-cell-inner/",_rightOf(_div($rownumber)),_under(_div("Operator"))));
+		_click(_div("/svmx-trigger-index/",_rightOf(_div($rownumber)),_under(_div("Operator"))));
+		_click(_listItem($operator));
+		_click(_div("/svmx-grid-cell-inner/",_rightOf(_div($rownumber)),_under(_div("Value"))));
+		_click(_div("/svmx-trigger-index/",_rightOf(_div($rownumber)),_under(_div("Value"))));
+		_click($bo_pg_PMPlanTemplate.btn_today);
+		_click(_div("Equals"));
+		
+	};
+	
+	
+	this.createPmPlan = function($pmPlanName,$PMTemplateName,$templateName){
+		_selectDomain();
+		_setValue(_textbox("planName"),$pmPlanName);
+		_click(_textbox("planTemplateName"));
+		_click(_listItem($PMTemplateName));
+		_setValue(_textbox("WOPurpose"),$templateName);
+		_click(_listItem($templateName));
+		/*var $today = new Date();
+		var $mnth = $today.getMonth();
+		var $yr = $today.getFullYear();
+		var $date = $today.getDate();
+		var $startDate = $mnth+"/"+$date+"/"+$yr;
+		var $endDate = $mnth+"/"+$date+"/"+($yr+1);*/
+
+		var $startDate = $bo_act_common.currentDate("-");	// Added by Bhupendra Singh
+		var $endDate = $bo_act_common.getfutureDate(1,"-");
+		
+		_setValue(_textbox("/startDate/"),$startDate);
+		_setValue(_textbox("/endDate/"),$endDate);
+		_click(_span("Save"));
+		_wait(3000);
+	};
+		
+	/*
+	 * Author: Meghana Rao
+	 * This method will create criteria based PM Plan
+	 */
+	this.verifytheadvancedexpression = function($ExpressionName){
+		
+		_setValue($bo_pg_PMPlanTemplate.txt_advanced_expression,$ExpressionName);
+		_click(_span("Condition Rules"));
+		_wait(20000);
+		_click($bo_pg_PMPlanTemplate.btn_save);
+		
+		
+		_assertEqual(true,_isVisible($bo_pg_PMPlanTemplate.expression_notvalid)); // To verify if an expression is invalid
+
+		
+	};
+	
+	this.saveadvancedexpression = function($ExpressionName){
+		
+		_setValue($bo_pg_PMPlanTemplate.txt_advanced_expression,$ExpressionName);
+		_click(_span("Condition Rules"));
+		_wait(20000);
+		_click($bo_pg_PMPlanTemplate.btn_save);
+		_assertEqual(false,_isVisible($bo_pg_PMPlanTemplate.expression_notvalid)); // To verify if an expression is invalid
+		
+		
+	};
+	
+this.editTextField = function($object,$objectValue){
+	_setValue($object,$objectValue);
+};
+
+this.editDropDownFields = function($object,$objectValue){
+	_setSelected($object,$objectValue);
+	//return $callBack.returnResult([_isVisible($accountName), "Account not created",$accountName] );
+};
+	
+//New Time Based PM Plan Template
+this.createTimeBasedPMPlanTemplateHeader = function($CoverageType,$IBCriteria,$LocCriteria){
+	var $PMTemplateName = $bo_act_common.generateRandomName("PMT");
+	$bo_act_navigation.navigateToPMPlanTemplatePage();
+	_wait(30000,_isVisible($bo_pg_PMPlanTemplate.btn_newPMPlanTemplate));
+	if(_condition($bo_pg_PMPlanTemplate.btn_newPMPlanTemplate == null))
+	window.reload();
+	_click($bo_pg_PMPlanTemplate.btn_newPMPlanTemplate);
+	_wait(60000,_isVisible($bo_pg_PMPlanTemplate.txt_PMPlanTemplateName));
+	_setValue($bo_pg_PMPlanTemplate.txt_PMPlanTemplateName,$PMTemplateName);
+	_setValue($bo_pg_PMPlanTemplate.txt_coverageType,$CoverageType);
+	_setValue(_textbox(0,_rightOf(_label("/Installed Product Criteria/"))),$IBCriteria);
+	_setValue(_textbox(0,_rightOf(_label("Location Criteria:"))),$LocCriteria);
+	return $PMTemplateName;
+};
+
+this.createTimeBasedPMPlanTemplateSchedules = function($NumberOfSchedules, $Seq, $WOP, $Frequency, $FreqUnit, $Recurring)
+{
+	_click(_image("svmx-action-col-icon svmx-action-col-1   svmx-sfmd-delete-icon"));
+		   	for(var $num=0; $num<$NumberOfSchedules; $num++){
+		   		_setStrictVisibilityCheck(true);
+		   		_click(_span("svmx-btn-icon svmx-sfmd-add-line-icon"));
+		   		_click(_image("svmx-action-col-icon svmx-action-col-0   svmx-sfmd-edit-icon["+$num+"]"));
+		   		_setStrictVisibilityCheck(false);
+		   		_getRecentWindow();
+		   		_setValue($bo_pg_PMPlanTemplate.txt_sequence,$Seq[$num]);
+		   		if($WOP != null)
+		   		$bo_act_common.searchfunction($WOP[$num]);
+		   		_setValue($bo_pg_PMPlanTemplate.txt_frequency,$Frequency[$num]);
+		   		_setValue($bo_pg_PMPlanTemplate.txt_frequencyUnit,$FreqUnit[$num]);
+		   		_listItem($FreqUnit[$num]);
+		   		if($Recurring[$num] == 1)
+		   		_check($bo_pg_PMPlanTemplate.btn_recurring);
+		   		else
+		   			_uncheck($bo_pg_PMPlanTemplate.btn_recurring);
+		   		_click($bo_pg_PMPlanTemplate.btn_update);
+		   }
+};
+
+this.createTimeBasedPMPlanTemplateApplicableProduct = function($NumberOfProduct, $Product, $ProductLine, $ProductFamily)
+{
+	_click(_span("Applicable Products"));
+	_wait(5000,_isVisible(_span("Product")));
+	_setStrictVisibilityCheck(true);
+	_click(_image("svmx-action-col-icon svmx-action-col-1   svmx-sfmd-delete-icon"));
+	_setStrictVisibilityCheck(false);
+//Need to enhance for adding specific product.
+};
+
+this.saveTimeBasedPMPlanTemplate = function(){
+_click($bo_pg_PMPlanTemplate.btn_saveIcon);
+_wait(15000,_isVisible(_heading2("pageDescription")));
+
+};
+};

@@ -1,0 +1,28 @@
+/**
+ * Email related actions and configurations
+ */
+var $email = new function email() {
+
+	/**
+	 * Function to send email's
+	 * 
+	 * @param $emailSubject
+	 * @param $emailBody
+	 */
+
+	this.sendEmail = function sendEmail($emailSubject, $emailBody) {
+		var $host = "smtp.gmail.com";
+		var $port = 465;
+		var $username = "from@gmail.com";
+		var $password = "password";
+		var $isSSL = true; // set to true if you use SSL
+		var $mailer = new Packages.net.sf.sahi.ant.Mailer($host, $port, $username, $password, $isSSL);
+		$mailer.setFrom("from@gmail.com");
+		$mailer.setTo("to@example.com");
+		$mailer.setSubject($emailSubject);
+		$mailer.setBody($emailBody);
+		$mailer.addAttachment("Attachment.zip", "d:/Attachment.zip");
+		$mailer.send();
+	};
+
+};

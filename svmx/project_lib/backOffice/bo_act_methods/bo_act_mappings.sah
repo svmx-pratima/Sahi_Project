@@ -1,0 +1,220 @@
+//Functions related to Back Office Mappings.
+
+var $bo_act_mappings = new function bo_act_mappings() {
+	
+	//This function creates a new mapping and saves the map with the given name.
+	//This is designed to work in Classic and Lightning
+	//The user should be in the 'QC and Mapping' tab before calling this function
+	//Container Name should be "Work Order" or "Parts" or "Labor" or "Expense" or "Travel" or any other Source object.
+	//Author:Janaki
+	
+	this.createMapping = function($containerName,$mapType,$pickListLabels,$pickListValues,$textLabels,$textValues,$mapName){
+		var $i = 0;
+		_wait(6000);
+		if(_isVisible($sfm_pg_sfmMapping.btn_mappingTab)){
+			_click($sfm_pg_sfmMapping.btn_mappingTab);
+		}
+		else if(_isVisible($sfm_pg_sfmMapping.btn_mappingTabWithoutQcTab)){
+			_click($sfm_pg_sfmMapping.btn_mappingTabWithoutQcTab);
+		}
+		_click(_f("main").s_label($containerName));
+		_click(_f("main").tab($mapType));
+		_click(_f("main").s_button("New").inside(_f("main").s_navigatorcontent($mapType)));
+		
+		_wait(6000);
+		if($textLabels.length> 0) {
+		//First setting the picklist values
+		for($i=0;$i<$textLabels.length;$i++){
+			
+				_wait(3000);
+				
+					_setValue(_f("main").s_textinput("textip").rightOf(_f("main").ftedatagriditemrenderer($textLabels[$i])).inside(_f("main").s_navigatorcontent($mapType)), $textValues[$i]);
+			}
+		}	
+		if($pickListLabels.length > 0) {	
+			for($i=0;$i<$pickListLabels.length;$i++){
+				
+				if($mapType.includes("Value Map")){
+					_click(_f("main").s_togglebutton("I want to choose a field from the list").rightOf(_f("main").ftedatagriditemrenderer($pickListLabels[$i])).inside(_f("main").s_navigatorcontent($mapType)));
+				}
+				//Special handling for look up fields
+				if(_isVisible(_f("main").s_button("Search and Select").rightOf(_f("main").ftedatagriditemrenderer($pickListLabels[$i])))){
+					_click(_f("main").s_button("Search and Select").rightOf(_f("main").ftedatagriditemrenderer($pickListLabels[$i])));
+				   	_setStrictVisibilityCheck(true);
+					_setValue(_f("main").s_textinput("lookUpSearchField"),$pickListValues[$i]);
+					_click($sfm_pg_sfmMapping.lkp_insideMapping);
+					_click(_f("main").ftedatagriditemrenderer($pickListValues[$i]));
+					_click($sfm_pg_sfmMapping.btn_selectForLookup);
+					_setStrictVisibilityCheck(false);
+				}
+				else{
+						_setSelected(_f("main").s_combobox("valuesCombo").rightOf(_f("main").ftedatagriditemrenderer($pickListLabels[$i])).inside(_f("main").s_navigatorcontent($mapType)),$pickListValues[$i]);
+				}
+			}
+		}
+		_setValue(_f("main").s_textinput("Save this map as").inside(_f("main").s_navigatorcontent($mapType)),$mapName);
+		_setValue(_f("main").s_textinput("Input ID Here").inside(_f("main").s_navigatorcontent($mapType)),$mapName);
+		_click(_f("main").s_button("Save").inside(_f("main").s_navigatorcontent($mapType)));
+		_wait(4000);
+		if(_isVisible(_f("main").button("OK"))){
+			_click(_f("main").button("OK"));
+		}
+		
+		//}
+		_wait(5000);
+	_assertVisible($sfm_pg_sfmMapping.label_mapSavedMsg);
+	//_click($sfm_pg_sfmMapping.btn_switchOnMapping);
+	_setStrictVisibilityCheck(false);
+	_click($bo_pg_sfmTransactionAndDesigner.btn_quickSave1);
+	_selectDomain();
+		
+};
+	
+	this.editExistingFieldsInMapping = function($containerName,$mapType,$pickListLabels,$pickListValues,$textLabels,$textValues,$mapName){
+		//This function edits an existing mapping and saves the map with the same name.
+		//This is designed to work in Classic and Lightning
+		//The user should be in the 'QC and Mapping' tab before calling this function
+		//Container Name should be "Work Order" or "Parts" or "Labor" or "Expense" or "Travel"
+		//Author : Janaki
+		 var $i = 0;
+		_click($sfm_pg_sfmMapping.btn_mappingTab);
+		_click(_f("main").s_label($containerName));
+		_setSelected(_f("main").s_combobox("searchCombo").inside(_f("main").s_navigatorcontent($mapType)),$mapName);
+		_click($sfm_pg_sfmMapping.btn_toggleMapOnOff);
+		if($pickListLabels.length > 0){
+			for($i=0;$i<$pickListLabels.length;$i++){
+				_setSelected(_f("main").s_combobox("valuesCombo").rightOf(_f("main").ftedatagriditemrenderer($pickListLabels[$i])).inside(_f("main").s_navigatorcontent($mapType)),$pickListValues[$i]);
+				_click(_f("main").s_button("Save").inside(_f("main").s_navigatorcontent($mapType)));
+
+				_wait(10000);
+
+				_wait(2000);
+
+				_assertVisible($sfm_pg_sfmMapping.label_mapSavedMsg);
+			}
+		}
+		if($textLabels.length > 0){
+			for($i=0;$i<$textLabels.length;$i++){
+				_setValue(_f("main").s_textinput("textip").rightOf(_f("main").ftedatagriditemrenderer($textLabels[$i])).inside(_f("main").s_navigatorcontent($mapType)), $textValues[$i]);
+			}
+			_click(_f("main").s_button("Save").inside(_f("main").s_navigatorcontent($mapType)));
+
+			_wait(10000);
+
+			_wait(2000);
+
+			_assertVisible($sfm_pg_sfmMapping.label_mapSavedMsg);
+		}
+		_setStrictVisibilityCheck(true);
+		_click($sfm_pg_sfmMapping.btn_switchOnMapping);
+		_setStrictVisibilityCheck(false);
+		_wait(10000);
+		_click($bo_pg_sfmTransactionAndDesigner.btn_quickSave1);
+		_wait(10000);
+	};
+	
+	this.addFieldsToExistingMapping = function($containerName,$mapType,$pickListLabels,$pickListValues,$textLabels,$textValues,$mapName){
+		//This function adds new fields to existing mapping and saves the map with the same name.
+		//This is designed to work in Classic and Lightning
+		//The user should be in the 'QC and Mapping' tab before calling this function
+		//Container Name should be "Work Order" or "Parts" or "Labor" or "Expense" or "Travel"
+		//Added by JJ
+		var $i = 0;
+		_selectDomain($g_domain);	
+		_click($sfm_pg_sfmMapping.btn_mappingTab);
+		_click(_f("main").s_label($containerName));
+		_setSelected(_f("main").s_combobox("searchCombo").inside(_f("main").s_navigatorcontent($mapType)),$mapName);
+		_click($sfm_pg_sfmMapping.btn_toggleMapOnOff);
+		if($pickListLabels.length > 0){
+					for($i=0;$i<$pickListLabels.length;$i++){
+						_click(_f("main").s_togglebutton("I want to choose a field from the list").rightOf(_f("main").ftedatagriditemrenderer($pickListLabels[$i])));
+						_setSelected(_f("main").s_combobox("valuesCombo").rightOf(_f("main").ftedatagriditemrenderer($pickListLabels[$i])),$pickListValues[$i]);
+						if(_isVisible($sfm_pg_sfmMapping.tab_fieldMapForExisting)){
+							_click($sfm_pg_sfmMapping.btn_saveFieldMap);
+						}
+						else if(_isVisible($sfm_pg_sfmMapping.tab_valueMapForExisting)){
+							_click($sfm_pg_sfmMapping.btn_saveMappingExistingRecord);
+						}
+						_wait(2000);
+						_assertVisible($sfm_pg_sfmMapping.label_mapSavedMsg);
+					}
+				}
+				if($textLabels.length > 0){
+					for($i=0;$i<$textLabels.length;$i++){
+						_setValue(_f("main").s_textinput("textip").rightOf(_f("main").ftedatagriditemrenderer($textLabels[$i])),$textValues[$i]);
+					}
+					if(_isVisible($sfm_pg_sfmMapping.tab_fieldMapForExisting) && !_isVisible($sfm_pg_sfmMapping.tab_valueMapForNew)){
+						_click($sfm_pg_sfmMapping.btn_saveFieldMap);
+					}
+					else if(_isVisible($sfm_pg_sfmMapping.tab_valueMapForExisting)){
+						_click($sfm_pg_sfmMapping.btn_saveMappingExistingRecord);
+					}
+					else if(_isVisible($sfm_pg_sfmMapping.tab_valueMapForNew) && !_isVisible($sfm_pg_sfmMapping.tab_fieldMapForExisting))
+						{
+						_click($sfm_pg_sfmMapping.btn_saveMappingExistingRecord);
+						//_click($sfm_pg_sfmMapping.btn_switchOnMapping);
+						}
+					else if(_isVisible($sfm_pg_sfmMapping.tab_fieldMapForExisting)&&_isVisible($sfm_pg_sfmMapping.tab_valueMapForNew)&&$mapType == "Field Map For Existing Records"){
+						_click($sfm_pg_sfmMapping.btn_saveFieldMap);
+					}
+					else if(_isVisible($sfm_pg_sfmMapping.tab_fieldMapForExisting)&&_isVisible($sfm_pg_sfmMapping.tab_valueMapForNew)&&$mapType == "Value Map For New Records"){
+						_click($sfm_pg_sfmMapping.btn_saveMappingExistingRecord);
+					}
+					_wait(2000);
+					_assertVisible($sfm_pg_sfmMapping.label_mapSavedMsg);
+				}
+		_setStrictVisibilityCheck(true);
+		_click($sfm_pg_sfmMapping.btn_toggleMapOnOff);
+		_setStrictVisibilityCheck(false);
+		_click($bo_pg_sfmTransactionAndDesigner.btn_quickSave1);
+	};
+	
+	this.deleteExistingMapping = function($mapName,$sourceObject,$targetObject){
+		//This function deletes an existing mapping if it exists
+		//Select Source object for field maps and make it "--None--" for value maps.
+		//Note: The mapping used here should not be used in any SFM process.
+		//This function takes care of logging the process id in which the mapping is used (If applicable)
+		//Added by JJ
+		$bo_act_navigation.navigatetoSFMMaps();
+		_selectDomain($g_domain);
+		_setSelected($sfm_pg_sfmMapping.cmb_mappingComboBox,$mapName);
+		_wait(5000);
+		var $temp = _getValue($sfm_pg_sfmMapping.txt_mappingNameInBuilder);
+		if($temp === "Use an existing map") {
+			_log("Mapping $mapName does not exist...Aborting");
+			return 0;	
+		}
+		_click($sfm_pg_sfmMapping.btn_deleteMappingOutsideProcess);
+		_setStrictVisibilityCheck(true);
+		_click($sfm_pg_sfmMapping.btn_yesButtonDeleteOutsideProcess);
+			 if(_isVisible($sfm_pg_sfmMapping.txt_mappingUsedWarning)) {
+				var $errMsg = _getValue($sfm_pg_sfmMapping.txt_mappingUsedWarning);
+				_log("FAIL: Cannot delete expression. Following is the error message: $errMsg");
+				_click($sfm_pg_sfmMapping.btn_okButtonAfterWarning);
+			   return 0;
+			}
+			_setStrictVisibilityCheck(false);
+			_assertVisible($sfm_pg_sfmMapping.label_mapDeleted);
+	};
+	
+	
+	this.createvalueMappingnewrecords = function($containerName,$pickListLabels,$pickListValues,$textLabels,$textValues,$mapName){
+		var $i=0;
+		_click($sfm_pg_sfmMapping.btn_mappingTab);
+		if($textLabels.length > 0){
+		_click(_f("main").s_label($containerName));
+		_click(_f("main").tab("Mapping(s)"));
+		_click(_f("main").tab("Value Map For New Records"));
+		_click(_f("main").s_button("New[2]"));
+		_wait(5000);
+		
+			for($i=0;$i<$textLabels.length;$i++){
+				_setValue(_f("main").s_textinput("textip").rightOf(_f("main").ftedatagriditemrenderer($textLabels[$i])),$textValues[$i]);
+		}
+			_wait(3000);
+			_setValue($sfm_pg_sfmMapping.txt_mappingNameForNew,$mapName);
+			_setValue($sfm_pg_sfmMapping.txt_mappingIdForNew,$mapName);
+			_click(_f("main").s_button("Save[2]"));
+	}
+};
+};

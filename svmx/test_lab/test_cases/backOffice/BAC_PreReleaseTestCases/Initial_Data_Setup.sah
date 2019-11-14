@@ -1,0 +1,111 @@
+
+//Author - Noor Salma Sharieff
+/*
+var $data_setup = _testcase("Data Set up");
+$data_setup.start();
+_setSpeed($g_stepSpeed);
+
+$bo_act_login.login($PRT_url, $bac_PRTun, $bac_PRTpwd);
+
+//Create a group wide profile
+$bo_act_navigation.navigateToConfigurationProfilesPage();
+if(_condition(_span("BackOffice") == null))
+$bo_act_configurationProfiles.createGroupProfile("BackOffice");
+_wait(1000);
+
+var $warrantyName = $bo_act_warrantyTerms.createWarrantyTermsSimple();
+_click(_link("Edit Layout"));
+_continueOnError();
+$bo_act_salesforcePageSetUp.dragAndDropFields($bo_pg_salesforcePageSetUp.btn_exchangeType, _cell("/entryCell/"));
+_stopOnError();
+$bo_act_salesforcePageSetUp.saveEditLayout();
+//$bo_act_workOrders.checkFieldAvailableInPageLayout($bo_pg_warrantyTerms.exchangeType,$bo_pg_salesforcePageSetUp.btn_exchangeType);
+
+var $proName = $bo_act_products.createProductSimple();
+_click(_link("Edit Layout"));
+_continueOnError();
+$bo_act_salesforcePageSetUp.dragAndDropFields($bo_pg_salesforcePageSetUp.btn_stockable, _cell("/entryCell/"));
+$bo_act_salesforcePageSetUp.dragAndDropFields($bo_pg_salesforcePageSetUp.btn_enableSerialized, _cell("/entryCell/"));
+_stopOnError();
+$bo_act_salesforcePageSetUp.saveEditLayout();
+*/
+var $caseNumber = $bo_act_Cases.createCase("New", "High", "Email");
+_click(_link("Edit Layout"));
+_continueOnError();
+$bo_act_salesforcePageSetUp.dragAndDropFields($bo_pg_salesforcePageSetUp.btn_componentSN, _cell("/entryCell/"));
+$bo_act_salesforcePageSetUp.dragAndDropFields($bo_pg_salesforcePageSetUp.btn_slaTerm, _cell("/entryCell/"));
+$bo_act_salesforcePageSetUp.dragAndDropFields($bo_pg_salesforcePageSetUp.btn_InitialResponseInternalBy, _cell("/entryCell/"));
+$bo_act_salesforcePageSetUp.dragAndDropFields($bo_pg_salesforcePageSetUp.btn_InitialResponseCustomerBy, _cell("/entryCell/"));
+$bo_act_salesforcePageSetUp.dragAndDropFields($bo_pg_salesforcePageSetUp.btn_actualInitialResponse, _cell("/entryCell/"));
+$bo_act_salesforcePageSetUp.dragAndDropFields($bo_pg_salesforcePageSetUp.btn_timeToInitialResponse, _cell("/entryCell/"));
+$bo_act_salesforcePageSetUp.dragAndDropFields($bo_pg_salesforcePageSetUp.btn_serviceMain, _cell("/entryCell/"));
+$bo_act_salesforcePageSetUp.dragAndDropFields($bo_pg_salesforcePageSetUp.btn_entitlementType, _cell("/entryCell/"));
+$bo_act_salesforcePageSetUp.dragAndDropFields($bo_pg_salesforcePageSetUp.btn_performAutoEntitlement, _cell("/entryCell/"));
+$bo_act_salesforcePageSetUp.dragAndDropFields($bo_pg_salesforcePageSetUp.btn_isEntitlementPerform, _cell("/entryCell/"));
+_stopOnError();
+$bo_act_salesforcePageSetUp.saveEditLayout();
+
+//Drag and Drop SLA Clock on case
+$bo_act_salesforcePageSetUp.dragAndDropSection("SLA",1);
+$bo_act_salesforcePageSetUp.dragAndDropVisualForcePage($bo_pg_salesforcePageSetUp.btn_SLAVisualPageCase, "SLA");
+$bo_act_salesforcePageSetUp.saveEditLayout();
+
+//Fields to get added on the Work Order
+var $accName = $bo_act_accounts.createAccount();
+
+var $proName1 = $bo_act_products.createProductSimple();
+var $IBName = $bo_act_installedProduct.createInstalledProduct($proName1,$accName,"");
+var $contactName = $bo_act_contacts.createContact($accName); 
+var $WONumber = $bo_act_installedProduct.createWOFromIB($IBName);
+_wait(5000);
+_click(_link("Edit Layout"));
+_continueOnError();
+$bo_act_salesforcePageSetUp.dragAndDropFields($bo_pg_salesforcePageSetUp.btn_slaTerm, _cell("/entryCell/"));
+$bo_act_salesforcePageSetUp.dragAndDropFields($bo_pg_salesforcePageSetUp.btn_actualRestoration, _cell("/entryCell/"));
+$bo_act_salesforcePageSetUp.dragAndDropFields($bo_pg_salesforcePageSetUp.btn_restorationCustomerBy, _cell("/entryCell/"));
+$bo_act_salesforcePageSetUp.dragAndDropFields($bo_pg_salesforcePageSetUp.btn_timeToRestore, _cell("/entryCell/"));
+$bo_act_salesforcePageSetUp.dragAndDropFields($bo_pg_salesforcePageSetUp.btn_restorationInternalBy, _cell("/entryCell/"));
+$bo_act_salesforcePageSetUp.dragAndDropFields($bo_pg_salesforcePageSetUp.btn_InitialResponseInternalBy, _cell("/entryCell/"));
+$bo_act_salesforcePageSetUp.dragAndDropFields($bo_pg_salesforcePageSetUp.btn_InitialResponseCustomerBy, _cell("/entryCell/"));
+$bo_act_salesforcePageSetUp.dragAndDropFields($bo_pg_salesforcePageSetUp.btn_actualInitialResponse, _cell("/entryCell/"));
+$bo_act_salesforcePageSetUp.dragAndDropFields($bo_pg_salesforcePageSetUp.btn_timeToInitialResponse, _cell("/entryCell/"));
+$bo_act_salesforcePageSetUp.dragAndDropFields($bo_pg_salesforcePageSetUp.btn_entitlementType, _cell("/entryCell/"));
+$bo_act_salesforcePageSetUp.dragAndDropFields($bo_pg_salesforcePageSetUp.btn_TravelRate, _cell("/entryCell/"));
+$bo_act_salesforcePageSetUp.dragAndDropFields($bo_pg_salesforcePageSetUp.btn_TravelUnit, _cell("/entryCell/"));
+$bo_act_salesforcePageSetUp.dragAndDropFields($bo_pg_salesforcePageSetUp.btn_ProformaInvoceAmount, _cell("/entryCell/"));
+$bo_act_salesforcePageSetUp.dragAndDropFields($bo_pg_salesforcePageSetUp.btn_TotalBillableAmount, _cell("/entryCell/"));
+$bo_act_salesforcePageSetUp.dragAndDropFields($bo_pg_salesforcePageSetUp.btn_RatePricingRule, _cell("/entryCell/"));
+$bo_act_salesforcePageSetUp.dragAndDropFields($bo_pg_salesforcePageSetUp.btn_RateType, _cell("/entryCell/"));
+$bo_act_salesforcePageSetUp.dragAndDropFields($bo_pg_salesforcePageSetUp.btn_performAutoEntitlement, _cell("/entryCell/"));
+$bo_act_salesforcePageSetUp.dragAndDropFields($bo_pg_salesforcePageSetUp.btn_acknowledgedByTech, _cell("/entryCell/"));
+$bo_act_salesforcePageSetUp.dragAndDropFields($bo_pg_salesforcePageSetUp.btn_AutoEntitlementStatus, _cell("/entryCell/"));
+$bo_act_salesforcePageSetUp.dragAndDropFields($bo_pg_salesforcePageSetUp.btn_isEntitlementPerform, _cell("/entryCell/"));
+$bo_act_salesforcePageSetUp.dragAndDropFields($bo_pg_salesforcePageSetUp.btn_scheduledDuration, _cell("/entryCell/"));
+
+_stopOnError();
+$bo_act_salesforcePageSetUp.saveEditLayout();
+
+
+$bo_act_navigation.navigateToHome();
+var $slaterm = $bo_act_slaTerms.createSlaTerms("Default");
+var $sconName = $bo_act_serviceMaintenanceContracts.createServiceMaintenanceContract($accName, $slaterm,1,0);
+var $location = $bo_act_locations.createLocation("", $accName, "MG Road", "India", "560001");
+$bo_act_serviceMaintenanceContracts.addCoveredLocationToSCON($sconName, $location);
+
+
+
+_click(_link("Edit Layout"));
+_continueOnError();
+$bo_act_salesforcePageSetUp.dragAndDropFields($bo_pg_salesforcePageSetUp.btn_slaTerm, _cell("/entryCell/"));
+$bo_act_salesforcePageSetUp.dragAndDropFields($bo_pg_salesforcePageSetUp.btn_startDate, _cell("/entryCell/"));
+$bo_act_salesforcePageSetUp.dragAndDropFields($bo_pg_salesforcePageSetUp.btn_endDate, _cell("/entryCell/"));
+$bo_act_salesforcePageSetUp.saveEditLayout();
+
+
+$bo_act_login.logOut();
+$data_setup.end();
+
+
+
+
+

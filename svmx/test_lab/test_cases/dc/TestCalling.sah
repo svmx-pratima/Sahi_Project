@@ -1,0 +1,167 @@
+var $RS_9362 = _testcase("RS_9362", "Creation of Event Subject Rule");
+$RS_9362.start();
+_setSpeed($g_stepSpeed);
+
+var $url = "https://test.salesforce.com";
+var $un = "commonuser@svmxpqt.com";
+var $pwd = "servicemax2";
+var $priority = "Medium";
+var $city = "Bangalore";
+var $userId="";
+var $loggedInUserName="commonuser@svmxpqt.com";
+var $firstName="Test";
+var $lastName="Technician";
+var $productFamily = ["--None--","GeneralSolution","AdvSolution","Accessory", "Storage"];
+var $productCode = "";
+var $orderStatus = "Open";
+var $orderType = "Depot Repair";
+var $accountName="SMAX Account"; 
+var $recordType = ["Depot","Depot Child","Depot Parent","Standard Location"];
+/*	
+ //Login to Salesforce
+$bo_act_login.login($url, $un, $pwd);
+var $loginStatus = $dc_sfApiDataCreation.login($un,$pwd);
+_log("Login Status is " + $loginStatus);
+
+ 
+//Creation of Account
+var $accountId = $dc_sfApiDataCreation.createAccount();
+_log("Account created is " + $accountId);
+
+var $contactName = $bo_act_contacts.createContact($accountName);
+var $locationName = $bo_act_locations.createLocation($recordType[3],$accountName,"#007","India","560001");
+var $productName = $bo_act_products.createProduct($productCode, $productFamily[0]);
+var $IBName = $bo_act_installedProduct.createInstalledProduct($productName, $accountName, $contactName);
+var $caseNumber="00001054" ;
+/**
+ * Create Case record
+ */
+//var $caseStatus = "Escalated";
+//var $casePriority = "Medium";
+//var $caseOrigin = "Phone";
+//var $caseNumber = $bo_act_Cases.createCase($caseStatus, $casePriority, $caseOrigin);
+//var $caseSite = "";
+//$bo_act_Cases.editCase($caseNumber,$accountName,$contactName,$IBName,$caseSite);
+ 
+//var $WO_Number = $bo_act_workOrders.createWorkOrder($caseNumber,$accountName,$contactName,$IBName,$orderStatus,$priority,$orderType);
+
+//Salesforce API Login for creation of data through Salesforce API
+/*
+var $loginStatus = $dc_sfApiDataCreation.login($un,$pwd);
+_log($loginStatus);
+ 
+
+//Creation of Service Team
+var $serviceTeamId = $dc_sfApiDataCreation.createServiceTeam();
+_log("ServiceTeam Id created is "+ $serviceTeamId);
+
+//Verify if Salesforce user exists
+var $userId = $dc_sfApiDataCreation.verifySFUserExists($loginStatus.sessionId,$firstName,$lastName);
+_log($userId);
+
+//Creation of Service Technician
+var $serviceTechnicianName = $dc_sfApiDataCreation.create_Technician($serviceTeamId,$userId);
+_log("Service Technician Name is "+ $serviceTechnicianName);
+
+//Configure Logged In User as Dispatcher
+var $loggedInUserName="commonuser@svmxpqt.com";
+var $loggedInUserFullName = $dc_sfApiDataCreation.fetchSFUserId($loginStatus.sessionId,$loggedInUserName);
+_log("Outside function" + $loggedInUserFullName);
+
+ 
+//Event Subject Rule creation
+$bo_act_login.login($url, $un, $pwd);
+var $ruleName= "PQT Rule1";
+var $ruleDescription= "PQT Rule Creation";
+$dc_act_eventSubjectRule.createEventSubjectRule($ruleName, $ruleDescription);
+_wait(4000);
+_click($dc_pg_eventSubjectRule.link_home);
+
+
+
+//Assignment of Current User as Dispatacher
+_click(_link("ServiceMax Setup"));
+_click(_div("Service Organization"));
+_click(_div("Service Org"));
+_setValue(_textbox("TrackTechTeam:selected_ID:TTree:PanelBar:PBItem:searchText"), "SMAX Bangalore Team");
+_click(_button("Go!"));
+_wait(10000);
+_click(_image("/radio_chk/",_leftOf(_link("SMAX Bangalore Team"))));
+_wait(3000);
+_click(_cell("Dispatcher"));
+_click(_button("Add Dispatcher"));
+_click(_image("Dispatcher Lookup (New Window)"));
+_selectWindow("lookup");
+_setValue(_textbox("lksrch"), $loggedInUserFullName);
+_click(_submit(" Go! "));
+_click(_link($loggedInUserFullName));
+_selectWindow();
+ _setValue(_textbox("TrackTechTeam:selected_ID:SVMXPageBlock:PbDispatch:DsptchrLst:0:j_id401"), $loggedInUserFullName);
+_click(_button("Save"));
+_wait(10000);
+_click(_button("Back To Setup Home"));
+_wait(1000);
+ 
+_click($dc_pg_eventSubjectRule.link_home);
+_wait(1000);
+
+//Creation of Work Order
+var $WO_Number = $dc_sfApiDataCreation.createWorkOrderUI($priority,$city);
+log("Work Order Number created is "+ $WO_Number);
+ 
+*/
+_click($dc_pg_eventSubjectRule.link_home);
+$dc_act_navigation.navigateToDispatchConsole();
+_wait(30000);
+_setSpeed(3000);
+_selectWindow("Dispatch Console");
+_focusWindow();
+
+//_setValue(_f("DispatchConsole").textinput("searchText"),$WO_Number);
+
+_click(_f("DispatchConsole").checkbox("New"));
+_wait(20000);
+_click(_f("DispatchConsole").checkbox("New"));
+_wait(20000);
+_setValue(_f("DispatchConsole").textinput("searchText"),"WO-00001911");
+_wait(10000);
+_call(Sahi.DRAG_DROP_SPEED=50);
+_click(_f("DispatchConsole").label("/Expand all/"));
+_wait(10000);
+var $passedTechName="/"+$serviceTechnicianName+"/";
+_log("Passed Tech Name:" +$passedTechName);
+
+_click(_f("DispatchConsole").uitextfield("/"+$passedTechName+"/"));
+_wait(1000);
+
+var $pos = _position(_f("DispatchConsole").uitextfield("/"+$passedTechName+"/"));
+_log($pos);
+var $xPos = parseInt($pos[0])+350;
+_log($xPos);
+var $yPos = parseInt($pos[1]);
+_log($yPos);
+_dragDrop(_f("DispatchConsole").uitextfield($WO_Number), _xy(_f("DispatchConsole").timescale("timeScale"), $xPos, $yPos));
+_wait(3000);
+var $text=_getText(_f("DispatchConsole").textinput("subject"));
+_log("Text in Event Subject WIndow", +$text);
+
+var $Actualtext=_getText(_f("DispatchConsole").textinput("subject"));
+_log($Actualtext);
+var $Expectedtext= $WO_Number+";"+$city+";"+$priority;
+_log($Expectedtext);
+_assertEqual($Actualtext==$ExpectedResult,"Test Case failed");
+
+
+
+var $deleteAccountResult;
+$deleteAccountResult = $dc_sfApiDataCreation.deleteAccount($accountId,$loginStatus.sessionId);
+
+var $deleteWOResult;
+$deleteWOResult = $dc_sfApiDataCreation.delete_WorkOrder($workOrderId,$loginStatus.sessionId);
+
+var $deleteServiceTeamResult;
+$deleteServiceTeamResult = $dc_sfApiDataCreation.delete_ServiceTeam($serviceTeamId,$loginStatus.sessionId);
+
+var $deleteServiceTechnician;
+$deleteServiceTechnician = $dc_sfApiDataCreation.$deleteServiceTechnician($serviceTechnicianId,$loginStatus.sessionId);
+ 

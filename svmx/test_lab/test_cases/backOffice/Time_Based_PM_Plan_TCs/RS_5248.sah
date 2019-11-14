@@ -1,0 +1,44 @@
+//author - Noor Salma Sharieff
+
+var $RS_5248 = _testcase("$RS_5248","Create a PM Plan from Account with coverage type as Account");
+$RS_5248.start();
+_setSpeed($g_stepSpeed);
+
+//Pre - Condition 
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+var $accName = $bo_act_accounts.createAccount();
+var $proName = $bo_act_products.createProduct("pro12", "--None--");
+var $installedProduct1 = $bo_act_installedProduct.createInstalledProduct($proName,$accName,"");
+var $installedProduct2 = $bo_act_installedProduct.createInstalledProduct($proName,$accName,"");
+var $location1 = $bo_act_locations.createLocation("", $accName, "MG Road", "India", "560001");
+var $location2 = $bo_act_locations.createLocation("", $accName, "MG Road", "India", "560001");
+
+//Test Steps
+var $PMPTempName = $bo_act_PMPlanTemplate.createTimeBasedPMPlanTemplate($proName, "Account (Visit Only)","","Weeks");
+var $PMPlan = $bo_act_PMPlan.createATimeBasedPMPlanFromAcc($accName, $PMPTempName,"Location (Must Have Location)");
+
+//Validations
+_assertExists($bo_pg_PMPlan.noRecordsToDisplayUnderPreventiveMaintenanceCoverages);
+
+var $startDate = _getText($bo_pg_PMPlan.div_startDate);
+_click($bo_pg_PMPlan.link_firstLinkInPMSchedule);
+var $lastRunDate = _getText($bo_pg_PMPlan.txt_lastRunDate);
+var $scheduleOnActual = _getText($bo_pg_PMPlan.txt_scheduledOnDate);
+_assertEqual($startDate,$lastRunDate, "Last Run Date is not equal to start date");
+
+_assert($lastRunDate != $scheduleOnActual,"Issue in Last Run Date and Scheduled On date");
+
+//Clean up functions
+$bo_act_accounts.deleteAccount($accName);
+$bo_act_products.deleteProduct($proName);
+$bo_act_installedProduct.deleteInstalledProduct($installedProduct1);
+$bo_act_installedProduct.deleteInstalledProduct($installedProduct2);
+$bo_act_locations.deleteLocation($location1);
+$bo_act_locations.deleteLocation($location2);
+$bo_act_PMPlanTemplate.deletePMPlanTemplate($PMPTempName);
+$bo_act_PMPlan.deletePMPlan($PMPlan);
+
+$RS_5248.end();
+
+
+

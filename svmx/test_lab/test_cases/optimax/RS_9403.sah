@@ -1,0 +1,65 @@
+var $user_credentials = $excel.readFromCustomExcel("../optimax/op_excleData/automation.xlsx", "User_Details","","");
+var $RTO_DispatchProcess = $excel.readFromCustomExcel("../optimax/op_excleData/automation.xlsx", "TestAppts","","");
+var $DP_Data = $excel.readFromCustomExcel("../optimax/op_excleData/automation.xlsx", "Dispatch_Process","","");
+
+
+for(var $i=0;$i<$user_credentials.length;$i++)
+{
+var $g_un = $user_credentials[$i][0];
+var $g_pwd = $user_credentials[$i][1];
+var $g_url = $user_credentials[$i][2];
+}
+
+var $dp_Id = $DP_Data[1][1];
+
+var $RS_9403 = _testcase("RS_9403", "Validate Appointment list page if the work order is dispatched");
+
+$RS_9403.start();
+	
+	
+$bo_act_login.login($g_url, $g_un, $g_pwd);
+
+_set($login_result, _fetch(login($g_un,$g_pwd)));
+_log($login_result);
+
+_set($number, _fetch(get_WO ($dp_Id)));
+_log($number);
+
+var $url;
+_set($url, window.document.location.href);
+_log($url);
+var $string=$url.substring(0,$url.lastIndexOf(".com")+5);
+
+var $wopage = $string + $number;
+_log($wopage);
+
+_navigateTo($wopage);
+
+var $WOName = _getText(_heading2("pageDescription"));
+_log($WOName);
+
+_assertNotExists(_button($RTO_DispatchProcess[0][13]));
+_assertNotVisible(_button($RTO_DispatchProcess[0][13]));
+
+$bo_act_login.logOut();
+
+//<browser>
+function login($g_un,$g_pwd){
+	
+	var $login_result = sforce.connection.login($g_un,$g_pwd);
+	$sfdc_sessionId = $login_result.sessionId;
+	_log("$sfdc_sessionId = "+$sfdc_sessionId);
+	return $login_result;
+} 
+
+function get_WO ($dp_Id)
+{
+		var WO_List = _call(sforce.connection.query("Select Id, Name, SVMXC__Dispatch_Process__c, SVMXC__SM_Appointment_Type__c, SVMXC__Work_Order_Scheduling_Status__c From SVMXC__Service_Order__c Where SVMXC__Dispatch_Process__c = '"+$dp_Id+"' AND SVMXC__Work_Order_Scheduling_Status__c = 'Dispatched' AND SVMXC__SM_Appointment_Type__c != null ORDER BY Id DESC limit 1"));
+		var WO_arr = WO_List.getArray("records");
+		var $number = WO_arr[0].Id;
+		_log($number);
+		return $number;
+}
+//</browser>
+
+$RS_9403.end();

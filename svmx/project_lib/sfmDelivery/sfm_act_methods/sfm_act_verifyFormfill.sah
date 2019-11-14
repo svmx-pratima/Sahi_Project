@@ -1,0 +1,41 @@
+//Function to verify formfill in SFM Delivery(Classic)
+
+var $sfm_act_verifySFDFormfill = new function sfm_act_verifySFDFormfill(){
+	this.verifyFormfill = function($caseNo) {
+		 _click(_span(1,_rightOf(_label("Case:"))));
+		_setValue(_textbox("svmx-form-field svmx-form-empty-field svmx-form-text[2]"),$caseNo);
+		_click(_span("/search-icon/"));
+		_wait(3000);
+		_click(_div("/"+$caseNo+"/",_under(_div("Case Number"))));
+		_click(_span("Select"));
+		_wait(3000);
+	};
+	this.verifyMultiAddFormfill = function($prodName) {
+		_click(_span("sfm-button-1087-btnIconEl"));
+		_setValue(_textbox("sfm-text-1279-inputEl"),$prodName);
+		_wait(3000);
+		_click(_span("sfm-button-1281-btnIconEl"));
+		_wait(3000);
+		_click(_div("svmx-grid-row-checker"));
+		_wait(1000);
+		_click(_span("Select"));
+		_wait(3000);
+		_click(_image("svmx-action-col-icon svmx-action-col-0   svmx-sfmd-edit-icon"));
+	};
+	this.verifyExtendedEditFormfill = function($prodName) {
+		_click(_span("sfm-button-1087-btnIconEl"));
+		_setValue(_textbox("sfm-text-1279-inputEl"),$prodName);
+		_wait(3000);
+		_click(_span("sfm-button-1281-btnIconEl"));
+		_wait(3000);
+		_click(_div("svmx-grid-row-checker"));
+		_wait(1000);
+		_click(_span("Select"));
+		_wait(3000);
+		_click(_image("svmx-action-col-icon svmx-action-col-0   svmx-sfmd-edit-icon"));
+		_wait(3000);
+			   
+	};
+	
+	};
+	

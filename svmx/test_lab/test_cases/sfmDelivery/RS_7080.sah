@@ -1,0 +1,31 @@
+//_includeOnce("../../../references/references.js");
+
+//author - Mamata Rout
+
+var $RS_7080 = _testcase("RS_7080", "Verify Save functionality on a Checklist Process");
+$RS_7080.start();
+_setSpeed($g_stepSpeed);
+
+
+var $checklistName=$bo_act_common.generateRandomName("7080Chklist");
+//change  the name of $sfmTemplateSaveAsName before execution.
+var $sfmTemplateSaveAsName=$bo_act_common.generateRandomName("7080Temp");
+var $mapName=$bo_act_common.generateRandomName("7080Map");
+var $objName="Work Order";
+var $sfmd_wizardName=$bo_act_common.generateRandomName("7080Wizard");
+var $wizardID=$sfmd_wizardName;
+var $nameOfTranType="to generate a Checklist/Survey type of Process";
+var $executionMode="Interactive";
+var $fieldActnType="SFM";
+var $actnName=$sfmName;
+var $wizardButtonName=$sfmName
+var $selectMapping="7080mapping";
+var $idealTime="99";
+var $invoiceNumber="INV999";
+
+//*************Login to Servicemax App***********
+$bo_act_login.login($g_url, $bac_un,$bac_pwd);
+
+//*****Navgate to SFm Designer and create a new SFM of type source to Target All ********
+			$bo_act_navigation.navigateToSfmTransactionDesigner();
+			$bo_act_SFM.newChecklistTypeSFM($checklistName,$nameOfTranType,$objName);

@@ -1,0 +1,72 @@
+
+var $bo_pg_autoEntitlementRule_CaseAndWO = new function bo_pg_autoEntitlementRule_CaseAndWO(){
+	
+	/**
+	 * Common Objects for Case and Work Order
+	 */
+	
+	this.btn_newRule = _submit("New Rule");
+	this.btn_deleteRule = _submit("Delete Rule");
+	this.btn_editeRule = _submit("Edit Rule");
+	this.btn_ruleSequence = _button("Rule Sequence");
+	
+	this.txt_autoEntitlementRuleName = _textbox("/CounterRule:RuleForm/");
+	this.txt_autoEntitlementRuleDescription = _textarea("/CounterRule:RuleForm/");
+	
+	// Rule 1st Row object
+	this.sel_workOrderField = _select("/CounterRuleList:0:j_id106/");
+	this.sel_workOrderFieldOperator = _select("/CounterRuleList:0:j_id110/");
+	this.sel_workOrderFieldValue = _textbox("/CounterRuleList:0:j_id114/");
+	
+	// Rule 2nd Row object
+	this.sel_CaseOrWOField2ndRow = _select("/CounterRuleList:1:j_id106/");
+	this.sel_CaseOrWOFieldOperator2ndRow = _select("/CounterRuleList:1:j_id110/");
+	this.sel_CaseOrWOFieldValue2ndRow = _textbox("/CounterRuleList:1:j_id114/");
+	
+	/**
+	 * Selects Entitlement Settings radio button
+	 */
+	this.sel_EntitlementSettings = function($EntitSetting){
+		_click(_radio($EntitSetting));
+	};
+	
+	//Object for the section "Specify the Entitlement settings to be used when a Work Order matches the above criteria."
+	
+	this.sel_entitlementBePerformedOn_ProductsServiced = _select(0,_rightOf(_cell("/Should entitlement be performed on Products Serviced?/")));
+	this.sel_parentIBOfComponentBeIncluded = _select(0,_rightOf(_cell("/Should the parent installed product of the Component be included/")));
+	this.sel_topLevelIBOfComponentBeIncluded = _select(0,_rightOf(_cell("/Should the top-level installed product of the Component be included/")));
+	this.sel_entitlementConsider_warrantiesORSconORBoth = _select(0,_rightOf(_cell("Should auto-entitlement consider only warranties or service contracts or both?")));
+	this.sel_accountOnWoMatchedWithScon = _select(0,_rightOf(_cell("Should the Account on the Work Order be matched with the Account on the Service Contract?")));
+	this.sel_contactOnWoMatchedWithScon = _select(0,_rightOf(_cell("Should the Contact on the Work Order be matched with the contacts entitled in the Service Contract?")));
+	this.sel_locationOnWoIncluded = _select(0,_rightOf(_cell("Should Location on Work Order be included in entitlement check?")));
+	this.sel_multipleWarrantiesOrScon = _select(0,_rightOf(_cell("/If multiple warranties and\\/or service contracts are found/")));
+	this.sel_warrantiesOrSconSearched = _select(0,_rightOf(_cell("Should warranties and service contracts be searched using counters or validity dates or both?")));
+	this.sel_ConsiderSlaCoverageDefined = _select(0,_rightOf(_cell("/Only consider SLA coverage defined at the service contract header level rather than SLA coverage/")));
+	this.sel_disableAutoEntitlementOnMultipleEntitlements = _select(0,_rightOf(_cell("/If multiple warranties and\\/or service contracts are found, do you want to disable Auto-Entitlement/")));
+	this.sel_mostSuitableMatchForAutoEntitlementOnMultipleEntitlements = _select(0,_rightOf(_cell("/service contracts are found, how should auto-entitlement identify the most suitable match/")));
+	this.btn_save = _submit("Save");
+	
+	//Object for the section "Specify the Entitlement settings to be used when a Case matches the above criteria." ONLY FOR CASE
+	this.sel_accountOnCaseMatchedWithScon = _select(0,_rightOf(_cell("Should the Account on the Case be matched with the Account on the Service Contract?")));
+	this.sel_contactOnCaseMatchedWithScon = _select(0,_rightOf(_cell("Should the Contact on the Case be matched with the contacts entitled in the Service Contract?")));
+	this.sel_locationOnCaseIncluded = _select(0,_rightOf(_cell("Should Location on Case be included in entitlement check?")));
+	
+	
+	this.selectAutoEntitlementRule_CaseAndWO = function($autoEntitlementRule_Name){
+		_click(_checkbox(0,_leftOf(_cell($autoEntitlementRule_Name,_near(_div("Rule Name"))))));
+		
+		};
+
+   //Changing the Rule Sequence
+	this.selectAutoEntitlementRule_Sequence = function($autoEntitlementRule_Name){
+		_setSelected(_select(0),$autoEntitlementRule_Name);
+		_click(_imageSubmitButton("Bottom"));
+		_click(_submit("Submit"));
+		};
+		
+	this.selectAutoEntitlementRule_SequenceTop = function($autoEntitlementRule_Name){
+		_setSelected(_select(0),$autoEntitlementRule_Name);
+		_click(_imageSubmitButton("Top"));
+		_click(_submit("Submit"));
+		};
+};

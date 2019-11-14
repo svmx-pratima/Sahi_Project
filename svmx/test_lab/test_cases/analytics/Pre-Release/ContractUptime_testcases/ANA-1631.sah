@@ -1,0 +1,180 @@
+var $an_cu_1631 = _testcase("ANA-1631","SCON within Coverage of Covered Product Advanced EXPR");
+$an_cu_1631.start();
+var $data = _readExcelFile("../../../analytics/Pre-Release/Data_Meghana.xlsx","Sheet1",true);
+var $un = $data[1]["Username"];
+var $pwd = $data[1]["pwd"];
+var $url = "https://test.salesforce.com";
+var $Account = $data[1]["Account"];
+var $Technician = $data[1]["Technician"];
+var $Product = $data[1]["Product"];
+var $OrderStatus = $data[1]["OrderStatus"];
+var $Closedon = $data[1]["ClosedOn"];
+var $Site = $data[1]["Site"];
+var $Component = $data[1]["Component"];
+var $ScheduledDate = $data[1]["ScheduledDate"];
+var $PreferredStartDate = $data[1]["PreferredStartDate"];
+var $PreferredEndDate = $data[1]["PreferredEndDate"];
+var $GuranteedUptime = $data[1]["GuranteedUptime"];
+var $user_meghana = $data[1]["user_meghana"];
+$bo_act_login.login($url, $un, $pwd);
+
+
+// To create a SCON
+
+var $ana_1631_create_SCON1 = "SVMXC__Service_Contract__c SCON1 = new SVMXC__Service_Contract__c(Name = 'ANA-1631-SCON1' , SVMXC__Company__c = '"+$Account+"' , SVMXC__Active__c = True, SVMXC__Start_Date__c = Date.valueOf('2017-01-01') , SVMXC__End_Date__c = Date.valueOf('2018-12-31') );insert SCON1;";
+var $ana_1631_result1 = $op_act_sForceApiCall.sForceQuery($un, $pwd, $ana_1631_create_SCON1 , "create");
+var $ana_1631_query_SCON1 = "Select Id,Name from SVMXC__Service_Contract__c where Name = 'ANA-1631-SCON1'";
+
+
+var $ana_1631_fetch_SCON1  = $op_act_sForceApiCall.sForceQuery($un, $pwd, $ana_1631_query_SCON1,"query");
+
+
+_wait(5000);
+_log($ana_1631_fetch_SCON1);
+
+var $ana_1631_SCON1 ;
+var $var31;
+var $varRV1;
+var $ana_1631_var1;
+$ana_1631_SCON1  = $ana_1631_fetch_SCON1[0].Id;
+var $ana_1631_SCOName1 = $ana_1631_fetch_SCON1[0].Name;
+_log($ana_1631_SCON1);
+_log($ana_1631_SCOName1);
+
+	$ana_1631_SCON1 = $ana_1631_fetch_SCON1[0].Id;
+
+
+_log($ana_1631_SCON1);
+
+// Create an IB
+
+var $ana_1631_create_IB1 = "SVMXC__Installed_Product__c IB01 = new SVMXC__Installed_Product__c(SVMXC__Company__c = '"+$Account+"' , Name = 'ANA-1631-IB1' , SVMXC__Status__c = 'Installed');insert IB01;";
+var $ana_1631_result_IB1  = $op_act_sForceApiCall.sForceQuery($un, $pwd, $ana_1631_create_IB1 , "create");
+
+_log($ana_1631_result_IB1);
+var $ana_1631_get_IB1 = "Select Id , Name from SVMXC__Installed_Product__c where Name = 'ANA-1631-IB1' Limit 1";
+
+var $ana_1631_fetch_IB1  = $op_act_sForceApiCall.sForceQuery($un, $pwd, $ana_1631_get_IB1,"query");
+_wait(5000);
+var $ana_1631_IB_ID1;
+
+	
+	$ana_1631_IB_ID1 = $ana_1631_fetch_IB1[0].Id ;
+
+
+
+_log($ana_1631_IB_ID1);
+
+// Create Covered Product 
+var $ana_1631_create_CP1 = "SVMXC__Service_Contract_Products__c CP01 = new SVMXC__Service_Contract_Products__c(SVMXC__Installed_Product__c = '"+$ana_1631_IB_ID1+"',SVMXC__Service_Contract__c = '"+$ana_1631_SCON1+"', Custom_checkbox__c = false , SVMXC__Is_Billable__c = true , SVMXC__Start_Date__c = System.Today()  ); insert CP01;";
+var $ana_1631_result_CP1 = $op_act_sForceApiCall.sForceQuery($un, $pwd, $ana_1631_create_CP1 , "create");
+var $ana_1631_get_CP1 = "Select Id , Name from SVMXC__Service_Contract_Products__c where Createdby.Id = '"+$user_meghana+"' Order by CreatedDate DESC Limit 1";
+var $ana_1631_fetch_CP1   = $op_act_sForceApiCall.sForceQuery($un, $pwd, $ana_1631_get_CP1,"query");
+var $ana_1631_cp_ID1;
+_wait(5000);
+	
+	$ana_1631_cp_ID1 = $ana_1631_fetch_CP1[0].Id ;
+	
+
+// SCON2 and IB2 for 2nd Calculation method.
+
+
+//To create a SCON
+
+var $ana_1631_create_SCON2 = "SVMXC__Service_Contract__c SCON1 = new SVMXC__Service_Contract__c(Name = 'ANA-1631-SCON2' , SVMXC__Company__c = '"+$Account+"' , SVMXC__Active__c = True, SVMXC__Start_Date__c = Date.valueOf('2018-01-01') , SVMXC__End_Date__c = Date.valueOf('2018-12-31') );insert SCON1;";
+var $ana_1631_result2 = $op_act_sForceApiCall.sForceQuery($un, $pwd, $ana_1631_create_SCON2 , "create");
+var $ana_1631_query_SCON2 = "Select Id,Name from SVMXC__Service_Contract__c where Name = 'ANA-1631-SCON2'";
+
+
+var $ana_1631_fetch_SCON2  = $op_act_sForceApiCall.sForceQuery($un, $pwd, $ana_1631_query_SCON2,"query");
+_wait(5000);
+_log($ana_1631_fetch_SCON2);
+
+var $ana_1631_SCON2 ;
+var $var32;
+var $varRV2;
+var $ana_1631_var2;
+$ana_1631_SCON2  = $ana_1631_fetch_SCON2[0].Id;
+var $ana_1631_SCOName2 = $ana_1631_fetch_SCON2[0].Name;
+_log($ana_1631_SCON2);
+_log($ana_1631_SCOName2);
+
+	$ana_1631_SCON2 = $ana_1631_fetch_SCON2[0].Id;
+
+
+_log($ana_1631_SCON2);
+
+//Create an IB
+
+var $ana_1631_create_IB2 = "SVMXC__Installed_Product__c IB01 = new SVMXC__Installed_Product__c(SVMXC__Company__c = '"+$Account+"' , Name = 'ANA-1631-IB2' , SVMXC__Status__c = 'Installed');insert IB01;";
+var $ana_1631_result_IB2  = $op_act_sForceApiCall.sForceQuery($un, $pwd, $ana_1631_create_IB2 , "create");
+
+_log($ana_1631_result_IB2);
+var $ana_1631_get_IB2 = "Select Id , Name from SVMXC__Installed_Product__c where Name = 'ANA-1631-IB2' Limit 1";
+
+var $ana_1631_fetch_IB2  = $op_act_sForceApiCall.sForceQuery($un, $pwd, $ana_1631_get_IB2,"query");
+
+var $ana_1631_IB_ID2;
+
+	
+	$ana_1631_IB_ID2 = $ana_1631_fetch_IB2[0].Id ;
+
+
+
+_log($ana_1631_IB_ID2);
+
+//Create Covered Product 
+var $ana_1631_create_CP2 = "SVMXC__Service_Contract_Products__c CP01 = new SVMXC__Service_Contract_Products__c(SVMXC__Installed_Product__c = '"+$ana_1631_IB_ID2+"',SVMXC__Service_Contract__c = '"+$ana_1631_SCON2+"', Custom_checkbox__c = true); insert CP01;";
+var $ana_1631_result_CP2 = $op_act_sForceApiCall.sForceQuery($un, $pwd, $ana_1631_create_CP2 , "create");
+var $ana_1631_get_CP2 = "Select Id , Name from SVMXC__Service_Contract_Products__c where Createdby.Id = '"+$user_meghana+"' Order by CreatedDate DESC Limit 1";
+var $ana_1631_fetch_CP2  = $op_act_sForceApiCall.sForceQuery($un, $pwd, $ana_1631_get_CP2,"query");
+var $ana_1631_cp_ID2;
+
+	
+	$ana_1631_cp_ID2 = $ana_1631_fetch_CP2[0].Id ;
+	
+	
+$an_act_Contract_Uptime.schedule_notifications("meghana.rao@servicemax.com");
+
+// FIRST ONE 
+
+var $ana_1631_guranteed_uptime1 = null;
+var $ana_1631_calculationmethod1;
+
+
+var $ana_1631_query_RV1 = "Select SVMXC__Installed_Product__c,SVMXC__Configuration_Name__c ,SVMXC__Contract__c,SVMXC__Gauranteed_Up_Time__c from SVMXC__SPM_Contract_Up_Time__c where SVMXC__Installed_Product__c = '"+$ana_1631_IB_ID1+"' AND SVMXC__Contract__c = '"+$ana_1631_SCON1+"'";
+var $ana_1631_resultRV1 = $op_act_sForceApiCall.sForceQuery($un, $pwd, $ana_1631_query_RV1,"query");
+
+$ana_1631_resultRV1.forEach(function($varRV1) {
+	
+
+	$ana_1631_guranteed_uptime1 = $varRV1.SVMXC__Gauranteed_Up_Time__c;
+	$ana_1631_calculationmethod1 = $varRV1.SVMXC__Configuration_Name__c;
+
+});
+
+
+
+var $ana_1631_guranteed_uptime2 = null;
+var $ana_1631_calculationmethod2;
+
+
+var $ana_1631_query_RV2 = "Select SVMXC__Installed_Product__c,SVMXC__Configuration_Name__c ,SVMXC__Contract__c,SVMXC__Gauranteed_Up_Time__c from SVMXC__SPM_Contract_Up_Time__c where SVMXC__Installed_Product__c = '"+$ana_1631_IB_ID2+"' AND SVMXC__Contract__c = '"+$ana_1631_SCON2+"'";
+var $ana_1631_resultRV2 = $op_act_sForceApiCall.sForceQuery($un, $pwd, $ana_1631_query_RV2,"query");
+
+$ana_1631_resultRV2.forEach(function($varRV2) {
+	
+
+	$ana_1631_guranteed_uptime2 = $varRV2.SVMXC__Gauranteed_Up_Time__c;
+	$ana_1631_calculationmethod2 = $varRV2.SVMXC__Configuration_Name__c;
+
+});
+
+
+_assertNotEqual($ana_1631_calculationmethod1, $ana_1631_calculationmethod2);
+$an_cu_1631.end();
+
+
+
+
+

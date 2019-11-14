@@ -1,0 +1,68 @@
+../../../test_lab/test_cases/backOffice/BAC_PreReleaseTestCases/RS_10337_Checklist_FeatureAdmin.sah
+../../../test_lab/test_cases/backOffice/BAC_PreReleaseTestCases/RS_10341_Checklist_SOU.sah
+../../../test_lab/test_cases/backOffice/BAC_PreReleaseTestCases/RS_10342_Checklist_SOU.sah
+../../../test_lab/test_cases/backOffice/BAC_PreReleaseTestCases/RS_10343_Checklist_SOU.sah
+../../../test_lab/test_cases/backOffice/BAC_PreReleaseTestCases/BAC_SFMSearch.sah
+../../../test_lab/test_cases/backOffice/BAC_PreReleaseTestCases/RS_5422_SFM.sah
+../../../test_lab/test_cases/backOffice/BAC_PreReleaseTestCases/RS_5244_SLAOnCase.sah
+../../../test_lab/test_cases/backOffice/BAC_PreReleaseTestCases/RS_5255_SLAOnWO.sah
+../../../test_lab/test_cases/backOffice/BAC_PreReleaseTestCases/RS_5258_TimeBasedPM.sah
+../../../test_lab/test_cases/backOffice/BAC_PreReleaseTestCases/RS_5259_SLAOnCase.sah
+../../../test_lab/test_cases/backOffice/BAC_PreReleaseTestCases/RS_5260_TimeBasedPM.sah
+../../../test_lab/test_cases/backOffice/BAC_PreReleaseTestCases/RS_5300_SLAOnWO.sah
+../../../test_lab/test_cases/backOffice/BAC_PreReleaseTestCases/RS_5440_SFM.sah
+../../../test_lab/test_cases/backOffice/BAC_PreReleaseTestCases/RS_7298_AutoEntitlementForWO.sah
+../../../test_lab/test_cases/backOffice/BAC_PreReleaseTestCases/RS_7304_AutoEntitlementForCase.sah
+../../../test_lab/test_cases/backOffice/BAC_PreReleaseTestCases/RS_5467_ManualEntitlementForCase.sah
+../../../test_lab/test_cases/backOffice/BAC_PreReleaseTestCases/RS_7019_Inventory.sah
+../../../test_lab/test_cases/backOffice/BAC_PreReleaseTestCases/RS_7027_Inventory.sah
+../../test_lab/test_cases/backOffice/BAC_PreReleaseTestCases/RS_7439_ConditionBasedPM.sah
+../../../test_lab/test_cases/backOffice/BAC_PreReleaseTestCases/RS_7441_AppAdministration.sah
+../../../test_lab/test_cases/backOffice/BAC_PreReleaseTestCases/RS_9810_SFMWizardHandOver.sah
+../../../test_lab/test_cases/backOffice/BAC_PreReleaseTestCases/RS_9834_checklist.sah
+../../../test_lab/test_cases/backOffice/BAC_PreReleaseTestCases/RS_12561_GetPrice.sah
+../../../test_lab/test_cases/backOffice/BAC_PreReleaseTestCases/RS_5334_GetPrice.sah
+../../../test_lab/test_cases/backOffice/BAC_PreReleaseTestCases/RS_12560_GetPriceOnScon-Travel.sah
+
+
+
+
+
+//Sanity Test Case Execution ON DEV ORG
+//SFM Search
+//../../../test_lab/test_cases/backOffice/SFMSearch_testcases/RS_10118.sah
+//../../../test_lab/test_cases/backOffice/SFMSearch_testcases/RS_10121.sah
+//TIME BASED PM
+//../../../test_lab/test_cases/backOffice/Time_Based_PM_Plan_TCs/RS_5248.sah
+//../../../test_lab/test_cases/backOffice/Time_Based_PM_Plan_TCs/RS_5249.sah
+//../../../test_lab/test_cases/backOffice/Time_Based_PM_Plan_TCs/RS_5258.sah
+//CHECKLIST
+//../../../test_lab/test_cases/backOffice/CheckList_testcases/RS_10337.sah
+//ENTITLEMENT
+//../../../test_lab/test_cases/backOffice/Entitlement_TCs/RS_7304.sah
+//../../../test_lab/test_cases/backOffice/Entitlement_TCs/RS_5604.sah
+//GET PRICE
+//../../../test_lab/test_cases/backOffice/GetPrice_TCs/RS_10011.sah
+//../../../test_lab/test_cases/backOffice/GetPrice_TCs/RS_10022.sah
+//INVENTORY
+//../../../test_lab/test_suites/backOffice/backOffice_InventoryTestCases.suite
+//SERVICE FLOW WIZARD
+//../../../test_lab/test_cases/backOffice/SFM_WebServicesAndJSCodeSnippets/RS_9830.sah
+//../../../test_lab/test_cases/backOffice/SFM_WebServicesAndJSCodeSnippets/RS_9831.sah
+//../../../test_lab/test_cases/backOffice/SFM_WebServicesAndJSCodeSnippets/RS_9832.sah
+//SFM DESIGNER
+//../../../test_lab/test_cases/backOffice/SFM_Designer_TCs/RS_5434.sah
+//../../../test_lab/test_cases/backOffice/SFM_Designer_TCs/RS_5435.sah
+//../../../test_lab/test_cases/backOffice/SFM_Designer_TCs/RS_5440.sah
+//../../../test_lab/test_cases/backOffice/SFM_Designer_TCs/RS_5441.sah
+//SLA
+//../../../test_lab/test_cases/backOffice/SLA_on_WO/RS_5263.sah
+//../../../test_lab/test_cases/backOffice/SLA_on_WO/RS_5255.sah
+//../../../test_lab/test_cases/backOffice/SLA_on_Case/RS_5259.sah
+//../../../test_lab/test_cases/backOffice/SLA_on_Case/RS_5247.sah
+//TRIGGER
+//../../../test_lab/test_cases/backOffice/Trigger_TestCases/RS_10320.sah
+//../../../test_lab/test_cases/backOffice/Trigger_TestCases/RS_10348.sah
+//APM Integration
+//../../../test_lab/test_cases/backOffice/APM_Integration_TCs/RS_11871.sah
+//../../../test_lab/test_cases/backOffice/APM_Integration_TCs/RS_11872.sah

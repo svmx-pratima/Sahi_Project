@@ -1,0 +1,43 @@
+//Author	:- 	Shashikala Kamath
+//Modified By :- Ashwini Holagi
+
+
+var $swat_tc_001_SFMSearch = _testcase("swat_tc_001_SFMSearch","Create SFM Search in configuration screen");
+
+$swat_tc_001_SFMSearch.start();
+
+_setSpeed($g_stepSpeed);
+	
+var $objectName = "Work Order";
+var $fieldName = "Order Status";
+var $operator = "Equals";
+var $fieldName1 = "Order Type";
+
+	
+//Login to the Application
+$bo_act_login.login($swat_Url,$swat_un,$swat_pwd);
+
+//Create Work Order through API
+var $workOrderNo = $swat_act_createDataUsingApi.createWorkOrder($swat_un, $swat_pwd, $swat_ClientId, $swat_ConsumerSecret, $swat_OrgInstance);
+
+// Create SFM Search
+var $searchItem = $swat_act_sfmSearch.createSfmSearch($objectName, $fieldName, $operator, $fieldName1);
+
+// Search Work Order using SFM Search
+$swat_act_sfmSearch.launchSfmSearch($searchItem, $workOrderNo);
+
+//Delete SFM Search
+$swat_act_sfmSearch.deleteSfmSearch($searchItem);
+
+//Delete Work Order
+//$swat_act_deleteData.deleteData($workOrderNo);
+
+$swat_tc_001_SFMSearch.end();
+
+
+
+
+
+ 
+
+

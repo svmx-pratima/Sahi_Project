@@ -1,0 +1,78 @@
+
+//author - Meghana Rao
+
+var $RS_7456 = _testcase("$RS_7456","Verify the user entered value takes precedence over mapping");
+$RS_7456.start();
+_setSpeed($g_stepSpeed);
+var $Workbenchurl = "https://workbench.developerforce.com/login.php";
+//Pre - Condition 
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+
+var $MapName = $bo_act_common.generateRandomName("SPMMap");
+
+// To create SFM Mapping
+
+$bo_act_SFM_mappings.createSFMMaps_AccounttoPMPlan($MapName,$MapName , "Account", "Preventive Maintenance Plan", "Parent Account ID");
+
+//Test Data Creation
+
+
+var $parentaccName = $bo_act_accounts.createAccount();
+var $newAccountName = $bo_act_accounts.createAccount();
+var $accountName = $bo_act_accounts.createAccount_parentaccount($parentaccName);
+var $contactName = $bo_act_contacts.createContact($accountName);
+var $proName = $bo_act_products.createProduct("pro12", "--None--");
+$bo_act_navigation.navigateToAccountsPage();
+_click(_link($accountName));
+
+// To set The SET007 to The given Map Name
+
+$bo_act_configurationProfiles.editGroupProfileForTextSettings($groupProfileName, "Preventive Maintenance", "Manage PM Plan", "SET007", $MapName);
+
+var $PMPTemplate = $bo_act_PMPlanTemplate.createUsageBasedConditionPMPTemplateNoSave($proName);
+$bo_act_PMPlanTemplate.updateUsageConditionRulesGridWithAdjFields("Months", "Every", 1, $bo_act_common.currentDate("-"), $bo_act_common.getfutureDate(1,"-"),"Fixed", 1,100, 10,"Days");
+$bo_act_PMPlanTemplate.saveConditionBasedPM();
+
+// To goto the Account and create PM Plan and verify if the Maps are working fine
+var $PMPlan = $bo_act_PMPlan.overwrite_mappedvalue($newAccountName, $parentaccName,$accountName, $PMPTemplate);
+
+
+/*
+ * To verify if the OVer-ridden value takes precedence over the Mapped value
+ */
+
+
+var $PMPlanQuery = "Select "+$orgnamespace+"__Account__r.Name from "+$orgnamespace+"__PM_Plan__c where Name = '"+$PMPlan+"'";
+var $pmplanqueryfetch =  $op_act_sForceApiCall.sForceQuery($bac_un, $bac_pwd, $PMPlanQuery , "query");
+
+if($orgnamespace == "SVMXC")
+{
+var $ActualNewAccountName = $pmplanqueryfetch[0].SVMXC__Account__r.Name;
+
+}
+else
+	
+{
+	var $ActualNewAccountName = $pmplanqueryfetch[0].SVMXDEV__Account__r.Name;
+}
+
+_assertEqual($newAccountName,$ActualNewAccountName);
+// Search the PM Plan Name
+$bo_act_common.cleanUpfunctionold($PMPlan);
+
+// CleanUp Function
+$bo_act_common.deleteAccount($bac_un, $bac_pwd, $accountName);
+$bo_act_common.deleteAccount($bac_un, $bac_pwd, $newAccountName);
+$bo_act_common.deleteAccount($bac_un, $bac_pwd, $parentaccName);
+$bo_act_common.deleteContact($bac_un, $bac_pwd, $contactName);
+$bo_act_common.deleteProduct($bac_un, $bac_pwd,$proName);
+$bo_act_common.deletePMPlantemplate($bac_un, $bac_pwd, $orgnamespace,$PMPTemplate);
+
+/*
+ * Delete SFM Mapping
+ */
+$bo_act_SFM_mappings.deleteSFMMappings($MapName, "Account", "Preventive Maintenance Plan");
+$RS_7456.end();
+
+
+

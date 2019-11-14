@@ -1,0 +1,74 @@
+var $user_credentials = $excel.readFromCustomExcel("../op_excleData/automation.xlsx", "User_Details","","");
+
+
+//var $nArr;
+//Calling the sforce API
+for(var $i=0;$i<$user_credentials.length;$i++)
+{
+var $g_un = $user_credentials[$i][0];
+var $g_pwd = $user_credentials[$i][1];
+var $g_url = $user_credentials[$i][2];
+}
+
+var $TechEligibilityRule = _testcase("TechEligibilityRule", "Create New Technician Eligibility Rule");
+
+$TechEligibilityRule.start();
+
+/*var $g_url = "https://test.salesforce.com/";
+var $g_un = "govendhan@svmx-cct5.org.cct5part1";
+var $g_pwd = "maxpl0re2";*/
+
+$bo_act_login.login($g_url, $g_un, $g_pwd);
+		
+
+var $date = "" + new Date();
+var $TechEligibilityName = "TechEligibilityRule_" + $date;
+var $rowCount = 0;
+var $rowIndex = "1";
+
+_click(_link("ServiceMax Setup"));
+_wait(20000,_isVisible(_div("Dispatch Management")));
+_click(_div("Dispatch Management"));
+
+_wait(20000,_isVisible(_div("Technician Eligibility Rules")));
+_click(_div("Technician Eligibility Rules"));
+
+_set($rowCount, _table("j_id0:SVMX_FORM:SMXC_PageBLOCK1:Pageblck1Sec1:j_id111:blck1Table").rows.length);
+$rowCount=$rowCount-1;
+_click(_button("New Rule"));
+_setValue(_textbox("j_id0:SVMX_FORM:SMXC_PageBLOCK1:Pageblck1Sec1:j_id111:blck1Table:" + $rowCount + ":j_id117"), $TechEligibilityName);
+_setValue(_textarea("j_id0:SVMX_FORM:SMXC_PageBLOCK1:Pageblck1Sec1:j_id111:blck1Table:" + $rowCount + ":j_id121"), "Technician Eligibility Rule Automation");
+_setSelected(_select("j_id0:SVMX_FORM:SMXC_PageBLOCK1:Pageblck1Sec4:SVMX_TAB1table1:0:j_id131"), "Order Status");
+_setSelected(_select("j_id0:SVMX_FORM:SMXC_PageBLOCK1:Pageblck1Sec4:SVMX_TAB1table1:0:j_id135"), "Equals");
+_setValue(_textbox("j_id0:SVMX_FORM:SMXC_PageBLOCK1:Pageblck1Sec4:SVMX_TAB1table1:0:j_id139"), "Open");
+_setSelected(_select("j_id0:SVMX_FORM:SMXC_PageBLOCK1:Pageblck1Sec4:SVMX_TAB1table1:1:j_id131"), "Order Type");
+_click(_cell("--None--EqualsNot EqualGreater ThanGreater or Equal ToLess ThanLess or Equal ToStarts WithContainsDoes Not ContainIncludesExcludesIs NullIs Not Null[1]"));
+_setSelected(_select("j_id0:SVMX_FORM:SMXC_PageBLOCK1:Pageblck1Sec4:SVMX_TAB1table1:1:j_id135"), "Equals");
+_setValue(_textbox("j_id0:SVMX_FORM:SMXC_PageBLOCK1:Pageblck1Sec4:SVMX_TAB1table1:1:j_id139"), "Cleaning");
+_click(_imageSubmitButton("Add"));
+_setSelected(_select("j_id0:SVMX_FORM:SMXC_PageBLOCK1:Pageblck1Sec4:SVMX_TAB1table1:2:j_id131"), "Order Type");
+_setSelected(_select("j_id0:SVMX_FORM:SMXC_PageBLOCK1:Pageblck1Sec4:SVMX_TAB1table1:2:j_id135"), "Equals");
+_setValue(_textbox("j_id0:SVMX_FORM:SMXC_PageBLOCK1:Pageblck1Sec4:SVMX_TAB1table1:2:j_id139"), "Repair");
+_setValue(_textbox("j_id0:SVMX_FORM:SMXC_PageBLOCK1:Pageblck1Sec5:j_id142"), "1 AND (2 OR 3)");
+_setSelected(_select("j_id0:SVMX_FORM:SMXC_PageBLOCK1:Pageblck1Sec7:SVMX_TAB1table2:0:j_id153"), "City");
+_setSelected(_select("j_id0:SVMX_FORM:SMXC_PageBLOCK1:Pageblck1Sec7:SVMX_TAB1table2:0:j_id159"), "Equals");
+_click(_imageSubmitButton("j_id0:SVMX_FORM:SMXC_PageBLOCK1:Pageblck1Sec7:SVMX_TAB1table2:0:RenPicklist"));
+_setValue(_textbox("j_id0:SVMX_FORM:SMXC_PageBLOCK1:Pageblck1Sec7:SVMX_TAB1table2:0:j_id165"), "Plesanton");
+_click(_button("Save"));
+
+
+_log("$TechEligibilityName = "+$TechEligibilityName);
+
+if(_exists($TechEligibilityName))
+	{
+	_log("Technician Eligibility Rule Created Successfully");
+	$excel.insertUnderColumn("../op_excleData/automation.xlsx", "Rules", "Eligibility Rule", $TechEligibilityName, $rowIndex);
+	}
+else
+	{
+	_fail("Error in Creating Technician Eligibility Rule");
+	}
+
+$bo_act_login.logOut();
+
+$TechEligibilityRule.end();

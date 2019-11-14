@@ -1,0 +1,7 @@
+
+var $userprofile = _testcase("$UserProfiles","Run the locale of the users");
+$userprofile.start();
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+var $userapexscript = "User user_edit = [Select ID , LocaleSidKey from User Where Id =:UserInfo.getUserId() LIMIT 1];user_edit.LocaleSidKey ='en_US';update user_edit;";
+var $user_query = $op_act_sForceApiCall.sForceQuery($bac_un, $bac_pwd, $userapexscript ,"create");
+$userprofile.end();

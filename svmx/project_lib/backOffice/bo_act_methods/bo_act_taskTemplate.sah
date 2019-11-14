@@ -1,0 +1,53 @@
+var $bo_act_taskTemplate = new function bo_act_taskTemplate(){
+	this.createTaskTemplate = function($templateName){
+		$bo_act_navigation.navigateToTaskTemplatePage();
+		_click(_button("New Task Template"));
+		if(_isVisible(_submit("Continue"))){
+			_click(_submit("Continue"));
+		}
+		_wait(6000);
+		/*_click(_span("svmx-btn-icon svmx-sfmd-cache-icon"));  // commented this code after issue get fixed
+		_click(_span("Proceed"));*/
+		_wait(60000,_isVisible(_label("Template Name:")));
+		_setValue(_textbox(0,_rightOf(_label("/Template Name/"))),$templateName);
+		
+	};
+	this.addTask = function($seq,$taskTitle,$desc,$priority){
+		_wait(60000,_isVisible(_image("/edit-icon/")));
+		_setStrictVisibilityCheck(true);
+		_click(_image("/edit-icon/"));	
+				_wait(3000);
+		_setValue(_textbox(0,_rightOf(_label("/Sequence/"))),$seq);
+		_setValue(_textbox(0,_rightOf(_label("/Task Title/"))),$taskTitle);
+		_setValue(_textarea(0,_rightOf(_label("Description:[1]"))),$desc);
+		_setValue(_textbox(0,_rightOf(_label("/Priority/"))),$priority);
+		if(_isVisible(_span("Update"))){
+			_click(_span("Update"));
+		}
+		_wait(3000);
+		
+		_setStrictVisibilityCheck(false);
+	};
+	
+	this.addRequiredParts = function($qty,$productName){
+		//var $productName = "";
+		_click(_button("Required Parts"));
+		_setStrictVisibilityCheck(true);
+		_click(_image("/edit-icon/"));
+		$bo_act_common.searchfunction($productName);
+		_setValue(_textbox(0,_rightOf(_label("Quantity:"))),$qty);
+		_click(_span("Update"));
+	//	_click(_span("svmx-btn-icon svmx-sfmd-save-icon"));
+		_wait(5000);
+		//_log($productName);
+	};
+	
+	this.saveTaskTemplate = function(){
+	_click($bo_pg_PMPlanTemplate.btn_saveIcon);
+	_wait(60000,_isVisible(_heading1("Task Template:")));
+	_click(_button(" Edit "));
+	_click(_submit(" Save "));
+};
+	
+	
+};

@@ -1,0 +1,51 @@
+var $rs_5023 = _testcase("RS_5023","Verify the criteria to show/not show SFM wizard");
+$rs_5023.start();
+
+var $sfmNameToBeCloned = "Manage Work Order Lines - Usage";
+var $sfmName = "Manage Work Order Lines - Usage"; 
+var $isCustom = false;
+var $sfmTemplate = "SVMXSTD: Manage WO Usage Lines";
+var $sfmTemplateSaveAsName = $sfmName;
+var $containerName = ["Order Status"];
+var $fieldName = ["Scheduled Date"];
+var $wizardCriteria = "EXPR002-SVMXSTD: Open Work Orders";
+var $wizardObject ="Work Order";
+
+
+//create Work order
+$objName= $orgnamespace+"__Service_Order__c";
+$obJson = "{\""+$orgnamespace+"__Order_Status__c\":\"Closed\",\""+$orgnamespace+"__Order_Type__c\":\"Field Service\"}";
+$columnName = "Name";
+$filter="id";
+$filterValue=$sfm_act_restApiMethods.postRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,$objName,$obJson,"POST");
+$woNumber =$sfm_act_restApiMethods.getRestApi($sfmdUsn,$sfmdPwd,$sfmClientId,$sfmConsumerSecret,$sfmOrgInstance,"GET", $objName, $columnName, $filter, $filterValue);
+
+_setSpeed($g_stepSpeed);
+$bo_act_login.login($g_url, $sfmdUsn, $sfmdPwd);
+$sfm_act_wizards.addToWizard($wizardObject, $sfmd_wizardName[7], $sfmd_wizardType[1],$sfmName,false,null,$wizardCriteria ); 
+
+//Navigate to the WO for validation
+$bo_act_navigation.navigateToCreatedRecordUsingGlobalSearch($woNumber);
+
+//Check for Wizard visibility when criteria is not met
+_selectDomain($g_domain);
+_assertNotVisible(_cell($sfmd_wizardName[7]),$sfmd_wizardName[7]+" is visbile when criteria is not met");  
+_wait(3000);
+_selectDomain();
+
+//Change the WO status to open and then check whether wizard is visible or not --RS-4982
+
+_click($sfm_pg_wo.btn_wo_edit);
+_wait(3000);
+_setSelected(_select(0,_rightOf(_label("/Order Status/"))), "Open");
+_click($sfm_pg_wo.btn_wo_save);
+_wait(20000,_isVisible($sfm_pg_wo.btn_wo_edit));
+_selectDomain($g_domain);
+_assertVisible(_cell($sfmd_wizardName[7]),$sfmd_wizardName[7]+" is not visbile when criteria is met");
+_wait(3000);
+_selectDomain();
+
+//delete the above created wizard
+$sfm_act_wizards.deleteSfmWizard($wizardObject,$sfmd_wizardName[7]);
+
+$rs_5023.end();

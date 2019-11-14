@@ -1,0 +1,190 @@
+var $rs_cu_10136 = _testcase("RS-10136","Update of Contract Uptime with Downtime values");
+$rs_cu_10136.start();
+var $data = _readExcelFile("../../../analytics/an_excleData/an_Datasheet1.xlsx","Sheet1",true);
+var $un = $data[1]["Username"];
+var $pwd = $data[1]["pwd"];
+var $url = "https://test.salesforce.com";
+var $Account = $data[1]["Account"];
+var $Technician = $data[1]["Technician"];
+var $Product = $data[1]["Product"];
+var $OrderStatus = $data[1]["OrderStatus"];
+var $Closedon = $data[1]["ClosedOn"];
+var $Site = $data[1]["Site"];
+var $Component = $data[1]["Component"];
+var $ScheduledDate = $data[1]["ScheduledDate"];
+var $PreferredStartDate = $data[1]["PreferredStartDate"];
+var $PreferredEndDate = $data[1]["PreferredEndDate"];
+var $GuranteedUptime = $data[1]["GuranteedUptime"];
+var $Downtime_value  = $data[1]["DownTime"];
+$bo_act_login.login($url, $un, $pwd);
+
+
+// Create a ContractUptime
+$an_act_Contract_Uptime.contract_uptime_downtime("Contract Uptime with Downtime");
+
+// To create a SCON
+
+var $RS_10136_create_SCON = "SVMXC__Service_Contract__c SCON1 = new SVMXC__Service_Contract__c(Name = 'RS-10136-SCON' , SVMXC__Company__c = '"+$Account+"' , SVMXC__Active__c = True, SVMXC__Start_Date__c = Date.valueOf('2017-01-01') , SVMXC__End_Date__c = Date.valueOf('2018-12-31') );insert SCON1;";
+var $RS_10136_result = $op_act_sForceApiCall.sForceQuery($un, $pwd, $RS_10136_create_SCON , "create");
+var $RS_10136_query_SCON = "Select Id,Name from SVMXC__Service_Contract__c where Name = 'RS-10136-SCON'";
+
+
+var $RS_10136_fetch_SCON  = $op_act_sForceApiCall.sForceQuery($un, $pwd, $RS_10136_query_SCON,"query");
+
+
+_wait(1000);
+_log($RS_10136_fetch_SCON);
+
+var $RS_10136_SCON ;
+var $var3;
+var $varRV1;
+var $RS_10136_var1;
+$RS_10136_SCON  = $RS_10136_fetch_SCON[0].Id;
+var $RS_10136_SCOName = $RS_10136_fetch_SCON[0].Name;
+_log($RS_10136_SCON);
+_log($RS_10136_SCOName);
+
+	$RS_10136_SCON = $RS_10136_fetch_SCON[0].Id;
+
+
+_log($RS_10136_SCON);
+
+// Create an IB
+
+var $RS_10136_create_IB = "SVMXC__Installed_Product__c IB01 = new SVMXC__Installed_Product__c(SVMXC__Company__c = '"+$Account+"' , Name = 'RS-10136-IB' , SVMXC__Status__c = 'Installed');insert IB01;";
+var $RS_10136_result_IB  = $op_act_sForceApiCall.sForceQuery($un, $pwd, $RS_10136_create_IB , "create");
+
+_log($RS_10136_result_IB);
+var $RS_10136_get_IB = "Select Id , Name from SVMXC__Installed_Product__c where Name = 'RS-10136-IB' Limit 1";
+
+var $RS_10136_fetch_IB  = $op_act_sForceApiCall.sForceQuery($un, $pwd, $RS_10136_get_IB,"query");
+
+var $RS_10136_IB_ID;
+
+	
+	$RS_10136_IB_ID = $RS_10136_fetch_IB[0].Id ;
+
+
+
+_log($RS_10136_IB_ID);
+
+// Create Covered Product 
+var $RS_10136_create_CP = "SVMXC__Service_Contract_Products__c CP01 = new SVMXC__Service_Contract_Products__c(SVMXC__Installed_Product__c = '"+$RS_10136_IB_ID+"',SVMXC__Service_Contract__c = '"+$RS_10136_SCON+"', Custom_checkbox__c = true ); insert CP01;";
+var $RS_10136_result_CP = $op_act_sForceApiCall.sForceQuery($un, $pwd, $RS_10136_create_CP , "create");
+var $RS_10136_get_CP = "Select Id , Name from SVMXC__Service_Contract_Products__c where Createdby.Id = '005q0000003GGfP' Order by CreatedDate DESC Limit 1";
+var $RS_10136_fetch_CP   = $op_act_sForceApiCall.sForceQuery($un, $pwd, $RS_10136_get_CP,"query");
+var $RS_10136_cp_ID;
+
+	
+	$RS_10136_cp_ID = $RS_10136_fetch_CP[0].Id ;
+
+
+
+// Create Work Order for the IB and SCON
+
+	var $RS_10136_create_WO = "SVMXC__Service_Order__c WO1 = new SVMXC__Service_Order__c(SVMXC__Component__c = '"+$RS_10136_IB_ID+"',SVMXC__Service_Contract__c = '"+$RS_10136_SCON+"', SVMXC__Order_Status__c = 'Closed' ); insert WO1;";
+	var $RS_10136_result_WO = $op_act_sForceApiCall.sForceQuery($un, $pwd, $RS_10136_create_WO , "create");
+	var $RS_10136_get_WO = "Select Id, Name from SVMXC__Service_Order__c where Createdby.Id = '005q0000003GGfP' Order by CreatedDate DESC Limit 1";
+	var $RS_10136_fetch_WO = $op_act_sForceApiCall.sForceQuery($un, $pwd, $RS_10136_get_WO,"query");
+	
+
+var $RS_10136_WO_ID ;
+
+$RS_10136_WO_ID = $RS_10136_fetch_WO[0].Id;
+	
+
+
+// To create Downtime for WO
+
+var $RS_10136_create_DT = "SVMXC__Down_Time__c DT1 = new SVMXC__Down_Time__c(SVMXC__Service_Order__c = '"+$RS_10136_WO_ID+"',SVMXC__Duration__c = 360,SVMXC__Start_Time__c = DateTime.valueOf('"+$PreferredStartDate+"'),SVMXC__End_Time__c = DateTime.valueOf('"+$PreferredEndDate+"')); insert DT1;";
+var $RS_10136_result_DT = $op_act_sForceApiCall.sForceQuery($un, $pwd, $RS_10136_create_DT , "create");
+var $RS_10136_get_DT = "Select Id, Name from SVMXC__Down_Time__c where SVMXC__Service_Order__c = '"+$RS_10136_WO_ID+"' Order by CreatedDate DESC Limit 1";
+var $RS_10136_fetch_DT = $op_act_sForceApiCall.sForceQuery($un, $pwd, $RS_10136_get_DT,"query");
+
+
+var $RS_10136_DT_ID ;
+
+$RS_10136_DT_ID = $RS_10136_fetch_DT[0].Id;
+
+	
+	
+$an_act_Contract_Uptime.schedule_notifications("meghana.rao@servicemax.com");
+
+var $RS_10136_ib1_id;
+var $RS_10136_scon1_id ;
+var $RS_10136_uptime_value ;
+var $RS_10136_guranteed_uptime = null;
+
+
+var $RS_10136_query_RV1 = "Select SVMXC__Installed_Product__c,SVMXC__Contract__c,SVMXC__Gauranteed_Up_Time__c from SVMXC__SPM_Contract_Up_Time__c where SVMXC__Installed_Product__c = '"+$RS_10136_IB_ID+"' AND SVMXC__Contract__c = '"+$RS_10136_SCON+"'";
+var $RS_10136_resultRV1 = $op_act_sForceApiCall.sForceQuery($un, $pwd, $RS_10136_query_RV1,"query");
+
+$RS_10136_resultRV1.forEach(function($varRV1) {
+	
+	$RS_10136_ib1_id = $varRV1.SVMXC__Installed_Product__c;
+	$RS_10136_scon1_id = $varRV1.SVMXC__Contract__c;
+	$RS_10136_guranteed_uptime = $varRV1.SVMXC__Gauranteed_Up_Time__c;
+
+});
+
+_log($RS_10136_ib1_id);
+_log($RS_10136_scon1_id);
+_log($RS_10136_guranteed_uptime); 
+
+_assertEqual($RS_10136_IB_ID, $RS_10136_ib1_id);
+_assertEqual($RS_10136_SCON,$RS_10136_scon1_id);
+_assertEqual($GuranteedUptime,Math.round($RS_10136_guranteed_uptime));
+
+
+// To verify the Downtime
+
+
+var $RS_10136_wo1_id ;
+var $RS_10136_down_time_value = null ;
+
+
+var $RS_10136_query_RV1 = "Select SVMXC__Down_Time__c,SVMXC__Work_Order__c from SVMXC__SPM_Down_Time_Detail__c where SVMXC__Work_Order__c='"+$RS_10136_WO_ID+"'";
+var $RS_10136_resultRV1 = $op_act_sForceApiCall.sForceQuery($un, $pwd, $RS_10136_query_RV1,"query");
+
+$RS_10136_resultRV1.forEach(function($varRV1) {
+	
+	$RS_10136_down_time_value = $varRV1.SVMXC__Down_Time__c;
+});
+
+_log($RS_10136_down_time_value);
+
+
+_assertEqual($Downtime_value, Math.round($RS_10136_down_time_value));
+
+
+// Re-run the Engine
+
+
+$an_act_Contract_Uptime.schedule_notifications("meghana.rao@servicemax.com");
+
+// To verify the number of records in Contract Uptime object
+
+var $rs_10136_query_RV2 = "Select Count(Id) from SVMXC__SPM_Contract_Up_Time__c where SVMXC__Contract__c = '"+$RS_10136_SCON+"'";
+var $rs_10136_result_RV2 = $op_act_sForceApiCall.sForceQuery($un, $pwd, $rs_10136_query_RV2,"query");
+
+
+_log($rs_10136_result_RV2[0].expr0);
+
+_assertEqual(2, $rs_10136_result_RV2[0].expr0);
+
+
+//Delete ContractUptime methods
+var $contractuptime = "Select Id from SVMXC__ServiceMax_Processes__c where SVMXC__ProcessID__c = 'UpDownTime'";
+var $fetchuptime = $op_act_sForceApiCall.sForceQuery($un, $pwd, $contractuptime,"query");
+
+var $uptime_process = $fetchuptime[0].Id;
+
+$uptime_delete = "delete [Select Id from SVMXC__ServiceMax_Config_Data__c where SVMXC__Dispatch_Process__c = '"+$uptime_process+"' ];";
+var $delete_data = $op_act_sForceApiCall.sForceQuery($un, $pwd, $uptime_delete , "create");
+
+$rs_cu_10136.end();
+
+
+
+
+

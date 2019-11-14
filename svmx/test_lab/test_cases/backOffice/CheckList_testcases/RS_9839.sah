@@ -1,0 +1,32 @@
+
+// Author Meghana Rao P
+/*
+ * To verify if the 2 questions are created under the same tags in Form designer
+ */
+var $RS_9839 = _testcase("RS_9839", "questions are created under the same tags in Form designer");
+$RS_9839.start();
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+
+$bo_act_navigation.navigateToSfmTransactionDesigner();
+_wait(60000, _isVisible($bo_pg_sfmTransactionAndDesigner.btn_newSFM));
+_wait(1000);
+
+$number1 = Math.random() * 3.5;
+
+$bo_act_checklistdesigner.newChecklistTypeSFM("A RS_9839 Process 1"+$number1+"","to generate a Checklist/Survey type of Process", "Work Order");
+
+$bo_act_checklistdesigner.create_newquestion_tag_in_designer("RS_9839 with TAG Question1"+$number1+"", "RS_9839TAG");
+
+$bo_act_checklistdesigner.create_newquestion_tag_in_designer("RS_9839 with TAG Question2"+$number1+"", "RS_9839TAG");
+
+
+$bo_act_navigation.navigateToSfmTransactionDesigner();
+// To verify the Questions under the tag 
+$bo_act_checklistdesigner.re_openChecklistTypeSFM("A RS_9839 Process 1"+$number1+"", true);
+$bo_act_checklistdesigner.verifythequestionsonUI("RS_9839 with TAG Question1"+$number1+"", "RS_9839TAG");
+$bo_act_checklistdesigner.re_openChecklistTypeSFM("A RS_9839 Process 1"+$number1+"", true);
+$bo_act_checklistdesigner.verifythequestionsonUI("RS_9839 with TAG Question2"+$number1+"", "RS_9839TAG");
+
+
+
+

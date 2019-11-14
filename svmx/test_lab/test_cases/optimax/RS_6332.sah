@@ -1,0 +1,62 @@
+var $user_credentials = $excel.readFromCustomExcel("../optimax/op_excleData/automation.xlsx", "User_Details","","");
+var $dp_details = $excel.readFromCustomExcel("../optimax/op_excleData/automation.xlsx", "Dispatch_Process","","");
+
+//var $nArr;
+//Calling the sforce API
+for(var $i=0;$i<$user_credentials.length;$i++)
+{
+var $g_un = $user_credentials[$i][0];
+var $g_pwd = $user_credentials[$i][1];
+var $g_url = $user_credentials[$i][2];
+}
+
+var $DPName = $dp_details[0][0];
+
+var $RS_6332 = _testcase("RS_6332", "Add Full & Incremental run schedule (Delete, Add Schedule & Quick Add)");
+
+$RS_6332.start();
+
+$bo_act_login.login($g_url, $g_un, $g_pwd);
+
+_log($DPName);
+_click(_link("ServiceMax Setup"));
+_wait(20000, _isVisible(_div("Dispatch Management")));
+_click(_div("Dispatch Management"));
+_wait(20000, _isVisible(_div("Dispatch Processes")));
+_click(_div("Dispatch Processes"));
+var $rowCount = 0;
+_set($rowCount, _table("page1:form1:block1:j_id81:j_id82").rows.length);
+for (var $i = 0; $i < $rowCount; $i++) 
+{
+	var $temp = _getText(_cell("page1:form1:block1:j_id81:j_id82:" + $i
+			+ ":j_id86"));
+	if (_areEqual($DPName, $temp)) 
+	{
+		$rowCount = $i;
+	}
+}
+_check(_checkbox("page1:form1:block1:j_id81:j_id82:" + $rowCount
+		+ ":j_id85"));
+_click(_submit("Edit"));
+
+_click(_cell("Scheduling"));
+_click(_button("Add Schedule"));
+//_click(_button("Add Schedule"));
+//_setSelected(_select("page1:form1:block1:tab7block1:j_id574:j_id605:2:runType"), "Incremental");
+_click(_cell("dataCell[4]"));
+
+var $rowCount1 = 0;
+_set($rowCount1, _table("page1:form1:block1:tab7block1:j_id557:j_id588").rows.length);
+_log($rowCount1);
+$rowCount1 = $rowCount1 - 2;
+_check(_checkbox("page1:form1:block1:tab7block1:j_id557:j_id588:" + $rowCount1 + ":j_id591"));
+
+/*$rowCount1 = $rowCount1 - 1;
+_check(_checkbox("page1:form1:block1:tab7block1:j_id574:j_id605:" + $rowCount1 + ":j_id608"));*/
+_click(_button("Delete"));
+_click(_submit("Cancel[5]"));
+
+
+$bo_act_login.logOut();
+
+$RS_6332.end();

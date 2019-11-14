@@ -1,0 +1,143 @@
+/**
+* SFM  transaction & designer Data Validation Rule page object repository and method to create a rule
+*/
+
+var $sfm_pg_dvr = new function sfm_pg_dvr() {
+	
+	this.btn_newRule = _f("main").s_button("New[5]");
+	this.txt_ruleName = _f("main").s_textinput("ruleName");
+	this.txt_ruleId = _f("main").s_textinput("ruleID");
+	this.txt_targetObject = _f("main").s_combobox("objCombo");
+	this.btn_dataValidationRules = _f("main").tab("Data Validation Rules");
+	this.txt_ruleDescription = _f("main").s_textarea("description");
+	this.txt_selectfield = _f("main").s_combobox("fieldCombo[1]");
+	this.txt_condition = _f("main").s_dropdownlist("conditionsCombo[1]");
+	this.txt_operand	= _f("main").s_dropdownlist("operandTypeCombo");
+	this.txt_value = _f("main").s_textinput("operandValue");
+	this.txt_valueFunction = _f("main").s_combobox("picklist");
+	this.txt_valueField = _f("main").s_dropdownlist("fieldOperandList");
+	this.btn_addRow = _f("main").s_button("Add a row[1]");
+	this.txt_advancedExpr = _f("main").s_textinput("advExpIP");
+	this.txt_messageType = _f("main").s_dropdownlist("msgType");
+	this.txt_messageDescription = _f("main").s_textarea("message");
+	this.btn_saveDVR = _f("main").s_button("Save");
+	this.btn_addToProcess = _f("main").s_button("Add To Process");
+	this.chk_targetParts = _f("main").s_checkbox("Parts");
+	this.chk_targetLabor = _f("main").s_checkbox("Labor");
+	this.chk_targetExpense = _f("main").s_checkbox("Expense");
+	this.chk_targetTravel = _f("main").s_checkbox("Travel");
+	this.btn_targetOk = _f("main").s_button("OK[1]");
+	this.btn_targetCancel = _f("main").s_button("Cancel");
+	this.txt_targetChilden= _f("main").s_label("Select target children to which the selected rule is to be added");
+	this.txt_dvrExists = _f("main").label("The Data Validation/Formula ID you have entered already exists. Please enter a unique ID.");
+
+	/**
+	 * Function to create a data validation rule
+	 *
+	 */
+	
+	this.newRule= function($targetObject, $rulename, $ruleDescription,$fieldArray, $conditionArray, $operandArray, $valueArray, $advExpr, $messageType,$targetChild){
+		//create Data validation rule
+		_click($sfm_pg_dvr.btn_dataValidationRules);
+		_wait(6000,_isVisible($sfm_pg_dvr.btn_newRule));
+		_click($sfm_pg_dvr.btn_newRule);
+		_setSelected($sfm_pg_dvr.txt_targetObject, $targetObject);
+		_setValue($sfm_pg_dvr.txt_ruleName, $rulename);
+		_setValue($sfm_pg_dvr.txt_ruleId,"");
+		_setValue($sfm_pg_dvr.txt_ruleId, $rulename);	
+		_setValue($sfm_pg_dvr.txt_ruleDescription,$ruleDescription);
+		_wait(1000);
+
+		$sfm_pg_dvr.setRule($fieldArray, $conditionArray, $operandArray, $valueArray);
+
+		_setValue($sfm_pg_dvr.txt_advancedExpr,$advExpr);
+		_setSelected($sfm_pg_dvr.txt_messageType,$messageType);
+		_setValue($sfm_pg_dvr.txt_messageDescription,$ruleDescription );
+		_click($sfm_pg_dvr.btn_saveDVR);
+		_wait(5000);
+		if(_exists($sfm_pg_dvr.txt_dvrExists)){
+			_focusWindow();
+			_takeScreenShot();
+			_logExceptionAsFailure("DVR already exists, refer screenshot for error");
+						
+		}
+		_click($sfm_pg_dvr.btn_addToProcess);
+		_wait(5000);
+		if(_exists($sfm_pg_dvr.txt_targetChilden)){
+			
+			if($targetChild =='Parts'){
+				_check($sfm_pg_dvr.chk_targetLabor);
+				_check($sfm_pg_dvr.chk_targetExpense);
+				_check($sfm_pg_dvr.chk_targetTravel);
+				_click($sfm_pg_dvr.btn_targetOk);
+			}
+			else if ($targetChild =='Labor'){
+				_check($sfm_pg_dvr.chk_targetParts);
+				_check($sfm_pg_dvr.chk_targetExpense);
+				_check($sfm_pg_dvr.chk_targetTravel);
+				_click($sfm_pg_dvr.btn_targetOk);
+			}
+			else if ($targetChild =='Expense'){
+				_check($sfm_pg_dvr.chk_targetParts);
+				_check($sfm_pg_dvr.chk_targetLabor);
+				_check($sfm_pg_dvr.chk_targetTravel);
+				_click($sfm_pg_dvr.btn_targetOk);
+			}
+			else if ($targetChild =='Travel'){
+				_check($sfm_pg_dvr.chk_targetParts);
+				_check($sfm_pg_dvr.chk_targetLabor);
+				_check($sfm_pg_dvr.chk_targetExpense);
+				_click($sfm_pg_dvr.btn_targetOk);
+			}
+			else{
+				_click($sfm_pg_dvr.btn_targetOk);	
+			}
+		}
+		
+	};
+	/**
+	 * Function to set the rule in  data validation page
+	 *
+	 */
+	this.setRule = function($fieldArray, $conditionArray, $operandArray, $valueArray){
+		for(var $i=0; $i<$fieldArray.length; $i++){
+			
+			if($i == 0){
+				//donothing
+			}else{
+				_click($sfm_pg_dvr.btn_addRow);
+			}
+			
+			_setSelected(_f("main").s_combobox("fieldCombo"+"["+$i+"]").rightOf(_f("main").s_label("Expressions")),$fieldArray[$i]);
+			_setSelected(_f("main").s_dropdownlist("conditionsCombo"+"["+$i+"]").rightOf(_f("main").s_label("Expressions")),$conditionArray[$i]);
+			
+			if($operandArray[$i]=='Value'){
+				_setSelected(_f("main").s_dropdownlist("operandTypeCombo"+"["+$i+"]").rightOf(_f("main").s_label("Expressions")),$operandArray[$i]);
+				//if($fieldArray[$i]=='Expense Type' ||$fieldArray[$i]=='Activity Type' ){
+				if(_exists(_f("main").s_combobox("picklist"+"["+$i+"]"))){
+					//_setValue(_f("main").s_textinput("textInput"+"["+$i+"]").rightOf(_f("main").s_label("Expressions")),$valueArray[$i]);
+					_setSelected(_f("main").s_combobox("picklist"+"["+$i+"]").rightOf(_f("main").s_label("Expressions")), $valueArray[$i]);
+				}
+				else{
+					_setValue(_f("main").s_textinput("operandValue"+"["+$i+"]").rightOf(_f("main").s_label("Expressions")),$valueArray[$i]);
+				
+				}
+			}
+			else if($operandArray[$i]=='Function'){
+				_setSelected(_f("main").s_dropdownlist("operandTypeCombo"+"["+$i+"]").rightOf(_f("main").s_label("Expressions")),$operandArray[$i]);
+				_setSelected(_f("main").s_combobox("picklist"+"["+$i+"]").rightOf(_f("main").s_label("Expressions")),$valueArray[$i]);	
+			}
+			else if($operandArray[$i]=='Field'){
+				_setSelected(_f("main").s_dropdownlist("operandTypeCombo"+"["+$i+"]").rightOf(_f("main").s_label("Expressions")),$operandArray[$i]);
+				_setSelected(_f("main").s_dropdownlist("fieldOperandList"+"["+$i+"]").rightOf(_f("main").s_label("Expressions")),$valueArray[$i]);	
+			}
+			else{
+				
+			}
+		}
+			
+	};
+
+
+};
+

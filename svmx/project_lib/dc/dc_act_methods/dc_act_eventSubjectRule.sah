@@ -1,0 +1,131 @@
+/**
+ * Function for the Creation of a new Event Subject Rule
+ */
+
+//vanditha
+var $dc_act_eventSubjectRule = new function dc_act_eventSubjectRule() {
+	 
+	/**
+	 * Create a new Event Subject Rule
+	 * 
+	 * @param $ruleName, $ruleDescription
+	 */
+	
+	this.createEventSubjectRule = function($ruleName, $ruleDescription){
+	    $dc_act_navigation.navigateToEventSubjectRule();
+	    _click($dc_pg_eventSubjectRule.btn_newRule);
+	    _setValue($dc_pg_eventSubjectRule.txt_eventSubjectRuleName,$ruleName);
+	    _setValue($dc_pg_eventSubjectRule.txt_eventSubjectRuleDescription,$ruleDescription);
+	    _setSelected($dc_pg_eventSubjectRule.sel_eventSubjectRuleWorkOrderField,"Order Status");
+	    _setSelected($dc_pg_eventSubjectRule.sel_eventSubjectRuleOperatorField,"Equals");
+	    _setValue($dc_pg_eventSubjectRule.txt_eventSubjectRuleCriteriaValue,"Open");
+
+	    var $woNumber ="Work Order Number";
+	    var $city="City";
+	    var $priority="Priority";
+	    
+	    _setSelected($dc_pg_eventSubjectRule.sel_eventSubjectRuleFieldSelection,[$woNumber]);
+	    _click($dc_pg_eventSubjectRule.sel_eventSubjectRuleFieldSelected);
+	    
+	    _setSelected($dc_pg_eventSubjectRule.sel_eventSubjectRuleFieldSelection,[$city]);
+	    _click($dc_pg_eventSubjectRule.sel_eventSubjectRuleFieldSelected);
+	    
+	    _setSelected($dc_pg_eventSubjectRule.sel_eventSubjectRuleFieldSelection,[$priority]);
+	    _click($dc_pg_eventSubjectRule.sel_eventSubjectRuleFieldSelected);
+	    _click($dc_pg_eventSubjectRule.btn_save);
+	    _wait(30000);
+	   _click($dc_pg_eventSubjectRule.btn_backToSetupHome);
+	    
+	};
+	
+	this.verifyEventSubjectRulePage = function($eventSubjectRuleName, $eventSubjectRuleDescription){
+	    $dc_act_navigation.navigateToEventSubjectRule();
+	   	_wait(60000, _isVisible($dc_pg_eventSubjectRule.btn_newRule));
+
+	};	
+
+	this.createAdvancedEventSubjectRule = function($eventSubjectRuleName, $eventSubjectRuleDescription){
+	    
+		//Work Order Fields to be displayed in Event Subject Rule 
+	    var $woNumber ="Work Order Number";
+	    var $city="City";
+	    var $priority="Priority";
+		
+		$dc_act_navigation.navigateToEventSubjectRule();
+	    _click($dc_pg_eventSubjectRule.btn_newRule);
+	    
+	    //Setting values in Event Subject Rule and Event Subject Rule Description
+	    _setValue($dc_pg_eventSubjectRule.txt_eventSubjectRuleName,$eventSubjectRuleName);
+	    _setValue($dc_pg_eventSubjectRule.txt_eventSubjectRuleDescription,$eventSubjectRuleDescription);
+	    
+	    //Setting up Work Order field Criteria
+	    _setSelected($dc_pg_eventSubjectRule.sel_eventSubjectRuleWorkOrderField1,"Order Status");
+	    _setSelected($dc_pg_eventSubjectRule.sel_eventSubjectRuleOperatorField1,"Equals");
+	    _setValue($dc_pg_eventSubjectRule.txt_eventSubjectRuleCriteriaValue1,"Open");
+	    _click($dc_pg_eventSubjectRule.btn_Add);
+	    _wait(5000);
+	    
+	    _setSelected($dc_pg_eventSubjectRule.sel_eventSubjectRuleWorkOrderField2,"Billing Type");
+	    _setSelected($dc_pg_eventSubjectRule.sel_eventSubjectRuleOperatorField2,"Is Not Null");
+	     _wait(5000);
+	     
+	    _setSelected($dc_pg_eventSubjectRule.sel_eventSubjectRuleWorkOrderField3,"Priority");
+	    _setSelected($dc_pg_eventSubjectRule.sel_eventSubjectRuleOperatorField3,"Equals");
+	    _setValue($dc_pg_eventSubjectRule.txt_eventSubjectRuleCriteriaValue3,"High");
+	    _wait(5000);
+	    _setValue($dc_pg_eventSubjectRule.txt_eventSubjectRuleCriteriaAdvancedExpression,"(1 AND 2) OR 3");
+	 
+  	    _setSelected($dc_pg_eventSubjectRule.sel_eventSubjectRuleFieldSelection,[$city]);
+	    _click($dc_pg_eventSubjectRule.sel_eventSubjectRuleFieldSelected);	    
+	    _setSelected($dc_pg_eventSubjectRule.sel_eventSubjectRuleFieldSelection,[$woNumber]);
+	    _click($dc_pg_eventSubjectRule.sel_eventSubjectRuleFieldSelected);	    
+	    _setSelected($dc_pg_eventSubjectRule.sel_eventSubjectRuleFieldSelection,[$priority]);
+	    _click($dc_pg_eventSubjectRule.sel_eventSubjectRuleFieldSelected);
+	    
+	    _setSelected($dc_pg_eventSubjectRule.sel_eventSubjectRuleFieldOption,[$woNumber]);
+	    _click($dc_pg_eventSubjectRule.sel_eventSubjectRuleFieldUpArrow);
+   	    _setSelected($dc_pg_eventSubjectRule.sel_eventSubjectRuleFieldOption,[$city]);
+	    _click($dc_pg_eventSubjectRule.sel_eventSubjectRuleFieldDownArrow);  
+	    _setSelected($dc_pg_eventSubjectRule.sel_eventSubjectRuleFieldOption,[$priority]);
+	    _click($dc_pg_eventSubjectRule.sel_eventSubjectRuleFieldBottomArrow); 
+	    
+	   _click($dc_pg_eventSubjectRule.btn_save);
+	   _wait(60000, _isVisible($dc_pg_eventSubjectRule.btn_newRule));
+    
+	};
+	
+	this.editAdvancedEventSubjectRule = function($eventSubjectRuleName){
+	   
+		var $woNumber ="Work Order Number";
+	    var $city="City";
+	    var $priority="Priority";
+	    var $account="Account";		
+	    
+   	    _click(_span($eventSubjectRuleName));
+	    _click(_checkbox(0,_leftOf(_span($eventSubjectRuleName))));
+	    _click($dc_pg_eventSubjectRule.btn_editRule);
+	    _wait(60000, _isVisible($dc_pg_eventSubjectRule.btn_save));
+	    
+	    //Edit the existing Subject Rule wrt Criteria
+	    _setSelected($dc_pg_eventSubjectRule.sel_eventSubjectRuleWorkOrderField3,"Priority");
+	    _setSelected($dc_pg_eventSubjectRule.sel_eventSubjectRuleOperatorField3,"Equals");
+	    _setValue($dc_pg_eventSubjectRule.txt_eventSubjectRuleCriteriaValue3,"Low");
+	    
+	    //Edit the existing Subject Rule wrt fields displayed in Event Subject Rule
+	    _setSelected($dc_pg_eventSubjectRule.sel_eventSubjectRuleFieldSelection,[$account]);
+	     _click($dc_pg_eventSubjectRule.sel_eventSubjectRuleFieldSelected);
+	     _click($dc_pg_eventSubjectRule.btn_save);
+		 _wait(60000, _isVisible($dc_pg_eventSubjectRule.btn_newRule));
+  	};
+  	
+	this.deleteEventSubjectRule = function($eventSubjectRuleName){
+		 
+   	    _click(_span($eventSubjectRuleName));
+	    _click(_checkbox(0,_leftOf(_span($eventSubjectRuleName))));
+	     _click($dc_pg_eventSubjectRule.btn_deleteRule);
+	    _wait(10000);
+	      
+	};	
+	
+}
+

@@ -1,0 +1,18 @@
+var $rs_4985 = _testcase("RS_4985","Assign to a group and log in as same group member.");
+$rs_4985.start();
+var $woNumber = $sfm_act_createCustomWizard.createBlankWoFromRest($sfmdUsn, $sfmdPwd, $sfmClientId, $sfmConsumerSecret, $sfmOrgInstance);
+
+var $wizTitle = "SFMWizPermission";
+$bo_act_login.login($g_url,$sfmdUsn, $sfmdPwd);
+$sfm_act_wizards.addToWizard("Work Order", $wizTitle, $sfmd_wizardType[4], "Work Order Service Report","false","Clone Default Group Profile");  
+_wait(5000);
+//Navigate to the WO for validation
+$bo_act_navigation.navigateToCreatedRecordUsingGlobalSearch($woNumber);
+_selectDomain($g_domain);
+if(_exists(_cell($wizTitle))){
+	_log("Pass ::: Wizard is visible which is assigned to the profile");
+}
+else{
+	_log("Fail ::: Wizard is not visible which is assigned to the profile", "FAILURE");
+}
+$rs_4985.end();

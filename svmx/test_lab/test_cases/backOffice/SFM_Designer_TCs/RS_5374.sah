@@ -1,0 +1,153 @@
+//_includeOnce("../../../references/references.js");
+
+//author - Mamata Rout
+
+var $RS_5374 = _testcase("RS_5374", "Linked Process -After saving main process revert back to work order page");
+$RS_5374.start();
+_setSpeed($g_stepSpeed);
+
+var $sfmToBeCloned="Add/Edit Products Serviced";
+var $sfmName=$bo_act_common.generateRandomName("SFMTest_");
+//change  the name of $sfmTemplateSaveAsName before execution.
+var $sfmTemplateSaveAsName=$bo_act_common.generateRandomName("Temp_");
+
+var $objName="Work Order";
+var $wizardname=$bo_act_common.generateRandomName("5374Wizard");
+var $wizardID=$bo_act_common.generateRandomName("5374WizardID");
+
+var $executionMode="Interactive";
+var $fieldActnType="SFM";
+var $actnName=$sfmName;
+
+var $stndSFMName=$sfmName;
+var $wizardButtonName=$sfmName;
+	
+var $workPerform="Testing RS-5374";
+var $wizardSelectObjectName=$objName;
+var $recordType = ["Depot","Depot Child","Depot Parent","Standard Location"];
+var $productFamily = ["--None--","GeneralSolution","AdvSolution","Accessory", "Storage"];
+var $productCode = "";
+var $unitOfTimeForCoverage = ["--None--","Days","Weeks","Months","Years"];
+var $exchangeType = ["--None--","Advance Exchange","Return Exchange"];
+var $coverageEffectiveFrom = ["--None--","Date Installed","Date Ordered","Date Shipped","Last Activity Date","Last Date Shipped","Warranty Start Date","Warranty End Date"];
+
+//*************Login to Servicemax App***********
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+
+var $accountName = $bo_act_accounts.createAccount();
+var $contactName = $bo_act_contacts.createContact($accountName);
+var $productName1 = $bo_act_products.createProduct($productCode, $productFamily[0]);
+var $productName2 = $bo_act_products.createProduct($productCode, $productFamily[0]);
+var $locationName = $bo_act_locations.createLocation($recordType[3],$accountName,"#007","India","560001");
+var $IBName1 = $bo_act_installedProduct.createIBWithSameSerialAndIB_ID($productName1, $accountName, $contactName,$locationName);
+var $IBName2 = $bo_act_installedProduct.createIBWithSameSerialAndIB_ID($productName2, $accountName, $contactName,$locationName);
+
+/**
+* Create Case record
+*/
+var $caseStatus = "New";
+var $casePriority = "Medium";
+var $caseOrigin = "Phone";
+var $caseNumber = $bo_act_Cases.createCase($caseStatus, $casePriority, $caseOrigin);
+
+/**
+ * Create 5 Year WN Template
+ */
+var $unit = $unitOfTimeForCoverage[4];
+var $warrantyName = $bo_act_warrantyTerms.createWarrantyTerms($exchangeType[2],"10","5",$unit,"20","5",$unit,"30","5",$unit,$coverageEffectiveFrom[1]);
+$bo_act_warrantyTerms.createApplicableProducts($productName2, $warrantyName); //Create Applicable product for warranty Terms
+$bo_act_navigation.navigateToCreatedRecordUsingGlobalSearch($IBName2); 	//Navigate to Installed Product Page using global search
+$bo_act_warrantyTerms.createWarranty($warrantyName);
+
+//Navigate to IB and Create WO from IB
+var $WONumber = $bo_act_installedProduct.createWOFromIB($IBName2);
+
+/**
+*Edit The Above created WO for few fields
+*/
+$bo_act_workOrders.editWorkOrder($WONumber);
+
+// Edit WO for Case 
+var $object = _textbox("/\\*Case|^Case/");
+var $objectValue = $caseNumber;
+$bo_act_workOrders.updateTextBoxFields($object, $objectValue);
+
+// Edit WO for Priority
+var $object = _select(0,_rightOf(_label("/\\*Priority|^Priority/")));
+var $objectValue = "Medium";
+$bo_act_workOrders.updateDropDownFields($object, $objectValue);
+
+// Edit WO for Billing Type
+var $object = _select(0,_rightOf(_label("Billing Type")));
+var $objectValue = "Contract";
+$bo_act_workOrders.updateDropDownFields($object, $objectValue);
+
+//Edit WO for Order Type
+var $object = _select(0,_rightOf(_label("/\\*Order Type|^Order Type/")));
+var $objectValue = "Field Service";
+$bo_act_workOrders.updateDropDownFields($object, $objectValue);
+
+$bo_act_workOrders.saveWorkOrder();     		// Save the Edited WO
+
+
+//*****Navgate to SFm Designer and create clone of Add/Edit product Services transaction********
+$bo_act_navigation.navigateToSfmTransactionDesigner();
+$bo_act_SFM.clnStandardSFM($sfmToBeCloned,$sfmName,$sfmTemplateSaveAsName);
+
+//*******Nagigate to SFM Wizard and Create Wizard and Add Above Transaction to it**********
+$bo_act_navigation.navigateToSfmWizard();
+$bo_act_SFW.createWizardGeneralInfo($objName,$wizardname,$wizardID);
+$bo_act_SFW.createWizardStep($fieldActnType,$actnName,$executionMode);
+
+//******Launch the Wizard in delivery for WO object**************
+
+$bo_act_navigation.navigateToWorkOrdersTab();
+_click(_link($WONumber));
+$bo_act_sfmVerifyWorkOrder.clkOnWizard($sfmName);
+
+//****Enter detail info in the main page and click Add/Modify Work detail**********
+ $bo_act_addEditProdServDelivery.headerInfo($locationName,$workPerform);
+ $bo_act_addEditProdServDelivery.addchildlineInfo($IBName2,$productName2,$warrantyName);
+_click($bo_pg_addEditProdServDelivery.icon_quicksave);
+
+ $bo_act_addEditProdServDelivery.clkAddModifyWorkDetailIcon();
+
+//*****Enter child details parts,labor,expenses and save*********
+_setValue(_textbox(0,_rightOf(_label("Start Date and Time:"))),$bo_act_addEditProdServDelivery.findDateToday());
+_setValue(_textbox(0,_rightOf(_label("End Date and Time:"))),$bo_act_addEditProdServDelivery.findNextMonthTodayDate());
+		
+$bo_act_addEditProdServDelivery.addPart();
+$bo_act_addEditProdServDelivery.addLabor();
+$bo_act_addEditProdServDelivery.addExpenses(); 
+
+_click($bo_pg_addEditProdServDelivery.icon_Save);
+
+
+//Verify if user landed into main page after saving child details***************
+_wait(6000, _isVisible(_span("Work Order")));
+if(_assertExists(_span("Work Order"))){
+	_log("User successfully landed into the main process");
+}else{
+	_log("Error occurred,please refer screenshot for detail");
+	_takeScreenShot();
+		}
+
+//verify is user landed into WO page after saving main process************
+_wait(3000);
+_click($bo_pg_addEditProdServDelivery.icon_Save);
+_wait(6000, _isVisible(_heading2("Work Order Detail")));
+if(_assertExists(_heading2("Work Order Detail"))){
+	_log("User successfully landed in work order detail page");
+}else{
+	_log("Error occurred, please ref screenshot for details");
+	_takeScreenShot();
+	}
+
+//*****************Deleteing testdata************
+$bo_act_navigation.navigateToSfmWizard();
+_setSelected($bo_pg_sfmWizard.sel_objPrevMaintPlan,$objName	);
+$bo_act_SFW.deleteWizard($wizardname);	
+$bo_act_SFM.deleteSFM($sfmName);
+_setSpeed($g_stepSpeed);
+
+$RS_5374.end();

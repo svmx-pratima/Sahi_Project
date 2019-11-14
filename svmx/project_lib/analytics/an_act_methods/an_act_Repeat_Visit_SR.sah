@@ -1,0 +1,135 @@
+/**
+ * Function to create a Repeat Visit Calculation method for Repeat Visit
+ */
+var $an_act_Repeat_Visit_SR = new function an_act_Repeat_Visit_SR() {
+	
+	
+	/*
+	 * This Function creates Calculation method for Repeat Visit with all Standard Fields for USA Region.
+	 * @param Calculationmethodname = The method name for the Calculation of SPM Metric
+	 */
+	this.rv_usa_calc = function($Calculationmethodname) {
+
+		// To setup the values
+		_click($an_pg_rv.link_home);
+		_click($an_pg_rv.link_servicemaxSetup);
+		_click($an_pg_rv.btn_serviceperformancemetrics);
+		_click($an_pg_rv.btn_serviceperformancemetricsetup);
+		_click($an_pg_rv.btn_click_metrics);
+		_click($an_pg_rv.btn_RepeatVisit);
+		_click($an_pg_rv.btn_AddRepeatVisit);
+		_click($an_pg_rv.btn_Activecheckbox1);
+		_setValue($an_pg_rv.txt_Calmethod, $Calculationmethodname);
+		_click($an_pg_rv.btn_clicksettings);
+		_click($an_pg_rv.list_repeatvisit_maps);
+		_click($an_pg_rv.list_rvmap_value1);
+		_click($an_pg_rv.txt_RepeatVisit_itemsforCalc);
+		_wait(200);
+		_click($an_pg_rv.list_Account);
+		_click($an_pg_rv.txt_RepeatVisit_itemsforCalc);
+		_wait(200);
+		_click($an_pg_rv.list_Location);
+		_click($an_pg_rv.txt_additionalfield);
+		_click($an_pg_rv.list_RV_Priority);
+		_click($an_pg_rv.btn_clickCriteria);
+		_click($an_pg_rv.txt_click_RepeatVisitQualification);
+		_click($an_pg_rv.list_select_USA_ClosedWO);
+		_click($an_pg_rv.btn_save);
+		_click($an_pg_rv.btn_click_OK);		
+
+	};
+	
+	/*
+	 * This Function creates Calculation method for Repeat Visit with all Custom Fields for USA Region.
+	 * @param Calculationmethodname = The method name for the Calculation of SPM Metric
+	 */
+	this.rv_usa_custom = function($Calculationmethodname){
+		
+		// To setup the values
+
+		_click($an_pg_rv.btn_click_metrics);
+		_click($an_pg_rv.btn_RepeatVisit);
+		_click($an_pg_rv.btn_AddRepeatVisit);
+		_click($an_pg_rv.btn_Activecheckbox1);
+		_setValue($an_pg_rv.txt_Calmethod, $Calculationmethodname);
+		_click($an_pg_rv.btn_clicksettings);
+		_click($an_pg_rv.btn_Account_selection);
+		_click($an_pg_rv.list_customAccount);
+		_click($an_pg_rv.txt_RepeatVisit_itemsforCalc);
+		_wait(200);
+		_click($an_pg_rv.list_Account);
+		_click($an_pg_rv.txt_RepeatVisit_itemsforCalc);
+		_wait(200);
+		_click($an_pg_rv.list_Location);
+		_click($an_pg_rv.txt_additionalfield);
+		_click($an_pg_rv.list_RV_Priority);
+		_click($an_pg_rv.list_repeatvisit_maps);
+		_click($an_pg_rv.list_rvmap_value1);
+		_click($an_pg_rv.btn_clickCriteria);
+		_click($an_pg_rv.txt_click_RepeatVisitQualification);
+		_click($an_pg_rv.list_select_USA_ClosedWO);
+		_click($an_pg_rv.btn_save);
+		_click($an_pg_rv.btn_click_OK);			
+		
+	};
+	
+	/*
+	 * This Function creates Calculation method for Repeat Visit with all Standard Fields for UK Region.
+	 * @param Calculationmethodname = The method name for the Calculation of SPM Metric
+	 */
+	this.rv_uk_calc = function($Calculationmethodname) {
+		
+		_click($an_pg_rv.btn_click_metrics);
+		_click($an_pg_rv.btn_RepeatVisit);
+		_click($an_pg_rv.btn_AddRepeatVisit);
+		_click($an_pg_rv.btn_Activecheckbox1);
+		_setValue($an_pg_rv.txt_Calmethod,$Calculationmethodname);
+		_click($an_pg_rv.btn_clicksettings);
+		_click($an_pg_rv.txt_RepeatVisit_itemsforCalc);
+		_click($an_pg_rv.list_Account);
+		_click($an_pg_rv.list_Location);
+		_click($an_pg_rv.txt_additionalfield);
+		_click($an_pg_rv.list_RV_Priority);
+		_click($an_pg_rv.btn_clickCriteria);
+		_click($an_pg_rv.txt_click_RepeatVisitQualification);
+		_click($an_pg_rv.list_select_UK_ClosedWO);
+		_click($an_pg_rv.btn_save);
+		_click($an_pg_rv.btn_click_OK);		
+		
+	};
+	
+	/*
+	 * This Function runs the Engine of Repeat Visit Metrics
+	 * @param Calculationmethodname = The method name for the Calculation of SPM Metric
+	 */
+	
+	this.rv_runEngine = function($emailId)
+	{
+		_click($an_pg_rv.link_home);
+		_click($an_pg_rv.link_servicemaxSetup);
+		_click($an_pg_rv.btn_serviceperformancemetrics);
+		_click($an_pg_rv.btn_serviceperformancemetricsetup);
+		_click($an_pg_rv.btn_click_metrics);
+		_click($an_pg_rv.btn_RepeatVisit);
+	    _click($an_pg_mttr.btn_schedule_notification);	
+	    _click($an_pg_mttr.list_timezone);
+	    _click($an_pg_mttr.btn_ist_timezone);
+	    _click($an_pg_mttr.btn_period);
+	    _click($an_pg_mttr.btn_daily);
+	    _click($an_pg_mttr.list_time);
+	    _click($an_pg_mttr.btn_time);
+	    _click($an_pg_mttr.txt_emailonsuccess);
+	    _setValue($an_pg_mttr.txt_emailonsuccess,$emailId);
+	    _click($an_pg_mttr.btn_save_sn);
+	    _wait(1000);
+	    _click($an_pg_mttr.btn_ok_sn);
+	    _wait(1000);
+	    _click($an_pg_mttr.btn_click_run);
+	    _wait(1000);
+	    _click($an_pg_mttr.btn_ok_sn);
+
+	};
+	
+	
+
+};

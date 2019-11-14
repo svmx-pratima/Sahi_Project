@@ -1,0 +1,1434 @@
+var $sfm_act_common = new function sfm_act_common() {
+
+	this.globalSearch = function($searchText) {
+
+		_click($bo_pg_search.btn_search);
+		_wait(5000, _isVisible($bo_pg_search.btn_searchAgain));
+		for (var $i = 0; $i <= 5; $i++) {
+			_wait(5000, _isVisible($bo_pg_search.txt_searchText));
+			_setValue($bo_pg_search.txt_searchText, $searchText);
+			_click($bo_pg_search.btn_searchAgain);
+			if (_isVisible(_link($searchText))) {
+				_click(_link($searchText));
+				_logOutput($searchText + " is found");
+				break;
+			} else {
+				if ($i == 5) {
+					_logException("The value " + $searchText + "is not found");
+				}
+			}
+
+		}
+
+	};
+	
+	this.switchToClassic = function(){
+		//This function checks if SFDC is in classic mode for further execution.
+		//Switches to classic if SFDC is in Lightning mode.
+		//Author: Janaki
+		_selectDomain();
+		var $url;
+		_set($url, window.location.href);
+		_log($url);
+		if($url.includes("lightning.force.com")){
+			_click($sfm_pg_commonSfdc.link_userProfileInLightning);
+			_wait(3000);
+			_click($sfm_pg_commonSfdc.link_switchToClassic);
+			_wait(4000);			
+		}
+			
+	};
+	
+	
+	this.navigateToObjectsInClassic = function($objectName){
+	//This function navigates to the given object name in classic
+	//Author: Janaki
+	_click($sfm_pg_commonSfdc.link_setup);
+	_setValue($sfm_pg_commonSfdc.text_setUpSearch,"Objects");
+	_click($sfm_pg_commonSfdc.link_objLink);
+	_click(_link($objectName));
+	};
+	
+	//This function removes field permission for given profile....added by Rubi Agrawal
+	this.RemoveFieldPermissionClassic = function($objectName,$FieldToEdit,$tech_Profile){
+		//var $chk_readonly=_checkbox(1,_in(_row($tech_Profile)));
+		var $chk_visible=_checkbox(0,_in(_row($tech_Profile)));
+		//var $verifycheckbox1=_isChecked($chk_visible);
+		//_log($verifycheckbox1);
+		//var $verifycheckbox2=_isChecked($chk_readonly);
+		//_log($verifycheckbox2);
+		
+	_click(_link("Setup"));
+	_setValue($sfm_pg_commonSfdc.text_setUpSearch,$objectName);
+	_click($sfm_pg_commonSfdc.link_objLink);
+	_click(_link($objectName));
+	_wait(5000);
+	for(var $i = 0; $i < $FieldToEdit.length; $i++)
+	{
+	//_isVisible($sfm_pg_commonSfdc.btn_FieldandRelation);
+	_click(_link($FieldToEdit[$i],_in(_div("noStandardTab"))));
+	_wait(5000);
+	_click($sfm_pg_commonSfdc.btn_FieldLevelSecure);
+	
+	if(_isChecked($chk_visible)==true)
+		{
+		 _uncheck($chk_visible);
+		// _uncheck($chk_readonly);
+		 _log("Permission has been removed");
+		 _click($sfm_pg_commonSfdc.btn_FieldLevelSecureSave);
+		 //_selectDomain();
+		}
+	else
+		{
+		 _log("Field has already *NO* permission");
+		 _click($sfm_pg_commonSfdc.btn_FieldLevelSecureCancel);
+		 _wait(2000);
+		 }
+		}
+	
+	};
+	//This function provide field permission for given profile....added by Rubi Agrawal
+	this.ProvideFieldPermissionClassic = function($objectName,$permissionToprovide,$tech_Profile){
+		
+	_click(_link("Setup"));
+	_setValue($sfm_pg_commonSfdc.text_setUpSearch,$objectName);
+	_click($sfm_pg_commonSfdc.link_objLink);
+	_click(_link($objectName));
+	for(var $i = 0; $i < $permissionToprovide.length; $i++)
+	{
+	//_click($sfm_pg_commonSfdc.btn_FieldandRelation);
+		_click(_link($permissionToprovide[$i],_in(_div("noStandardTab"))));
+		_wait(5000);
+		_click($sfm_pg_commonSfdc.btn_FieldLevelSecure);
+	var $chk_readonly=_checkbox(1,_in(_row($tech_Profile)));
+	var $chk_visible=_checkbox(0,_in(_row($tech_Profile)));
+	if(_isChecked($chk_visible)==false || _isChecked($chk_readonly)==false )
+		{
+		 _check($chk_visible);
+		 _check($chk_readonly);
+		 _log("Permission has been provided");
+		 (_wait(2000),_isVisible($sfm_pg_commonSfdc.btn_FieldLevelSecureSave));
+		 _click($sfm_pg_commonSfdc.btn_FieldLevelSecureSave);
+		 _wait(5000);
+		 
+		}
+	else
+		{
+		 _log("Field has already permission");
+		 _click($sfm_pg_commonSfdc.btn_FieldLevelSecureCancel);
+		 }
+	_setValue($sfm_pg_commonSfdc.text_setUpSearch,$objectName);
+	_click($sfm_pg_commonSfdc.link_objLink);
+	_click(_link($objectName));
+	}};
+	this.addDependentControllingPicklistValues = function($ctrl_picklist_name,$ctrl_picklist_value,$dep_picklist_value) {
+		//Author:Janaki.
+		//This function adds a dependent picklist value to the controlling picklist value.
+		
+		var $header_row = _getText(_row("/"+$ctrl_picklist_name+":/"));
+		var $header_list = $header_row.split(" ");
+		var $noOfSpaces = 1;
+		var $i = 0;
+		for($i=0;$i<$ctrl_picklist_name.length;$i++){
+			if($ctrl_picklist_name.charAt($i) == " "){
+				$noOfSpaces = $noOfSpaces + 1;
+			}
+		}
+		
+		var $index = $header_list.indexOf($ctrl_picklist_value);
+		var $index = $index - $noOfSpaces;
+		_click(_cell($dep_picklist_value+"["+$index+"]"));
+		_click($sfm_pg_commonSfdc.btn_include_values);
+	};
+	
+	this.createWoInClassic = function(){
+	//Author:Janaki
+	//This function creates a blank work order in SFDC Classic mode
+	//Returns: Created Wo number	
+		
+		_click($sfm_pg_commonSfdc.btn_allTabs);
+		_click($sfm_pg_commonSfdc.link_workOrder);
+		_click($sfm_pg_commonSfdc.btn_newWo);
+		_setSelected(_select(0,_rightOf(_label("/Order Type/"))),"Field Service");
+        //Just for selection of mandatory fields
+       _click($sfm_pg_commonSfdc.btn_saveWo);
+		_wait(5000);
+		var $woNum = _getText(_heading2("/WO-/"));
+		return $woNum;
+	};
+	
+	this.launchSFMProcessInClassic = function($processName){
+		//This function launches the given process by clicking the button
+		//Author: Janaki
+		
+		_selectDomain($g_domain);
+		_call(_button($processName).scrollIntoView());
+		_click(_button($processName));
+		_wait(6000);
+		_selectDomain();
+		
+	};
+	
+	this.saveClassicSfmProcess = function(){
+		//This function saves a SFM process by clicking on 'Save' icon.
+		//Author: Janaki
+		_click($sfm_pg_commonSfdc.btn_saveProcess);
+		_setStrictVisibilityCheck(true);
+		_wait(15000,_isVisible($sfm_pg_commonSfdc.btn_okSaveProcess));
+		if(_isVisible($sfm_pg_commonSfdc.btn_okSaveProcess)){
+			_click($sfm_pg_commonSfdc.btn_okSaveProcess);
+		}
+		_setStrictVisibilityCheck(false);
+	};
+	
+	this.logoutInClassic = function(){
+		//This function logs out of SFDC in Classic mode
+		//Returns: None
+		//Author: Janaki
+		_click($sfm_pg_commonSfdc.btn_userArrow);
+		_click($sfm_pg_commonSfdc.link_logout);
+		_wait(2000);
+	};
+	this.getCurrentTimeStamp = function(){
+    	//This function returns the current date and time in the form - DD-MM-YYYY_HR_MIN_SEC
+         var stamp = new Date();
+         var timeStamp = stamp.getDate() + "_" + (stamp.getMonth()+1) + "_" + stamp.getFullYear() + "_" + stamp.getHours() + "_" + stamp.getMinutes() + "_" + stamp.getSeconds();
+    	 return timeStamp;
+  };
+  this.globalSearchOnce = function($searchText){
+	  //This function searches globally only once without search again.
+	  //Author: Janaki
+	   _setSpeed($g_stepSpeed);
+	  _click($sfm_pg_commonSfdc.link_home);
+	   global_clearBrowserCache();
+	  _setValue($sfm_pg_commonSfdc.txt_searchBox,$searchText);
+	  _click($sfm_pg_commonSfdc.btn_globalSearch);
+	  _wait(5000);
+	  if(_isVisible(_link($searchText,_in(_div("searchResultsHolderDiv"))))){
+		  _click(_link($searchText,_in(_div("searchResultsHolderDiv"))));
+		  _wait(15000,_isVisible($bo_pg_workOrders.btn_editWorkOrder));
+	  }
+	  else {
+		  _log("Search Item not found");
+	  }
+  };
+  
+  this.searchWOandLaunchSFM = function($WONumber,$sfmName){
+		$sfm_act_common.globalSearchOnce($WONumber);
+		_wait(10000);
+		_setStrictVisibilityCheck(true);
+		$sfm_act_createCustomWizard.clickWizardBtn($sfmName);
+		_wait(5000,_isVisible(_div("/"+$sfmName+"/")));
+	};
+  
+  
+  this.performQuickSave = function(){
+	  //This function does quick save in the sfm delivery screen.
+	  //Author: Janaki
+	  _click($sfm_pg_commonSfdc.btn_quickSave);
+	  if(_isVisible($sfm_pg_commonSfdc.btn_okSaveProcess)){
+		  _click($sfm_pg_commonSfdc.btn_okSaveProcess);
+	  }
+	  _wait(2000);
+  };
+  
+  this.createWorkDetail = function($lineType,$recordType){
+	//This function creates a work detail from a work order
+	//Return Work detail number in the form of WL-********
+	 //Author: Janaki
+	  
+	_click($sfm_pg_commonSfdc.btn_newWorkDetail);
+	_setSelected(_select(0,_rightOf(_label("/Record Type of new record/"))),$recordType);
+	_click($sfm_pg_commonSfdc.btn_continue);
+	_setSelected(_select(0,_rightOf(_label("/Line Type/"))),$lineType);
+	_click($sfm_pg_commonSfdc.btn_save_dep_picklist);
+	var $workDetailNum = _getText(_heading2("/WL-/"));
+	return $workDetailNum;
+
+  };
+  
+  this.openSfmProcess = function($processName){
+	  //This function opens the SFM designer in a new window for custom
+	  //SFM transactions
+	  //Please use the following commands after performing the required operations in the new window.
+	  // _selectWindow();
+	  // _closeWindow();
+	  //Author: Janaki.
+	 _openWindow(_link("Home").href,"new window");
+	_selectWindow("new window"); // Perform required actions on new window
+	_wait(20000);
+	_click($bo_pg_home.link_servicemaxSetup );
+	_wait(3000,_isVisible($bo_pg_servicemaxSetup.btn_serviceFlowManager));
+	_click($bo_pg_servicemaxSetup.btn_serviceFlowManager);
+	_click($bo_pg_servicemaxSetup.btn_sfmTransactionAndDocsDesigner);
+	_wait(8000);	 
+	_wait(20000, _isVisible($bo_pg_sfmTransactionAndDesigner.btn_standardSfmTransaction));
+	_setSpeed(3000);
+	_click($bo_pg_sfmTransactionAndDesigner.btn_yourCustomSfmTransactions);
+	_setValue($bo_pg_sfmTransactionAndDesigner.txt_yourCustomSfmTransactionsQuickFind,$processName);
+	_click(_f("main").s_label($processName));
+	_wait(20000);
+	};
+	
+  this.clearSvmxCache = function(){
+	  //This function clears servicemax cache
+	  //Author: Janaki.
+	  _click($sfm_pg_commonSfdc.btn_clearSvmxCache);
+	  _setStrictVisibilityCheck(true);
+	  _click($sfm_pg_commonSfdc.btn_proceedPopUp);
+	  _setStrictVisibilityCheck(false);
+	  _wait(10000);
+	 };
+
+	 this.addCustomFields = function($objectName,$fieldNames,$dataTypes,$multiPicklistValues,$lookupType){
+			//Function to add set of custom fields to the given object
+			//Creates only if object is already not present.
+			//Author:Janaki
+			var $i = 0;var $z = 0;
+			this.navigateToObjectsInClassic($objectName);
+			for($i=0;$i<$fieldNames.length;$i++){
+				if(!_isVisible(_link($fieldNames[$i]))){
+					
+				
+					_click($sfm_pg_wo.btn_newCustomField);
+					_click(_radio("/dtype/",_in(_cell($dataTypes[$i]))));
+					_click($sfm_pg_wo.btn_nextInAddCustomFields);
+					_log($i+" "+$dataTypes[$i]);
+					if($dataTypes[$i] === "Lookup Relationship"){
+						_setSelected(_select(0,_near(_label("*Related To"))),$lookupType[$i]);
+						_click($sfm_pg_wo.btn_nextInAddCustomFields);
+						
+					}
+					
+					_setValue($sfm_pg_wo.txt_customFieldName,$fieldNames[$i]);
+					if($dataTypes[$i] === "Lookup Relationship"){
+						_click($sfm_pg_wo.btn_nextInAddCustomFields);
+					}
+					//Add multi picklist values if needed
+					if($dataTypes[$i] === "Picklist (Multi-Select)" || $dataTypes[$i] === "Picklist"){
+						_check($sfm_pg_wo.radio_multiPicklist);
+						for($z=0;$z<$multiPicklistValues.length;$z++){
+							_type($sfm_pg_wo.txt_multiPickTextArea,$multiPicklistValues[$z]);
+							_keyPress($sfm_pg_wo.txt_multiPickTextArea,13);
+						}
+					}
+					_click($sfm_pg_wo.btn_nextInAddCustomFields);
+					_click($sfm_pg_wo.btn_nextInAddCustomFields);
+					_click($sfm_pg_wo.btn_saveCustomField);
+					_selectDomain();
+				}
+				else {
+					   _log($fieldNames[$i]+" already present in "+$objectName+" object");
+					}
+			}
+		_closeWindow();
+		_selectWindow();	
+		};
+		this.findIfFieldPresentInPageLayout = function($fieldName){
+			//This function checks if one field is present in the currently opened page page layout and returns true or false
+			//Author : Janaki
+			var $i = 0; var $j = 0;
+			
+							var $result = false;
+							_setStrictVisibilityCheck(true);
+							if(_isVisible(_cell("/"+$fieldName+"/"))){
+								var $collect = _collect("_cell","/"+$fieldName+"/");
+								$i = 0;
+								for($i=0;$i<$collect.length;$i++){
+									var $x = _getText($collect[$i]);
+									var $length = $fieldName.length;
+									$x = $x.substring(0,$length);
+									if($x === $fieldName){
+									   $result = true;
+									   _log($fieldName+" is present in the pagelayout already");
+									}
+									else {
+										continue;
+									}
+								}
+							}
+							else {
+								  $result = false;
+								 }
+							
+				_log($result);
+		_setStrictVisibilityCheck(false);
+		return $result;
+		};	
+		
+this.addFieldsToLightningPageLayout = function($object_name,$pageLayoutForProfile,$fieldsArray,$myDomain){
+			//This function adds the given fields to the given Lightning component layout
+			//Example: Missing fields in Work order page layout
+			//Author: Janaki
+			var $i = 0;
+			//_click(_span("/Page Layouts/"));
+			_click(_link("Edit",_leftOf(_tableHeader($pageLayoutForProfile))));
+			for($i=0;$i<$fieldsArray.length;$i++){
+				_setValue($sfm_pg_wo.txt_pgLayoutQuickFind,$fieldsArray[$i]);
+				var $shortName = $fieldsArray[$i].substr(0,4);
+				_dragDrop(_span("/"+$shortName+"/"),_span("Information(Header visible on edit only)"));
+			}
+			_click($sfm_pg_wo.btn_pgLayoutSave);
+			_wait(6000);	
+};	
+
+this.editWorkOrder = function($textLabels,$textValues,$pickListLabels,$pickListValues,$textAreaLabels,$textAreaValues,$checkBoxLabels,$checkBoxValues,$dateTimeLabels,$dateTimeDateValues,$timeValues,$emailLabels,$emailValues,$multiPickLabels,$multiPickValues,$urlLabels,$urlValues,$telephoneLabels,$telephoneValues,$lookUpLabels,$lookUpValues){
+	//This function edits work order in Lightning mode
+	//Author : Janaki
+	//Text values and Date values can be combined into a single array
+	
+	//Click any of the pencil icons to open edit mode
+	
+	_setStrictVisibilityCheck(true);
+	_wait(6000);
+	
+    _click($sfm_pg_wo.btn_pencilToEditWo);
+	var $i = 0;
+	//Fill text values 
+	if($textLabels.length > 0){
+		for($i=0;$i<$textLabels.length;$i++){
+			//Special handling for Scheduled Date as we have another Scheduled Date Time field.
+			if($textLabels[$i] === "Scheduled Date"){
+				_setValue(_textbox($textLabels[$i]),$textValues[$i]);
+			}
+			else{
+				_setValue(_textbox("/"+$textLabels[$i]+"/"),$textValues[$i]);
+			}
+		}
+	}
+	//Then Fill all picklists
+	if($pickListLabels.length > 0){
+		//Fill picklist values
+		for($i=0;$i<$pickListLabels.length;$i++){
+			_setSelected(_select(0,_near(_label("/"+$pickListLabels[$i]+"/"))),$pickListValues[$i]);
+		}
+	}
+	//TextAreas to be filled next
+	if($textAreaLabels.length > 0){
+		for($i=0;$i<$textAreaLabels.length;$i++){
+			_setValue(_textarea(0,_near(_label("/"+$textAreaLabels[$i]+"/"))),$textAreaValues[$i]);
+		}
+	}
+	//Checkboxes are filled
+	if($checkBoxLabels.length > 0){
+		for($i=0;$i<$checkBoxLabels.length;$i++){
+			if($checkBoxValues[$i] === "true"){
+				_check(_checkbox(0,_near(_label("/"+$checkBoxLabels+"/"))));
+			
+			}
+			else if($checkBoxValues[$i] === "false"){
+				_uncheck(_checkbox(0,_near(_label("/"+$checkBoxLabels+"/"))));
+			}
+		}
+	}
+	
+	//Fill all Date Time fields
+	if($dateTimeLabels.length > 0){
+		for($i=0;$i<$dateTimeLabels.length;$i++){
+			var $x = $dateTimeDateValues[$i];
+			var $y = $timeValues[$i];
+			var $combi = $x + " " +$y;
+			_setValue(_textbox($dateTimeLabels[$i]),$combi);
+			
+		}
+	}
+	//Fill email fields
+	if($emailLabels.length > 0){
+		for($i=0;$i<$emailLabels.length;$i++){
+			_setValue(_textbox($emailLabels[$i]),$emailValues[$i]);
+		}
+	}
+   //Fill multi picklists
+	if($multiPickLabels.length > 0){
+		var $uniqueMulti = [];
+		//find out the unique list of multi picklists
+		for($i=0;$i<$multiPickLabels.length;$i++){
+			if($uniqueMulti.indexOf($multiPickLabels[$i]) == -1){
+				$uniqueMulti.push($multiPickLabels[$i]);
+			}
+		}
+		_log($uniqueMulti);
+		var $j=0;var $p=0;
+		for($i=0;$i<$uniqueMulti.length;$i++){
+			var $actualList = [];
+			var $currentMultiValues = [];
+			for($j=0;$j<$multiPickValues.length;$j++){
+				if($multiPickLabels[$j] == $uniqueMulti[$i]){
+						$currentMultiValues.push($multiPickValues[$j]);
+					
+				}
+			}
+			_log($currentMultiValues);
+			for($p=0;$p<$currentMultiValues.length;$p++){
+				_setSelected(_select(0,_rightOf(_cell($uniqueMulti[$i]))),$currentMultiValues[$p]);
+				_click($sfm_pg_commonSfdc.btn_multiArrow);
+			}
+		
+			
+			_setStrictVisibilityCheck(true);
+	}
+}
+	//Fill URL fields
+	if($urlLabels.length > 0){
+		for($i=0;$i<$urlLabels.length;$i++){
+			_setValue(_textbox($urlLabels[$i]),$urlValues[$i]);
+		}
+	}
+	//Fill Telephone number values.
+if($telephoneLabels.length > 0){
+		
+	for($i=0;$i<$telephoneLabels.length;$i++){
+		_setValue(_textbox($telephoneLabels[$i]),$telephoneValues[$i]);;
+	}
+}
+//Fill Lookup Values
+if($lookUpLabels.length > 0){
+	for($i=0;$i<$lookUpLabels.length;$i++){
+			_setValue(_textbox($lookUpLabels[$i]),$lookUpValues[$i]);
+			_click(_image($lookUpLabels[$i] +" Lookup (New Window)"));
+			_selectWindow("/lookup/");
+			_click(_link($lookUpValues[$i]));
+			_selectWindow();
+	}
+}
+	
+//Saving everything together
+_click($sfm_pg_wo.btn_saveEditWO);
+_wait(2000);
+};
+
+this.verifyValues = function($textLabels,$textValues,$pickListLabels,$pickListValues,$textAreaLabels,$textAreaValues,$checkBoxLabels,$checkBoxValues,$dateTimeLabels,$dateTimeDateValues,$timeValues,$emailLabels,$emailValues,$lookUpLabels,$lookUpValues,$multiPickLabels,$multiPickValues,$urlLabels,$urlValues,$telephoneLabels,$telephoneValues){
+	//This function takes the values in a given object/record, compares with expected values
+	//and returns true/false on the basis of the results
+	//Author : Janaki
+	_setStrictVisibilityCheck(true);
+	_wait(6000);
+    _click($sfm_pg_wo.btn_pencilToEditWo);
+	var $i = 0;
+	var $result = true;
+	var $actualList = [];
+	if($textLabels.length > 0){
+			for($i=0;$i<$textLabels.length;$i++){
+				if($textLabels[$i] === "Scheduled Date"){
+					$actualList.push(_getValue(_textbox($textLabels[$i])));
+				}
+				else {	
+						$actualList.push(_getValue(_textbox("/"+$textLabels[$i]+"/")));
+				}
+				_log("Expected value for "+$textLabels[$i]+":"+$textValues[$i]);
+				_log("Actual value for"+$textLabels[$i]+":"+$actualList[$i]);
+			}
+			if(_areEqual($textValues,$actualList)){
+				_log("Text & Date values match");
+				$x = true;
+				$result = Boolean($result && $x);
+				_log($result);
+			}
+			else {
+				_log("Text & Date values do not match");
+				$x = false;
+				$result = Boolean($result && $x);
+				_log($result);
+			}
+	}
+	$actualList = [];
+	if($pickListLabels.length > 0){
+		for($i=0;$i<$pickListLabels.length;$i++){
+			$actualList.push(_getValue(_select(0,_near(_label("/"+$pickListLabels[$i]+"/")))));
+			_log("Expected value for "+$pickListLabels[$i]+":"+$pickListValues[$i]);
+			_log("Actual value for"+$pickListLabels[$i]+":"+$actualList[$i]);
+			
+		}
+		if(_areEqual($pickListValues,$actualList)){
+			_log("Picklist values match");
+			$x = true;
+			$result = Boolean($result && $x);
+			_log($result);
+		}
+		else {
+			_log("Picklist values do not match");
+			$x = false;
+			$result = Boolean($result && $x);
+			_log($result);
+		}
+	}
+	$actualList = [];
+	if($textAreaLabels.length > 0){
+		for($i=0;$i<$textAreaLabels.length;$i++){
+			$actualList.push(_getText(_textarea(0,_near(_label("/"+$textAreaLabels[$i]+"/")))));
+			_log("Expected value for "+$textAreaLabels[$i]+":"+$textAreaValues[$i]);
+			_log("Actual value for"+$textAreaLabels[$i]+":"+$actualList[$i]);
+			
+		}
+		if(_areEqual($textAreaValues,$actualList)){
+			_log("Text Area values match");
+			$x = true;
+			$result = Boolean($result && $x);
+			_log($result);
+		}
+		else {
+			_log("Text Area values do not match");
+			$x = false;
+			$result = Boolean($result && $x);
+			_log($result);
+		}
+	}
+	$actualList = [];
+	if($checkBoxLabels.length > 0){
+		for($i=0;$i<$checkBoxLabels.length;$i++){
+			$actualList.push(_getAttribute(_checkbox($checkBoxLabels[$i]),"checked"));
+			_log("Expected value for "+$checkBoxLabels[$i]+":"+$checkBoxValues[$i]);
+			_log("Actual value for"+$checkBoxLabels[$i]+":"+$actualList[$i]);
+		}
+	}
+	$actualList = [];
+	if($dateTimeLabels.length > 0){
+		for($i=0;$i<$dateTimeLabels.length;$i++){
+			var $x = _getValue(_textbox($dateTimeLabels[$i]));
+			var $temp = $x.split(" ");
+			_log($temp);
+			var $dateValue = $temp[0];
+			$actualList.push($dateValue);
+			_log("Expected date value for "+$dateTimeLabels[$i]+":"+$dateTimeDateValues[$i]);
+			_log("Actual date value for"+$dateTimeLabels[$i]+":"+$actualList[$i]);
+		}
+		if(_areEqual($dateTimeDateValues,$actualList)){
+			_log("Date/Time Date values match");
+			$x = true;
+			$result = Boolean($result && $x);
+			_log($result);
+		}
+		else {
+			_log("Date/Time Date values do not match");
+			$x = false;
+			$result = Boolean($result && $x);
+			_log($result);
+		}	
+	}
+	$actualList = [];
+	if($dateTimeLabels.length > 0){
+		for($i=0;$i<$dateTimeLabels.length;$i++){
+			var $x = _getValue(_textbox($dateTimeLabels[$i]));
+			var $temp = $x.split(" ");
+			_log($temp);
+			var $timeValue = $temp[1] + " "+ $temp[2];
+			$actualList.push($timeValue);
+			_log("Expected time value for "+$dateTimeLabels[$i]+":"+$timeValues[$i]);
+			_log("Actual time value for"+$dateTimeLabels[$i]+":"+$actualList[$i]);
+		}
+		if(_areEqual($timeValues,$actualList)){
+			_log("Date/Time Time values match");
+			$x = true;
+			$result = Boolean($result && $x);
+			_log($result);
+		}
+		else {
+			_log("Date/Time Time values do not match");
+			$x = false;
+			$result = Boolean($result && $x);
+			_log($result);
+		}	
+	}
+	$actualList = [];
+	if($emailLabels.length > 0){
+		for($i=0;$i<$emailLabels.length;$i++){
+			$actualList.push(_getValue(_textbox($emailLabels[$i])));
+			_log("Expected date value for "+$emailLabels[$i]+":"+$emailValues[$i]);
+			_log("Actual date value for"+$emailLabels[$i]+":"+$actualList[$i]);
+		}
+		if(_areEqual($emailValues,$actualList)){
+			_log("Email values match");
+			$x = true;
+			$result = Boolean($result && $x);
+			_log($result);
+		}
+		else {
+			_log("Email values do not match");
+			$x = false;
+			$result = Boolean($result && $x);
+			_log($result);
+		}	
+	}
+	$actualList = [];
+	if($lookUpLabels.length > 0){
+		for($i=0;$i<$lookUpLabels.length;$i++){
+			$actualList.push(_getText(_textbox($lookUpLabels[$i])));
+			_log("Expected date value for "+$lookUpLabels[$i]+":"+$lookUpValues[$i]);
+			_log("Actual date value for"+$lookUpLabels[$i]+":"+$actualList[$i]);
+		}
+		if(_areEqual($lookUpValues,$actualList)){
+			_log("Lookup values match");
+			$x = true;
+			$result = Boolean($result && $x);
+			_log($result);
+		}
+		else {
+			_log("Lookup values do not match");
+			$x = false;
+			$result = Boolean($result && $x);
+			_log($result);
+		}	
+	}
+	$actualList = [];
+	//Verify Multi picklist values
+	var $i = 0;
+	var $uniqueMulti = [];
+	//find out the unique list of multi picklists
+	for($i=0;$i<$multiPickLabels.length;$i++){
+		if($uniqueMulti.indexOf($multiPickLabels[$i]) == -1){
+			$uniqueMulti.push($multiPickLabels[$i]);
+		}
+	}
+	_log($uniqueMulti);
+	var $j=0;
+	for($i=0;$i<$uniqueMulti.length;$i++){
+		var $actualList = [];
+		var $currentMultiValues = [];
+		for($j=0;$j<$multiPickValues.length;$j++){
+			if($multiPickLabels[$j] == $uniqueMulti[$i]){
+					$currentMultiValues.push($multiPickValues[$j]);
+				
+			}
+		
+	}
+		_log($currentMultiValues);
+		_setStrictVisibilityCheck(true);
+		var $collect = _collect("_select","/.*/",_near(_image("Add",_rightOf(_cell($uniqueMulti[$i])))));
+		var $x = _getText($collect[1]);
+		var $p = 0;var $actualList = [];
+		for($p=0;$p<$x.length;$p++){
+			$actualList.push($x[$p]);
+		}
+		_log("Expected values for "+$uniqueMulti[$i]+" "+$currentMultiValues);
+		_log("Actual values for "+$uniqueMulti[$i]+" "+$actualList);
+		_setStrictVisibilityCheck(false);
+	
+		if(_areEqual($currentMultiValues,$actualList)){
+			_log("Multi Picklist values match");
+			$x = true;
+			$result = Boolean($result && $x);
+			_log($result);
+		}
+		else {
+			_log("Multi Picklist values do not match");
+			$x = false;
+			$result = Boolean($result && $x);
+			_log($result);
+		}	
+}
+	$actualList = [];
+	//Verify URL values
+	if($urlLabels.length > 0){
+		
+		for($i=0;$i<$urlLabels.length;$i++){
+			$actualList.push(_getText(_textbox($urlLabels[$i])));
+			_log("Expected date value for "+$urlLabels[$i]+":"+$urlValues[$i]);
+			_log("Actual date value for"+$urlLabels[$i]+":"+$actualList[$i]);
+		}
+		if(_areEqual($urlValues,$actualList)){
+			_log("URL values match");
+			$x = true;
+			$result = Boolean($result && $x);
+			_log($result);
+		}
+		else {
+			_log("URL values do not match");
+			$x = false;
+			$result = Boolean($result && $x);
+			_log($result);
+		}	
+	}
+$actualList = [];
+//Verify Telephone values
+if($telephoneLabels.length > 0){
+		
+		for($i=0;$i<$telephoneLabels.length;$i++){
+			$actualList.push(_getText(_textbox($telephoneLabels[$i])));
+			_log("Expected value for "+$telephoneLabels[$i]+":"+$telephoneValues[$i]);
+			_log("Actual value for"+$telephoneLabels[$i]+":"+$actualList[$i]);
+		}
+		if(_areEqual($telephoneValues,$actualList)){
+			_log("Telephone values match");
+			$x = true;
+			$result = Boolean($result && $x);
+			_log($result);
+		}
+		else {
+			_log("Telephone values do not match");
+			$x = false;
+			$result = Boolean($result && $x);
+			_log($result);
+		}	
+	}
+
+_click($sfm_pg_wo.btn_saveEditWO);
+_wait(2000);
+_setStrictVisibilityCheck(false);
+return $result;
+};
+
+//Function to verify values based on the input arrays given
+//Returns true or false based on the verification result.
+//Text,Picklist and Date fields can be combined into a single array
+//Time field of Date/Time fields should be given as separate array with the same label
+//Text area should be given as a separate array
+//Checkboxes should be given as separate array.
+//Pass empty arrays "[]" as parameters if nothing of that data type needs to be verified.
+//Author: Janaki
+	
+
+this.verifyValuesInDelivery = function($textPicklistDateLabels,$textPicklistDateExpValues,$timeLabels,$timeExpValues,$textAreaLabels,$textAreaExpvalues,$checkBoxLabels,$checkBoxExpValues,$multiPickLabels,$multiPickValues){
+	
+	//This is a wrapper function to call individual functions to verify values of various data types
+	var $result = true; var $x;
+	//First text and picklists
+	if($textPicklistDateLabels.length > 0){
+		$x = this.verifyTextPicklistValues($textPicklistDateLabels, $textPicklistDateExpValues);
+		_log($x);
+		$result = Boolean($result && $x);
+	}
+	if($timeLabels.length > 0){
+		$x = this.verifyTimeValues($timeLabels,$timeExpValues);
+		_log($x);
+		$result = Boolean($result && $x);
+	}
+	if($textAreaLabels.length > 0){
+		$x = this.verifyTextAreaValues($textAreaLabels,$textAreaExpvalues);
+		_log($x);
+		$result = Boolean($result && $x);
+	}
+	if($checkBoxLabels.length > 0){
+		$x = this.verifyCheckBoxValues($checkBoxLabels,$checkBoxExpValues);
+		_log($x);
+		$result = Boolean($result && $x);
+	}
+	if($multiPickLabels.length > 0){
+		$x = this.verifyMultiPicklistValuesInDelivery($multiPickLabels, $multiPickValues)
+		_log($x);
+		$result = Boolean($result && $x);
+	}
+_log($result);
+return $result;
+};
+	
+	
+
+	this.verifyTextPicklistValues = function($textPicklistDateLabels,$textPicklistDateExpValues){
+		//Verifies text,lookup,URL,phone,percent and picklist values
+		var $i = 0; var $actualList = [];
+		for($i=0;$i<$textPicklistDateLabels.length;$i++){
+		 		$actualList.push(_getValue(_textbox(0,_near(_label("/"+$textPicklistDateLabels[$i]+"/")))));
+		 		_log("Expected Value for "+$textPicklistDateLabels[$i]+": "+$textPicklistDateExpValues[$i]);
+		 		_log("Actual Value for "+$textPicklistDateLabels[$i]+": "+$actualList[$i]);
+			}
+		_log($textPicklistDateExpValues);
+		_log($actualList);
+		if(_areEqual($textPicklistDateExpValues,$actualList)){
+			_log("Text , Picklist, Date, URL, Phone, Percent,Email values match");
+			return true;
+		}
+		else
+			{
+			 _log("Text , Picklist values do not match");
+			 return false;
+			}
+	};
+	
+	this.verifyTimeValues = function($timeLabels,$timeExpValues) {
+		var $i = 0; var $actualList = [];
+		for($i=0;$i<$timeLabels.length;$i++){
+			var $x = _getValue(_textbox(1,_near(_label("/"+$timeLabels[$i]+"/"))));
+			$x = parseInt($x,10);
+			var $y = _getValue(_textbox(2,_near(_label("/"+$timeLabels[$i]+"/"))));
+			//$y = parseInt($y,10);
+			var $z = _getValue(_textbox(3,_near(_label("/"+$timeLabels[$i]+"/"))));
+			var $time= $x+":"+$y+" "+$z;
+		 		$actualList.push($time);
+		 		_log("Expected Value for "+$timeLabels[$i]+": "+$timeExpValues[$i]);
+		 		_log("Actual Value for "+$timeLabels[$i]+": "+$actualList[$i]);
+			}
+		_log($timeExpValues);
+		_log($actualList);
+		if(_areEqual($timeExpValues,$actualList)){
+			_log("Time values match");
+			return true;
+		}
+		else
+			{
+			    _log("Time values do not match");
+				return false;
+			}	
+	};
+	this.verifyTextAreaValues = function($textAreaLabels,$textAreaExpvalues){
+		var $i = 0; var $actualList = [];
+		for($i=0;$i<$textAreaLabels.length;$i++){
+		 		$actualList.push(_getValue(_textarea(0,_near(_label("/"+$textAreaLabels[$i]+"/")))));
+		 		_log("Expected Value for "+$textAreaLabels[$i]+": "+$textAreaExpvalues[$i]);
+		 		_log("Actual Value for "+$textAreaLabels[$i]+": "+$actualList[$i]);
+			}
+		_log($textAreaExpvalues);
+		_log($actualList);
+		if(_areEqual($textAreaExpvalues,$actualList)){
+			_log("Text area values match");
+			return true;
+		}
+		else
+			{
+				_log("Text area values do not match");
+				return false;
+			}	
+	};
+	
+	this.verifyCheckBoxValues =  function($checkBoxLabels,$checkBoxExpValues){
+		var $i = 0; var $actualList = [];
+		var $x;
+		for($i=0;$i<$checkBoxLabels.length;$i++){
+			var $pvalue=_parentTable(_button("/"+$checkBoxLabels[$i]+"/"));
+			var $value=_getAttribute($pvalue,"className");
+			 if($value.indexOf("checked")!=-1)
+			{
+				 $actualList.push(true);
+			}
+			else{
+				$actualList.push(false);
+				}
+
+			_log("Expected Value for "+$checkBoxLabels[$i]+": "+$checkBoxExpValues[$i]);
+	 		_log("Actual Value for "+$checkBoxLabels[$i]+": "+$actualList[$i]);
+		}
+		_log($checkBoxExpValues);
+		_log($actualList);
+		if(_areEqual($checkBoxExpValues,$actualList)){
+			_log("CheckBox values match");
+			return true;
+		}
+		else
+			{
+			    _log("Checkbox values do not match");
+				return false;
+			}	
+	};
+	this.verifyMultiPicklistValuesInDelivery = function($multiPickLabels,$multiPickValues){
+		//This function verifies the given values in the multipicklists and returns
+		//true or false based on the results
+		var $i = 0;
+		var $uniqueMulti = [];var $actualList = [];
+		//find out the unique list of multi picklists
+		for($i=0;$i<$multiPickLabels.length;$i++){
+			if($uniqueMulti.indexOf($multiPickLabels[$i]) == -1){
+				$uniqueMulti.push($multiPickLabels[$i]);
+			}
+		}
+		_log($uniqueMulti);
+		var $j=0;var $z=0;var $result = true;var $x;
+		for($i=0;$i<$uniqueMulti.length;$i++){
+			var $actualList = [];
+			var $currentMultiValues = [];
+			for($j=0;$j<$multiPickValues.length;$j++){
+				if($multiPickLabels[$j] == $uniqueMulti[$i]){
+						$currentMultiValues.push($multiPickValues[$j]);
+				}
+			}
+			var $x = _getValue(_textbox(0,_near(_label("/"+$uniqueMulti[$i]+"/"))));
+			$actualList = $x.split(";");
+			_log("Expected values for "+$uniqueMulti[$i]+" "+$currentMultiValues);
+			_log("Actual values for "+$uniqueMulti[$i]+" "+$actualList);
+			if(_areEqual($currentMultiValues,$actualList)){
+				_log("Multi Picklist values for "+$uniqueMulti[$i]+" match");
+				$x = true;
+				$result = Boolean($result && $x);
+			}
+			else
+				{
+				    _log("Multi Picklist values for "+$uniqueMulti[$i]+"do not match");
+				    $x = false;
+					$result = Boolean($result && $x);
+				}		
+			
+		}
+return $result;	
+};
+	this.addUserLookupInScreenDesigner = function($fieldName,$containerName){
+		//This function adds a user lookup which needs special handling in the screen designer
+		//to an existing page layout
+		_click($bo_pg_sfmTransactionAndDesigner.btn_screenDesigner);
+		_click(_f("main").s_datagroup("dataGroup").near(_f("main").s_richtext($containerName)));
+		_click(_f("main").s_label($fieldName));
+		_click($bo_pg_sfmTransactionAndDesigner.btn_addFieldToPage);
+		_click($bo_pg_sfmTransactionAndDesigner.btn_pageLayoutSave);
+		_wait(3000, _isVisible($bo_pg_sfmTransactionAndDesigner.label_pageSaved));
+		
+	};
+	this.addSubtractDates = function($given_date,$num_of_days) {
+		//This function adds or subtracts calendar days from a given date and returns in the
+		//form of MM/DD/YYYY
+		//Author: Janaki.
+		var $result_date = new Date($given_date);
+		var $monthString; var $dateString;
+        $result_date.setDate($given_date.getDate()+$num_of_days);
+        if(($result_date.getMonth()+1) <10){
+        	$monthString = "0"+($result_date.getMonth()+1);
+        }
+        else {
+        	$monthString = $result_date.getMonth()+1;
+        }
+        if($result_date.getDate() < 10){
+        	$dateString = "0"+$result_date.getDate();
+        }
+        else{
+        	$dateString = $result_date.getDate();
+        }
+        $result_date = $monthString + "/" + $dateString + "/" + $result_date.getFullYear();
+        return $result_date;
+	};
+	
+	this.calculateNow = function(){
+		//Calculating current time and returns in the form of HH:MM AM/PM
+		//Author: Janaki
+		var $p = $current.getHours();
+		var $min = $current.getMinutes();
+		if($p > 12){
+			if($min < 10){
+				$min = "0"+$min;
+			}
+			else if($min >= 10){
+				 $min = $current.getMinutes();
+			}
+			var $now = $current.getHours()-12+":"+$min+" PM";
+		}
+		else if($p == 12){
+			if($min < 10){
+				$min = "0"+$min;
+			}
+			else if($min >= 10){
+				 $min = $current.getMinutes();
+			}
+			var $now = $current.getHours()+":"+$min+" PM";
+		}
+		else {
+			if($min < 10){
+				$min = "0"+$min;
+			}
+			if($min >= 10){
+				 $min = $current.getMinutes();
+			}
+			if($current.getHours() == 0){
+				var $now = "12" +":"+$min+" AM";
+			}
+			else {
+				var $now = $current.getHours()+":"+$min+" AM";
+			}
+		}
+	 return $now;
+	};
+	
+	this.removePrecedingZeroInDate =  function($dateValue){
+		//This function removes the preceding zero in date fields
+		//Author: Janaki
+		var $y = $dateValue.split("/");
+		var $i=0;
+		for($i=0;$i<$y.length;$i++){
+			$y[$i] = parseInt($y[$i],10);	
+		}
+		var $correctDate = $y[0]+"/"+$y[1]+"/"+$y[2];
+		return $correctDate;	
+	};
+	
+
+	this.getCurrentUserName = function(){
+		//This function finds and returns the currently logged in username in Classic.
+		//Author : Janaki
+		
+		var $userName = _getText(_heading1("currentStatusUserName"));
+		return $userName;
+		
+	};
+
+
+this.getWorkDetailNumberFromWO = function() {
+	//This function fetches the latest work detail number from any work order
+	//Returns Work Detail Line number in the form of WL-*********
+	//Author : Janaki
+	var $wDetailNum = _getText($sfm_pg_wo.link_workDetail);
+	return $wDetailNum;
+	
+	
+};
+this.navigateToLatestWorkDetail = function() {
+	//This function navigates to work detail (Child line items) after
+	//save in a source to target process when the line number is unknown.
+	//Author: Janaki
+	var $x = _count("_tableHeader", "/WL-/",_near(_tableHeader("Line Number")));
+	_log($x);
+	$x = $x-1;
+	_click(_link("/WL-/["+$x+"]",_near(_link("Edit"))));
+	_wait(2000);
+};
+
+this.addColumnToRelatedList = function($relatedList,$columnName){
+	//This function adds the given column to the related list
+	//Parameters : $relatedList Ex: Work Detail,$columnName Ex: Line Number
+	//If the column is already added, then no action is performed
+	//Returns: NIL
+	//Author: Janaki
+	
+	_click($sfm_pg_commonSfdc.link_editLayout);
+	_click($sfm_pg_commonSfdc.btn_relatedLists);
+	_click(_click(_div("/properties/",_near(_cell($relatedList)))));
+	if(!_isVisible(_emphasis($relatedList,_rightOf(_image("rlPropFields_iconRight"))))){
+		_click(_emphasis($columnName));
+		_click($sfm_pg_commonSfdc.btn_addColumnToRelatedList);
+	}
+	_click($sfm_pg_commonSfdc.btn_okaddColumnToRelatedList);
+	_click($sfm_pg_commonSfdc.btn_savePageLayout);
+	_wait(3000);
+
+};
+
+this.getRecordType = function(){
+	//This function returns the record type of the record created
+	//Author: Janaki
+	_click($sfm_pg_wo.btn_pencilToEditWo);
+	var $recType = _getText(_cell(1,_near(_cell("Record Type"))));
+	_click($sfm_pg_wo.btn_saveEditWO);
+	_wait(2000);
+	_log("Record Type of this record is "+$recType);
+	return $recType;
+};
+
+this.sortRelatedList = function($relatedList,$sortingField,$order){
+	//This function sets the option to sort the items of the related list in the required order
+	//Parameters: $relatedList - Name of the related list
+	//$sortingField - field on the basis of which sorting will be performed
+	//$order - "Ascending" Or "Descending"
+	//Author: Janaki
+	_click($sfm_pg_commonSfdc.link_editLayout);
+	_click($sfm_pg_commonSfdc.btn_relatedLists);
+	_click(_div("/properties/",_near(_cell($relatedList))));
+	_click($sfm_pg_commonSfdc.txt_sortingRelatedList);
+	_click(_div($sortingField));
+	if($order === "Descending"){
+		_click($sfm_pg_commonSfdc.radio_descending);
+	}
+	else if($order === "Ascending"){
+		_click($sfm_pg_commonSfdc.radio_ascending);
+	}
+	_click($sfm_pg_commonSfdc.btn_okaddColumnToRelatedList);
+	_click($sfm_pg_commonSfdc.btn_savePageLayout);
+	_wait(3000);
+};
+
+this.getWorkDetailNumber = function(){
+	//This function gets the Line number of the Work Detail record
+	//Returns Work Detail Line number in the form of WL-*********
+	//Note: This function assumes Line Number field is present in the page layout
+	//Author : Janaki
+	$sfm_act_SFM.openLatestExtEdit();
+	_wait(2000);
+	_setStrictVisibilityCheck(true);
+	var $wlNum = _getText(_textbox(0,_near(_label("/Line Number/"))));
+	_click($sfm_pg_commonSfdc.btn_updateExtEdit);
+	_setStrictVisibilityCheck(false);
+	_log("Created Work Detail is "+$wlNum);
+	return $wlNum;
+};
+
+this.getDateTimeInRestFormat = function($dateTimeValue){
+	//This is a utility to return the given date time in a format for REST API
+	//Author: Janaki
+	var $current = new Date($dateTimeValue);
+	var $restFormat = $current.getFullYear()+"-"+($current.getMonth()+1)+"-"+$current.getDate()+"T"+$current.getHours()+":"+$current.getMinutes()+":00.000Z";
+	_log($restFormat);
+	return $restFormat;
+};
+this.deleteStepFromWizard = function($wizardObject,$wizardName,$processName){
+	//deletes a given step from a given wizard
+	var $i=0;
+	$bo_act_navigation.navigateToSvmxSetup();
+	_click(_div("Service Flow Manager"));
+	_click(_div("SFM Wizards"));
+	_setSelected($sfm_pg_wizards.selectObject,$wizardObject);
+	_wait(3000);
+	_click(_checkbox(0,_leftOf(_span($wizardName))));
+	_click($sfm_pg_wo.btn_editWizardStep);
+	_click($sfm_pg_wo.btn_manageWizardSteps);
+	for($i=0;$i<$processName.length;$i++){
+	if(_isVisible(_span($processName))){
+			_click(_checkbox(0,_leftOf(_span($processName))));
+			
+	}
+	}
+	_expectConfirm($sfm_pg_wo.btn_deleteStepFromWizard);
+	_click($sfm_pg_wo.btn_deleteStepFromWizard);
+	_wait(5000,_isVisible($sfm_pg_wo.msg_wizardStepDeleteSuccess));	
+};
+
+this.editGlobalSettings = function($groupProfile,$module,$subModule,$settingName,$settingValue){
+	//This function is used for setting any value in the global settings
+	//Author: Janaki
+	//Parameters: $groupProfile - Group profile name of logged in user
+	//$module - Module under which the setting exists
+	//$subModule - Submodule under which the setting exists.
+	//setting Name - Ex: GBL 037
+	//$settingValue = 'True' or 'False'
+	//Sample usage - RS_11192.sah
+	$bo_act_navigation.navigateToSvmxSetup();
+	_click($bo_pg_servicemaxSetup.btn_configProfiles);
+	_wait(7000,_isVisible($bo_pg_servicemaxSetup.label_orgWide));
+	_check(_checkbox(0,_leftOf(_span($groupProfile))));
+	_click($sfm_pg_commonSfdc.btn_edit);
+	_setSelected(_select("/Modulelist/"),$module);
+	_wait(4000);
+	_setSelected(_select("/SubModulelist/"),$subModule);
+	_click(_link("/Edit/",_leftOf(_span($settingName))));
+	_selectWindow("Servicemax_Conf_Prof");
+	_setStrictVisibilityCheck(true);
+	_click(_radio("/disp_setting/",_near(_label($settingValue))));
+	_click($sfm_pg_commonSfdc.btn_save);
+	_assertVisible(_div("Success:Save Data Saved successfully"));
+	_click($sfm_pg_commonSfdc.btn_closeGlobal);
+	_selectWindow();
+	_click($sfm_pg_commonSfdc.btn_saveGlobal);
+};
+
+this.addAttachment = function($numberInPage,$fileNameWithPath,$fileDescription){
+	//This function is used to add an attachment to any page.
+	//Author:Janaki
+	//Parameters: $numberInPage - The nth attachment in the page. First attachment - 1 etc..
+	// Path should be like : scripts/Sahi_Project/svmx/test_lab/test_cases/sfmDelivery/attachments/barbie2.jpg
+	var $num = parseInt($numberInPage-1);
+	_log($num);
+	_setFile2(_file($num),$fileNameWithPath,"/salesforce/",true,true);
+	_wait(15000,_isVisible(_textbox($numberInPage)));
+	//Adding File Description
+	_setValue(_textbox($numberInPage),$fileDescription);
+};
+
+this.createChecklistProcess = function($processName){
+	//This function creates a generic custom checklist process
+	//Author: Janaki
+	//Parameters: $processName
+	var $stdMapping = "SVMXSTD: Map Work Order to Checklist";
+	$bo_act_navigation.navigateToSfmTransactionDesigner();
+	_click($bo_pg_sfmTransactionAndDesigner.btn_newSFM);
+	_wait(60000, _isVisible($bo_pg_sfmTransactionAndDesigner.txt_name));
+	_setValue($bo_pg_sfmTransactionAndDesigner.txt_name, $processName);
+	_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmTransactionId,"");
+	_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmTransactionId,$processName);
+	_setSelected($bo_pg_sfmTransactionAndDesigner.lbl_checklistOb,"to generate a Checklist/Survey type of Process");
+	_wait(10000);
+	_setSelected($bo_pg_sfmTransactionAndDesigner.list_checklistObjCombo,"Work Order");
+	if(_isVisible($bo_pg_sfmTransactionAndDesigner.btn_popUpOK)){
+		_click($bo_pg_sfmTransactionAndDesigner.btn_popUpOK);
+	}
+	_click($bo_pg_sfmTransactionAndDesigner.btn_qualifyingCriteriaAndFieldMapping);
+	_setSelected($bo_pg_sfmTransactionAndDesigner.list_mappingCombo,$stdMapping);
+	_click($bo_pg_sfmTransactionAndDesigner.btn_quickSave1);
+};
+	
+this.configChecklistSection = function($sectionTitle){
+	//Date,Date/Time,Picklists,Numbers,Text types of questions
+	//First section is available by default.
+	var $i=0; var $j=0;
+	_click($bo_pg_sfmTransactionAndDesigner.tab_formDesigner);
+	_click($bo_pg_sfmTransactionAndDesigner.btn_editSectionInChecklist);
+	_setStrictVisibilityCheck(true);
+	_setValue($bo_pg_sfmTransactionAndDesigner.txt_checklistSectionTitle,$processName);
+	_click($bo_pg_sfmTransactionAndDesigner.btn_applyChecklistSection);
+	_click($bo_pg_sfmTransactionAndDesigner.btn_closeSectionEdit);
+	_click($bo_pg_sfmTransactionAndDesigner.btn_quickSave1);
+	for($i=1;$i<$sectionTitle.length;$i++){
+		_click($bo_pg_sfmTransactionAndDesigner.btn_addSection);
+		_click($bo_pg_sfmTransactionAndDesigner.btn_editSectionInChecklist);
+		_setStrictVisibilityCheck(true);
+		_setValue($bo_pg_sfmTransactionAndDesigner.txt_checklistSectionTitle,$sectionTitle[$i]);
+		_click($bo_pg_sfmTransactionAndDesigner.btn_applyChecklistSection);
+		_click($bo_pg_sfmTransactionAndDesigner.btn_closeSectionEdit);
+		_click($bo_pg_sfmTransactionAndDesigner.btn_quickSave1);
+	}
+	_assertVisible($bo_pg_sfmTransactionAndDesigner.msg_sfmSaved);
+};
+
+		//Author: Anand Kakhandaki
+		//return current date
+		this.getToday=function(){
+			var $currentTime = new Date();
+			var $month = $currentTime.getMonth() + 1;
+			var $day = $currentTime.getDate();
+			var $year = $currentTime.getFullYear();
+			var $ret=$month+"/"+$day+"/"+$year;
+			_log("Today date: "+$ret);
+			return $ret;
+		};
+	
+this.createQuestion= function($sectionName,$questionText,$responseType,$requiredOrNot,$preFillOption,$preFillField,$defaultAns,$tag,$addToForm,$helpUrl,$responseSetName,$responseSetValues,$includeInOpdoc,$descriptionReq){
+	//This function is used to create a Checklist question and is capable of handling all the available types of questions
+	//Author:Janaki
+	//Refer RS_11196.sah for the detailed usage
+	
+	_click(_f("main").s_richeditabletext($sectionName));
+	_click($bo_pg_sfmTransactionAndDesigner.btn_addNewQuestion);
+	_click(_f("main").uiftetextfield($responseType));
+	_setStrictVisibilityCheck(true);
+	_setValue($bo_pg_sfmTransactionAndDesigner.txt_questionText,$questionText);
+	_setValue($bo_pg_sfmTransactionAndDesigner.txt_helpUrl,$helpUrl);
+	_setSelected($bo_pg_sfmTransactionAndDesigner.list_answerType, $responseType);
+	if($responseType === "Text" || $responseType === "Number" || $responseType === "Date Time"){
+			if($preFillOption){
+				_click($bo_pg_sfmTransactionAndDesigner.checkBox_preFillFromWo);
+				_setSelected($bo_pg_sfmTransactionAndDesigner.list_preFillList,$preFillField);
+				}
+			if($responseType === "Date Time" || $responseType === "Date"){
+				if($defaultAns === "Now" || $defaultAns === "Today" || $defaultAns === "Tomorrow" || $defaultAns === "Yesterday"){
+					_setSelected($bo_pg_sfmTransactionAndDesigner.list_dateCombo, "Function");
+					_setSelected($bo_pg_sfmTransactionAndDesigner.list_dateFunctionsCheklist, $defaultAns);
+				}
+				else{
+					_setSelected($bo_pg_sfmTransactionAndDesigner.list_dateCombo, "Value");
+					_setValue($bo_pg_sfmTransactionAndDesigner.txt_dateValue, $defaultAns);
+				}
+			}
+			else {
+				_setValue($bo_pg_sfmTransactionAndDesigner.txt_defaultResponse, $defaultAns);
+			}
+			_setValue($bo_pg_sfmTransactionAndDesigner.txt_helpUrl, $helpUrl);
+			_setValue($bo_pg_sfmTransactionAndDesigner.txt_tagForChklistQues, $tag);
+			
+		}
+	else if($responseType === "Radio Button" || $responseType === "Picklist" ||$responseType === "Checkbox"|| $responseType === "Multi-select Picklist"){
+		if($preFillOption){
+			_click($bo_pg_sfmTransactionAndDesigner.checkBox_preFillFromWo);
+			_setSelected($bo_pg_sfmTransactionAndDesigner.list_preFillList,$preFillField);
+			}
+		_setValue($bo_pg_sfmTransactionAndDesigner.txt_helpUrl, $helpUrl);
+		_setValue($bo_pg_sfmTransactionAndDesigner.txt_tagForChklistQues, $tag);
+		_setValue(_f("main").s_textinput("responseSetName"), $responseSetName);
+		var $i=0;
+		for($i=0;$i<$responseSetValues.length;$i++){
+		if($i!=0){
+			_click(_f("main").s_button("Add an Answer"));
+		}
+		_setValue(_f("main").s_textinput("ansValue["+$i+"]"),$answers[$i]);
+		if(($responseType === "Radio Button" || $responseType === "Picklist") && ($responseSetValues[$i] === $defaultAns[0])){
+			_click(_f("main").s_radiobutton("Default["+$i+"]"));
+		  }
+		}
+		//Mark multiple default values for multi select picklists
+		if($responseType === "Checkbox" || $responseType === "Multi-select Picklist")
+		for($j=0;$j<$defaultAns.length;$j++){
+			var $temp = _getValue(_f("main").s_textinput("ansValue").leftOf(_f("main").s_checkbox("Default["+$j+"]")));
+			if($temp === $defaultAns[$j]){
+				_click(_f("main").s_checkbox("Default["+$j+"]"));
+			}
+		}
+			
+}
+	else if($responseType === "Attachment"){
+		var $temp = _getValue($bo_pg_sfmTransactionAndDesigner.chk_includeInOpdoc);
+		_log($temp);
+		if(($temp && !$includeInOpdoc) || (!$temp && $includeInOpdoc)) {
+			_check($bo_pg_sfmTransactionAndDesigner.chk_includeInOpdoc);
+		}
+		var $temp = _getValue($bo_pg_sfmTransactionAndDesigner.chk_descReq);
+		_log($temp);
+		if(($temp && !$descriptionReq) || (!$temp && $descriptionReq)) {
+			_check($bo_pg_sfmTransactionAndDesigner.chk_descReq);
+		}
+	}
+	
+if($addToForm){
+		_click($bo_pg_sfmTransactionAndDesigner.btn_addToFormnLib);
+		_wait(5000);
+}
+else{
+		_click($bo_pg_sfmTransactionAndDesigner.btn_addToLibOnly);
+		_wait(5000);
+}
+_click($bo_pg_sfmTransactionAndDesigner.btn_closeQuestionWindow);
+
+//Finally check if the question is required
+if($requiredOrNot){
+	_click(_f("main").s_checkbox("Required").near(_f("main").s_label($questionText)));
+}
+//Finally save the process after creation of question
+_click($bo_pg_sfmTransactionAndDesigner.btn_quickSave1);
+};	
+
+this.launchChecklistFirstTime = function($checklistName){
+	//This function is used to launch the given checklist for the first time
+	//Author:Janaki
+	_click(_label($checklistName));
+	_wait(10000);
+};
+
+this.submitChecklist = function(){
+	//This function submits a given checklist
+	//Author: Janaki.
+	_click($bo_pg_sfmTransactionAndDesigner.btn_submitCheckList);
+	_wait(9000,_isVisible(_link("Checklists")));
+};
+
+this.closeChecklists = function(){
+	//This function closes the list of checklists and gets back to the work order
+	//Author: Janaki
+	_click($bo_pg_sfmTransactionAndDesigner.btn_closeChecklist);
+	_wait(10000);
+};
+
+this.verifyNotesAndAttachments = function($attachmentName){
+	//This function returns true or false if the given attachment is present in the list of attachments
+	//Author: Janaki
+if(_isVisible(_link("/"+$attachmentName+"/",_in(_div("/RelatedNoteList/"))))){
+	return true;
+}
+else{
+	return false;
+}
+};
+this.verifyFiles = function($fileName){
+	//This function returns true or false if the given attachment is present in the list of Salesforce files
+	//Author: Janaki
+if(_isVisible(_isVisible(_link("/"+$fileName+"/"),_in(_div("/RelatedFileList/"))))){
+	return true;
+}
+else{
+	return false;
+}
+
+};
+
+this.addRelatedListIfNotPresent = function($relatedList){
+	//This function will check if the related list is present or not and add it if it is not present.
+	//Author: Janaki
+	var $shortName
+	if(!_isVisible(_heading3($relatedList))){
+		_click($sfm_pg_wo.link_editLayout);
+		_click($sfm_pg_wo.link_relatedLists);
+		_setValue($sfm_pg_wo.txt_quickFind,$relatedList);
+		var $temp = _collect("_heading3","/.*/");
+		var $x = _count("_heading3","/.*/");
+		$x=$x-1;
+		_setValue($sfm_pg_wo.txt_pgLayoutQuickFind,$relatedList);
+		if($relatedList.length > 5){
+			$shortName = $name.substr(0,4);
+		}
+		else{
+			  $shortName = $relatedList;
+		}
+		_dragDrop(_span("/"+$shortName+"/"),$temp[$x]);
+		_click($sfm_pg_wo.btn_pgLayoutSave);
+		_click($sfm_pg_wo.btn_Yes);
+		_wait(9000);
+	}
+};
+
+this.startNewChecklistSubmission = function($checklistName){
+	//This function starts a new checklist process where previous instances are submitted
+	//Author:Janaki
+	_click(_label("Start New",_rightOf(_label($checklistName))));
+	_wait(10000);
+};
+};
+
+
+

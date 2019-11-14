@@ -1,0 +1,130 @@
+var $bo_act_sfmVerifyWorkOrder= new function bo_act_sfmVerifyWorkOrder() {
+
+	this.verifyWorkOrderOnlineDisplay = function($sfmTranName,$workOrderName){
+		_click($bo_pg_sfmVerifyWorkOrder.imgBtn_allTab);
+		_click($bo_pg_sfmVerifyWorkOrder.link_workOrder);
+		this.clickSpecificWorkOrder($workOrderName);
+		_wait(7000);
+		return $callBack.returnResult(_isVisible(_button($sfmTranName)));
+
+		};
+	
+	//always keep one work order, instead need to use array index with ordername workOrderName[1]; 
+	this.clickSpecificWorkOrder = function($workOrderName){
+	_click(_link($workOrderName));
+	};
+	this.verifyWizardOnPMPObj=function($sfmName){
+	_click($bo_pg_sfmVerifyWorkOrder.img_allTab);
+	//_wait(2000);
+	_click($bo_pg_sfmVerifyWorkOrder.lnk_objPMP);
+	_wait(30000);
+	_click($bo_pg_sfmVerifyWorkOrder.lnk_firstLinkPMP);		
+};
+
+this.verifyWizardOnWOObj=function($sfmName){
+	_click($bo_pg_sfmVerifyWorkOrder.img_allTab);
+	//_wait(2000);
+	_click($bo_pg_sfmVerifyWorkOrder.link_workOrder);
+	_wait(10000);
+	_click($bo_pg_sfmVerifyWorkOrder.lnk_firstLinkWO);
+};
+	
+	this.wizardButtonVerification=function($wizardname){			
+			_selectDomain($g_domain);
+		if( _assertVisible($bo_pg_sfmVerifyWorkOrder.wizardButtonExist)){
+			_log("SFm wizard visible");
+            _selectDomain();
+		}else{
+			//_fail("SFM Wizard Not visible");
+			//_stopTestCase();
+			_selectDomain();
+				}
+		};
+	
+	this.verifyAddEditWizardButton=function($wizardname){			
+			_selectDomain($g_domain);
+		var $status= _isVisible($bo_pg_sfmVerifyWorkOrder.wizardButtonExist);
+		if ($status="false") {
+			//_log("SFm wizard not visible");
+            _selectDomain();			
+		}else{
+			_fail("SFM Wizard Not visible");
+			_stopTestCase();
+			_selectDomain();
+				}
+		};
+		this.clkOnWizard=function($wizardButtonName){
+			_selectDomain($g_domain);
+			_call(_button($wizardButtonName).scrollIntoView());
+			if(_assertVisible(_button($wizardButtonName))){
+				_click(_button($wizardButtonName));
+				//_wait(3000);
+			//_log("User successfully launch the wizard in delivery");}
+			}
+			else{
+				_fail("Launching of wizard in delivery failed");
+			}
+		_selectDomain();
+			_wait(10000);
+		};		
+		this.wizardButtonNotVisible=function($wizardname){
+			
+			_selectDomain($g_domain);
+			var $status= _isVisible(_button($wizardname));
+		if ($status="false") {
+			//_log("SFm wizard not visible");
+            _selectDomain();			
+		}else{
+			_fail("SFM Wizard visible");
+			_stopTestCase();
+			_selectDomain();
+				}
+		};
+	this.wizardButtonVisible=function($wizardname){
+			
+			_selectDomain($g_domain);
+			var $status= _isVisible(_button($wizardname));
+		if ($status="true") {
+			//_log("SFm wizard visible");
+            _selectDomain();			
+		}else{
+			_fail("SFM Wizard Not visible");
+			_stopTestCase();
+			_selectDomain();
+				}
+		};
+			this.searchWizard=function($wizardTitleName ){
+				_selectDomain($g_domain);
+			var $textDisplay=_getText(_table("tbcontainer"));
+				if(!$wizardTitleName.indexOf($textDisplay) != -1){
+						var $result =  true ;
+				}else{
+					 var $result = false; 
+				}		
+				 _selectDomain();				
+			}				
+				this.clickOnWizardButton=function($SFMName){
+				_selectDomain($g_domain);
+				_call(_button($sfmName).scrollIntoView()); _click(_button($sfmName));
+				_selectDomain();					
+			}
+				this.wizardVisibility=function($wizardTitleName ){
+					_selectDomain($g_domain);
+				var $textDisplay=_getText(_table("tbcontainer"));
+					if(!$wizardTitleName.indexOf($textDisplay) != -1){
+						_log("Wizard is visible")
+							
+					}else{
+						 _log("Wizard is not visible")
+					}		
+					 _selectDomain();				
+				}			
+					
+					this.showAllTab=function($tabName){
+						_click($bo_pg_sfmVerifyWorkOrder.img_allTab);
+						_click(_link($tabName));
+					}
+	
+	};
+
+

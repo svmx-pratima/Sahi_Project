@@ -1,0 +1,155 @@
+/*
+///////////////////////////////////
+//
+//Author	:- 	Anand Kakhandaki
+//Reviewer	:- 	
+//Pre-Req	:-	
+//
+//Steps		:-	
+//
+///////////////////////////////////
+*/
+var $rs_7011 = _testcase("$BVT_TC_005_LinkedProcess","Verify linked Process.");
+$rs_7011.start();
+
+
+		$woName="";
+		var $url="https://test.salesforce.com";
+		 $sfmUsn="deepa@12x.com.cfg3";
+		 $sfmPwd="svmx9898";
+
+		//Variables Declarations
+		$LinkedprocessName = "Manage Work Details for Products Serviced";
+		$LinkedsfmName = $bo_act_common.generateRandomName("SFM_Auto_");
+		$LinkedsfmPgLayoutName =	$bo_act_common.generateRandomName("SFM_Auto_Page");
+
+		$processName = "Add/Edit Products Serviced";
+		$sfmName = $bo_act_common.generateRandomName("SFM_Auto_");
+		$sfmPgLayoutName =	$bo_act_common.generateRandomName("SFM_Auto_Page");
+		$wizTitle = $bo_act_common.generateRandomName("SFM Wiz");
+		
+		
+		// Creation of Linked SFM Process
+		$bo_act_login.login($url,$sfmUsn,$sfmPwd);
+		
+		$bo_act_navigation.navigateToSfmTransactionDesigner();
+		_wait(20000,_isVisible($bo_pg_sfmTransactionAndDesigner.lbl_ServiceFlowManager));
+		$sfm_act_Transactions.cloneAndSaveProcess($LinkedprocessName, $LinkedsfmName, $LinkedsfmPgLayoutName);
+		_wait(5000,_isVisible($bo_pg_sfmTransactionAndDesigner.btn_saveAndclose));
+		_click($bo_pg_sfmTransactionAndDesigner.btn_saveAndclose);
+		_wait(10000,_isVisible($bo_pg_sfmTransactionAndDesigner.lbl_ServiceFlowManager));
+		
+		//Creation of main SFM Process
+		$bo_act_navigation.navigateToSfmTransactionDesigner();
+		_wait(10000,_isVisible($bo_pg_sfmTransactionAndDesigner.lbl_ServiceFlowManager));
+		$sfm_act_SFM.selectSFM($processName,false);
+		_wait(5000,_isVisble($bo_pg_sfmTransactionAndDesigner.btn_clone));
+		_click($bo_pg_sfmTransactionAndDesigner.btn_clone);
+		_wait(60000, _isVisible($bo_pg_sfmTransactionAndDesigner.txt_name));
+		_setValue($bo_pg_sfmTransactionAndDesigner.txt_name, $sfmName);
+		_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmTransactionId, "");
+		_click($bo_pg_sfmTransactionAndDesigner.btn_screenDesigner);
+		_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmSavePageLayoutAs, $sfmPgLayoutName);
+		_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmSavePageLayoutAsId, "");
+		_setValue($bo_pg_sfmTransactionAndDesigner.txt_sfmSavePageLayoutAsId, $sfmPgLayoutName);
+		_wait(5000,_isVisible($bo_pg_sfmTransactionAndDesigner.btn_pageLayoutSave));
+		_click($bo_pg_sfmTransactionAndDesigner.btn_pageLayoutSave);
+		_wait(5000,_isVisible($bo_pg_sfmTransactionAndDesigner.tab_advancedOptions));
+		_click($bo_pg_sfmTransactionAndDesigner.tab_advancedOptions);
+		_wait(5000,_isVisible($bo_pg_sfmTransactionAndDesigner.btn_LinkedProcess));
+		
+		
+		//Test below code if not working then remove code
+		_click(_f("main").tab("Linked Process"));
+		//_click($bo_pg_sfmTransactionAndDesigner.btn_LinkedProcess);
+		//_click($bo_pg_sfmTransactionAndDesigner.btn_LinkedProcess);
+		_wait(10000,_isVisble($bo_pg_sfmTransactionAndDesigner.lbl_productServiced));
+		_click(_f("main").s_label("Products Serviced[3]"));
+		//_click($bo_pg_sfmTransactionAndDesigner.lbl_productServiced);
+		_wait(5000,_isVisible(_f("main").s_label($LinkedsfmName)));
+		//_click(_f("main").listbasecontentholder("/ListBaseContentHolder.*/"));
+		//_wait(5000);		
+		//_click(_f("main").s_button("Remove[1]"));
+		//_wait(5000);
+		_click(_f("main").s_label($LinkedsfmName));
+		_wait(5000,_isVisible($bo_pg_sfmTransactionAndDesigner.btn_moveToRight));
+		//_click(_f("main").s_button("Add[2]"));
+		_click($bo_pg_sfmTransactionAndDesigner.btn_moveToRight);
+		_wait(5000,_isVisible($bo_pg_sfmTransactionAndDesigner.btn_finalQuickSave));
+		_click($bo_pg_sfmTransactionAndDesigner.btn_finalQuickSave);
+		_wait(5000,_isVisible($bo_pg_sfmTransactionAndDesigner.btn_saveAndclose));
+		_click($bo_pg_sfmTransactionAndDesigner.btn_saveAndclose);
+		_wait(15000);
+		
+		
+		
+		// $sfm_act_Transactions.cloneAndSaveProcess($processName, $sfmName, $sfmPgLayoutName);
+		
+//		check if script failed then do uncomment below code
+		//$bo_act_navigation.navigateToSfmWizard();
+		//$sfm_act_createCustomWizard.chooseObject("Work Order");
+	
+		
+		//$sfm_act_createCustomWizard.addManageWizSteps($wizTitle,"SFM",$sfmName,"Sysadmin01 Group");
+
+		var $wizardSelectObjectName="Work Order";
+		var $wizardIDName=$wizTitle;
+		var $handOver1=false;
+		var $wizardStep1Type="SFM";
+		var $executionMode1= "Interactive";
+		
+		$bo_act_navigation.navigateToSfmWizard();
+		$bo_act_SFW.createWizardGeneralInfo($wizardSelectObjectName, $wizTitle, $wizardIDName);
+		$bo_act_SFW.createSFMWizardStepwithHandOver($wizardStep1Type, $sfmName, $executionMode1, $handOver1);
+		_wait(10000,_isVisible(_button("Quick Save")));
+		$bo_act_SFW.quickSaveSFWizard();
+		$bo_act_SFW.saveAndClose();
+		
+		var $productName1 =$bo_act_products.createProduct(); 
+		_wait(10000);
+		var $productName2 =$bo_act_products.createProduct(); 
+		_wait(10000);
+
+
+		$woName=$sfm_act_createCustomWizard.createBlankWo();
+		_log($woName);
+		
+		
+
+		// add Product Serviced
+		$sfm_act_createCustomWizard.clickWizardBtn($sfmName);
+
+
+		
+		_wait(3000);
+		_selectDomain();
+		_setStrictVisibilityCheck(true);
+		_click($sfm_pg_wizardWindow.btn_addRow);
+		_click($sfm_pg_wizardWindow.btn_edit);
+		_setValue($sfm_pg_wizardWindow.txt_part,$productName1);
+		_click($sfm_pg_wizardWindow.btn_update);
+		_wait(10000);
+		_click($sfm_pg_wizardWindow.btn_quickSave);
+		_wait(30000,_isVisible($sfm_pg_wizardWindow.btn_downArrow));
+		_click($sfm_pg_wizardWindow.btn_downArrow);
+		_wait(10000);
+		_click(_span($LinkedsfmName));
+		_wait(10000);
+		
+		
+		
+		$sfm_act_createCustomWizard.addParts($productName2);
+		$sfm_act_createCustomWizard.addLabor($productName2);
+		$sfm_act_createCustomWizard.addExpenses("Airfare");
+		$sfm_act_createCustomWizard.addTravel();
+		$sfm_act_createCustomWizard.saveWizard();
+		_wait(10000);
+		$sfm_act_createCustomWizard.saveWizard();
+		_wait(15000);
+		//$sfm_act_common.globalSearch($woName);
+		//_click(_link($woName));
+		
+
+		$sfm_act_Validations.validateTc7011();
+
+$rs_7011.end();

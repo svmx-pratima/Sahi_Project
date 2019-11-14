@@ -1,0 +1,58 @@
+var $rs_7433 = _testcase("RS_7433","Verify the fixed adjustment is performed for multiple coverages.");
+$rs_7433.start();
+
+var $workBenchUrl = "https://workbench.developerforce.com/login.php";;
+$templateName = $bo_act_common.generateRandomName("temp");
+$taskTitle = $bo_act_common.generateRandomName("task");
+$pmPlanName = $bo_act_common.generateRandomName("pmPlan");
+//var $PMTemplateName = $bo_act_common.generateRandomName("PMT");
+var $PMProcessName = $bo_act_common.generateRandomName("PMProName");
+var $pmProcessId = $bo_act_common.generateRandomName("PMProId");
+$bo_act_login.login($g_url,$bac_un,$bac_pwd);
+
+var $proName = $bo_act_products.createProduct("pro12", "--None--");
+var $accName = $bo_act_accounts.createAccount();
+$bo_act_navigation.navigateToTaskTemplatePage();
+// Save Task Template
+$bo_act_taskTemplate.createTaskTemplate($templateName);
+$bo_act_taskTemplate.addTask("1", $taskTitle, "Tasks","Low");
+$bo_act_taskTemplate.addRequiredParts("1",$proName);
+_click(_span("/save-icon/"));
+_wait(3000);
+////====Paste Here===
+////Save PM Plan Template
+$PMTemplateName = $bo_act_PMPlanTemplate.createCriteriaBasedPMTemplate($proName);
+$bo_act_PMPlanTemplate.addRow("City", "Equals", "Bangalore");
+_click(_span("Save"));
+//Create IB
+//$bo_act_navigation.navigateToInstalledProductPage();
+$bo_act_installedProduct.createInstalledProduct($proName,$accName,"");
+//Create PMPlan From IB
+_selectDomain($g_domain);
+_click(_button("New Condition Based PM Plan from IB"));
+_wait(3000);
+$bo_act_PMPlanTemplate.createPmPlan($pmPlanName, $PMTemplateName, $templateName);
+$bo_act_navigation.navigateToPMProcess();
+//Create PM Process
+$bo_act_PMProcess.addNewPMProcess("Condition Based Preventive Maintenance", $PMProcessName, $pmProcessId,"40");
+_click(_button("Save & Close"));
+$recordId = $bo_act_PMProcess.fetchRecordId($pmProcessId);
+$bo_act_login.loginToWorkBench($workBenchUrl, "Sandbox", $bac_un,$bac_pwd);
+$script = "SVMXC.PREV_Conditional_Engine_Batch batchable = new SVMXC.PREV_Conditional_Engine_Batch();batchable.setProcessIds = new Set<String>{'"
+	+$recordId+
+	"'};Database.executeBatch(batchable, 1);";
+$bo_act_login.runApexScriptinWB($script);
+$bo_act_login.login($g_url,$bac_un,$bac_pwd);
+$bo_act_navigation.navigateToPreventiveMaintenancePlans();
+_click(_link($pmPlanName));
+_wait(3000);
+var $wo = _getTableContents(_table("/list/",_near(_heading3("Work Orders"))),["Work Order Number"]);
+//_log($wo);
+//_log($wo.length);
+if($wo.length==2){
+	_log("Pass");
+}
+else{
+	_log("Fail");
+}
+$rs_7433.end();

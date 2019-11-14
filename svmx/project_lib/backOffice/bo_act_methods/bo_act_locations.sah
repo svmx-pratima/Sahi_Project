@@ -1,0 +1,144 @@
+/**
+ * Functions for the Accounts Object
+ */
+var $bo_act_locations = new function bo_act_locations() {
+	//var $recordType = ["Depot","Depot Child","Depot Parent","Standard Location"];
+	/**
+	 * Create a location
+	 * 
+	 */
+
+	this.createLocation = function($recordType,$accountName,$street,$country,$zipCode){
+		var $locName = $bo_act_common.generateRandomName("loc");
+		$bo_act_navigation.navigateToLocations();
+		_click($bo_pg_locations.btn_new);
+		_setSelected($bo_pg_locations.sel_recordType, $recordType);
+		_click($bo_pg_locations.btn_continue);
+		_setValue($bo_pg_locations.txt_locationName, $locName);
+		_setValue($bo_pg_locations.txt_street, $street);
+		_setSelected($bo_pg_locations.sel_country, $country);
+		_setValue($bo_pg_locations.txt_zip, $zipCode);
+		_setValue($bo_pg_locations.txt_accountName, $accountName);
+		_click($bo_pg_locations.btn_save);
+		_assertNotVisible(_div("/Error: Invalid Data/"));
+		_wait(15000, _isVisible(_heading2($locName)));
+		_logOutput($locName+ " location is created");
+		return $locName;
+		};
+		
+	this.createLocationWithSpecificPrefix = function($Prefix,$recordType,$accountName,$street,$country,$zipCode){
+		var $locName = $bo_act_common.generateRandomName($Prefix);
+		$bo_act_navigation.navigateToLocations();
+		_click($bo_pg_locations.btn_new);
+		_setSelected($bo_pg_locations.sel_recordType, $recordType);
+		_click($bo_pg_locations.btn_continue);
+		_setValue($bo_pg_locations.txt_locationName, $locName);
+		_setValue($bo_pg_locations.txt_street, $street);
+		_setSelected($bo_pg_locations.sel_country, $country);
+		_setValue($bo_pg_locations.txt_zip, $zipCode);
+		_setValue($bo_pg_locations.txt_accountName, $accountName);
+		_click($bo_pg_locations.btn_save);
+		_assertNotVisible(_div("/Error: Invalid Data/"));
+		_wait(15000, _isVisible(_heading2($locName)));
+		_logOutput($locName+ " location is created");
+		return $locName;
+		};
+	// Added By Bhupendra Singh for APM Integration Testing
+	this.createLocationWithExternalRecordID = function($Prefix,$recordType,$accountName,$street,$country,$city,$zipCode,$extRecID_Loc,$extRecID_Act){
+		var $locName = $bo_act_common.generateRandomName($Prefix);
+		$bo_act_navigation.navigateToLocations();
+		_click($bo_pg_locations.btn_new);
+		_setSelected($bo_pg_locations.sel_recordType, $recordType);
+		_click($bo_pg_locations.btn_continue);
+		_setValue($bo_pg_locations.txt_locationName, $locName);
+		_setValue($bo_pg_locations.txt_street, $street);
+		_setSelected($bo_pg_locations.sel_country, $country);
+		_setValue($bo_pg_locations.txt_city, $city);
+		_setValue($bo_pg_locations.txt_zip, $zipCode);
+		_setValue($bo_pg_locations.txt_accountName, $accountName);
+		_setValue($bo_pg_locations.txt_externalRecordID, $extRecID_Loc);
+		_setValue($bo_pg_locations.txt_externalAccountID, $extRecID_Act);
+		_click($bo_pg_locations.btn_save);
+		_assertNotVisible(_div("/Error: Invalid Data/"));
+		_wait(15000, _isVisible(_heading2($locName)));
+		_logOutput($locName+ " location is created");
+		return $locName;
+		};		
+		
+		this.deleteLocation = function($location){
+			$bo_act_navigation.navigateToLocations();
+			_click(_link($location));
+			_click($bo_pg_locations.btn_delete);
+			
+		};
+		
+		this.openLocationRecord = function($location){
+			$bo_act_navigation.navigateToLocations();
+			_click(_link($location));
+			
+		};
+		
+		this.editLocation = function($locName){
+            $bo_act_navigation.navigateToLocations();
+            _click(_link($locName));
+            _click($bo_pg_locations.btn_edit);
+          //  _click($bo_pg_locations.txt_locationName, $locName);
+            _click($bo_pg_locations.chk_stockingLocation);
+            _click($bo_pg_locations.btn_save);
+            _assertNotVisible(_div("/Error: Invalid Data/"));
+            _wait(15000, _isVisible(_heading2($locName)));
+            };
+            
+		this.addInstalledProductToLocation = function($productName,$accountName,$contactName){
+				var $serialNum = $bo_act_common.generateRandomName("Ser");
+				var $IBName = $bo_act_common.generateRandomName("IB_");
+				 //$bo_act_navigation.navigateToLocations();
+				 //_click($locationName);
+				 _click($bo_pg_locations.btn_NewInstalledProduct);
+				_setValue($bo_pg_installedProducts.txt_productName,$productName);
+				_setValue($bo_pg_installedProducts.txt_serialNumber, $serialNum);
+				_setValue($bo_pg_installedProducts.txt_accountName, $accountName);
+				_setValue($bo_pg_installedProducts.txt_contactName, $contactName);
+				_setValue($bo_pg_installedProducts.txt_installedProductName, $IBName);
+				_setValue($bo_pg_installedProducts.txt_installedDate);
+				_click($bo_pg_installedProducts.btn_save);
+				_assertNotVisible(_div("/Error: Invalid Data/"));
+				_logOutput($IBName+ " IB is created");
+				_wait(15000, _isVisible(_heading2($IBName)));
+				return $IBName;
+		};
+		
+		/**
+		* Create an Stock Transfer
+		*/
+		    this.createStockTransfer = function($sourceLocation,$destinationLocation) {
+		         $bo_act_navigation.navigateToStockTransfer();
+		        _click($bo_pg_stockTransfer.btn_new);
+		        _setValue($bo_pg_stockTransfer.txt_sourceLocation,$sourceLocation);
+		        _setValue($bo_pg_stockTransfer.txt_destinationLocation,$destinationLocation);
+		        _click($bo_pg_stockTransfer.btn_save);
+		        _assertNotVisible(_div("/Error: Invalid Data/"));
+		        _wait(15000, _isVisible($StockadjustmentName));
+		        _logOutput($StockTransferDetail+ " Stock Transfer is created");
+		   return $StockTransferDetail;
+		    };
+		    
+		    this.addLocation = function($locName,$recordType,$accountName,$street,$country,$zipCode){
+				var $locName = $bo_act_common.generateRandomName($locName);
+				$bo_act_navigation.navigateToLocations();
+				_click($bo_pg_locations.btn_new);
+				_setSelected($bo_pg_locations.sel_recordType, $recordType);
+				_click($bo_pg_locations.btn_continue);
+				_setValue($bo_pg_locations.txt_locationName, $locName);
+				_setValue($bo_pg_locations.txt_street, $street);
+				_setSelected($bo_pg_locations.sel_country, $country);
+				_setValue($bo_pg_locations.txt_zip, $zipCode);
+				_setValue($bo_pg_locations.txt_accountName, $accountName);
+				_click($bo_pg_locations.btn_save);
+				_assertNotVisible(_div("/Error: Invalid Data/"));
+				_wait(15000, _isVisible(_heading2($locName)));
+				_logOutput($locName+ " location is created");
+				return $locName;
+				};
+
+};

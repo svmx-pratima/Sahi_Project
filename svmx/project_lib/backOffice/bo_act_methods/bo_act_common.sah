@@ -1,0 +1,459 @@
+
+var $bo_act_common = new function bo_act_common() {
+
+this.generateRandomName = function($Prefix){
+	 _wait(1000);
+  var $now = new Date();
+    var $day = $now.getDate();
+    var $month = $now.getMonth()+1;
+    var $year = $now.getFullYear();
+    var $hrs = $now.getHours();
+	var $min = $now.getMinutes();
+	var $sec = $now.getSeconds();
+    var $RandomString = $Prefix+$day + $month+ $year+$hrs+$min+$sec; 	
+    _log("Num Gen = ",$RandomString);
+    return $RandomString;
+};
+
+this.setDate = function($seperator){
+    var $now = new Date();
+    var $monthday;// = $now.getDate();
+    if ($now.getDate() < 10)
+        $monthday = "0" + $now.getDate();
+    else
+        $monthday = $now.getDate();
+    var $month = $now.getMonth() + 1;
+    if ($month < 10)
+      $month = "0" + $month;
+
+    var $year = $now.getFullYear();
+ 
+    $monthday = $monthday-1;
+    var $currentDate = $month+ $seperator + $monthday + $seperator + $year; 
+    return $currentDate;
+	
+};
+
+this.currentDate= function ($seperator){
+    var $now = new Date();
+    var $monthday;// = $now.getDate();
+    if ($now.getDate() < 10)
+        $monthday = "0" + $now.getDate();
+    else
+        $monthday = $now.getDate();
+    var $month = $now.getMonth() + 1;
+    if ($month < 10)
+      $month = "0" + $month;
+
+    var $year = $now.getFullYear();
+    
+    var $currentDate = $month+ $seperator + $monthday + $seperator + $year; 
+    return $currentDate;
+};
+this.currentDate_GMT= function ($seperator){
+    var $now = new Date();
+    var $monthday;// = $now.getDate();
+    if ($now.getDate() < 10)
+        $monthday = "0" + $now.getDate();
+    else
+        $monthday = $now.getDate();
+    var $month = $now.getMonth() + 1;
+    if ($month < 10)
+      $month = "0" + $month;
+
+    var $year = $now.getFullYear();
+    
+    var $currentDate = $year+ $seperator + $month + $seperator + $monthday; 
+    return $currentDate;
+};
+this.futureDate_GMT= function ($futureYear,$seperator){
+    var $now = new Date();
+    var $monthday;// = $now.getDate();
+    if ($now.getDate() < 10)
+        $monthday = "0" + $now.getDate();
+    else
+        $monthday = $now.getDate();
+    var $month = $now.getMonth() + 1;
+    if ($month < 10)
+      $month = "0" + $month;
+
+    var $year = $now.getFullYear();
+    $year = $year + $futureYear;
+    
+    var $currentDate = $year+ $seperator + $month + $seperator + $monthday; 
+    return $currentDate;
+};
+
+// Please contact Bhupendra Singh if you wanted to changes/modify this getfutureDate function
+
+/*this.getfutureDate1 = function($futureYear, $seperator,$futureDay){
+	var $now = new Date();
+    var $monthday=$now.getDate();
+    
+    var $year = $now.getFullYear();
+	$year = $year+$futureYear;
+	
+    var $month = $now.getMonth() + 1;
+
+	if ($futureDay!==null && $futureDay!=="") {
+		$monthday=$monthday+$futureDay;
+		//if adding date make month to next month below logic works
+		var $nowAdd=new Date();
+		$nowAdd.setDate($monthday);
+		var $monthdayAdd=$nowAdd.getDate();
+		
+		var $monthAdd=$nowAdd.getMonth()+1;
+		
+		if ($monthAdd>$month) {
+			$monthday=$monthdayAdd;
+			$month=$monthAdd;
+		}
+	}
+    
+     var $currentDate = $month+ $seperator +$monthday  + $seperator+$year; 
+     _log("$currentDate: "+$currentDate);
+    return $currentDate;
+};*/
+
+
+//Please contact Bhupendra Singh if you wanted to changes/modify/comment/un-comment this getfutureDate function
+
+this.getfutureDate = function($futureYear, $seperator,$futureDay){
+	var $now = new Date();
+    var $monthday=$now.getDate();
+    var $year = $now.getFullYear();
+	$year = $year+$futureYear;
+	
+    var $month = $now.getMonth() + 1;
+
+	if ($futureDay!=null && $futureDay!="") {
+		$monthday=$monthday+$futureDay;
+		//if adding date make month to next month below logic works
+		var $nowAdd=new Date();
+		$nowAdd.setDate($monthday);
+		var $monthdayAdd=$nowAdd.getDate();
+		var $monthAdd=$nowAdd.getMonth()+1;
+		
+		if ($monthAdd>$month || $monthAdd==1) {
+			$monthday=$monthdayAdd;
+			$month=$monthAdd;
+			if ($monthAdd==1) {
+				$year = $nowAdd.getFullYear();
+				$year = $year+$futureYear;
+			}
+		}else{
+			$monthday=$monthdayAdd;
+			$month=$monthAdd;
+			$year = $nowAdd.getFullYear();
+		}
+		
+	}
+    if ($month < 10)
+        $month = "0"+$month;
+    if ($monthday < 10)
+    	$monthday = "0"+$monthday;
+
+    var $currentDate = $month+ $seperator +$monthday  + $seperator+$year; 
+     _log("$currentDate: "+$currentDate);
+    return $currentDate;
+};
+
+
+/*this.getfutureDate = function($futureYear, $seperator){
+	// Dont change this code/function Back office is using this function
+	var $now = new Date();
+    var $monthday;	// = $now.getDate();
+    if ($now.getDate() < 10)
+        $monthday = "0" + $now.getDate();
+    else
+        $monthday = $now.getDate();
+    var $month = $now.getMonth() + 1;
+    if ($month < 10)
+        $month = "0" + $month;
+
+    var $year = $now.getFullYear();
+	$year = $year+$futureYear;
+    
+     var $futureDate = $month+ $seperator +$monthday  + $seperator + $year; 
+     _log($futureDate);
+    return $futureDate;
+};
+*/
+this.getPastDate = function($pastYear, $seperator){
+	var $now = new Date();
+    var $monthday;// = $now.getDate();
+    if ($now.getDate() < 10)
+        $monthday = "0" + $now.getDate();
+    else
+        $monthday = $now.getDate();
+    var $month = $now.getMonth() + 1;
+    if ($month < 10)
+        $month = "0" + $month;
+
+    var $year = $now.getFullYear();
+	$year = $year-$pastYear;
+    
+     var $currentDate = $month+ $seperator +$monthday  + $seperator+$year; 
+    return $currentDate;
+};
+
+this.searchfunction = function($searchValue){
+_getRecentWindow();
+_setStrictVisibilityCheck(true);
+_wait(15000);
+_click(_span("/svmx-button/",_near(_div("svmx-column-inner",_in(_div("svmx-panel svmx-fit-item svmx-window-item svmx-panel-default"))))));
+_getRecentWindow();
+//_click(_textbox("/svmx-picklist/"));
+//_click(_listItem("Contains"));
+_click(_textbox("/sfm-text/",_near(_span("/svmx-sfmd-search-icon/"))));
+_click(_span("/svmx-sfmd-search-icon/"));
+_setValue(_textbox("/sfm-text/",_near(_span("/svmx-sfmd-search-icon/"))),$searchValue);
+_click(_span("/svmx-sfmd-search-icon/"));
+_click(_div($searchValue,_near(_span("Select"))));
+_click(_span("Select"));
+_setStrictVisibilityCheck(false);
+};
+
+this.searchfunctionWithObject = function($objectValue,$searchValue){
+	_getRecentWindow();
+	_setStrictVisibilityCheck(true);
+	_wait(15000);
+	if($objectValue=="Part:"){
+		_click(_span("/svmx-button/",_near(_label("Part:",_in(_div("svmx-panel svmx-fit-item svmx-window-item svmx-panel-default"))))));
+	}
+	else {
+	_click(_span("/svmx-button/",_near(_div($objectValue,_in(_div("svmx-panel svmx-fit-item svmx-window-item svmx-panel-default"))))));
+	}
+	_getRecentWindow();
+	//_click(_textbox("/svmx-picklist/"));
+	//_click(_listItem("Contains"));
+	_click(_textbox("/sfm-text/",_near(_span("/svmx-sfmd-search-icon/"))));
+	_click(_span("/svmx-sfmd-search-icon/"));
+	_setValue(_textbox("/sfm-text/",_near(_span("/svmx-sfmd-search-icon/"))),$searchValue);
+	_click(_span("/svmx-sfmd-search-icon/"));
+	_click(_div($searchValue,_near(_span("Select"))));
+	_click(_span("Select"));
+	_setStrictVisibilityCheck(false);
+	};
+
+this.currentDateWithoutAppendingZero= function ($seperator){
+    var $now = new Date();
+    var $monthday = $now.getDate();// = $now.getDate();
+    var $month = $now.getMonth()+1;
+    var $year = $now.getFullYear();
+    var $currentDate = $month+ $seperator + $monthday + $seperator + $year; 
+    return $currentDate;
+};
+
+this.nextMonthWithoutAppendingZero= function ($seperator){
+    var $now = new Date();
+    var $monthday = $now.getDate();// = $now.getDate();
+    var $month = $now.getMonth();
+    if($month == 12)
+    	$month =1;
+    else
+    	$month = $now.getMonth()+1;
+    var $year = $now.getFullYear();
+    var $nextMonthDate = $month+ $seperator + $monthday + $seperator + $year; 
+    return $nextMonthDate;
+};
+
+this.nextMonthDateTimeWithoutAppendingZero= function ($seperator){
+    var $now = new Date();
+    var $monthday = $now.getDate();// = $now.getDate();
+    var $month = $now.getMonth()+1;
+    if($month == 12)
+    	$month =1;
+    else
+    	$month = $month+1;
+    var $year = $now.getFullYear();
+    var $hours = 11;
+    var $minutes = $now.getMinutes();
+    if($minutes < 10)
+        $minutes = "0" + $minutes;
+    
+    var $nextMonthDateTime = $month+ $seperator + $monthday + $seperator + $year + " " + $hours + ":" + $minutes + " AM"; 
+    return $nextMonthDateTime;
+};
+
+this.endDateCalculationForIB = function ($startDateExpectedOn_IB, $durationOfCoverage, $seperator){
+	var $dateInstalled = new Date($startDateExpectedOn_IB);
+	_logOutput($dateInstalled);
+	var $year = $dateInstalled.getFullYear();
+	_logOutput($year);
+	var $year = $year + $durationOfCoverage;
+	_logOutput($year);
+	var $month = $dateInstalled.getMonth();
+	_logOutput($month);
+	var $day = $dateInstalled.getDate();
+	_logOutput($day);
+	if($day== 1 && ($month== 1 || 2 || 4 || 6 || 8 || 9 || 11 )){
+		var $endDateCalculationForIB =  ($month)+$seperator+("31")+$seperator+$year;
+		_logOutput($endDateCalculationForIB);
+	}
+	else if($day== 1 && ($month== 3 || 5 || 7 || 10 || 12)){
+		var $endDateCalculationForIB =  ($month)+$seperator+("30")+$seperator+$year;
+		_logOutput($endDateCalculationForIB);
+	}else{
+	var $endDateCalculationForIB =  ($month+1)+$seperator+($day-1)+$seperator+$year;
+	_logOutput($endDateCalculationForIB);
+	}
+	return $endDateCalculationForIB;
+	};
+
+this.cleanUpfunctionold = function($value)
+	{
+		_setValue(_textbox("phSearchInput"),$value);
+		_click(_button("phSearchButton"));
+		if(_condition(_heading1("Search Results") == null))
+			{
+			_click(_button("phSearchButton"));
+			}
+		_wait(3000, _isVisible(_link("searchAll")));
+		if(_isVisible(_link("searchAll"))){
+			_click(_link("searchAll"));
+		}
+		if(_isVisible(_link($value))){
+			_click(_link($value));
+			_wait(3000, _isVisible(_button("Delete")));
+			_click(_button("Delete"));
+			_logOutput($value+ " is deleted");
+
+		}else{
+			_logException("The value "+$value+"is not found");
+		}
+		
+	};
+	
+	this.getStartDateWithoutZeros = function($pastYear, $seperator){
+		var $now = new Date();
+	    var $monthday = $now.getDate();
+	    var $month = $now.getMonth() + 1;
+	    var $year = $now.getFullYear();
+		$year = $year-$pastYear;
+	    
+		var $StartDate = $month+ $seperator +$monthday  + $seperator+$year; 
+	    return $StartDate;
+	};
+	
+	 this.getEndDateWithoutZeros = function($futureYear, $seperator){
+			var $now = new Date();
+		    var $monthday = $now.getDate();
+		    var $month = $now.getMonth() + 1;
+		    var $year = $now.getFullYear();
+			$year = $year+$futureYear;
+		    
+		     var $EndDate = $month+ $seperator +$monthday  + $seperator+$year; 
+		    return $EndDate;
+		};
+
+
+		this.cleanUpfunction = function($value)
+		{
+			_call(top.location.reload(true));
+			_click(_link("Home")); // Changes added by Meghana
+			_doubleClick($bo_pg_search.btn_search);
+			_wait(5000,_isVisible($bo_pg_search.btn_searchAgain));
+			for(var $i=0;$i<=5;$i++){
+					_wait(5000,_isVisible($bo_pg_search.txt_searchText));
+					_setValue($bo_pg_search.txt_searchText,$value);
+					_click($bo_pg_search.btn_searchAgain);
+				if(_isVisible(_link($value))){
+					_click(_link($value));
+					_wait(5000, _isVisible($bo_pg_search.btn_delete));
+					_click($bo_pg_search.btn_delete);
+					_logOutput($value+ " is deleted");
+					break;
+				}else{
+					if($i == 5){
+						_logException("The value "+$value+"is not found");
+					}
+				}
+				
+			}
+			
+		};
+		
+		this.deleteWorkOrder = function($userName,$password,$namespace,$value){
+		/*	var $delete_Query = "delete [Select Id from "+$namespace+"__Service_Order__c where Name = '"+$value+"'];";
+			var $delete_data = $op_act_sForceApiCall.sForceQuery($userName, $password, $delete_Query , "create");*/
+		};
+		
+		// Changes added by Meghana
+		
+		this.deleteCase = function($userName,$password,$value){
+/*			var $delete_Query = "delete [Select Id from Case where CaseNumber ='"+$value+"'];";
+			var $delete_data = $op_act_sForceApiCall.sForceQuery($userName, $password, $delete_Query , "create");*/	
+			
+		};
+		
+		
+		this.deleteProduct = function($userName,$password,$value){
+/*			var $delete_Query = "delete [Select Id from Product2 where Name = '"+$value+"'];";
+			var $delete_data = $op_act_sForceApiCall.sForceQuery($userName, $password, $delete_Query , "create");*/
+			
+			
+		};
+		
+		this.deleteAccount = function($userName,$password,$value){
+//			var $delete_Query = "delete [Select Id from Account where Name = '"+$value+"'];";
+//			var $delete_data = $op_act_sForceApiCall.sForceQuery($userName, $password, $delete_Query , "create");
+			
+		};
+		
+		this.deleteContact = function($userName,$password,$value){
+//			var $delete_Query = "delete [Select Id from Contact where Name = '"+$value+"'];";
+//			var $delete_data = $op_act_sForceApiCall.sForceQuery($userName, $password, $delete_Query , "create");
+			
+			
+		};
+		
+		this.deleteIB = function($userName,$password,$namespace,$value){
+//			var $delete_Query = "delete [Select Id from "+$namespace+"__Installed_Product__c where Name = '"+$value+"'];";
+//			var $delete_data = $op_act_sForceApiCall.sForceQuery($userName, $password, $delete_Query , "create");
+			
+		};
+
+		// Delete SLA Terms
+		
+		this.deleteSLA = function($userName,$password,$namespace,$value){
+		/*	var $delete_Query = "delete [Select Id from "+$namespace+"__Service_Level__c where Name = '"+$value+"'];";
+			var $delete_data = $op_act_sForceApiCall.sForceQuery($userName, $password, $delete_Query , "create");*/
+			
+		};
+		
+		
+		// Delete Location
+		this.deleteLocation = function($userName,$password,$namespace,$value){
+		/*	var $delete_Query = "delete [Select Id from "+$namespace+"__Site__c where Name = '"+$value+"'];";
+			var $delete_data = $op_act_sForceApiCall.sForceQuery($userName, $password, $delete_Query , "create");*/
+			
+		};
+			
+		
+		this.deleteActivityMaster = function($userName,$password,$nameSpace,$value){
+		/*	var $delete_Query = "delete[Select Id from " +$nameSpace+"__Activity_Master__c where Name = '"+$value+"'];";
+			var $delete_data = $op_act_sForceApiCall.sForceQuery($userName, $password, $delete_Query , "create");*/
+		};
+		
+		this.deleteSCON = function($userName,$password,$nameSpace,$value){
+			/*var $delete_Query = "delete[Select Id from " +$nameSpace+"__Service_Contract__c where Name = '"+$value+"'];";
+			var $delete_data = $op_act_sForceApiCall.sForceQuery($userName, $password, $delete_Query , "create");*/
+		};
+		
+		this.deleteWarranty = function($userName,$password,$nameSpace,$value){
+//			var $delete_Query = "delete[Select Id from " +$nameSpace+"__Service_Template__c where Name = '"+$value+"'];";
+//			var $delete_data = $op_act_sForceApiCall.sForceQuery($userName, $password, $delete_Query , "create");
+		};
+		
+		
+		this.deletePMPlantemplate = function($userName,$password,$nameSpace,$value){
+		/*	var $delete_Query = "delete[Select Id from " +$nameSpace+"__PM_Plan_Template__c where Name = '"+$value+"'];";
+			var $delete_data = $op_act_sForceApiCall.sForceQuery($userName, $password, $delete_Query , "create");*/
+		};
+		
+		this.deletePMPlan = function($userName,$password,$nameSpace,$value){
+	/*		var $delete_Query = "delete[Select Id from " +$nameSpace+"__PM_Plan__c where Name = '"+$value+"'];";
+			var $delete_data = $op_act_sForceApiCall.sForceQuery($userName, $password, $delete_Query , "create");*/
+		};
+};

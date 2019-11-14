@@ -1,0 +1,40 @@
+
+
+/**
+ * Installed Product object repository
+ */
+
+var $bo_pg_installedProducts = new function bo_pg_installedProducts(){
+	this.btn_new = _button(" New ");
+	this.txt_productName = _textbox("/Product/");
+	this.txt_serialNumber = _textbox("/Serial/");
+	this.txt_accountName = _textbox("/\\*Account|^Account/",_rightOf(_label("/\\*Account|^Account/")));
+	this.txt_locationName = _textbox("/\\*Location|^Location/");
+	this.txt_distributor_account = _textbox("/Distributor Account/");
+	this.txt_contactName = _textbox("/\\*Contact|^Contact/");
+	this.txt_installedProductName = _textbox("/\\*Installed Product Name|^\\*Installed Product ID/");
+	this.txt_installedDate = _click(_link(0,_rightOf(_textbox("Date Installed"))));
+	this.btn_save = _submit(" Save ");
+	this.btn_delete = _button("Delete");
+	this.btn_continue = _submit("Continue");
+	this.txt_city = _textbox("City");
+	
+	this.btn_createWorkOrder = _button("Create Work Order");
+	this.btn_sfmSave = _span("/svmx-sfmd-save-icon/");
+	this.txt_workOrderNumber = _heading2("/WO/");
+	this.btn_SFWcreateSupportCase = _button("Create Support Case");
+	this.txt_SFMcreateSupportCaseStatus = _textbox(0,_rightOf(_label("Status:")));
+	this.txt_SFMcreateSupportCasePriority = _textbox(0,_rightOf(_label("Priority:")));
+	this.txt_SFMcreateSupportCaseOrigin = _textbox(0,_rightOf(_label("Case Origin:")));
+	this.txt_caseNumber = _heading2(0,_near(_heading1("/Case/")));
+	
+	//Sales Force Edit Page
+	this.editStatus = _select(0,_rightOf(_label("/Status/")));
+	this.txt_ExternalRecordID_IB = _textbox("External Record ID");
+	this.txt_externalAccountID_IB = _textbox("Account (External)");
+	this.txt_externalLocationID_IB = _textbox("Location (External)");
+	this.txt_externalParentID_IB = _textbox("Parent (External)");
+	this.txt_externalTopLevelID_IB = _textbox("Top-Level (External)");	
+};
+
+

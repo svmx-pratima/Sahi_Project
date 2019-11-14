@@ -1,0 +1,26 @@
+
+
+/**
+ * Home page object repository
+ */
+
+var $bo_pg_configurationProfiles = new function bo_pg_configurationProfiles(){
+
+	this.btn_edit = _submit("Edit");
+	this.btn_editForGrp = _submit("Edit[1]");
+	this.sel_selectModule = _select(0,_rightOf(_label("Select Module")));
+	this.sel_selectSubModule = _select(0,_rightOf(_label("Select Submodule")));
+	this.chk_true = _radio("True");
+	this.chk_false = _radio("False");
+	this.btn_popUpSave = _button("Save");
+	this.btn_popUpClose = _submit("Close");
+	this.btn_save = _submit("Save");
+	this.chk_globalProfile = _checkbox("/list_prof:list_prof:GloProf:/",_leftOf(_span("Active")));
+	this.chk_groupProfile = _checkbox(0,_leftOf(_span("AutoBACGroup")));
+	this.sel_chooseOption = _select(0,_rightOf(_cell("Choose Option")));
+	this.txt_settingValues = _textbox("Value");
+	
+};
+
+
+

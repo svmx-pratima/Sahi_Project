@@ -1,0 +1,12 @@
+../../../test_lab/test_cases/swat/swat_tc_002_create_quote_from_work_order.sah
+../../../test_lab/test_cases/swat/swat_tc_004_create_usage_from_estimates.sah
+../../../test_lab/test_cases/swat/swat_tc_011_customLinkedProcess.sah
+../../../test_lab/test_cases/swat/swat_tc_010_linked_SFM.sah
+../../../test_lab/test_cases/swat/swat_tc_003_manage_work_order_lines_usage.sah
+../../../test_lab/test_cases/swat/swat_tc_007_cloned_manage_work_order_lines_usage.sah
+../../../test_lab/test_cases/swat/swat_tc_008_cloned_create_usage_from_estimates.sah
+../../../test_lab/test_cases/swat/swat_tc_001_SFMSearch.sah
+../../../test_lab/test_cases/swat/swat_tc_005_output_document.sah
+../../../test_lab/test_cases/swat/swat_tc_006_cloned_create_quote_from_work_order.sah
+../../../test_lab/test_cases/swat/swat_tc_009_cloned_output_document.sah
+//../../../test_lab/test_cases/swat/swat_tc_012_webService.sah

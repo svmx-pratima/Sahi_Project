@@ -1,0 +1,167 @@
+//Tests are to be written here [Bhupendra Singh Chouhan]
+
+//Pre - Condition Test Data
+var $recordType = ["Depot","Depot Child","Depot Parent","Standard Location"];
+var $productFamily = ["--None--","GeneralSolution","AdvSolution","Accessory", "Storage"];
+var $productCode = "";
+var $exchangeType = ["--None--","Advance Exchange","Return Exchange"];
+var $unitOfTimeForCoverage = ["--None--","Days","Weeks","Months","Years"];
+var $coverageEffectiveFrom = ["--None--","Date Installed","Date Ordered","Date Shipped","Last Activity Date","Last Date Shipped","Warranty Start Date","Warranty End Date"];
+var $materialPercentCovered = 10;
+var $laborPercentCovered = 20;
+var $expensesPercentCovered = 30;
+var $durationOfCoverage = 5;
+var $seperator = "/";
+
+var $RS_10137 = _testcase("$RS_10137","Verify the functionality of Auto Entitlement on WO's PS lines using warranty.");
+$RS_10137.start();
+_setSpeed($g_stepSpeed);
+/**
+* Login to the Sandbox Org
+*/
+
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+
+/**
+ * Create Account, Contact, Location, Product and Installed Product
+ */
+var $accountName = $bo_act_accounts.createAccount();
+var $contactName = $bo_act_contacts.createContact($accountName);
+var $productName = $bo_act_products.createProduct($productCode, $productFamily[0]);
+var $IBName = $bo_act_installedProduct.createInstalledProduct($productName, $accountName, $contactName);
+
+/**
+ * Create 5 Year WN Template
+ */
+var $unit = $unitOfTimeForCoverage[4];
+var $warrantyName = $bo_act_warrantyTerms.createWarrantyTerms($exchangeType[2],"10","5",$unit,"20","5",$unit,"30","5",$unit,$coverageEffectiveFrom[1]);
+$bo_act_warrantyTerms.createApplicableProducts($productName, $warrantyName); //Create Applicable product for warranty Terms
+$bo_act_navigation.navigateToCreatedRecordUsingGlobalSearch($IBName); 	//Navigate to Installed Product Page using global search
+$bo_act_warrantyTerms.createWarranty($warrantyName);		//Create Warranty from IB
+
+/**
+ * Create Auto Entitlement Rules for Work Order
+ */
+
+var $WOField = "Order Type";
+var $Operator = "Equals";
+var $Value = "Field Service";
+var	$p1 = "Yes";		        // $p1 = Yes/No for Select should Entitlement Be Performed On Products Serviced?
+var	$p2 = "No";			    	// $p2 = Yes/No for Select should Parent IB Of Component Be Included for Entitlement check?
+var	$p3 = "No";					// $p3 = Yes/No for Select should Top-Level IB Of Component Be Included for Entitlement check?
+var	$p4 = "Warranties";			// $p4 = Warranties/Scon/Both for Entitlement check?
+var	$p5 = "Validity dates";     // $p8 = Validity dates/Counters/Both
+
+//Navigate to Auto Entitlement Rules - Work Order
+$autoEntitlementRuleName = $bo_act_autoEntitlementRule_WO.createAutoEntitlementRuleWithWarranty_WO($WOField, $Operator, $Value, $p1, $p2, $p3, $p4, $p5);
+
+//Changing the Rule Sequence
+$bo_act_autoEntitlementRule_WO.changingAutoEntitlementRule_SequenceTop($autoEntitlementRuleName);
+
+/**
+ * Configure the Global Profile SET001
+ */
+// Global Setting SET001 - Enable Auto Entitlement For Work Order is set to True for Auto Entitlement process to trigger 
+//(This is a Global Setting and is available under Module "Entitlement Verification" and Submodule "Auto-Entitlement - Work Order") 
+
+var $Module = "Entitlement Verification";
+var $SubModule = "Auto-Entitlement-Work Order";
+var $Setting = "SET001";
+var $value = true;
+$bo_act_configurationProfiles.editGlobalProfileForBooleanSettings($Module, $SubModule, $Setting, $value);
+
+/**
+ * Create Case record
+ */
+var $caseStatus = "New";
+var $casePriority = "Medium";
+var $caseOrigin = "Phone";
+var $caseNumber = $bo_act_Cases.createCase($caseStatus, $casePriority, $caseOrigin);
+
+//Navigate to IB and Create WO from IB
+var $WONumber = $bo_act_installedProduct.createWOFromIB($IBName);
+
+/**
+*Edit The Above created WO for few fields
+*/
+$bo_act_workOrders.editWorkOrder($WONumber);
+
+// Edit WO for Case 
+var $object = _textbox("/\\*Case|^Case/");
+var $objectValue = $caseNumber;
+$bo_act_workOrders.updateTextBoxFields($object, $objectValue);
+
+// Edit WO for Priority
+var $object = _select(0,_rightOf(_label("/\\*Priority|^Priority/")));
+var $objectValue = "Medium";
+$bo_act_workOrders.updateDropDownFields($object, $objectValue);
+
+// Edit WO for Billing Type
+var $object = _select(0,_rightOf(_label("Billing Type")));
+var $objectValue = "Contract";
+$bo_act_workOrders.updateDropDownFields($object, $objectValue);
+
+//Edit WO for Order Type
+var $object = _select(0,_rightOf(_label("/\\*Order Type|^Order Type/")));
+var $objectValue = "Field Service";
+$bo_act_workOrders.updateDropDownFields($object, $objectValue);
+
+var $object = _textbox("/\\*Component|^Component/");
+var $objectValue = "";
+$bo_act_workOrders.updateTextBoxFields($object, $objectValue);
+
+$bo_act_workOrders.saveWorkOrder();     		// Save the Edited WO
+
+/**
+ * Create Work Details record
+ */
+var $WDrecordType =  ["Estimate","Products Serviced","Request/Receipt","Usage/Consumption"];
+var $WDActivityType =  ["--None--","Calibration","Cleanup","Installation","Repair","Service"];
+var $WDLineType = ["--None--","Parts","Labor","Expenses"];
+
+var $WDNumber = $bo_act_workDetails.createWorkDetails($WONumber, $WDrecordType[1], $IBName, $WDActivityType[1], $WDLineType[2]);
+
+//Perform Auto Entitlement on Work Order
+$bo_act_autoEntitlementRule_WO.performAutoEntitlement_WO($WONumber);
+
+/**
+ * Navigate to the WO's Work details for validation of Entitlement
+ */
+
+$bo_act_workDetails.navigateToWorkDetails($WONumber, $WDNumber);
+
+var $productWarranty = _getText(_link(0,_rightOf(_cell("Product Warranty"))));
+
+_assertNotNull($productWarranty, "Product Warranty is Null");
+
+// Validation of "Is Entitlement Performed?" Checkbox
+
+if(_isVisible(_image("Checked",_rightOf(_cell("/Is Entitlement Performed/"))))){
+	_logOutput("Entitlement is Performed = PASS");
+	}else{
+	_fail("Entitlement is Not Performed = Failed");
+	}
+
+
+// Delete the Auto Entitlemet Rule created on WO
+$bo_act_autoEntitlementRule_WO.deleteAutoEntitlementRule_WO($autoEntitlementRuleName);
+
+//Clean up function
+
+$bo_act_common.deleteCase($bac_un, $bac_pwd,$caseNumber);
+$bo_act_common.deleteAccount($bac_un, $bac_pwd, $accountName);
+$bo_act_common.deleteContact($bac_un, $bac_pwd, $contactName);
+$bo_act_common.deleteIB($bac_un, $bac_pwd, $orgnamespace,$IBName);
+$bo_act_common.deleteProduct($bac_un, $bac_pwd,$productName);
+$bo_act_common.deleteWarranty($bac_un, $bac_pwd, $orgnamespace,$warrantyName);
+$bo_act_common.deleteWorkOrder($bac_un, $bac_pwd, $orgnamespace,$WONumber);
+
+//var $datacreated = [$WONumber,$caseNumber,$IBName,$productName,$contactName,$accountName,$warrantyName];
+//for (var i = 0; i < $datacreated.length; i++) {
+//	$bo_act_common.cleanUpfunction($datacreated[i]);
+//}
+
+$bo_act_login.logOut(); 
+
+$RS_10137.end();
+

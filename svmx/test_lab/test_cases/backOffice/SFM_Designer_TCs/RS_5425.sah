@@ -1,0 +1,68 @@
+//author - Mamata Rout;
+
+var $RS_5425 = _testcase("RS_5425", "On adding new step for a SFW which is hidden");
+$RS_5425.start();
+_setSpeed($g_stepSpeed);
+var $sfmName ="Capture Downtime";
+	var $wizardname=$bo_act_common.generateRandomName("5425SFW");
+	var	$wizardID=$wizardname;
+	var $stndSFMName="Add/Edit Products Serviced";
+	var $searchText=$wizardname;
+	var $objName="Work Order";	
+	var $fieldActnType="SFM";
+
+	var $actnName2=$sfmName;
+	var $actnName1=$stndSFMName;
+	var $actnName2=$sfmName;
+	var $executionMode = "Interactive";
+	var $processType="SFM Wizards";
+	_setSpeed($g_stepSpeed);
+	$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+//_div("svmx-grid-checkheader")
+	//***Navigate SFm Wizard->Create new Wizard->add standard SFM-*************
+	$bo_act_navigation.navigateToSfmWizard();
+	$bo_act_SFW.createWizardGeneralInfo($objName,$wizardname,$wizardID);
+	$bo_act_SFW.createWizardStep($fieldActnType,$actnName1,$executionMode);
+	_wait(2000);
+//*******Navigate to SFM App Permission and disable the permission for SFM wizard created above**********
+	$bo_act_navigation.navigateToSfmAppPermission();
+	 $bo_act_SFMAppPermission.genericSearchInAppPermission($processType,$objName,$searchText);
+if(_isVisible(_div("svmx-grid-checkheader"))){
+	_click(_div("svmx-grid-checkheader"));
+}
+	$bo_act_SFMAppPermission.disableAppPermission();
+//Navigate back to SFM Wizard and Add a new step to existing Wizard created above*****
+	$bo_act_SFW.editWizard($objName,$wizardID);
+	$bo_act_SFW.createWizardStep($fieldActnType,$actnName2,$executionMode);
+
+//*****Launch the Wizard in delivery and verify its visibility**********
+	$bo_act_sfmVerifyWorkOrder.verifyWizardOnWOObj($sfmName);
+	_wait(2000);
+	$bo_act_sfmVerifyWorkOrder.wizardButtonNotVisible($sfmName);
+//****SFM App Permission->Enable to App permission for the wizard created above****
+	$bo_act_navigation.navigateToSfmAppPermission();
+	 $bo_act_SFMAppPermission.genericSearchInAppPermission($processType,$objName,$searchText);
+	_click(_div("svmx-grid-checkheader"));
+	_click($bo_pg_sfmAppPermissionD.btn_clickSaveAppPermission);
+	_wait(3000);
+	_click($bo_pg_sfmAppPermissionD.popUpOK);
+	var $isvisible = _exists(_div("App Permissions saved successfully"));
+
+//Again Launch the Wizard in Delivery, verify the visibility*****
+	$bo_act_sfmVerifyWorkOrder.verifyWizardOnWOObj($sfmName);
+	_wait(2000);
+	$bo_act_sfmVerifyWorkOrder.wizardButtonVisible($sfmName);
+	
+//****Delete The Wizard Created*******
+
+	$bo_act_SFW.deleteWizards( $objName,$wizardID);
+	_setSpeed($g_stepSpeed);
+	$RS_5425.end();
+	
+	
+	
+	
+	
+	
+	
+	

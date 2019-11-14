@@ -1,0 +1,22 @@
+
+
+/**
+ * Home page object repository
+ */
+
+var $bo_pg_accounts = new function bo_pg_accounts(){
+	this.btn_new = _button(" New ");
+	this.txt_accountName = _textbox("acc2");
+	this.txt_ExternalRecordID = _textbox("External Record ID");
+	this.txt_description = _textarea("/acc/",_rightOf(_label("Description")));
+	this.btn_save = _submit(" Save ");
+	this.btn_delete = _button("Delete");
+	this.btn_saveAndNew = _submit("Save & New");
+	this.newInstalledProduct = _button("New Installed Product");
+	this.txt_parentaccount = _textbox("Parent Account");
+	
+	
+};
+
+
+

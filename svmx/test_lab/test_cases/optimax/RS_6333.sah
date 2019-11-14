@@ -1,0 +1,74 @@
+var $user_credentials = $excel.readFromCustomExcel("../optimax/op_excleData/automation.xlsx", "User_Details","","");
+var $dp_details = $excel.readFromCustomExcel("../optimax/op_excleData/automation.xlsx", "RS_6329","","");
+
+//var $nArr;
+//Calling the sforce API
+for(var $i=0;$i<$user_credentials.length;$i++)
+{
+var $g_un = $user_credentials[$i][0];
+var $g_pwd = $user_credentials[$i][1];
+var $g_url = $user_credentials[$i][2];
+}
+
+var $DPName = $dp_details[0][0];
+
+var $RS_6333 = _testcase("RS_6333", "Delete a Dispatch Process");
+
+$RS_6333.start();
+
+$bo_act_login.login($g_url, $g_un, $g_pwd);
+
+_log($DPName);
+_click(_link("ServiceMax Setup"));
+_wait(20000, _isVisible(_div("Dispatch Management")));
+_click(_div("Dispatch Management"));
+_wait(20000, _isVisible(_div("Dispatch Processes")));
+_click(_div("Dispatch Processes"));
+var $rowCount = 0;
+_set($rowCount, _table("page1:form1:block1:j_id81:j_id82").rows.length);
+for (var $i = 0; $i < $rowCount; $i++) 
+{
+	var $temp = _getText(_cell("page1:form1:block1:j_id81:j_id82:" + $i
+			+ ":j_id86"));
+	if (_areEqual($DPName, $temp)) 
+	{
+		$rowCount = $i;
+	}
+}
+_check(_checkbox("page1:form1:block1:j_id81:j_id82:" + $rowCount
+		+ ":j_id85"));
+_click(_submit("Delete"));
+_assertEqual("Do you want to delete the selected dispatch processes?", _lastConfirm());
+_click(_cell("pbTitle"));
+_windowAction("refresh");
+
+var $rowCount1 = 0;
+_set($rowCount1, _table("page1:form1:block1:j_id81:j_id82").rows.length);
+_log("RowCount : " + $rowCount);
+_log("RowCount 1 : " + $rowCount1);
+
+$rowCount1 = $rowCount1 - 1;
+
+if ($rowCount < $rowCount1)
+	{
+	var $temp = _getText(_cell("page1:form1:block1:j_id81:j_id82:" + $rowCount
+			+ ":j_id86"));
+
+	if (_areEqual($DPName, $temp)) 
+		{
+		_fail("Error in deleting Dispatch Process");
+		}
+	else
+		{
+		_log("Dispatch Process Deleted Successfully");
+		}
+
+	}
+else
+	{
+	_log("Dispatch Process Deleted Successfully");
+	}
+
+$bo_act_login.logOut();
+
+$RS_6333.end();

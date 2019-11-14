@@ -1,0 +1,68 @@
+var $user_credentials = $excel.readFromCustomExcel("../op_excleData/automation.xlsx", "User_Details","","");
+var $Dispatch_Process = $excel.readFromCustomExcel("../op_excleData/automation.xlsx", "Dispatch_Process","","");
+
+for(var $i=0;$i<$user_credentials.length;$i++)
+{
+var $g_un = $user_credentials[$i][0];
+var $g_pwd = $user_credentials[$i][1];
+var $g_url = $user_credentials[$i][2];
+}
+
+//for(var $i=0;$i<$Dispatch_Process.length;$i++)
+//{
+var $dp_Name = $Dispatch_Process[0][0];
+var $dp_Id = $Dispatch_Process[0][1];
+var $dp_Terr_Id = $Dispatch_Process[0][2];
+//}
+
+
+var $RS_6723 = _testcase("RS_6723", "Verify 'Abort Job' button on 'Resource Sent' status");
+
+$RS_6723.start();
+
+var $sfdc_sessionId = null;
+
+$bo_act_login.login($g_url, $g_un, $g_pwd);
+
+_set($login_result, _fetch(login($g_un,$g_pwd)));
+_log($login_result);
+
+$op_utility.delete_WO($dp_Id,$login_result.sessionId);
+
+_set($WO,_fetch(create_WO ($dp_Terr_Id)));
+
+$op_utility.run_Job_Now($dp_Name);
+
+_click(_cell("dataCell  [30]"));
+_click(_submit("Show Jobs"));
+_click(_submit("Show Jobs"));
+_click(_submit("Show Jobs"));
+_click(_submit("Show Jobs"));
+_check(_radio("Checkbox"));
+__click(_cell("pbTitle[1]"));
+_click(_cell("pbButton [1]"));
+
+//<browser>
+
+function login($g_un,$g_pwd){
+	
+	var $login_result = sforce.connection.login($g_un,$g_pwd);
+	$sfdc_sessionId = $login_result.sessionId;
+	_log("$sfdc_sessionId = "+$sfdc_sessionId);
+	return $login_result;
+}
+
+function create_WO ($dp_Terr_Id){
+	var WO = new sforce.SObject("SVMXDEV__Service_Order__c");
+	WO.SVMXDEV__Primary_Territory__c=$dp_Terr_Id;
+	WO.SVMXDEV__Order_Type__c="Cleaning";
+	WO.SVMXDEV__Order_Status__c='Open';
+	WO.SVMXDEV__State__c="TX";
+	WO.SVMXDEV__Zip__c='75024';
+	WO.SVMXDEV__Country__c="United States";
+	var result_WO = sforce.connection.create([WO]);
+	_log(" Work order= "+result_WO[0].id);
+	}
+
+//</browser>
+$RS_6723.end();

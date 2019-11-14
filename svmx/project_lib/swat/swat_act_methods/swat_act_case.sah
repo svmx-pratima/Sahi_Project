@@ -1,0 +1,33 @@
+/**
+ * Function to create a case record
+ */
+var $swat_act_case = new function swat_act_case() {
+
+	/**
+	 * Create an Cases
+	 * 
+	 */
+	this.createCase = function($caseStatus, $casePriority, $caseOrigin ) {
+		var $caseSubject = $bo_act_common.generateRandomName("Case");
+        $bo_act_navigation.navigateToCasesPage();
+		_click($bo_pg_Cases.btn_new);
+		_setValue($bo_pg_Cases.txt_subjectName, $caseSubject);
+		_setSelected($bo_pg_Cases.sel_selectCaseStatus,$caseStatus);
+		_setSelected($bo_pg_Cases.sel_selectCasePriority,$casePriority);
+		_setSelected($bo_pg_Cases.sel_selectCaseOrigin,$caseOrigin);
+		_click($bo_pg_Cases.btn_save);
+		_assertNotVisible(_div("/Error: Invalid Data/"));
+		_wait(15000, _isVisible($caseSubject));
+		//var $caseNumber = _getText($bo_pg_Cases.txt_caseNumber);
+		var $caseNumber =_getText($bo_pg_Cases.txt_caseNumber1);
+		_logOutput($caseNumber+ " Case is created");
+		//var exactCaseNumber=extract($caseNumber, "( ) of (.*)/", true);$caseNumber
+		 
+		// $caseNumber.replace(" [View Hierarchy]", "");
+		 _log("Case Number" + $caseNumber);
+    return $caseNumber;
+	};
+	
+
+	
+};

@@ -1,0 +1,125 @@
+//Note: The logged in user should have the inventory set for the location.
+
+var $RS_7012 = _testcase("RS_7012","Verify user trunk and current user literals in map");
+$RS_7012.start();
+//Variables used
+var $object_name = "Work Order";
+var $ctrlPicklist = "Order Status";
+var $processName = "RS_7012";
+var $process_to_clone = "Manage Work Order Lines - Usage";
+var $sfmTemplate = "SVMXSTD: Manage WO Usage Lines";
+var $isCustom = false;
+var $ctr = 0;
+var $i = 0;
+var $containerName = ["Order Status","Parts","Parts","Parts"];
+var $fieldName=["Closed By","Consumed From Location","Line Type","Record Type ID"];
+var $currentWizardName = $sfmd_wizardName[4];
+var $success_message = "Work Order was saved.";
+var $stdMap = "SVMXSTD: Close Work Order";
+var $pickListLabels = ["Line Type","Record Type"];
+var $pickListValues = ["Parts","Usage/Consumption"];
+var $textLabels = ["Closed By","Site"];
+var $textValues = ["SVMX.CURRENTUSERID","SVMX.USERTRUNK"];
+var $inventoryLocation = "Classic Automation Location";
+var $productName = "Chrome";
+var $mapType = "Value Map for Existing Records";
+
+//Appending current timestamp to process name to make it unique.
+var $timeStamp = $bo_act_navigation.getCurrentTimeStamp();
+$processName = $processName + "_" + $timeStamp;
+var $pageLayoutName = $processName + "pg";
+var $mapName = $processName + "mp";
+
+//Login and switch to classic
+$bo_act_login.login($g_url,$sfmdUsn,$sfmdPwd);
+
+_wait(15000);
+
+//Get current user name
+var $currentUser = $sfm_act_common.getCurrentUserName();
+var $expValues = [$currentUser,$inventoryLocation];
+
+//Navigate to servicemax setup and setup required process.
+//Clone standard process and add the dependent picklist in the screen designer
+_setSpeed(3000);
+$sfm_act_SFM.cloneTDM016($process_to_clone,$processName,$isCustom,$pageLayoutName, $sfmTemplate, $fieldName, $containerName);
+$bo_act_navigation.designHeaderScreen($pageLayoutName,["Site"]);
+$bo_act_navigation.designChildScreen($pageLayoutName,["Canceled By"],["Parts"]);
+_click($bo_pg_sfmTransactionAndDesigner.btn_quickSave1);
+_click($bo_pg_sfmTransactionAndDesigner.btn_qualifyingCriteriaAndFieldMapping);
+
+//Set up the mapping with SVMX.CURRENTRECORD literals for Header
+$bo_act_mappings.createMapping("Work Order",$mapType,[],[],$textLabels,$textValues,$mapName);
+_setSpeed(1000);
+//Add the custom process to SFM wizard.
+$sfm_act_wizards.addToWizard($object_name,$currentWizardName,"SFM",$processName);
+_selectDomain();
+_setSpeed(1000);
+//Create a work order
+var $wo_number = $sfm_act_common.createWoInClassic();
+$sfm_act_common.globalSearchOnce($wo_number);
+
+//Launch the process in SFM Delivery
+$sfm_act_common.launchSFMProcessInClassic($processName);
+_wait(10000);
+
+//Verify the values in header
+var $verifyResult = $sfm_act_common.verifyValuesInDelivery($textLabels,$expValues,[],[],[],[],[],[],[],[]);
+_assertTrue($verifyResult,"Following Literals are verified in header- SVMX.CURRENTUSERID and SVMX.USERTRUNK");
+
+//Create mapping for child lines by navigating to SFM Designer from Delivery.
+ $mapName = $mapName + "_2";
+//Edit the mapping.Set the value to Order status to 'Closed'
+ $sfm_act_common.openSfmProcess($processName);
+_wait(10000);
+$textLabels = ["Canceled By","Consumed From Location"];
+$mapType = "Value Map For New Records";
+_click($bo_pg_sfmTransactionAndDesigner.btn_qualifyingCriteriaAndFieldMapping);
+$bo_act_mappings.createMapping("Parts",$mapType,[],[],$textLabels,$textValues,$mapName);
+_closeWindow();
+_selectWindow();
+
+//Clear Servicemax cache in service delivery.
+$sfm_act_common.clearSvmxCache();
+_wait(5000);
+//Add child line item
+$textLabels = ["Line Qty"];
+$textValues = ["12"];
+$sfm_act_SFM.addChildLine("Parts",$productName, $textLabels, $textValues, $pickListLabels, $pickListValues, [],[],[],[],[],[],[],[],[]);
+$sfm_act_SFM.openLatestExtEdit();
+$sfm_act_SFM.performLookupInChild("Part",$productName);
+$sfm_act_common.performQuickSave();
+_wait(3000);
+$sfm_act_SFM.openLatestExtEdit();
+
+_wait(2000);
+$textLabels = ["Canceled By","Consumed From Location"];
+$verifyResult =  $sfm_act_common.verifyValuesInDelivery($textLabels,$expValues,[],[],[],[],[],[],[],[]);
+_click($sfm_pg_wo.btn_updateExtEdit);
+_assertTrue($verifyResult);
+if($verifyResult){
+	_log("PASS:User trunk and current user literals verified for header and child");
+} else {
+	_log("FAIL:User trunk and current user literals are not verified for header and child");
+}
+
+$sfm_act_common.saveClassicSfmProcess();
+$sfm_act_common.logoutInClassic();
+_setSpeed($g_stepSpeed);	
+$RS_7012.end();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

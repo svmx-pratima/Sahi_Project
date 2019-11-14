@@ -1,0 +1,26 @@
+// Author Meghana Rao P
+/*
+ * This test case verifies the Output of a Standard Search Functionality
+ */
+var $RS_10125 = _testcase("RS_10125", "Choosing a standard search and verify the output");
+$RS_10125.start();
+
+
+var $data = _readExcelFile("../../backOffice/bo_excleData/BORegressionDatasheet.xlsx",$orgtype,true);
+var $createwoquery = $data[1]["CreateWorkOrderOpen"];
+var $fetchwo = $data[1]["fetchwo"];
+
+// create a Work Order
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+
+var $rs_10125_result = $op_act_sForceApiCall.sForceQuery($bac_un, $bac_pwd, $createwoquery ,"create");
+var $rs_10125_query_wo = $fetchwo;
+var $rs_10125_fetch = $op_act_sForceApiCall.sForceQuery($bac_un, $bac_pwd, $rs_10125_query_wo ,"query");
+
+$rs_10125_WO1 = $rs_10125_fetch[0].Name;
+
+
+$number1 = Math.floor(Math.random() * 10);
+$bo_act_sfmsearchdelivery.sfmsearch("SVMXSTD: Account Search",$rs_10125_WO1, true);
+
+$RS_10125.end();

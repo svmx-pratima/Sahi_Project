@@ -1,0 +1,71 @@
+var $rs_5348 = _testcase("RS_5348","Verify Advanced Data validation rule");
+$rs_5348.start();
+$sfmName = $bo_act_common.generateRandomName("RS_5348_");
+var $sfmNameToBeCloned = "Create Usage Lines from Estimates";
+var $isCustom = false;
+var $sfmTemplate = "SVMXSTD: Manage WO Usage Lines";
+var $containerName = ["Order Status","Order Status","Order Status"];
+var $fieldName = ["Problem Description","Invoice Number", "Order Type"];
+
+//dvr variables
+var $targetObject="Work Order";
+var $rulename =$sfmName;
+var $ruleDescription ="OrderType-Depot Repair and BillingType-Warranty OR Problem description -SFMDClassic Auto and Invoice Number-45";
+var $fieldArray = ["Order Type","Billing Type","Problem Description","Invoice Number"];
+var $conditionArray = ["Equals","Equals","Is Not Null","Equals"];
+var $operandArray =["Value","Value","","Value"];
+var $valueArray =["Depot Repair","Warranty","","45"];
+var $advExpr= "(1 AND 2 ) OR (3 AND 4 )";
+var $messageType = "Error";
+var $wizardObject ="Work Order";
+
+//Create WO through REST API
+var $woNumber = $sfm_act_createCustomWizard.createBlankWoFromRest($sfmdUsn, $sfmdPwd, $sfmClientId, $sfmConsumerSecret, $sfmOrgInstance);
+
+//login
+$bo_act_login.login($g_url,$sfmdUsn,$sfmdPwd); 
+
+// clone the process
+$sfm_act_SFM.cloneTDM016($sfmNameToBeCloned,$sfmName,$isCustom, $sfmName,$sfmTemplate, $fieldName, $containerName);
+
+//add dvr to the process
+$sfm_pg_dvr.newRule($targetObject, $rulename, $ruleDescription, $fieldArray, $conditionArray, $operandArray, $valueArray, $advExpr, $messageType);
+_click($sfm_pg_sfmDesigner.btn_saveSFM); 
+
+//add to wizard
+$sfm_act_wizards.addToWizard($wizardObject, $sfmd_wizardName[0], $sfmd_wizardType[1], $sfmName);  
+
+//Navigate to the WO for validation
+$bo_act_navigation.navigateToCreatedRecordUsingGlobalSearch($woNumber);
+
+$sfm_act_createCustomWizard.clickWizardBtn($sfmName);
+
+//check for DVR when 1 and 2 are true
+_setValue($sfm_pg_sfmDesigner.txt_billingType, "Warranty");
+_setValue($sfm_pg_sfmDesigner.txt_orderType, "Depot Repair");
+_click($sfm_pg_sfmDesigner.btn_deliverySave);
+_wait(3000);
+_assertExists(_div("/"+$ruleDescription+"/"),"DVR is not triggered when 1 and 2 are true");
+_wait(3000);
+
+//check for DVR when 3 and 4 are true
+_setValue($sfm_pg_sfmDesigner.txt_billingType, "Empowerment");
+_setValue($sfm_pg_sfmDesigner.txt_orderType, "Field Service");
+_setValue($sfm_pg_sfmDesigner.txt_problemDescription,"SFMDClassic Auto");
+_setValue($sfm_pg_sfmDesigner.txt_invoiceNumber, "45");
+_click($sfm_pg_sfmDesigner.btn_deliverySave);
+_wait(3000);
+_assertExists(_div("/"+$ruleDescription+"/"),"DVR is not triggered when 3 and 4 are true");
+_wait(3000);
+
+//check for DVR when no condition satisfies
+_setValue($sfm_pg_sfmDesigner.txt_problemDescription,"");
+_setValue($sfm_pg_sfmDesigner.txt_invoiceNumber, "50");
+_click($sfm_pg_sfmDesigner.btn_deliverySave);
+
+_assertNotVisible(_div($ruleDescription),"DVR is triggered when not supposed to be");
+if(_exists($sfm_pg_sfmDesigner.txt_priceAlert)){
+	_click($sfm_pg_sfmDesigner.btn_priceAlertOk);
+}
+
+$rs_5348.end();

@@ -1,0 +1,72 @@
+var $sfm_act_targetObjectUpdate=new function sfm_act_targetObjectUpdate(){
+	
+	
+	/**
+	 * Author		:	Anand Kakhandaki
+	 * Function		: 	To add row to target Object update on the selected object
+	 * Parameter	:	$tarObject = Taget Object name
+	 * 					$fieldsList = Array of fields name
+	 * 					$operatorList= Array of operator names (Set, Increase, Decrease)
+	 * 					$valueList = Array of Input value
+	 * Example		:	Refer RS_5339.sah file for function usage
+	 */
+	this.createTOU = function($tarObject,$fieldsList,$operatorList,$valueList){
+				_click($sfm_pg_targetObjectUpdate.tab_TOU);
+				_setStrictVisibilityCheck(true);
+				_click(_f("main").s_label($tarObject).near($sfm_pg_targetObjectUpdate.lbl_selectTrgObject));
+				_wait(3000);
+				//var $row=null;
+				//var $comboID=null;
+				//var $txtField=null;
+				//var $temp=null;
+				//var $index=null;
+				//var $datetimeField=null;
+				for(var $i=0; $i<$fieldsList.length; $i++){
+					_click($sfm_pg_targetObjectUpdate.btn_addTOU);
+					var $temp=$i;
+					var $index=$temp+1;
+					var $row=_f("main").s_label($index.toString()).near($sfm_pg_targetObjectUpdate.lbl_trgFieldUpdates);
+					
+					_click($sfm_pg_targetObjectUpdate.lbl_clickToAddField);
+					_wait(2000);
+					_setValue($sfm_pg_targetObjectUpdate.txt_quickFindTOU,$fieldsList[$i]);
+					_doubleClick(_f("main").s_label($fieldsList[$i]).near($sfm_pg_targetObjectUpdate.btn_AddFieldTOU));
+					
+					_setSelected(_f("main").s_dropdownlist("conditionsCombo").near(_f("main").s_label($fieldsList[$i])),$operatorList[$i]);
+					
+					var $comboID=_f("main").s_dropdownlist("conditionsCombo").near(_f("main").s_label($fieldsList[$i]).near($row));
+					var $txtField=_f("main").s_textinput("textip").rightOf($comboID);
+					
+					if (_isVisible($txtField)==true) {
+						_setValue($txtField,$valueList[$i]);
+					}else{
+						$datetimeField=_f("main").s_richeditabletext("textDisplay").near(_f("main").s_combobox("hoursCombo").rightOf($comboID));
+						if (_isVisible($datetimeField)==true) {
+							if ($valueList[$i].includes(":")) {
+								var $date=$valueList[$i].split(" ");
+								var $dateValue=$date[0];
+								var $time=$date[1].split(":");
+								var $timeValue=$time[0];
+								var $minValue=$time[1];
+								_log("date: "+$dateValue+" Time "+$timeValue+" minute "+$minValue);
+								_setValue(_f("main").s_richeditabletext("textDisplay").near(_f("main").s_combobox("hoursCombo").rightOf($comboID)),$dateValue);
+								_setSelected(_f("main").s_combobox("hoursCombo").rightOf($comboID),$timeValue);
+								_setSelected(_f("main").s_combobox("minsCombo").rightOf($comboID),$minValue);
+								
+							}else{
+								_setValue(_f("main").s_richeditabletext("textDisplay").near(_f("main").s_combobox("hoursCombo").rightOf(_f("main").s_label($fieldsList[$i]))),$valueList[$i]);
+							}
+						}else {
+							var $selField=_f("main").s_combobox("valuesCombo").rightOf($comboID);
+							if (_isVisible($selField)==true) {
+								_setSelected($selField,$valueList[$i]);
+							}else{
+								var $dateFiled=_f("main").mxftetextinput(0).rightOf($comboID);
+								_setValue(_f("main").s_richeditabletext(0).inside($dateFiled),$valueList[$i]);
+							}
+						}
+				}	
+				_setStrictVisibilityCheck(false);
+			}
+		};
+};

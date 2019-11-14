@@ -1,0 +1,45 @@
+var $user_credentials = $excel.readFromCustomExcel("../op_excleData/automation.xlsx", "User_Details","","");
+
+//var $nArr;
+//Calling the sforce API
+for(var $i=0;$i<$user_credentials.length;$i++)
+{
+var $g_un = $user_credentials[$i][0];
+var $g_pwd = $user_credentials[$i][1];
+var $g_url = $user_credentials[$i][2];
+}
+
+var $RS_6698 = _testcase("RS_6698", "Validating the Dispatch Methods available when Optimax is enabled");
+
+$RS_6698.start();
+
+/*var $g_url = "https://test.salesforce.com/";
+var $g_un = "govendhan@svmx-cct5.org.cct5part1";
+var $g_pwd = "maxpl0re2";*/
+
+$bo_act_login.login($g_url, $g_un, $g_pwd);
+		
+
+_click(_link("ServiceMax Setup"));
+_wait(20000,_isVisible(_div("Dispatch Management")));
+_click(_div("Dispatch Management"));
+_wait(20000,_isVisible(_div("Dispatch Processes")));
+_click(_div("Dispatch Processes"));
+_click(_submit("New Process"));
+
+//var $list = _getOptions(_select("page1:form1:block1:tab1block1:j_id77:j_id85:j_id89"));
+
+var $list = _getOptions(_select("page1:form1:block1:tab1block1:j_id77:j_id85:j_id89"));
+
+if ($list[1] == "Immediate" && $list[2] == "Optimized Batch" && $list[3] == "Real Time Optimization")
+	{
+	 _log("Optimax Dispatch Methods Available :" + $list[1] + ", " + $list[2] + ", " + $list[3] + ", ");
+	}
+else
+	{
+	_fail("All Optimax Dispatch Methods not available");
+	}
+
+$bo_act_login.logOut();
+
+$RS_6698.end();

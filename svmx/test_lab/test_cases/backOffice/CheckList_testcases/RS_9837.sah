@@ -1,0 +1,48 @@
+// Author Meghana Rao P
+/*
+ * Create Questions with tags and delete them and verify the UI.
+ */
+var $RS_9837 = _testcase("RS_9837", "Verify the Checklist tag (s) behavior if we remove/delete all questions from the tag(s)");
+$RS_9837.start();
+
+
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+
+var $number1 = $bo_act_common.generateRandomName("num");
+var $QuestionName1 = $bo_act_common.generateRandomName("A RS_9837_1");
+var $QuestionName2 = $bo_act_common.generateRandomName("A RS_9837_2");
+var $Process1 = $bo_act_common.generateRandomName("9837_Pro");
+var $TagName = $bo_act_common.generateRandomName("Tag_");
+//$bo_act_navigation.navigateToSvmxSetup();
+// To create a Checkbox Question with default checklist number 1
+
+$bo_act_navigation.navigateToSfmTransactionDesigner();
+_wait(60000, _isVisible($bo_pg_sfmTransactionAndDesigner.btn_newSFM));
+_wait(1000);
+
+// To create Checklist Process 1
+$bo_act_checklistdesigner.newChecklistTypeSFM($Process1,"to generate a Checklist/Survey type of Process", "Work Order");
+
+$bo_act_checklistdesigner.create_newquestion_tag_in_designer($QuestionName1, $TagName);
+
+$bo_act_checklistdesigner.create_newquestion_tag_in_designer($QuestionName2, $TagName);
+
+_click(_f("main").s_button("Save & Close"));		// saving SFM Process
+_wait(5000);
+
+
+// To delete the Question from the Checklist Library
+$bo_act_questionlibrary.deletequestionlibrary($QuestionName1);
+$bo_act_questionlibrary.deletequestionlibrary($QuestionName2);
+
+_call(top.location.reload());
+// Re open the Checklist and verify the Questions . They must not be Present
+//$bo_act_navigation.navigateToSvmxSetup();
+$bo_act_navigation.navigateToSfmTransactionDesigner();
+$bo_act_checklistdesigner.re_openChecklistTypeSFM($Process1, true);
+
+$bo_act_checklistdesigner.verifyquestionnotpresent($QuestionName1,$TagName);
+
+$bo_act_login.logOut(); 
+
+$RS_9837.end();

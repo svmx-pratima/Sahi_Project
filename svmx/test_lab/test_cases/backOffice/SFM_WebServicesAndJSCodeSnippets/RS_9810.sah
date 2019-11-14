@@ -1,0 +1,158 @@
+
+//author - Noor Salma Sharieff
+
+var $RS_9810 = _testcase("$RS_9810","Check for Continue Button after Execution of Web service.");
+$RS_9810.start();
+_setSpeed($g_stepSpeed);
+
+$user = "svmx test4";
+var $className = $bo_act_common.generateRandomName("fClassName");
+var $methodName = $bo_act_common.generateRandomName("MethodName");
+
+var $codeBase = "global class "+$className+ "\n"+ 
+"{\n"+
+"webservice static SVMXC.INTF_WebServicesDef.INTF_Response "+$methodName+"(SVMXC.INTF_WebServicesDef.INTF_Request request)\n"+
+"{\n"+     
+     "system.debug(LoggingLevel.WARN, 'req is = ' + request); \n"+ 
+     "SVMXC.INTF_WebServicesDef.INTF_Response obj = new SVMXC.INTF_WebServicesDef.INTF_Response(); \n"+ 
+     "try\n"+  
+     "{\n"+ 
+         "String recordId; \n"+ 
+         "for(SVMXC.INTF_WebServicesDef.SVMXMap objSVXMMap : request.valueMap) \n"+ 
+         "{\n"+  
+             "if(objSVXMMap.key == 'SVMX_RECORDID') \n"+ 
+             "{\n"+  
+                  "recordId = objSVXMMap.value; \n"+ 
+             "} \n"+ 
+         "} \n"+ 
+         "SVMXC__Service_Order__c objWO = [Select Id, Name, OwnerId from SVMXC__Service_Order__c where Id=:recordId]; \n"+ 
+         "objWO.OwnerId = UserInfo.getUserId(); \n"+ 
+         "Update objWO; \n"+ 
+         "SVMXC.INTF_WebServicesDef.SVMXMap sObj = new SVMXC.INTF_WebServicesDef.SVMXMap(); \n"+ 
+         "sObj.record = objWO; \n"+  
+         "obj.valueMap = new List<SVMXC.INTF_WebServicesDef.SVMXMap>(); \n"+ 
+         "obj.valueMap.add(sObj); \n"+ 
+         "obj.message = 'Work Order updated';\n"+ 
+         "obj.success = true;\n"+ 
+         "obj.messageType = 'INFO'; \n"+ 
+         "system.debug(LoggingLevel.WARN, 'obj is = ' + obj); \n"+ 
+         "return obj; // Return should be of INTF_Response type and \n"+ 
+     "}\n"+  
+     "catch(Exception ex) \n"+ 
+     "{\n"+  
+          "obj.message = ex.getMessage();\n"+  
+         "obj.success = false; \n"+ 
+        "obj.messageType = 'ERROR';\n"+  
+         "return obj;\n"+  
+     "}\n"+ 
+"}\n"+ 
+"}";
+
+var $codeDev = "global class "+$className+ "\n"+ 
+"{\n"+
+"webservice static SVMXDEV.INTF_WebServicesDef.INTF_Response "+$methodName+"(SVMXDEV.INTF_WebServicesDef.INTF_Request request)\n"+
+"{\n"+     
+     "system.debug(LoggingLevel.WARN, 'req is = ' + request); \n"+ 
+     "SVMXDEV.INTF_WebServicesDef.INTF_Response obj = new SVMXDEV.INTF_WebServicesDef.INTF_Response(); \n"+ 
+     "try\n"+  
+     "{\n"+ 
+         "String recordId; \n"+ 
+         "for(SVMXDEV.INTF_WebServicesDef.SVMXMap objSVXMMap : request.valueMap) \n"+ 
+         "{\n"+  
+             "if(objSVXMMap.key == 'SVMX_RECORDID') \n"+ 
+             "{\n"+  
+                  "recordId = objSVXMMap.value; \n"+ 
+             "} \n"+ 
+         "} \n"+ 
+         "SVMXDEV__Service_Order__c objWO = [Select Id, Name, OwnerId from SVMXDEV__Service_Order__c where Id=:recordId]; \n"+ 
+         "objWO.OwnerId = UserInfo.getUserId(); \n"+ 
+         "Update objWO; \n"+ 
+         "SVMXDEV.INTF_WebServicesDef.SVMXMap sObj = new SVMXDEV.INTF_WebServicesDef.SVMXMap(); \n"+ 
+         "sObj.record = objWO; \n"+  
+         "obj.valueMap = new List<SVMXDEV.INTF_WebServicesDef.SVMXMap>(); \n"+ 
+         "obj.valueMap.add(sObj); \n"+ 
+         "obj.message = 'Work Order updated';\n"+ 
+         "obj.success = true;\n"+ 
+         "obj.messageType = 'INFO'; \n"+ 
+         "system.debug(LoggingLevel.WARN, 'obj is = ' + obj); \n"+ 
+         "return obj; // Return should be of INTF_Response type and \n"+ 
+     "}\n"+  
+     "catch(Exception ex) \n"+ 
+     "{\n"+  
+          "obj.message = ex.getMessage();\n"+  
+         "obj.success = false; \n"+ 
+        "obj.messageType = 'ERROR';\n"+  
+         "return obj;\n"+  
+     "}\n"+ 
+"}\n"+ 
+"}";
+
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+
+$bo_act_navigation.navigateToSetUpAndSearch("Installed Packages");
+_click(_link("/ServiceMax/"));
+if(_getText(_cell(0,_rightOf(_cell("Namespace Prefix"))))!="SVMXDEV")
+var $code = $codeBase;
+else
+$code = $codeDev;
+
+$bo_act_salesforcePageSetUp.createApexClasses($code);
+
+var $actionTitle = $bo_act_customAction.createCustomActionForWebService("Work Order", $className, $methodName);
+
+$bo_act_customAction.addParametersForWebService("Owner","Field Name", "Owner ID");
+
+var $wizardTitleName = $bo_act_common.generateRandomName("SFWTitle");
+var $wizardIDName = $bo_act_common.generateRandomName("SFWId");
+$bo_act_navigation.navigateToSfmWizard();
+$bo_act_SFW.createWizardGeneralInfo("Work Order", $wizardTitleName, $wizardIDName);
+$bo_act_SFW.createOthersWizardStepwithHandOver("Others", $actionTitle,true);
+$bo_act_SFW.createOthersWizardStepwithHandOver("Others", $actionTitle,false);
+$bo_act_SFW.quickSaveSFWizard();
+$bo_act_SFW.saveAndClose();
+
+var $accountName = $bo_act_accounts.createAccount();
+var $contactName = $bo_act_contacts.createContact($accountName);
+var $caseNumber = $bo_act_Cases.createCase("New", "High", "Email");
+var $productName = $bo_act_products.createProduct();
+var $IBName = $bo_act_installedProduct.createInstalledProduct($productName, $accountName, $contactName);
+var $WONumber = $bo_act_workOrders.createWorkOrder($caseNumber, $accountName, $contactName, $IBName, "Open", "High", "Field Service");
+
+_selectDomain($g_domain);
+_assertExists(_button($actionTitle,_near(_cell($wizardTitleName))));
+_click(_button($actionTitle,_near(_cell($wizardTitleName))));
+_selectDomain();
+_assertContainsText("Work Order updated",_div("messageText"));
+_assertExists(_submit("Continue"));
+_click(_submit("Continue"));
+_wait(10000,isVisible(_div("messageText")));
+_assertContainsText("Work Order updated",_div("messageText"));
+
+//Clean up function
+//var $datacreated = [$contactName,$caseNumber,$accountName,$productName,$IBName,$WONumber];
+//for (var i = 0; i < $datacreated.length; i++) {
+	//$bo_act_common.cleanUpfunction($datacreated[i]);
+//}
+$bo_act_SFW.deleteWizards("Work Order", $wizardIDName);
+$bo_act_customAction.deleteCustomAction("Work Order", $actionTitle);
+$bo_act_salesforcePageSetUp.deleteapexClasses($className);
+
+var $Workbenchurl = "https://workbench.developerforce.com/login.php";
+var $nameSpace = $bo_act_salesforcePages.checkNameSpace();
+
+var $delscript =
+	"DELETE[SELECT id FROM Contact WHERE Name = '"+$contactName+"'];\n"+
+	"DELETE[SELECT id FROM Case WHERE CaseNumber = '"+$caseNumber+"'];\n"+
+	"DELETE[SELECT id FROM Account WHERE Name = '"+$accountName+"'];\n"+
+	"DELETE[SELECT id FROM Product2 WHERE Name = '"+$productName+"'];\n"+
+	"DELETE[SELECT id FROM "+$nameSpace+"__Installed_Product__c WHERE Name = '"+$IBName+"'];\n"+
+	"DELETE[SELECT id FROM "+$nameSpace+"__Service_Order__c WHERE Name = '"+$WONumber+"'];\n";
+	
+
+$bo_act_login.loginToWorkBench($Workbenchurl,"Sandbox", $bac_un, $bac_pwd);
+$bo_act_login.runApexScriptinWB($delscript);
+
+$RS_9810.end();
+
+
+

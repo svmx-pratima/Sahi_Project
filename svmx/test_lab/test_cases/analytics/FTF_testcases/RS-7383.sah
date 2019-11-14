@@ -1,0 +1,18 @@
+var $an_ftf_738 = _testcase("ANA-738","UI verification");
+$an_ftf_738.start();
+var $cred = _readExcelFile("../../analytics/an_excleData/credentials.xlsx","Sheet1",true);
+var $un =$bac_un ;
+var $pwd =$bac_pwd;
+var $url =$cred[1]["url"];
+var $user =$cred[1]["User"];
+$bo_act_login.login($url, $un, $pwd);
+
+
+//create calc and save 
+$an_act_FTF.ftf_UI("FTF_UI");
+$an_act_FTF.ftf_runEngine("vinaya.v@servicemax.com");
+
+$an_ftf_738.end();
+
+
+

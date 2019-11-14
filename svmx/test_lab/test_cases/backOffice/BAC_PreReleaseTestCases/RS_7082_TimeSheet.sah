@@ -1,0 +1,50 @@
+
+//Author - Noor Salma Sharieff
+
+var $RS_7082 = _testcase("Creation of Timesheet Header and Daily Summary records when Frequency is Weekly and Timesheet Engine run using Run Now.");
+$RS_7082.start();
+_setSpeed(100);
+
+$bo_act_login.login($PRT_url, $bac_PRTun, $bac_PRTpwd);
+
+$bo_act_configurationProfiles.editGlobalProfileForBooleanSettings("Common", "Global Settings", "GBL027", true);
+
+//Create Business hours
+if(true,_isVisible(_link("IST_Timesheet")))
+	{wait(1000);}
+	else{
+$bo_act_salesforcePageSetUp.createBusinessHours("IST_Timesheet","(GMT+05:30) India Standard Time (Asia/Kolkata)");
+	}
+ 
+
+var $userName = $bo_act_salesforcePageSetUp.createUser("Salesforce", "ServiceMax Service User");
+var $userName1 = $bo_act_salesforcePageSetUp.createUser("Salesforce", "ServiceMax Admin");
+$bo_act_configurationProfiles.linkSalesforceProfileToServiceMax("BackOffice", "ServiceMax Service User");
+$bo_act_configurationProfiles.linkSalesforceProfileToServiceMax("BackOffice", "ServiceMax Admin");
+
+//Create time sheet Tab
+//Create Time Sheet Filter
+
+
+$bo_act_timesheet.createTimesheetConfig("(GMT+05:30) India Standard Time (Asia/Kolkata)", "BackOffice");
+
+
+/*
+_assertExists(_link("/TSR-00000/"));
+_assertExists(_link("/TSR-00001/"));
+_assertExists(_link("/TSR-00002/"));
+_assertExists(_link("/TSR-00003/"));
+_assertExists(_link("/TSR-00004/"));
+_assertExists(_link("/TSR-00005/"));
+_assertExists(_link("/TSR-00006/"));
+*/
+
+
+
+
+$RS_7082.end();
+
+
+
+
+

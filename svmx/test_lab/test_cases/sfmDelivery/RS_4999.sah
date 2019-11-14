@@ -1,0 +1,53 @@
+var $RS_4999 = _testcase("RS_4999", "Field level:Webservice Header Field test On Exit");
+$RS_4999.start();
+var $sfmNameToBeCloned = "Manage Work Order Lines - Usage";
+var $sfmName=$bo_act_common.generateRandomName("RS_4999_");
+var $isCustom = false;
+var $sfmTemplate = "SVMXSTD: Manage WO Usage Lines";
+var $sfmTemplateSaveAsName = $sfmName;
+var $containerName = ["Order Status","Order Status","Order Status","Order Status"];
+var $fieldName=["Order Type","Zip","Is Entitlement Performed","Driving Time (in Minutes)"];
+var $webServiceObject ="Zip" ;
+var $event = "On Exit";
+var $eventType = "Webservice";
+var $methodName = "objWebService.onExit";
+var $wizardObject ="Work Order";
+
+
+
+//Create WO through REST API
+var $woNumber = $sfm_act_createCustomWizard.createBlankWoFromRest($sfmdUsn, $sfmdPwd, $sfmClientId, $sfmConsumerSecret, $sfmOrgInstance);
+
+//login
+_setSpeed($g_stepSpeed);
+$bo_act_login.login($g_url, $sfmdUsn, $sfmdPwd); 
+
+//clone Source to Target Child Process
+$sfm_act_SFM.cloneTDM016($sfmNameToBeCloned,$sfmName,$isCustom, $sfmTemplateSaveAsName,$sfmTemplate,$fieldName, $containerName);
+$sfm_act_SFM.setWebservice($webServiceObject, $event, $eventType, $methodName);
+_click($sfm_pg_sfmDesigner.btn_saveSFM); 
+
+//add the process to wizard
+$sfm_act_wizards.addToWizard($wizardObject, $sfmd_wizardName[1], $sfmd_wizardType[1], $sfmName);  
+
+//Navigate to the WO for validation
+$bo_act_navigation.navigateToCreatedRecordUsingGlobalSearch($woNumber);
+
+$sfm_act_createCustomWizard.clickWizardBtn($sfmName);
+
+//Validate in delivery on exit form zip to any other field
+_setValue($sfm_pg_sfmDesigner.txt_orderType,"Field Service");
+_click($sfm_pg_sfmDesigner.chk_deliveryIsEntitlePerformed);
+_click($sfm_pg_sfmDesigner.txt_zip);
+_click($sfm_pg_sfmDesigner.txt_drivingTime);
+_wait(3000);
+_assertEqual("Depot Repair", _getText($sfm_pg_sfmDesigner.txt_orderType), "Order type is not updated");
+_assertEqual("560063",_getText($sfm_pg_sfmDesigner.txt_zip),"Zip is not updated");
+_assertEqual("15",_getText($sfm_pg_sfmDesigner.txt_drivingTime),"Driving time is not updated");
+//_assertEqual(false,$sfm_act_common. verifyCheckBoxValues(["Is Entitlement Performed:"],[false]),"Is Entitlement Performed is checked");	
+if($sfm_act_common. verifyCheckBoxValues(["Is Entitlement Performed:"],[false])){
+	_log("Pass ::: Is Entitlement Performed is not checked");
+}else{
+	_log("Is Entitlement Performed is checked","FAILURE");
+}
+$RS_4999.end();

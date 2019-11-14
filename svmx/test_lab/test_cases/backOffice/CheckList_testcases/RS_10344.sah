@@ -1,0 +1,48 @@
+// Author Bhupendra Singh Chouhan
+
+/*
+ * SOU For upgrade Scenario
+ */
+var $RS_10344 = _testcase("RS_10344", "Verify the SOU behavior if user try to change answer type of the question in form designer which is used in SOU.");
+$RS_10344.start();
+
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+
+//var $number1 = $bo_act_common.generateRandomName("num");
+var $QuestionName1 = $bo_act_common.generateRandomName("Number Question_");
+var $QuestionName2 = $bo_act_common.generateRandomName("Text Question_");
+var $checklistProcessName = $bo_act_common.generateRandomName("ChecklistProcess_");
+var $AnswerType1 = "Number";
+var $AnswerType2 = "Text";
+var $operandType = "Question"; 
+var $fieldName1 = "Scheduled Duration";
+var $fieldName2 = "Entitlement Notes";
+
+// To create a Checkbox Question with default checklist number 1
+
+$bo_act_navigation.navigateToSfmTransactionDesigner();
+_wait(60000, _isVisible($bo_pg_sfmTransactionAndDesigner.btn_newSFM));
+_wait(1000);
+
+// To create Checklist Process 
+$bo_act_checklistdesigner.newChecklistTypeSFM($checklistProcessName,"to generate a Checklist/Survey type of Process", "Work Order");
+
+$bo_act_checklistdesigner.addQuestionToChecklistProcess($QuestionName1, $AnswerType1);
+$bo_act_checklistdesigner.addQuestionToChecklistProcess($QuestionName2, $AnswerType2);
+
+//To create SOU configuration for Checklist Process
+//	SOU Row 1st
+$bo_act_checklistdesigner.configureSOUToChecklistProcess($fieldName1, $operandType, $QuestionName1);
+//SOU Row 2nd
+$bo_act_checklistdesigner.configureSOUToChecklistProcess($fieldName2, $operandType, $QuestionName2);
+
+
+$bo_act_checklistdesigner.editQuestionOfChecklistProcess("", "");
+
+
+//Save Checklist Process
+$bo_act_checklistdesigner.saveAndCloseChecklistProcess();
+
+$bo_act_login.logOut(); 
+
+$RS_10344.end();

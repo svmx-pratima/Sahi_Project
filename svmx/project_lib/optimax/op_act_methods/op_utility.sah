@@ -1,0 +1,210 @@
+/**
+ * Function to perform login work flows
+ */
+var $op_utility = new function op_utility() {
+	this.run_Job_Now = function($dp_Name) {
+		//_log("$dp_Name_utility = " + $dp_Name);
+		_click(_link("ServiceMax Setup"));
+		_wait(20000, _isVisible(_div("Dispatch Management")));
+		_click(_div("Dispatch Management"));
+		_wait(20000, _isVisible(_div("Dispatch Processes")));
+		_click(_div("Dispatch Processes"));
+		var $rowCount = 0;
+		_set($rowCount, _table("page1:form1:block1:j_id81:j_id82").rows.length);
+		_log("$rowCount = " + $rowCount);
+		for (var $i = 0; $i < $rowCount; $i++) {
+			var $temp = _getText(_cell("page1:form1:block1:j_id81:j_id82:" + $i
+					+ ":j_id86"));
+			//_log("$dp_Name_utility temp = " + $dp_Name);
+			//_log("$rowCount2 = " + $rowCount);
+			//_log("$temp = " + $temp);
+			if (_areEqual($dp_Name, $temp)) {
+				$rowCount = $i;
+				//_log("$rowCount3 = " + $rowCount);
+			}
+		}
+
+		_check(_checkbox("page1:form1:block1:j_id81:j_id82:" + $rowCount
+				+ ":j_id85"));
+
+		_click(_submit("Show Jobs"));
+		_check(_radio("Checkbox"));
+		_click(_submit("Run Job Now"));
+		if (_exists("Started the job successfully.")) {
+			_log("Started the job successfully.");
+		} else {
+			_fail("Error in running the job");
+		}
+	}
+
+	this.validate_Job_Success = function($dp_Id, $sfdc_sessionId,$wait) {
+		var $is_success = false;
+		if($is_success == false){
+			_wait($wait);
+		}
+		_set($is_success, _fetch(validate_Job_Success($dp_Id,$sfdc_sessionId)));
+		
+		return $is_success;
+		// <browser>
+		function validate_Job_Success($dp_Id,$sfdc_sessionId) {
+			sforce.connection.sessionId = $sfdc_sessionId;
+			var svmx_Job_result = _call(sforce.connection.query("Select Id, SVMXDEV__SVMX_Process__c, SVMXDEV__OptiMax_Message__c  From SVMXDEV__SVMX_Jobs__c Where SVMXDEV__SVMX_Process__c = '"+ $dp_Id + "' ORDER BY Name DESC LIMIT 1"));
+			var records = svmx_Job_result.getArray("records");
+			_log("records size =" + records.length + " records.SVMXDEV__OptiMax_Message__c = "+records[0].SVMXDEV__OptiMax_Message__c);
+			if(records[0].SVMXDEV__OptiMax_Message__c === 'Success'){
+				$is_success = true;				
+			}
+			else{
+				$is_success = false;
+			}
+			_log("Is Job success = "+ $is_success);
+			
+			return $is_success;
+		}
+		// </browser>		
+	}
+	
+	this.validate_Job_InProg = function($dp_Id) {
+		var $is_success = null;
+		_set($is_success, _fetch(validate_Job_InProg($dp_Id)));
+		return $is_success;
+		// <browser>
+		function validate_Job_InProg($dp_Id) {
+			var svmx_Job_result = _call(sforce.connection
+					.query("Select Id, SVMXDEV__SVMX_Process__c, SVMXDEV__OptiMax_Message__c  From SVMXDEV__SVMX_Jobs__c Where SVMXDEV__SVMX_Process__c = '"
+							+ $dp_Id + "' AND SVMXDEV__OptiMax_Message__c = 'In Progress' ORDER BY Name DESC LIMIT 1"));
+			var records = svmx_Job_result.getArray("records");
+			_log("records size =" + records.length);
+			if(records.length > 0){
+				$is_success = true;
+			}
+			else{
+				$is_success = false;
+			}
+			_log("Is Job In Progress = "+ $is_success);
+			return $is_success;
+		}
+		
+		// </browser>
+	}
+	
+	this.search_MTTS_Rule = function($MTTSName) 
+	{
+		var $rowCount = 0;
+		_set($rowCount, _table("MTTSRule:RuleForm:RuleBlock:MTTSRuleList").rows.length);
+		_log("$rowCount = " + $rowCount);
+		for (var $i = 0; $i < $rowCount; $i++) 
+		{
+			var $temp = _getText(_cell("MTTSRule:RuleForm:RuleBlock:MTTSRuleList:" + $i
+					+ ":j_id88"));
+			_log("$temp = " + $temp);
+			if (_areEqual($MTTSName, $temp)) 
+			{
+				$rowCount = $i;
+			}
+		}
+		_check(_checkbox("MTTSRule:RuleForm:RuleBlock:MTTSRuleList:" + $rowCount
+				+ ":Hide_selected"));
+		return $rowCount;
+
+	}
+	
+	this.search_ActiveProfile = function() 
+	{
+		var $rowCount = 0;
+		_set($rowCount, _table("list_prof:list_prof:GloProf:j_id28").rows.length);
+		_log("$rowCount = " + $rowCount);
+		for (var $i = 0; $i < $rowCount; $i++) 
+		{
+			var $temp = _getText(_cell("list_prof:list_prof:GloProf:j_id28:" + $i
+					+ ":j_id33"));
+					
+				_log("$temp = " + $temp);
+			if (_areEqual("Active", $temp)) 
+			{
+				$rowCount = $i;
+			}
+		}
+		
+		_check(_checkbox("list_prof:list_prof:GloProf:j_id28:"+ $rowCount + ":org_selected"));
+
+	}
+	
+	this.delete_WO = function($dp_Id, $sfdc_sessionId) {
+		var $is_success = false
+		_set($is_success, _fetch(delete_WO($dp_Id,$sfdc_sessionId)));
+		return $is_success;
+		// <browser>
+		function delete_WO($dp_Id,$sfdc_sessionId) {
+			sforce.connection.sessionId = $sfdc_sessionId;
+			var delete_WO = [];
+			var svmx_Job_result = _call(sforce.connection.query("Select Id, SVMXDEV__Dispatch_Process__c  From SVMXDEV__Service_Order__c Where SVMXDEV__Dispatch_Process__c = '"+ $dp_Id + "'"));
+			var records = svmx_Job_result.getArray("records");
+			_log("records.length = "+records.length);
+			if(records.length > 0){
+				for(var $x=0;$x<records.length;$x++){
+					var record = records[$x];
+					delete_WO.push(record.Id);
+				}
+				var delResult = sforce.connection.deleteIds([delete_WO]);
+				if(delResult.length < 0){
+					_log(delResult.length +" Wo are deleted");
+					$is_success = true
+				}
+			}
+			else{
+				_log("No WO's to delete");
+				$is_success = false;
+			}
+			
+			return $is_success;
+		}
+		// </browser>		
+	}
+	
+	
+	this.read_file = function($dp_Id, $sfdc_sessionId,$text_validation,$file_Name) {
+		var $no_text_count = null;
+		_set($no_text_count, _fetch(read_file($dp_Id,$sfdc_sessionId,$text_validation,$file_Name)));
+		return $no_text_count;
+		// <browser>
+		function read_file($dp_Id,$sfdc_sessionId,$text_validation,$file_Name) {
+			sforce.connection.sessionId = $sfdc_sessionId;
+			var svmx_Job_result = _call(sforce.connection.query("Select Id, SVMXDEV__SVMX_Process__c, SVMXDEV__OptiMax_Message__c  From SVMXDEV__SVMX_Jobs__c Where SVMXDEV__SVMX_Process__c = '"+ $dp_Id + "' ORDER BY Name DESC LIMIT 1"));
+			var records = svmx_Job_result.getArray("records");
+			_log("records size =" + records.length);
+			if(records[0].Id != null){
+				var attachment = _call(sforce.connection.query("SELECT ParentId, Body, Id FROM Attachment WHERE ParentId = '"+records[0].Id+"' AND Name = '"+$file_Name+"'"));
+				var attach_Id = attachment.getArray("records");
+				var myFile=atob(attach_Id[0].Body);
+				_log("Validation Text : " + $text_validation);
+				//_log("myFile = "+myFile);
+				$no_text_count = myFile.split($text_validation).length;
+				$no_text_count = $no_text_count - 1;
+				_log("pos = "+$no_text_count);
+			}
+			return $no_text_count;
+		}
+		// </browser>
+	}
+	
+	this.search_Territory_Match_Rule = function($TerrName) 
+	{
+		var $rowCount = 0;
+		_set($rowCount, _table("TRTRYRule:RuleForm:RuleBlock:TrtryRuleList").rows.length);
+		_log("$rowCount = " + $rowCount);
+		for (var $i = 0; $i < $rowCount; $i++) 
+		{
+			var $temp = _getText(_cell("TRTRYRule:RuleForm:RuleBlock:TrtryRuleList:" + $i + ":j_id89"));
+			//_log("$temp = " + $temp);
+			if (_areEqual($TerrName, $temp)) 
+			{
+				$rowCount = $i;
+			}
+		}
+		_check(_checkbox("TRTRYRule:RuleForm:RuleBlock:TrtryRuleList:" + $rowCount + ":Hide_selected"));
+		return $rowCount;
+
+	}
+
+}

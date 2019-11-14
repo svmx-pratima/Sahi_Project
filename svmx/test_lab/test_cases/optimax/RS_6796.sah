@@ -1,0 +1,100 @@
+var $user_credentials = $excel.readFromCustomExcel("../optimax/op_excleData/automation.xlsx", "User_Details","","");
+var $RTO_DispatchProcess = $excel.readFromCustomExcel("../optimax/op_excleData/automation.xlsx", "RTO_DispatchProcess","","");
+
+
+for(var $i=0;$i<$user_credentials.length;$i++)
+{
+var $g_un = $user_credentials[$i][0];
+var $g_pwd = $user_credentials[$i][1];
+var $g_url = $user_credentials[$i][2];
+}
+
+var $RS_6796 = _testcase("RS_6796", "Create a new Work Order for the Fresh Optimax ECO dispatch process");
+
+$RS_6796.start();
+	
+	
+$bo_act_login.login($g_url, $g_un, $g_pwd);
+
+_set($login_result, _fetch(login($g_un,$g_pwd)));
+_log($login_result);
+
+_set($create_rto_wo, _fetch(create_rto_wo($RTO_DispatchProcess)));
+_log($create_rto_wo);
+
+//<browser>
+function login($g_un,$g_pwd){
+	
+	var $login_result = sforce.connection.login($g_un,$g_pwd);
+	$sfdc_sessionId = $login_result.sessionId;
+	_log("$sfdc_sessionId = "+$sfdc_sessionId);
+	return $login_result;
+} 
+
+function create_rto_wo($RTO_DispatchProcess){
+	
+	var CreateRecords=[];
+	
+	for(var $i=0;$i<$RTO_DispatchProcess.length;$i++)
+	{
+		var WO = new sforce.SObject("SVMXC__Service_Order__c");
+		WO.SVMXC__Primary_Territory__c= $RTO_DispatchProcess[$i][5];
+		WO.SVMXC__Preferred_Business_Hours__c=$RTO_DispatchProcess[$i][6];
+		WO.SVMXC__Order_Type__c=$RTO_DispatchProcess[$i][7];
+		WO.SVMXC__Order_Status__c=$RTO_DispatchProcess[$i][8];
+		WO.SVMXC__Zip__c=$RTO_DispatchProcess[$i][9];
+		WO.SVMXC__Country__c=$RTO_DispatchProcess[$i][10];
+		WO.SVMXC__City__c=$RTO_DispatchProcess[$i][11];
+		WO.SVMXC__State__c=$RTO_DispatchProcess[$i][12];
+		CreateRecords.push(WO);  
+	}
+	
+	var result_WO = sforce.connection.create([WO]);
+    _log("result_WO = "+result_WO);
+	 _log(" Work order = "+result_WO[0].id);
+
+// Wait for the Work order to get scheduled and work order is updated with scheduled information
+	 
+	 var $count=0;
+	 while($count!=5000){
+		 _log(1000);
+		  $count++;
+		                 }
+	 
+	 // Validating the Work order scheduled info
+	 
+var wo_result = sforce.connection.query("Select Id, SVMXC__Service_Group__c,SVMXC__Group_Member__c,SVMXC__Scheduled_Date_Time__c,SVMXC__OptiMax_Status__c from SVMXC__Service_Order__c Where Id = '"+result_WO[0].id+"'");
+var records = wo_result.getArray("records");
+_log("records = "+records);
+for (var i=0; i< records.length; i++) {
+var record = records[i];
+if(record.SVMXC__Service_Group__c!=null ){
+_log("Service Team is populated");
+}
+else{
+	_log("Service Team is not populated");
+}
+if(record.SVMXC__Group_Member__c!=null ){
+	_log("Technician is populated");
+	}
+	else{
+		_log("Technician is not populated");
+	}
+if(record.SVMXC__Scheduled_Date_Time__c!=null ){
+	_log("Work order assigned");
+	}
+	else{
+		_log("Work order is not assigned");
+	}
+if(record.SVMXC__OptiMax_Status__c!=null ){
+	_log("Optimax Status populated");
+	}
+	else{
+		_log("Optimax Status is not populated");
+	}
+}
+return result_WO;
+}
+//</browser>
+
+$RS_6796.end();

@@ -1,0 +1,111 @@
+var $rs_6346 = _testcase("RS_6346","Verify Confirmation type on Child when simple expressions is configured - Source to Target Save");
+$rs_6346.start();
+var $sfmNameToBeCloned = "Create Usage Lines from Estimates";
+var $sfmName = $bo_act_common.generateRandomName("RS_6346_");
+var $isCustom = false;
+var $sfmTemplate = "SVMXSTD: Create Usage from Estimates";
+var $sfmTemplateSaveAsName = $sfmName;
+var $containerName = ["Parts","Labor","Expenses","Travel"];
+var $fieldName=["Received City",
+                "Received City",
+                "Received City",
+                "Received City"];
+var $targetObject ="Work Detail (Work Order)";
+var $rulename =$sfmName;
+var $ruleDescription ="Received City should not be Panaji";
+
+var $fieldArray = ["Received City"];
+var $conditionArray = ["Equals"];
+var $operandArray =["Value"];
+var $valueArray =["Panaji"];
+var $advExpr= "";
+var $messageType = "Confirmation";
+var $wizardObject ="Work Order";
+
+//Create WO through REST API
+var $woNumber = $sfm_act_createCustomWizard.createBlankWoFromRest($sfmdUsn, $sfmdPwd, $sfmClientId, $sfmConsumerSecret, $sfmOrgInstance);
+
+//login
+_setSpeed($g_stepSpeed);
+$bo_act_login.login($g_url, $sfmdUsn, $sfmdPwd);
+
+//clone Source to Target Child Process
+$sfm_act_SFM.cloneTDM016($sfmNameToBeCloned,$sfmName,$isCustom, $sfmTemplateSaveAsName,$sfmTemplate,$fieldName, $containerName);
+$sfm_act_SFM.partsNotMandatory();
+
+//create Data validation rule
+$sfm_pg_dvr.newRule($targetObject, $rulename, $ruleDescription, $fieldArray, $conditionArray, $operandArray, $valueArray, $advExpr, $messageType);
+_click($sfm_pg_sfmDesigner.btn_saveSFM); 
+
+//add the process to wizard
+$sfm_act_wizards.addToWizard($wizardObject, $sfmd_wizardName[0], $sfmd_wizardType[1], $sfmName); 
+
+//Navigate to the WO for validation
+$bo_act_navigation.navigateToCreatedRecordUsingGlobalSearch($woNumber);
+
+$sfm_act_createCustomWizard.clickWizardBtn($sfmName);
+
+//Add a row to all child lines
+
+//add line to Parts
+$sfm_act_sfmDesigner.addChildLine("Parts");
+_setValue($sfm_pg_sfmDesigner.txt_eeLineQty,"5");
+_setValue($sfm_pg_sfmDesigner.txt_eeReceivedCity,"Panaji");
+_click($sfm_pg_sfmDesigner.btn_eeUpdate);
+_wait(3000);
+
+//add line to Labor
+$sfm_act_sfmDesigner.addChildLine("Labor");
+_setValue($sfm_pg_sfmDesigner.txt_eeLineQty,"5");
+_setValue($sfm_pg_sfmDesigner.txt_eeReceivedCity,"Panaji");
+_click($sfm_pg_sfmDesigner.btn_eeUpdate);
+_wait(3000);
+
+//add line to Expenses
+$sfm_act_sfmDesigner.addChildLine("Expenses");
+_setValue($sfm_pg_sfmDesigner.txt_eeLineQty,"5");
+_setValue($sfm_pg_sfmDesigner.txt_eeReceivedCity,"Panaji");
+_click($sfm_pg_sfmDesigner.btn_eeUpdate);
+_wait(3000);
+
+//add line to Travel
+$sfm_act_sfmDesigner.addChildLine("Travel");
+_setValue($sfm_pg_sfmDesigner.txt_eeReceivedCity,"Panaji");
+_click($sfm_pg_sfmDesigner.btn_eeUpdate);
+_wait(3000);
+
+//Validate the DVR Step1 & 2 to validate whether rule is triggering or not
+_click($sfm_pg_sfmDesigner.btn_deliverySave);
+if(_exists(_span("SFM Transaction Manager"))){
+	if(_exists(_label("Parts: "+$ruleDescription))){
+		_log("Pass ::: DVR Confirmation for Parts is working");
+		_click(_span("Next"));
+	}else{
+		_log("Fail ::: DVR Confirmation for Parts is not working","FAILURE");
+	}
+	if(_exists(_label("Labor: "+$ruleDescription))){
+		_log("Pass ::: DVR Confirmation for Labor is working");
+		_click(_span("Next"));
+	}else{
+		_log("Fail ::: DVR Confirmation for Labor is not working","FAILURE");
+	}
+	if(_exists(_label("Expenses: "+$ruleDescription))){
+		_log("Pass ::: DVR Confirmation for Expenses is working");
+		_click(_span("Next"));
+	}else{
+		_log("Fail ::: DVR Confirmation for Expenses is not working","FAILURE");
+	}
+	if(_exists(_label("Travel: "+$ruleDescription))){
+		_log("Pass ::: DVR Confirmation for Travel is working");
+		_click(_span("Save"));
+	}else{
+		_log("Fail ::: DVR Confirmation for Travel is not working","FAILURE");
+	}
+	
+}else{
+	_log("Fail ::: DVR Confirmation is not working","FAILURE");
+}
+if(_exists($sfm_pg_sfmDesigner.txt_priceAlert)){
+	_click($sfm_pg_sfmDesigner.btn_priceAlertOk);
+}
+$rs_6346.end();

@@ -1,0 +1,16 @@
+var $CreateWOwithEntitlemenHistory = _testcase("CreateWOwithEntitlemenHistory",
+		"Creating a Work Order with Perform Auto Entitlement record");
+$CreateWOwithEntitlemenHistory.start();
+_setSpeed($g_stepSpeed);
+
+//Pre - Condition 
+$bo_act_login.login($g_url, $sfmUsn, $sfmPwd);
+var $i=0;
+_click(_span("WO-00001356"));
+for(i = 0; i < 50000;i++)
+{
+_click(_button(" Clone "));
+_check(_checkbox("00N0n0000016jbE"));
+_click(_submit(" Save "));
+}
+$CreateWOwithEntitlemenHistory.end();

@@ -1,0 +1,130 @@
+// author = Lohitha
+
+var $swat_createIB = _testcase("$swat_createIB","create Insatalled Products");
+$swat_createIB.start();
+_setSpeed($g_stepSpeed);
+
+var $user_credentials_xls = $excel.readFromCustomExcel("../swat/swat_excelData/swatdata.xlsx", "USer_Details","","");
+var $IBdata_xls = $excel.readFromCustomExcel("../swat/swat_excelData/swatdata.xlsx", "Installed Product","","");
+
+for(var $i=0; $i<$user_credentials_xls.length; $i++){
+	var $swat_un = $user_credentials_xls[$i][0];
+	var $swat_pwd = $user_credentials_xls[$i][1];
+	var $swat_url = $user_credentials_xls[$i][2];
+}
+
+for(var $i=0;$i<$IBdata_xls.length;$i++)
+{
+	var $ib_id = $IBdata_xls[$i][0];
+	var $ib_product = $IBdata_xls[$i][1];
+	var $ib_slnum = $IBdata_xls[$i][2];
+	var $ib_status = $IBdata_xls[$i][3];
+	var $ib_account = $IBdata_xls[$i][4];
+	var $ib_contact = $IBdata_xls[$i][5];
+	var $ib_location = $IBdata_xls[$i][6];
+	var $ib_ibid = $IBdata_xls[$i][7];
+	var $ib_dateinstalled = $IBdata_xls[$i][8];
+	_log("$ib_product = "+$ib_product);
+	_log("$ib_account = "+$ib_account);
+	_log("$ib_contact = "+$ib_contact);
+	_log("$ib_location ="+$ib_location);
+	_log("$ib_ibid ="+$ib_ibid);
+	_log("$ib_slnum ="+$ib_slnum);
+}
+
+
+$bo_act_login.login($swat_url, $swat_un, $swat_pwd);
+//$bo_act_login.login("https://test.salesforce.com", "lohithaadmin@dcfull.com", "maxpl0re2");
+
+_set($login_result, _fetch(login($swat_un,$swat_pwd)));
+_log($login_result);
+
+_set($del_ib, _fetch(deleteIB()));
+_log($del_ib);
+
+_set($ib_creation, _fetch(createIB($IBdata_xls)));
+_log($ib_creation);
+
+if($ib_creation.length != null && $ib_creation != false && $ib_creation != null){
+	//updating IB id in IB excel
+	for(var $i=0; $i< $ib_creation.length; $i++){
+		_log("$ib_creation[i] ="+$ib_creation[$i]);
+		$excel.insertUnderColumn("../swat/swat_excelData/swatdata.xlsx", "Installed Product", "Id", $ib_creation[$i],(1+$i));
+		//$excel.insertUnderColumn($filePath, $sheetName, $columnName, $dataToWrite, $rowIndex)
+	}
+}
+	
+//<browser>
+
+function login($swat_un,$swat_pwd)
+{
+	var $login_result = sforce.connection.login($swat_un,$swat_pwd);
+	return $login_result;
+}
+
+//delete and create IBs
+function deleteIB(){
+	var delete_IB = [];
+	//deleting the existing IBs
+	var ibresult = _call(sforce.connection.query("SELECT Id,Name FROM SVMXC__Installed_Product__c WHERE Name LIKE '%Auto%'"));
+	var del_ib = ibresult.getArray("records");
+	_log("del ib.length = "+del_ib.length);
+	if(del_ib.length > 0){
+		for(var $i=0;$i<del_ib.length;$i++){
+			var ib = del_ib[$i];
+			delete_IB.push(ib.Id);
+		}
+		var delResult = sforce.connection.deleteIds([delete_IB]);
+		_log("del result ib = "+delResult);
+		if(delResult.length < 0){
+			_log(delResult.length +" Existed IBs are deleted");
+		}
+	}
+	else{
+		_log("No Existed IBs to delete");
+	}
+}
+
+function createIB($IBdata_xls){
+	var $isSuccess = false;
+	var createIb =[];
+	var ib_Id = [];
+	//creating IBs
+	for(var $i=0; $i<$IBdata_xls.length; $i++){
+		var currentDate= new Date();
+		_log(" current date value = "+currentDate);
+		var ib = new sforce.SObject("SVMXC__Installed_Product__c");
+		_log("$IBs from excel "+$IBdata_xls[$i][1]);
+		ib.SVMXC__Product__c = $IBdata_xls[$i][1];
+		ib.SVMXC__Serial_Lot_Number__c = $IBdata_xls[$i][2];
+		ib.SVMXC__Status__c = $IBdata_xls[$i][3];
+		ib.SVMXC__Company__c = $IBdata_xls[$i][4];
+		ib.SVMXC__Contact__c = $IBdata_xls[$i][5];
+		ib.SVMXC__Site__c = $IBdata_xls[$i][6];
+		ib.Name = $IBdata_xls[$i][7];
+		ib.SVMXC__Date_Installed__c = currentDate;
+		createIb.push(ib);
+		_log("createIb "+createIb);
+	}
+	//fetch ib data from installed product excel
+	
+	var $ib_result = _call(sforce.connection.create(createIb));
+	if($ib_result != 0 && $ib_result != null){
+		$isSuccess = true;
+		_log("$ib_result = "+$ib_result);
+		for(var $x=0; $x<$ib_result.length; $x++){
+			if($ib_result[$x].id === null){
+				$isSuccess = false;
+				return $isSuccess;
+			}
+			ib_Id.push($ib_result[$x].id);
+			_log("ib_Id.push = "+ib_Id);
+		}
+		_log("ib_Id = "+ib_Id);
+		return ib_Id;
+	}
+	return $isSuccess;
+}
+//</browser>
+
+

@@ -1,0 +1,104 @@
+
+//author - Noor Salma Sharieff
+
+var $RS_9852 = _testcase("$RS_9852","CLONE - Condition Based PM Process - Creation of Standard Task on PM Work Order.");
+$RS_9852.start();
+_setSpeed($g_stepSpeed);
+var $excel = _getExcel("C:\\auto\\sahi_pro\\userdata\\scripts\\Sahi_Project\\svmx\\test_lab\\test_cases\\backOffice\\bo_excleData\\BAC_TestData.xlsx","Sheet1");
+var $Workbenchurl = "https://workbench.developerforce.com/login.php";
+
+
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+
+
+//Create Task Template
+var $templateName = $bo_act_common.generateRandomName("Task");
+$bo_act_taskTemplate.createTaskTemplate($templateName);
+$bo_act_taskTemplate.addTask(1, $templateName, $templateName, "High");
+$bo_act_taskTemplate.addRequiredParts(1, $excel.get(2,1));
+$bo_act_taskTemplate.saveTaskTemplate();
+
+//Create  Condition Based PM Plan Template
+var $PMPTemplate = $bo_act_PMPlanTemplate.createCriteriaBasedPMTemplate($excel.get(2,1));
+$bo_act_PMPlanTemplate.firstCriteriaBasedCondition("Status", "Equals", "Installed");
+$bo_act_PMPlanTemplate.addTaskTemplateToConditionBasedPMT($templateName);
+$bo_act_PMPlanTemplate.saveConditionBasedPM();
+
+//Create Condition Based PM Plan
+
+$bo_act_serviceMaintenanceContracts.AddCoveredProductToSCON($excel.get(7,1), $excel.get(3,1));
+var $PMPlan = $bo_act_PMPlan.createUsageOrFrequencyBasedPMPlan($excel.get(7,1),$PMPTemplate,$excel.get(3,1));
+
+//Create PM Process
+var $PMProcessId = $bo_act_PMProcess.createPMProcess("Condition Based Preventive Maintenance", 0, $PMPlan,"One Per Product");
+_click($bo_pg_PMProcess.tab_workOrderRules);
+_setSelected($bo_pg_PMProcess.sel_AssignTo,"Primary Technician");
+_setSelected($bo_pg_PMProcess.sel_SelectTaskObject,"Task");
+_setSelected($bo_pg_PMProcess.sel_TaskMapToUse,"/SVMXSTD/");
+_click($bo_pg_PMProcess.btn_quickSave);
+
+//Run the PM Engine
+$bo_act_login.loginToWorkBench($Workbenchurl,"Sandbox", $bac_un, $bac_pwd);
+$bo_act_login.runApexScriptinWB($excelScripts.get(1,1));
+
+//Verify Task is created
+_click(_link($PMPlan));
+_click($bo_pg_PMPlan.link_firstLinkInWorkOrders);
+
+AssertEqual($templateName,_getCellText(_link(0,_under(_tableHeader("Subject")))));
+
+if(_isVisible(_image("Checked",_rightOf(_cell("Is PM Work Order"))))){
+	_logOutput("Is PM Work Order is checked");
+	}else{
+	_fail("Is PM Work Order is not checked");
+	}
+
+//Change the Assignee to Technician in PM Process
+$bo_act_PMProcess.editPMProcess($PMProcessId);
+_uncheck(_checkbox(0,_rightOf(_span("Do not create new work order if existing work order is open"))));
+_click($bo_pg_PMProcess.tab_workOrderRules);
+_setSelected($bo_pg_PMProcess.sel_AssignTo,"Technician");
+_setValue(_textbox(0,_rightOf(_span("Technician"))),$excel.get(11,1));
+_click($bo_pg_PMProcess.btn_quickSave);
+
+//Run the PM Engine
+$bo_act_login.loginToWorkBench($Workbenchurl,"Sandbox", $bac_un, $bac_pwd);
+$bo_act_login.runApexScriptinWB($excelScripts.get(1,1));
+
+//Verify Task is created
+_click(_link($PMPlan));
+_click($bo_pg_PMPlan.link_firstLinkInWorkOrders);
+_assertExists($excel.get(11,1),_rightOf(_cell("Preferred Technician"))); //need checking
+AssertEqual($templateName,_getCellText(_link(0,_under(_tableHeader("Subject")))));
+
+if(_isVisible(_image("Checked",_rightOf(_cell("Is PM Work Order"))))){
+	_logOutput("Is PM Work Order is checked");
+	}else{
+	_fail("Is PM Work Order is not checked");
+	}
+//Change the Assignee to Team
+$bo_act_PMProcess.editPMProcess($PMProcessId);
+_click($bo_pg_PMProcess.tab_workOrderRules);
+_setSelected($bo_pg_PMProcess.sel_AssignTo,"Team");
+_setValue(_textbox(0,_rightOf(_span("Team"))),"Team 5");
+_click($bo_pg_PMProcess.btn_quickSave);
+
+//Run the Pm Engine
+$bo_act_login.loginToWorkBench($Workbenchurl,"Sandbox", $bac_un, $bac_pwd);
+$bo_act_login.runApexScriptinWB($excelScripts.get(1,1));
+
+//Verify Task is not created
+_click(_link($PMPlan));
+_click($bo_pg_PMPlan.link_firstLinkInWorkOrders);
+_assertExists(_tableHeader("No records to display"),_under(_div("Open Activities")));
+
+if(_isVisible(_image("Checked",_rightOf(_cell("Is PM Work Order"))))){
+	_logOutput("Is PM Work Order is checked");
+	}else{
+	_fail("Is PM Work Order is not checked");
+	}
+
+$RS_9852.end();
+
+
+

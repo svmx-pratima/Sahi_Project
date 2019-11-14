@@ -1,0 +1,105 @@
+var $data = _readExcelFile("../../analytics/an_excleData/an_Datasheet1.xlsx","Sheet1",true);
+var $un =$bac_un ;
+var $pwd =$bac_pwd;
+var $url = "https://test.salesforce.com";
+$bo_act_login.login($url, $un, $pwd);
+
+// Delete ContractUptime methods
+var $contractuptime = "Select Id from SVMXC__ServiceMax_Processes__c where SVMXC__ProcessID__c = 'UpDownTime'";
+var $fetchuptime = $op_act_sForceApiCall.sForceQuery($un, $pwd, $contractuptime,"query");
+
+var $uptime_process = $fetchuptime[0].Id;
+
+$uptime_delete = "delete [Select Id from SVMXC__ServiceMax_Config_Data__c where SVMXC__Dispatch_Process__c = '"+$uptime_process+"' ];";
+var $delete_data = $op_act_sForceApiCall.sForceQuery($un, $pwd, $uptime_delete , "create");
+
+
+// Delete MTTR Calculation methods
+var $mttr = "Select Id from SVMXC__ServiceMax_Processes__c where SVMXC__ProcessID__c = 'MeanTimeToRepair'";
+var $fetchmttr = $op_act_sForceApiCall.sForceQuery($un, $pwd, $mttr,"query");
+
+var $mttr_process = $fetchmttr[0].Id;
+
+$delete_mttr = "delete [Select Id from SVMXC__ServiceMax_Config_Data__c where SVMXC__Dispatch_Process__c = '"+$mttr_process+"' ];";
+var $delete_data = $op_act_sForceApiCall.sForceQuery($un, $pwd, $delete_mttr , "create");
+
+// Delete Repeat visit Calculation methods
+
+var $repeatvisit = "Select Id from SVMXC__ServiceMax_Processes__c where SVMXC__ProcessID__c = 'RepeatVisit'";
+var $fetchrv = $op_act_sForceApiCall.sForceQuery($un, $pwd, $repeatvisit,"query");
+
+var $repeatvisit_process = $fetchrv[0].Id;
+
+$delete_rv = "delete [Select Id from SVMXC__ServiceMax_Config_Data__c where SVMXC__Dispatch_Process__c = '"+$repeatvisit_process+"'];";
+var $delete_data = $op_act_sForceApiCall.sForceQuery($un, $pwd, $delete_rv , "create");
+
+
+// Delete MTTC Calculation methods
+
+
+var $mttc = "Select Id from SVMXC__ServiceMax_Processes__c where SVMXC__ProcessID__c = 'MeanTimeToComplete'";
+var $fetchmttc = $op_act_sForceApiCall.sForceQuery($un, $pwd, $mttc,"query");
+
+var $mttc_process = $fetchmttc[0].Id;
+
+$delete_mttc = "delete [Select Id from SVMXC__ServiceMax_Config_Data__c where SVMXC__Dispatch_Process__c = '"+$mttc_process+"'];";
+var $delete_data = $op_act_sForceApiCall.sForceQuery($un, $pwd, $delete_mttc , "create");
+
+
+
+
+// Delete FTF Calculation methods
+
+var $ftf = "Select Id from SVMXC__ServiceMax_Processes__c where SVMXC__ProcessID__c = 'FirstTimeFix'";
+var $fetchftf = $op_act_sForceApiCall.sForceQuery($un, $pwd, $ftf,"query");
+
+var $ftf_process = $fetchftf[0].Id;
+
+$delete_ftf = "delete [Select Id from SVMXC__ServiceMax_Config_Data__c where SVMXC__Dispatch_Process__c = '"+$ftf_process+"' ];";
+var $delete_data = $op_act_sForceApiCall.sForceQuery($un, $pwd, $delete_ftf , "create");
+
+
+// Delete Technician Utilization calculation methods
+
+var $techutil = "Select Id from SVMXC__ServiceMax_Processes__c where SVMXC__ProcessID__c = 'Utilization'";
+var $fetchtechutil = $op_act_sForceApiCall.sForceQuery($un, $pwd, $techutil,"query");
+
+var $techutil_process = $fetchtechutil[0].Id;
+
+$delete_techutil = "delete [Select Id from SVMXC__ServiceMax_Config_Data__c where SVMXC__Dispatch_Process__c = '"+$techutil_process+"' ];";
+var $delete_data = $op_act_sForceApiCall.sForceQuery($un, $pwd, $delete_techutil , "create");
+
+
+// Delete ART Calculation methods
+
+var $art = "Select Id from SVMXC__ServiceMax_Processes__c where SVMXC__ProcessID__c = 'AverageResponseTime'";
+var $fetchart = $op_act_sForceApiCall.sForceQuery($un, $pwd, $art,"query");
+
+var $art_process = $fetchart[0].Id;
+
+$delete_art = "delete [Select Id from SVMXC__ServiceMax_Config_Data__c where SVMXC__Dispatch_Process__c = '"+$art_process+"' ];";
+var $delete_data = $op_act_sForceApiCall.sForceQuery($un, $pwd, $delete_art , "create");
+
+// Delete Attach Rate Calculation methods
+
+var $attachrate = "Select Id from SVMXC__ServiceMax_Processes__c where SVMXC__ProcessID__c = 'ContractPenetration'";
+var $fetchattachrate = $op_act_sForceApiCall.sForceQuery($un, $pwd, $attachrate,"query");
+
+var $attachrate_process = $fetchattachrate[0].Id;
+
+$delete_attachrate = "delete [Select Id from SVMXC__ServiceMax_Config_Data__c where SVMXC__Dispatch_Process__c = '"+$attachrate_process+"' ];";
+var $delete_data = $op_act_sForceApiCall.sForceQuery($un, $pwd, $delete_attachrate , "create");
+
+
+//Delete Mean time between failure
+
+
+var $mtbf = "Select Id from SVMXC__ServiceMax_Processes__c where SVMXC__ProcessID__c = 'ContractPenetration'";
+var $fetchmtbf = $op_act_sForceApiCall.sForceQuery($un, $pwd, $mtbf,"query");
+
+var $mtbf_process = $fetchmtbf[0].Id;
+
+$delete_mtbf = "delete [Select Id from SVMXC__ServiceMax_Config_Data__c where SVMXC__Dispatch_Process__c = '"+$mtbf_process+"' ];";
+var $delete_data = $op_act_sForceApiCall.sForceQuery($un, $pwd, $delete_mtbf , "create");
+
+

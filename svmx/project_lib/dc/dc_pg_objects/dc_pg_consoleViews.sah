@@ -1,0 +1,42 @@
+//vanditha
+var $dc_pg_consoleViews = new function dc_pg_consoleViews() {
+	this.link_home = _link("Home");
+	this.link_servicemaxSetup = _link("ServiceMax Setup");
+	this.link_DispatchManagement=_div("Dispatch Management");
+	this.link_DispatchConsoleViews=_div("Dispatch Console Views");
+	this.txt_manageViewHeading=_heading2("Manage Views");
+	this.txt_standardViewHeading=_heading2("Standard Views");
+	this.txt_customViewHeading=_heading2("Custom Views");
+	this.txt_configureView=_heading2("Configure View");
+	this.btn_new=_submit("New");
+	this.sel_object=_select("j_id0:j_id1:mainPagBlck:j_id36:j_id37:j_id41:j_id42:j_id45");
+	
+	this.txtViewName=_textbox(1);
+	this.txtViewId=_textbox(2);
+	this.selViewFor=_select("j_id0:j_id1:mainPagBlck:j_id36:j_id70:j_id74:j_id75:j_id76");
+
+	this.sel_woFieldName1=_select("j_id0:j_id1:mainPagBlck:j_id86:j_id91:0:j_id95");
+	this.sel_woOperator1=_select("j_id0:j_id1:mainPagBlck:j_id86:j_id91:0:j_id99");
+	this.txt_woFieldValue1=_textbox("j_id0:j_id1:mainPagBlck:j_id86:j_id91:0:j_id103");
+	
+
+	this.sel_woFieldName2=_select("j_id0:j_id1:mainPagBlck:j_id86:j_id91:1:j_id95");
+	this.sel_woOperator2=_select("j_id0:j_id1:mainPagBlck:j_id86:j_id91:1:j_id99");
+	this.txt_woFieldValue2=_textbox("j_id0:j_id1:mainPagBlck:j_id86:j_id91:1:j_id103");
+	
+	this.btn_add=_imageSubmitButton("Add");
+	
+	this.txtAdvancedExpression=_textbox(5);
+	
+	
+	this.sel_fieldSelection=_select("j_id0:j_id1:mainPagBlck:j_id116:j_id147:j_id151");
+	this.sel_fieldSelected=_select("j_id0:j_id1:mainPagBlck:j_id116:j_id147:j_id160");
+	this.submitButton=_imageSubmitButton("Add[1]");
+	
+	this.btn_QuickSave=_button("Quick Save");
+	this.btn_save=_submit("Save");
+	this.btn_saveAndClose=_button("Save & Close");
+	this.txtSavedConsoleView=_span("Work Order DC View");
+
+ 
+}

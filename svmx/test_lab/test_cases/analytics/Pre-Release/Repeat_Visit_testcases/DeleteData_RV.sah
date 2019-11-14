@@ -1,0 +1,11 @@
+var $data = _readExcelFile("../../../analytics/Pre-Release/Data_Meghana.xlsx","Sheet1",true);
+var $un = $data[1]["Username"];
+var $pwd = $data[1]["pwd"];
+var $url = "https://test.salesforce.com";
+$bo_act_login.login($url, $un, $pwd);
+$delete1 = "delete [Select Id from SVMXC__Service_Order__c];";
+var $delete_data = $op_act_sForceApiCall.sForceQuery($un, $pwd, $delete1 , "create");
+
+
+$delete3 = "delete [Select Id from SVMXC__SPM_Repeat_Visit__c];";
+var $delete_data = $op_act_sForceApiCall.sForceQuery($un, $pwd, $delete3 , "create");

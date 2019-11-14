@@ -1,0 +1,146 @@
+var $an_ar_1650 = _testcase("ANA-1650","Converting out of coverage to within coverage for CP ");
+$an_ar_1650.start();
+var $data = _readExcelFile("../../../analytics/Pre-Release/Data_Meghana.xlsx","Sheet1",true);
+var $un = $data[1]["Username"];
+var $pwd = $data[1]["pwd"];
+var $url = "https://test.salesforce.com";
+var $Account = $data[1]["Account"];
+var $Technician = $data[1]["Technician"];
+var $Product = $data[1]["Product"];
+var $OrderStatus = $data[1]["OrderStatus"];
+var $Closedon = $data[1]["ClosedOn"];
+var $Site = $data[1]["Site"];
+var $Component = $data[1]["Component"];
+var $ScheduledDate = $data[1]["ScheduledDate"];
+var $user_meghana = $data[1]["user_meghana"];
+$bo_act_login.login($url, $un, $pwd);
+
+// To create a SCON
+
+var $ana_1650_create_SCON = "SVMXC__Service_Contract__c SCON1 = new SVMXC__Service_Contract__c(Name = 'SCON ANA-1650' , SVMXC__Company__c = '"+$Account+"' , SVMXC__Active__c = True, SVMXC__Start_Date__c = Date.valueOf('2017-01-01') , SVMXC__End_Date__c = Date.valueOf('2018-12-31') );insert SCON1;";
+var $ana_1650_result = $op_act_sForceApiCall.sForceQuery($un, $pwd, $ana_1650_create_SCON , "create");
+var $ana_1650_query_SCON = "Select Id , Name from SVMXC__Service_Contract__c where Name = 'SCON ANA-1650' Limit 1";
+	
+var $ana_1650_fetch_SCON  = $op_act_sForceApiCall.sForceQuery($un, $pwd, $ana_1650_query_SCON,"query");
+
+_wait(5000);
+
+_log($ana_1650_fetch_SCON);
+
+var $ana_1650_SCON ;
+var $var3;
+var $varRV1;
+var $ana_1650_var1;
+$ana_1650_SCON  = $ana_1650_fetch_SCON[0].Id;
+var $ana_1650_SCOName = $ana_1650_fetch_SCON[0].Name;
+_log($ana_1650_SCON);
+_log($ana_1650_SCOName);
+
+	$ana_1650_SCON = $ana_1650_fetch_SCON[0].Id;
+
+
+_log($ana_1650_SCON);
+
+// Create an IB
+
+var $ana_1650_create_IB = "SVMXC__Installed_Product__c IB01 = new SVMXC__Installed_Product__c(SVMXC__Company__c = '"+$Account+"' , Name = 'IB Automation ANA-1650' , SVMXC__Status__c = 'Installed');insert IB01;";
+var $ana_1650_result_IB  = $op_act_sForceApiCall.sForceQuery($un, $pwd, $ana_1650_create_IB , "create");
+
+_log($ana_1650_result_IB);
+var $ana_1650_get_IB = "Select Id, Name from SVMXC__Installed_Product__c where Name = 'IB Automation ANA-1650' Limit 1";
+
+	
+
+var $ana_1650_fetch_IB  = $op_act_sForceApiCall.sForceQuery($un, $pwd, $ana_1650_get_IB,"query");
+
+_wait(2000);
+var $var2;
+var $ana_1650_IB_ID;
+
+	
+	$ana_1650_IB_ID = $ana_1650_fetch_IB[0].Id ;
+
+
+
+_log($ana_1650_IB_ID);
+
+// Create Covered Product 
+var $ana_1650_create_CP = "SVMXC__Service_Contract_Products__c CP01 = new SVMXC__Service_Contract_Products__c(SVMXC__Installed_Product__c = '"+$ana_1650_IB_ID+"',SVMXC__Service_Contract__c = '"+$ana_1650_SCON+"',SVMXC__End_Date__c = System.Today() ); insert CP01;";
+var $ana_1650_result_CP = $op_act_sForceApiCall.sForceQuery($un, $pwd, $ana_1650_create_CP , "create");
+var $ana_1650_get_CP = "Select Id from SVMXC__Service_Contract_Products__c where Createdby.Id = '"+$user_meghana+"' Order by CreatedDate DESC Limit 1";
+var $ana_1650_fetch_CP   = $op_act_sForceApiCall.sForceQuery($un, $pwd, $ana_1650_get_CP,"query");
+var $ana_1650_cp_ID;
+
+	
+	$ana_1650_cp_ID = $ana_1650_fetch_CP[0].Id ;
+
+
+
+
+//$an_act_AttachRate.attachrate_installed_IB("ATTACH RATE 1");
+$an_act_AttachRate.ScheduleNotifications("meghana.rao@servicemax.com");
+
+var $ana_1650_ib1_id = null ;
+var $ana_1650_scon1_id ;
+var $ana_1650_covered_product;
+
+for(var $i=0;$ana_1650_ib1_id == null ; $i++)
+{
+var $ana_1650_query_RV1 = "Select SVMXC__Installed_Product__c,SVMXC__Service_Contract__c,SVMXC__Covered_By__c from SVMXC__SPM_Contract_Penetration__c where SVMXC__Installed_Product__c = '"+$ana_1650_IB_ID+"' AND SVMXC__Service_Contract__c = '"+$ana_1650_SCON+"'";
+var $ana_1650_resultRV1 = $op_act_sForceApiCall.sForceQuery($un, $pwd, $ana_1650_query_RV1,"query");
+
+$ana_1650_resultRV1.forEach(function($varRV1) {
+	
+	$ana_1650_ib1_id = $varRV1.SVMXC__Installed_Product__c;
+	$ana_1650_scon1_id = $varRV1.SVMXC__Service_Contract__c;
+	$ana_1650_covered_product = $varRV1.SVMXC__Covered_By__c;	
+	
+});
+}
+_assertEqual($ana_1650_IB_ID ,$ana_1650_ib1_id);
+_assertEqual($ana_1650_SCON ,$ana_1650_scon1_id);
+_assertEqual("Contract" ,$ana_1650_covered_product);
+
+
+// Update the Covered Product
+
+var $ana_1650_create_CP2 = "SVMXC__Service_Contract_Products__c CP01 = new SVMXC__Service_Contract_Products__c(Id = '"+$ana_1650_cp_ID+"',SVMXC__End_Date__c = Date.valueOf('2017-01-01')); update CP01;";
+var $ana_1650_result_CP2 = $op_act_sForceApiCall.sForceQuery($un, $pwd, $ana_1650_create_CP2 , "create");
+var $ana_1650_get_CP2 = "Select Id from SVMXC__Service_Contract_Products__c where Createdby.Id = '"+$user_meghana+"' Order by CreatedDate DESC Limit 1";
+var $ana_1650_fetch_CP2   = $op_act_sForceApiCall.sForceQuery($un, $pwd, $ana_1650_get_CP2,"query");
+var $ana_1650_cp_ID2;
+
+_wait(5000);	
+	$ana_1650_cp_ID2 = $ana_1650_fetch_CP2[0].Id ;
+
+
+
+
+//$an_act_AttachRate.attachrate_installed_IB("ATTACH RATE 1");
+$an_act_AttachRate.ScheduleNotifications("meghana.rao@servicemax.com");
+_wait(20000);
+var $ana_1650_ib1_id2;
+var $ana_1650_scon1_id2 ;
+var $ana_1650_covered_product2 = "Contract";
+
+
+var $ana_1650_query_RV12 = "Select SVMXC__Installed_Product__c,SVMXC__Service_Contract__c,SVMXC__Covered_By__c from SVMXC__SPM_Contract_Penetration__c where SVMXC__Installed_Product__c = '"+$ana_1650_IB_ID+"'";
+var $ana_1650_resultRV12 = $op_act_sForceApiCall.sForceQuery($un, $pwd, $ana_1650_query_RV12,"query");
+_wait(5000);
+$ana_1650_resultRV12.forEach(function($varRV12) {
+	
+	$ana_1650_ib1_id2= $varRV12.SVMXC__Installed_Product__c;
+	$ana_1650_scon1_id2 = $varRV12.SVMXC__Service_Contract__c;
+	$ana_1650_covered_product2 = $varRV12.SVMXC__Covered_By__c;	
+	
+});
+
+_assertEqual($ana_1650_IB_ID ,$ana_1650_ib1_id2);
+_assertEqual("Not Covered" ,$ana_1650_covered_product2);
+
+$an_ar_1650.end();
+
+
+
+
+

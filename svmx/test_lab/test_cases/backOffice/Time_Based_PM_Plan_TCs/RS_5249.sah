@@ -1,0 +1,50 @@
+//author - Noor Salma Sharieff
+
+var $RS_5249 = _testcase("$RS_5249","Create a PM Plan from Account with coverage location");
+$RS_5249.start();
+_setSpeed($g_stepSpeed);
+
+var $Workbenchurl = "https://workbench.developerforce.com/login.php";
+//Pre - Condition 
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+var $accName = $bo_act_accounts.createAccount();
+var $proName = $bo_act_products.createProduct("pro12", "--None--");
+//var $installedProduct1 = $bo_act_installedProduct.createInstalledProduct($proName,$accName,"");
+//var $installedProduct2 = $bo_act_installedProduct.createInstalledProduct($proName,$accName,"");
+var $location1 = $bo_act_locations.createLocation("", $accName, "MG Road", "India", "560001");
+var $installedProduct1 =$bo_act_locations.addInstalledProductToLocation($proName,$accName,"");
+var $location2 = $bo_act_locations.createLocation("", $accName, "MG Road", "India", "560001");
+var $installedProduct2 =$bo_act_locations.addInstalledProductToLocation($proName,$accName,"");
+
+//Test Steps
+var $PMPTempName = $bo_act_PMPlanTemplate.createTimeBasedPMPlanTemplate($proName, "Location (Visit Only)","","Weeks");
+var $PMPlan = $bo_act_PMPlan.createATimeBasedPMPlanFromAcc($accName, $PMPTempName,"Location (Must Have Location)");
+
+//Validations
+_click($bo_pg_PMPlan.link_firstLinkInPMcoverages);
+var $actuallocation1 = _getText($bo_pg_PMPlan.link_locationname);
+_assertEqual($location1,$actuallocation1);
+
+_click(_link($PMPlan));
+var $startDate = _getText($bo_pg_PMPlan.div_startDate);
+_click($bo_pg_PMPlan.link_firstLinkInPMSchedule);
+var $lastRunDate = _getText($bo_pg_PMPlan.txt_lastRunDate);
+
+$actualScheduledOn = _getText($bo_pg_PMPlan.txt_scheduledOnDate);
+_assertEqual($startDate,$lastRunDate,"Last Run Date is not equal to start date");
+_assert($lastRunDate != $actualScheduledOn,"Issue in Last Run Date and Scheduled On date");
+
+//Clean up function
+
+$bo_act_accounts.deleteAccount($accName);
+$bo_act_products.deleteProduct($proName);
+$bo_act_installedProduct.deleteInstalledProduct($installedProduct1);
+$bo_act_installedProduct.deleteInstalledProduct($installedProduct2);
+$bo_act_locations.deleteLocation($location1);
+$bo_act_locations.deleteLocation($location2);
+$bo_act_PMPlanTemplate.deletePMPlanTemplate($PMPTempName);
+$bo_act_PMPlan.deletePMPlan($PMPlan);
+$RS_5249.end();
+
+
+

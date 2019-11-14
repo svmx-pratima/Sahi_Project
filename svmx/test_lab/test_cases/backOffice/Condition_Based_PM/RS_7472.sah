@@ -1,0 +1,122 @@
+//author - Meghana Rao P
+
+var $RS_7472 = _testcase("$RS_7472"," Verify if the Number condition is met, then the Preferred Start Date must be WO creation date.");
+$RS_7472.start();
+_setSpeed($g_stepSpeed);
+var $Workbenchurl = "https://workbench.developerforce.com/login.php";
+_setSpeed($g_stepSpeed);
+//Pre - Condition 
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+
+//Test Data Creation
+var $accName = $bo_act_accounts.createAccount();
+var $proName = $bo_act_products.createProduct("pro12", "--None--");
+var $IBName = $bo_act_installedProduct.createInstalledProduct($proName,$accName,"");
+var $contactName = $bo_act_contacts.createContact($accName);
+var $slaterm = $bo_act_slaTerms.createSlaTerms("Default");
+var $caseNumber = $bo_act_installedProduct.createSupportCase("New");
+
+
+// Change the SET004 to TRUE
+
+var $Module = "Preventive Maintenance";
+var $SubModule = "PM Actions";
+var $Setting = "SET004";
+var $value = true;
+$bo_act_configurationProfiles.editGlobalProfileForBooleanSettings($Module, $SubModule, $Setting, $value);
+
+var $PMPTemplate = $bo_act_PMPlanTemplate.createUsageBasedCondition_DifferentDate($proName, "Preferred Start Time");
+$bo_act_PMPlanTemplate.updateUsageConditionRulesGridWithAdjFields("Months", "Every", 1, $bo_act_common.currentDate("-"), $bo_act_common.getfutureDate(1,"-"),"Fixed", 1,100, 10,"Days");
+$bo_act_PMPlanTemplate.saveConditionBasedPM();
+
+var $sconName = $bo_act_serviceMaintenanceContracts.createServiceMaintenanceContract($accName, $slaterm,1,0);
+$bo_act_serviceMaintenanceContracts.AddCoveredProductToSCON($sconName, $IBName);
+var $PMPlan = $bo_act_PMPlan.createUsageOrFrequencyBasedPMPlan($sconName,$PMPTemplate,$IBName);
+var $PMProcessId = $bo_act_PMProcess.createPMProcess("Condition Based Preventive Maintenance", 0, $PMPlan,"One Per Product");
+
+//This code supports name spaces and assigns the variable with correct namespace script
+$bo_act_navigation.navigateToSetUpAndSearch("Installed Packages");
+_click(_link("/ServiceMax/"));
+if(_getText(_cell(0,_rightOf(_cell("Namespace Prefix"))))!="SVMXDEV")
+var $script = "SVMXC.PREV_Conditional_Engine_Batch batchable = new SVMXC.PREV_Conditional_Engine_Batch();String processId = '"+$PMProcessId+"';SVMXC__ServiceMax_Processes__c condtionprocess = [select id from SVMXC__ServiceMax_Processes__c where SVMXC__ProcessID__c =: processId limit 1];batchable.setProcessIds = new Set<String>{condtionprocess.Id};Database.executeBatch(batchable, 1);";
+else
+$script = "SVMXDEV.PREV_Conditional_Engine_Batch batchable = new SVMXDEV.PREV_Conditional_Engine_Batch();String processId = '"+$PMProcessId+"';SVMXDEV__ServiceMax_Processes__c condtionprocess = [select id from SVMXDEV__ServiceMax_Processes__c where SVMXDEV__ProcessID__c =: processId limit 1];batchable.setProcessIds = new Set<String>{condtionprocess.Id};Database.executeBatch(batchable, 1);";
+
+
+$bo_act_login.loginToWorkBench($Workbenchurl,$environment, $bac_un, $bac_pwd);
+$bo_act_login.runApexScriptinWB($script);
+
+$bo_act_login.login($g_url, $bac_un, $bac_pwd);
+$bo_act_navigation.navigateToPreventiveMaintenancePlans();
+_click(_link($PMPlan));
+var $WONumber = _getText($bo_pg_PMPlan.link_firstLinkInWorkOrders);
+_log("WO is created : " + $WONumber);
+//to fecth the PReferred Start time from the Work Order
+
+var $workorderpreferredstartdate = "Select "+$orgnamespace+"__Preferred_Start_Time__c, CreatedDate from "+$orgnamespace+"__Service_Order__c where Name = '"+$WONumber+"'";
+var $queryfetch_wo = $op_act_sForceApiCall.sForceQuery($bac_un, $bac_pwd, $workorderpreferredstartdate , "query");
+
+if($orgnamespace == "SVMXC")
+{
+
+	var $workorderpreferredstartdate = $queryfetch_wo[0].SVMXC__Preferred_Start_Time__c;
+	var $createdDate = $queryfetch_wo[0].CreatedDate;
+}
+
+else
+{
+
+var $workorderpreferredstartdate = $queryfetch_wo[0].SVMXDEV__Preferred_Start_Time__c;
+var $createdDate = $queryfetch_wo[0].CreatedDate;
+}
+
+_logOutput($workorderpreferredstartdate);
+_logOutput($createdDate);
+// To convert Work Order date in the given format
+
+var d = new Date($workorderpreferredstartdate),
+month = '' + (d.getMonth() + 1),
+day = '' + (d.getDate()+1),
+year = d.getFullYear();
+
+if (month.length < 2) month = '0' + month;
+if (day.length < 2) day = '0' + day;
+
+var $new_dateworkorder =  [year, month, day].join('-');
+
+// To convert the created date into the given format
+
+var d1 = new Date($createdDate),
+month = '' + (d1.getMonth() + 1),
+day = '' + d1.getDate(),
+year = d1.getFullYear();
+
+if (month.length < 2) month = '0' + month;
+if (day.length < 2) day = '0' + day;
+
+var $new_createddateworkorder =  [year, month, day].join('-');
+_assertEqual($new_createddateworkorder,$new_dateworkorder); // To verify if the dates are same on work order and PM Schedule Expression Display
+
+//Clean up function
+
+
+$bo_act_common.deleteAccount($bac_un, $bac_pwd, $accName);
+$bo_act_common.deleteContact($bac_un, $bac_pwd, $contactName);
+$bo_act_common.deleteIB($bac_un, $bac_pwd, $orgnamespace,$IBName);
+$bo_act_common.deleteProduct($bac_un, $bac_pwd,$proName);
+$bo_act_common.deleteWorkOrder($bac_un, $bac_pwd, $orgnamespace,$WONumber);
+$bo_act_common.deleteSLA($bac_un, $bac_pwd, $orgnamespace, $slaterm);
+$bo_act_common.deleteSCON($bac_un, $bac_pwd, $orgnamespace, $sconName);
+$bo_act_common.deletePMPlantemplate($bac_un, $bac_pwd, $orgnamespace,$PMPTemplate);
+$bo_act_common.deletePMPlan($bac_un, $bac_pwd, $orgnamespace,$PMPlan);
+
+//var $datacreated = [$contactName,$accName,$proName,$IBName,$WONumber,$slaterm,$PMPTemplate,$sconName,$PMPlan];
+//for (var i = 0; i < $datacreated.length; i++) {
+//	$bo_act_common.cleanUpfunction($datacreated[i]);
+//}
+$bo_act_PMProcess.deletePMProcess($PMProcessId);
+
+$RS_7472.end();
+
+
+

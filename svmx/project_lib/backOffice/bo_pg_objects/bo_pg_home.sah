@@ -1,0 +1,55 @@
+
+
+/**
+ * Home page object repository
+ */
+
+var $bo_pg_home = new function bo_pg_home(){
+	this.link_home = _link("Home");
+	//this.link_servicemaxSetup = _link("ServiceMax Setup");
+	//Ashwini
+	//this.link_servicemaxSetup = _link("/ServiceMax Setup/", _in(_div("/ServiceMax Admin.*Setup/")));
+
+	this.link_servicemaxSetup = _link("/ServiceMax Setup/");
+
+	//Ashwini
+	//this.link_servicemaxSetup=_link("/ServiceMax Setup/", _in(_div("/ServiceMax Admin.*Setup/")));
+	this.btn_userName = _span("userNavLabel");
+	this.btn_allTabs =_image("All Tabs");
+	this.link_accounts = _link("/\\Accounts[1]|^Accounts/");
+	this.link_cases = _link("/\\Cases[1]|^Cases/");
+	this.link_priceBooks = _link("Price Books");
+	this.btn_go = _button(" Go! ");
+	this.link_contacts = _link("/\\Contacts[1]|^Contacts/");
+	this.link_products = _link("/\\Products[1]|^Products/");
+	this.link_installedProducts = _link("Installed Products");
+	this.link_serviceMaintenanceContracts = _link("Service/Maintenance Contracts");
+	this.link_locations = _link("Locations");
+	this.link_warrantyTerms = _link("Warranty Terms");
+	this.link_stockTransfer = _link("Stock Transfer");
+	this.link_stockAdjustment =_link("Stock Adjustments");
+	this.link_logOut = _link("Logout");
+	this.link_allTabs = _image("All Tabs");
+	
+	this.link_preventiveMaintenancePlans = _link("Preventive Maintenance Plans");
+	
+	this.link_customWorkOrders = _link("/listRelatedObject Custom/",_near(_image("Work Orders")));
+	this.link_viewSVMXConfiguration = _link("/View ServiceMax Configuration Changes/");
+	
+	this.sel_WBEnvironment = _select(0,_rightOf(_label("Environment:")));
+	this.btn_loginWithSalesForce = _submit("Login with Salesforce");
+	this.label_serviceMaxSFMSearch = _heading2("ServiceMax SFM Search");
+	this.link_featureAdministration = _link("Feature Administration");
+	this.link_technicianEquipment = _link("Technician/Equipment");
+
+//Lightning objects defined below
+	
+	this.lnk_switchToLightningExp =_link("Switch to Lightning Experience");
+	this.btn_App_Launcher = _click(_div("App Launcher"));
+	this.txt_searchApps = _textbox("Search apps or items...");
+	this.lnk_serviceMaxSetup = _click(_mark("ServiceMax Setup"));
+
+};
+
+
+
