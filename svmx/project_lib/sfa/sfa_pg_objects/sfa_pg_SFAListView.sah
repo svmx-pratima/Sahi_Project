@@ -26,8 +26,12 @@ var $sfa_pg_SFAListView=new function sfa_pg_SFAListView(){
 	this.buttonNext=_button("Next");
 	this.radio1=_span("slds-radio--faux")
 	this.radio2=_span("slds-radio--faux[1]")
+	this.radio3=_span("slds-radio--faux[2]")
+
 	//this.textbox_Saleforce_Dropdown=_textbox("objSFDCEventJson__SFDC_Data_Event_Type");
 	this.textbox_SalesforceRecipient_Dropdown=_textbox("objSFDCActionJson__Recipient_Field_API_Names");
+	this.btn_radiusDropdown_Recipients=_textbox("Recipients");
+
 	this.textbox_SalesforceProcessId_Dropdown=_textbox("strSFMProcessId");
 	this.messageTitle=_textbox("objSFDCActionJson__Message_Title");
 	this.textbox_Expression_Filter_Dropdown=_textbox("strExpressionId");
@@ -74,7 +78,6 @@ var $sfa_pg_SFAListView=new function sfa_pg_SFAListView(){
 	this.link_createSourceToTarget=_link("To create Source to Target records");
 	this.link_createMapChildLine=_link("To create and map child lines only");
 	this.link_createManageChildLine=_span("To create and manage child lines");
-	this.link_cr
 	
 	//Where Used window Items
 	this.btn_heading_whereUsedDivHeading=_heading2("/Where Used:.*/");
@@ -239,6 +242,26 @@ else if($DOMObject == "objSFDCEventJson__Event_Trigger_Fields")
 
 				_click($links[$counter]);
 			}	
+			else if($DOMObject=="Recipients")
+			{		
+			 _click(_textbox("Recipients"));
+				 _wait(1000);
+				 $links = _collect("_link","/.*/",_in(_list("Menu__list slds-dropdown__list")));
+				 $linkslen=$links.length;
+				 _log("TOTAL LINKS IN DROPDOWN ARE"+$linkslen);				 
+				 
+				 if($counter >= $linkslen)
+				 {
+					 $counter = $linkslen-1;
+				  }
+		
+			 //To select pick list item based on the random index generated
+				_log("Index is"+$counter);
+				_log($links[$counter]);
+
+				_click($links[$counter]);
+			}	
+			
 			else if($DOMObject == "objSFDCEventJson__SFDC_Data_Event_Type")
 			{		
 			 _click(_textbox("objSFDCEventJson__SFDC_Data_Event_Type"));
