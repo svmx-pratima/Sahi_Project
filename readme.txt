@@ -12,3 +12,9 @@ NOTE: Download/clone in the sahipro source scripts under /auto/sahi_pro/userdata
 
 
 
+Mac : 
+Launch Terminal
+Navigate to "cd /auto/sahi_pro/userdata/bin"
+Type "./start_dashboard.sh"
+
+In Sahi_Dashbaord->Go to the svmx/test_lab/test_cases/service-flow-admin/SFA_CreateAutomation.sah and run the file or any .sah extesnion file.
