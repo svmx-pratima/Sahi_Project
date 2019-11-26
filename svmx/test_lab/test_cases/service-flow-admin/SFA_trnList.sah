@@ -64,6 +64,8 @@ $SFA_trnList.start();
 		_click($sfa_pg_SFAListView.btn_heading_autName);
 		_wait(5000,_isVisible($sfa_pg_SFAListView.btn_actionMenu));
 		var $sortStatus=$sfa_pg_SFAListView.colSort($colName, $order);
+        _log("Did it sort or NO"+$sortStatus);
+
 		_assertTrue($sortStatus, "Links on "+$colName+" column are sorted in order");
 		
 		//descending
@@ -71,8 +73,8 @@ $SFA_trnList.start();
 		_click($sfa_pg_SFAListView.btn_heading_autName);
 		_wait(5000,_isVisible($sfa_pg_SFAListView.btn_actionMenu));
 		var $sortStatus=$sfa_pg_SFAListView.colSort($colName, $order);
+		_log("Did it sort or NO"+$sortStatus);
 		_assertTrue($sortStatus, "Links on "+$colName+" column are sorted in order");
-	
 		
 		//$sfmrdz_act_common.launchHomeWindow($homecurrentHomePageULR);
 	//	_wait(10000,_isVisible($bo_pg_home.link_home));
