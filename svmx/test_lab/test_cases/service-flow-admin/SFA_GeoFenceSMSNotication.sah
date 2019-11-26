@@ -78,7 +78,7 @@ _click(_link("Additional Number[1]"));
 _click(_div("+1"));
 _click(_textarea("objSMSActionJson.Message_Body"));
 _setValue(_textarea("objSMSActionJson.Message_Body"), "test");
-_button("Finish")
+_click(_button("Finish"));
 
 //$sfa_pg_SFAListView.selectRandomPicklistitem($sfa_pg_SFAListView.btn_radiusDropdown_Recipients);
 

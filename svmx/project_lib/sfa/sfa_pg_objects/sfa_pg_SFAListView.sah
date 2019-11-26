@@ -186,7 +186,7 @@ else if($DOMObject == "objSFDCEventJson__Event_Trigger_Fields")
 			{		
 			 _click(_textbox("strSFMProcessId"));
 				 _wait(1000);
-				 $links = _collect("_link","/.*/",_in(_list("Menu__list slds-dropdown__list[2]")));
+				 $links = _collect("_link","/.*/",_in(_list("Menu__list slds-dropdown__list[1]")));
 				 $linkslen=$links.length;
 				 _log("TOTAL LINKS IN DROPDOWN ARE"+$linkslen);				 
 				 
@@ -401,8 +401,8 @@ else if($DOMObject == "objSFDCEventJson__Event_Trigger_Fields")
 				_click($links[$counter]);
 			}	
 	  };
-	  
-	 /**
+	
+		 /**
 		 * Function to sort list view Items
 		 * Modified by - Ajay Kumar 5-Mar-2019
 		 * $colName - Column name to sort Ex:"TRANSACTION NAME","DATA VALIDATION RULES NAME"
@@ -455,21 +455,27 @@ else if($DOMObject == "objSFDCEventJson__Event_Trigger_Fields")
 		var $retVal=false;
 		for(var $i=0;$i<$linkListSorted.length;$i++){	
 		//	_log("Sorted Links len"+$linkListSorted.length);
+	
 			if($orgList[$i]==$linkListSorted[$i]){;
 				$retVal=true;
-				//_log("Status of list values"+$retVal);
+				_log("Status of list values"+$retVal);
 			}else{
-				_log("Actual object is: "+$orgList[$i]);
-				_log("Expected object is: "+$linkListSorted[$i]);
+				//_log("Actual object is: "+$orgList[$i]);
+			//	_log("Expected object is: "+$linkListSorted[$i]);
 				$retVal=false;
 				break;
 			}	
-		}
+
 		//_assertTrue($retVal, "Links on "+$colName+" column are not sorted in order");
 		return $retVal;
+		_log($retVal)
 	};
 
 	  };
+};
+	  
+	  
+		
 	  
 	  
 		
