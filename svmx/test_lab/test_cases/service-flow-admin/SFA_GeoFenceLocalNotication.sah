@@ -6,6 +6,8 @@
  * 
  				1)  Should be able to Create a Automation of type Record Create.
  * Expt Res	:
+            Automation List View should launch successfully�by verifying:
+				a) Create new SFA of type Event service type as Geofence and action notification as Local Notification.
  */
 
 var $SFA_GeoFenceLocalNotication= _testcase("SFA_GeoFenceLocalNotication.sah","Create a Automation");
@@ -29,63 +31,6 @@ _setSpeed($g_stepSpeed);
 //	 */
 //	
 	$bo_act_login.login($url, $un, $pwd);
-_click(_link("ServiceMax Setup"));
-_click(_div("Mobile"));
-_click(_div("Service Flow Automation"));
-
-//Assertions on automation list view
-//	_wait(1000);
-//	_assertExists($sfa_pg_SFAListView.btn_NewTrn);
-//	_wait(1000);
-
-    _click($sfa_pg_SFAListView.btn_NewTrn);
-    _wait(1000);
-
-  	//_assertExists($sfa_pg_SFAListView.btn_processNav);
-
-	$sfa_pg_SFAListView.selectRandomPicklistitem("strSVMXGroupProfileId");
-	
-	
-
-//_click($sfa_pg_SFAListView.titleAuNAME);
-
-var $autName =$sfa_pg_SFAListView.randomNumber();
-var $map = $sfa_pg_SFAListView.titlenameAut;
-var $titleName =$map.concat("Automation_");
-var $titleName =$titleName.concat($autName);
-_setValue(_textbox("strSFAProcessName"),$titleName);
-_setValue(_textarea("strDescription"),$titleName);
-_click(_span("slds-checkbox--faux"));
-_click($sfa_pg_SFAListView.buttonNext);
-_click($sfa_pg_SFAListView.radio2);
-$sfa_pg_SFAListView.selectRandomPicklistitem("objGeofenceEventJson__Trigger_Type");
-_click($sfa_pg_SFAListView.buttonNext);
-$sfa_pg_SFAListView.selectRandomPicklistitem("objGeofenceEventJson__Sort_Records_By");
-//$sfa_pg_SFAListView.selectRandomPicklistitem("objGeofenceEventJson__Location_Field");
-_click(_link("Site"));
-$sfa_pg_SFAListView.selectRandomPicklistitem("objGeofenceEventJson__Fence_Radius");
-_click($sfa_pg_SFAListView.buttonNext);
-_wait(500);
-_click($sfa_pg_SFAListView.buttonNext);
-_setValue(_textbox("objGeofenceActionJson__Message_Title"),$titleName);
-_setValue(_textarea("objGeofenceActionJson__Message_Body"),$titleName);
-$sfa_pg_SFAListView.selectRandomPicklistitem("strSFMProcessId");
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+	var $sfaProcessName = $bo_act_serviceFlowAutomation.createServiceFlowAutomationProcess_GeolocationEvent();
+	_log($sfaProcessName);
 
