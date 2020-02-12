@@ -3,21 +3,21 @@
 
 // PLEASE DO NOT Use separate names for DEV and Base UN and PWD , instead just change the base/dev credentials in $bac_un & $bac_pwd, while committing to jenkins, also follow the same procedures.
 
-var $g_url = "https://test.salesforce.com"; 
+var $g_url = "https://login.salesforce.com"; 
 /*
-var $bac_un = "bhupen.win18tospr18@bacofc.com"; //pointing to Base
-var $bac_pwd = "automation@backoffice.com2";  
+//var $bac_un = "bhupen.win18tospr18@bacofc.com"; //pointing to Base
+//var $bac_pwd = "automation@backoffice.com2";  
 
 var $bac_client_id = "3MVG9qbIpUScOGtZoxWRZ21R8iqmYG3wPibQ4j4E5jRngfjd2MYcwiCfX8_2YmEFtXfRH5SOdHfjAw2SScl8I";
 var $bac_client_secret = "1504290649766161433";
 var $bac_orginstance = "cs94";	
 
-var $nameSpace_Org = "SVMXC";
+//var $nameSpace_Org = "SVMXC";
 var $workinghours_global = "01mi0000000ISUq";
 var $defaultBHours_Org = "01m1I0000001OIV";
 
-//var $bac_un = "svmxdev@automation.sandbox"; //pointing to Dev
-//var $bac_pwd = "salesforce@987"; 
+var $bac_un = "pratima.svmx@servicemax.com"; //pointing to Dev
+var $bac_pwd = "Testing123"; 
 
 //var $bac_client_id = "3MVG90D5vR7Utjbq11Xruz7O6hQKxZR7XqU4qBTufscW715MqtB7Ej_dLuODdcNvcmAw.Hqlf4_VuxRs48LXA";
 //var $bac_client_secret = "65B712362A3A7FC16E05F8ED21E0A54BC5CFBEB25E239DA1820443210369562E";
@@ -65,7 +65,7 @@ var $nameSpace_Org = "SVMXC";
 
 
 var $environment = "Sandbox"; // Production
-var $groupProfileName = "AutoBACGroup";
+var $groupProfileName = "Cloned11";
 
 //Copied from global file
 var $bac_g_url  = "https://test.salesforce.com/";

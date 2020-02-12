@@ -29,63 +29,37 @@ _setSpeed($g_stepSpeed);
 //	 */
 //	
 	$bo_act_login.login($url, $un, $pwd);
-_click(_link("ServiceMax Setup"));
-_click(_div("Mobile"));
-_click(_div("Service Flow Automation"));
 
-//Assertions on automation list view
-//	_wait(1000);
-	_assertExists($sfa_pg_SFAListView.btn_NewTrn);
-//	_wait(1000);
 
-    _click($sfa_pg_SFAListView.btn_NewTrn);
-  	_assertExists($sfa_pg_SFAListView.btn_processNav);
 
-	$sfa_pg_SFAListView.selectRandomPicklistitem("strSVMXGroupProfileId");
-	
-	
+var $sfaProcessName = $bo_act_serviceFlowAutomation.createServiceFlowAutomationProcess_SalesforceEvent();
+_log($sfaProcessName);
+/**
+ *Verify the SFA Process is created 
+*/
+var $actMsg = _getText(_heading2("slds-text-heading--small"));
+var $expMsg = "Automation created successfully";
 
-//_click($sfa_pg_SFAListView.titleAuNAME);
+_assertEqual($expMsg,$actMsg,"Actual and expected SFA Success message are not same");
+_wait(30000, _isVisible($bo_pg_serviceFlowAutomation.btn_newAutomation));
+_assertExists(_link($sfaProcessName));
+$bo_act_serviceFlowAutomation.editSFAProcess($sfaProcessName);
 
-var $autName =$sfa_pg_SFAListView.randomNumber();
-var $map = $sfa_pg_SFAListView.titlenameAut;
-var $titleName =$map.concat("Automation_");
-var $titleName =$titleName.concat($autName);
-_wait(1000);
-_setValue(_textbox("strSFAProcessName"),$titleName);
-_setValue(_textarea("strDescription"),$titleName);
-_click(_span("slds-checkbox--faux"));
-_click($sfa_pg_SFAListView.buttonNext);
-_click($sfa_pg_SFAListView.radio1);
-$sfa_pg_SFAListView.selectRandomPicklistitem("objSFDCEventJson__SFDC_Data_Event_Type");
-_click($sfa_pg_SFAListView.buttonNext);
-$sfa_pg_SFAListView.selectRandomPicklistitem("objSFDCEventJson__Object_API_Name");
-$sfa_pg_SFAListView.selectRandomPicklistitem("strExpressionId");
 
-if(_assertExists(_textbox("objSFDCEventJson__Event_Trigger_Fields")))
-{
-	$sfa_pg_SFAListView.selectRandomPicklistitem("objSFDCEventJson__Event_Trigger_Fields");
-}
-_click($sfa_pg_SFAListView.buttonNext);
-_wait(500);
-//_assertTrue(_span("slds-radio--faux[1]").disabled);
-//_assertTrue(_span("slds-radio--faux[2]").disabled);
-_wait(500);
-_click($sfa_pg_SFAListView.buttonNext);
-_wait(500);
-_setValue(_textbox("objSFDCActionJson__Message_Title"),$titleName);
-_setValue(_textarea("objSFDCActionJson__Message_Body"),$titleName);
-$sfa_pg_SFAListView.selectRandomPicklistitem("objSFDCActionJson__Recipient_Field_API_Names");
-//_click(_textbox("objSFDCActionJson__Recipient_Field_API_Names"));
-//_call(window.scrollTo(0,800)); // Scroll down.
-$sfa_pg_SFAListView.selectRandomPicklistitem("strSFMProcessId");
-_wait(500);
-_click(_button("Finish"));
-_assertExists(_div("Alert Toast__alert-toast slds-notify slds-notify--toast slds-theme--success slds-theme--alert-texture"));
+// Delete the created SFA process
+$bo_act_serviceFlowAutomation.deleteSFAProcess($sfaProcessName);
+
+/**
+ Verify the SFA Process is deleted 
+*/
+var $actdltMsg = _getText(_heading2("slds-text-heading--small"));
+var $expdltMsg = "Automation deleted successfully.";
+//_assertEqual($expdltMsg,$actdltMsg,"Actual and expected SFA Success message same");
 
 
 
 
+$bo_act_login.logOut();
 
 
 
