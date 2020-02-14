@@ -6,104 +6,88 @@ var $bo_act_serviceFlowAutomation = new function bo_act_serviceFlowAutomation() 
 	 * Create a New service Flow Automation Rule WO
 	 */
 	
-	this.createServiceFlowAutomationProcess_SalesforceEvent = function() {
-		 var $autName =$sfa_pg_SFAListView.randomNumber();
-var $map = $sfa_pg_SFAListView.titlenameAut;
-var $titleName =$map.concat("Automation_");
-var $titleName =$titleName.concat($autName);
+	this.createServiceFlowAutomationProcess_SalesforceEvent = function($eventType, $object) {
+		var $autName =$sfa_pg_SFAListView.randomNumber();
+		var $map = $sfa_pg_SFAListView.titlenameAut;
+		var $titleName =$map.concat("Automation_");
+		var $titleName =$titleName.concat($autName);
 		var $sfaProcessName = $bo_act_common.generateRandomName("SFAPro_");
 		$bo_act_navigation.navigateToServiceFlowAutomation();
 		_wait(30000, _isVisible($bo_pg_serviceFlowAutomation.btn_newAutomation));
 		_click($bo_pg_serviceFlowAutomation.btn_newAutomation);
-
 	    $sfa_pg_SFAListView.selectRandomPicklistitem("strSVMXGroupProfileId");
-
 		_setValue($bo_pg_serviceFlowAutomation.txt_automationName, $sfaProcessName);
 		_setValue($bo_pg_serviceFlowAutomation.txt_automationDescription, $sfaProcessName);
 		_click($bo_pg_serviceFlowAutomation.btn_enableAutomation);
 		_click($bo_pg_serviceFlowAutomation.btn_nextTabOnAutomation);
 		_click($sfa_pg_SFAListView.radio1);
-
-		$sfa_pg_SFAListView.selectRandomPicklistitem("objSFDCEventJson__SFDC_Data_Event_Type");
+		_click(_span($eventType),$eventType);
+		//$sfa_pg_SFAListView.selectRandomPicklistitem("objSFDCEventJson__SFDC_Data_Event_Type");
 		_click($bo_pg_serviceFlowAutomation.btn_nextTabOnAutomation);
+		_click(_span($object),$object);
+		$sfa_pg_SFAListView.selectRandomPicklistitem("strExpressionId");
 
-
-$sfa_pg_SFAListView.selectRandomPicklistitem("objSFDCEventJson__Object_API_Name");
-
-$sfa_pg_SFAListView.selectRandomPicklistitem("strExpressionId");
-
-if(_assertExists(_textbox("objSFDCEventJson__Event_Trigger_Fields")))
-{
-	$sfa_pg_SFAListView.selectRandomPicklistitem("objSFDCEventJson__Event_Trigger_Fields");
-}
+		if($eventType=="Record Field Updated")
+		{
+			$sfa_pg_SFAListView.selectRandomPicklistitem("objSFDCEventJson__Event_Trigger_Fields");
+		}
 
 		_click($bo_pg_serviceFlowAutomation.btn_nextTabOnAutomation);
 		_click($bo_pg_serviceFlowAutomation.btn_nextTabOnAutomation); // Click Next on Action Service Tab
 		_setValue(_textbox("objSFDCActionJson__Message_Title"),$titleName);
-_setValue(_textarea("objSFDCActionJson__Message_Body"),$titleName);
-$sfa_pg_SFAListView.selectRandomPicklistitem("objSFDCActionJson__Recipient_Field_API_Names");
-//_click(_textbox("objSFDCActionJson__Recipient_Field_API_Names"));
-//_call(window.scrollTo(0,800)); // Scroll down.
-$sfa_pg_SFAListView.selectRandomPicklistitem("Input Picklist__input slds-input slds-combobox__input[2]");
-_wait(500);
-_click(_span("slds-checkbox--faux"));
-_click(_span("+ Add another button"));
-//_click(_button("Finish"));
-//_assertExists(_div("Alert Toast__alert-toast slds-notify slds-notify--toast slds-theme--success slds-theme--alert-texture"));
-_setValue(_textbox("* Button Name"),"Button ");
-$sfa_pg_SFAListView.selectRandomPicklistitem("Input Picklist__input slds-input slds-combobox__input[3]");
-_click(_span("+ Add another button"));
-_setValue(_textbox("* Button Name[1]"),"Button 1");
-$sfa_pg_SFAListView.selectRandomPicklistitem("Input Picklist__input slds-input slds-combobox__input[4]");
-_setValue(_textbox("* Button Name[2]"),"Button 2234567890987765655");
-$sfa_pg_SFAListView.selectRandomPicklistitem("Input Picklist__input slds-input slds-combobox__input[5]");
-_click(_span("+ Add another button")).disabled();
-_click(_button("Button slds-button Button--type-icon-bare slds-button--icon-bare slds-button_icon-bare slds-button--icon-x-small[2]"));
-_click(_span("+ Add another button"));
-_setValue(_textbox("* Button Name[2]"),"Button 2234567890987765655");
-$sfa_pg_SFAListView.selectRandomPicklistitem("Input Picklist__input slds-input slds-combobox__input[5]");
-
-_wait(500);
-		//_assertVisible(_heading2("ModalHeader__title slds-text-heading--medium"));
-		//_click(_link($inserField));
-		//_click(_span($sfmName),$sfmName);
+		_setValue(_textarea("objSFDCActionJson__Message_Body"),$titleName);
+		$sfa_pg_SFAListView.selectRandomPicklistitem("objSFDCActionJson__Recipient_Field_API_Names");
+		$sfa_pg_SFAListView.selectRandomPicklistitem("Input Picklist__input slds-input slds-combobox__input[2]");
+		_wait(500);
+		_click(_span("slds-checkbox--faux"));
+		_click(_span("+ Add another button"));
+		//_assertExists(_div("Alert Toast__alert-toast slds-notify slds-notify--toast slds-theme--success slds-theme--alert-texture"));
+		_setValue(_textbox("* Button Name"),"Button ");
+		$sfa_pg_SFAListView.selectRandomPicklistitem("Input Picklist__input slds-input slds-combobox__input[3]");
+		_click(_span("+ Add another button"));
+		_setValue(_textbox("* Button Name[1]"),"Button 1");
+		$sfa_pg_SFAListView.selectRandomPicklistitem("Input Picklist__input slds-input slds-combobox__input[4]");
+		_setValue(_textbox("* Button Name[2]"),"Button 2234567890987765655");
+		$sfa_pg_SFAListView.selectRandomPicklistitem("Input Picklist__input slds-input slds-combobox__input[5]");
+		_click(_span("+ Add another button")).disabled();
+		_click(_button("Button slds-button Button--type-icon-bare slds-button--icon-bare slds-button_icon-bare slds-button--icon-x-small[2]"));
+		_click(_span("+ Add another button"));
+		_setValue(_textbox("* Button Name[2]"),"Button 2234567890987765655");
+		$sfa_pg_SFAListView.selectRandomPicklistitem("Input Picklist__input slds-input slds-combobox__input[5]");
+		_wait(500);
 		_click($bo_pg_serviceFlowAutomation.btn_finishOnAutomation);
 		
 		return $sfaProcessName;	
 	};
-	this.createServiceFlowAutomationProcess_GeolocationEvent = function() {
-		 var $autName =$sfa_pg_SFAListView.randomNumber();
-var $map = $sfa_pg_SFAListView.titlenameAut;
-var $titleName =$map.concat("Automation_");
-var $titleName =$titleName.concat($autName);
+	this.createServiceFlowAutomationProcess_GeolocationEvent = function($eventType1) {
+	 	var $autName =$sfa_pg_SFAListView.randomNumber();
+		var $map = $sfa_pg_SFAListView.titlenameAut;
+		var $titleName =$map.concat("Automation_");
+		var $titleName =$titleName.concat($autName);
 		var $sfaProcessName = $bo_act_common.generateRandomName("SFAPro_");
 		$bo_act_navigation.navigateToServiceFlowAutomation();
 		_wait(30000, _isVisible($bo_pg_serviceFlowAutomation.btn_newAutomation));
 		_click($bo_pg_serviceFlowAutomation.btn_newAutomation);
-
-	$sfa_pg_SFAListView.selectRandomPicklistitem("strSVMXGroupProfileId");
-
+		$sfa_pg_SFAListView.selectRandomPicklistitem("strSVMXGroupProfileId");
 		_setValue($bo_pg_serviceFlowAutomation.txt_automationName, $sfaProcessName);
 		_setValue($bo_pg_serviceFlowAutomation.txt_automationDescription, $sfaProcessName);
 		_click($bo_pg_serviceFlowAutomation.btn_enableAutomation);
 		_click($bo_pg_serviceFlowAutomation.btn_nextTabOnAutomation);
 		_click($bo_pg_serviceFlowAutomation.rdbtn_selectGeolocationEventForAutomation);
-$sfa_pg_SFAListView.selectRandomPicklistitem("objGeofenceEventJson__Trigger_Type");
+		_click(_span($eventType1),$eventType1);
 		_click($bo_pg_serviceFlowAutomation.btn_nextTabOnAutomation);
-
 		_click($sfa_pg_SFAListView.buttonNext);
-$sfa_pg_SFAListView.selectRandomPicklistitem("objGeofenceEventJson__Sort_Records_By");
-//$sfa_pg_SFAListView.selectRandomPicklistitem("objGeofenceEventJson__Location_Field");
-_click(_link("Site"));
-$sfa_pg_SFAListView.selectRandomPicklistitem("objGeofenceEventJson__Fence_Radius");
-_click($sfa_pg_SFAListView.buttonNext);
-_wait(500);
-_click($sfa_pg_SFAListView.buttonNext);
-_setValue(_textbox("objGeofenceActionJson__Message_Title"),$titleName);
-_setValue(_textarea("objGeofenceActionJson__Message_Body"),$titleName);
-$sfa_pg_SFAListView.selectRandomPicklistitem("strSFMProcessId");
-_click($bo_pg_serviceFlowAutomation.btn_finishOnAutomation);
-		
+		$sfa_pg_SFAListView.selectRandomPicklistitem("objGeofenceEventJson__Sort_Records_By");
+		//$sfa_pg_SFAListView.selectRandomPicklistitem("objGeofenceEventJson__Location_Field");
+		_click(_link("Site"));
+		$sfa_pg_SFAListView.selectRandomPicklistitem("objGeofenceEventJson__Fence_Radius");
+		_click($sfa_pg_SFAListView.buttonNext);
+		_wait(500);
+		_click($sfa_pg_SFAListView.buttonNext);
+		_setValue(_textbox("objGeofenceActionJson__Message_Title"),$titleName);
+		_setValue(_textarea("objGeofenceActionJson__Message_Body"),$titleName);
+		$sfa_pg_SFAListView.selectRandomPicklistitem("strSFMProcessId");
+		_click($bo_pg_serviceFlowAutomation.btn_finishOnAutomation);
 		return $sfaProcessName;	
 	};
 		
@@ -122,5 +106,3 @@ _click($bo_pg_serviceFlowAutomation.btn_finishOnAutomation);
 	};
 	
 };
-
-

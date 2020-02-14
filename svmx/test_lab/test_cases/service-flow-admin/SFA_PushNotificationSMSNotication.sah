@@ -1,0 +1,114 @@
+/**
+ * Author	: Pratima
+ * Reviewer	: 
+ * Pre-req	: Nothing
+ * Testcase	: Creates a New Automation with all required fields.
+ * 
+ 				1)  Should be able to Create a Automation of any type .
+ * Expt Res	:
+            Automation List View should launch successfully�by verifying:
+				a) Create new SFA of type Event service type as Local Notification and action notification as SMS Notification.
+ */
+
+var $SFA_PushNotificationSMSNotication= _testcase("SFA_PushNotificationSMSNotication.sah","Create a Automation");
+$SFA_PushNotificationSMSNotication.start();
+_setSpeed($g_stepSpeed);
+
+/**
+ * Login to the Sandbox Org and launching Automation list view**/
+
+	/**
+	 * Global Variable declaration
+	 */
+//
+	var $url="https://svmxdev-dev-ed.lightning.force.com";
+	var $un="pratima.svmxdev@servicemax.com";
+	var $pwd="Testing123";
+	var $viewName="automations";
+//	
+//	/**
+//	 * Login to the Sandbox Org and launching AUTOMATION list view
+//	 */
+//	
+	$bo_act_login.login($url, $un, $pwd);
+_click(_link("ServiceMax Setup"));
+_click(_div("Mobile"));
+_click(_div("Service Flow Automation"));
+
+//Assertions on automation list view
+//	_wait(1000);
+//	_assertExists($sfa_pg_SFAListView.btn_NewTrn);
+//	_wait(1000);
+
+    _click($sfa_pg_SFAListView.btn_NewTrn);
+    _wait(1000);
+
+  	//_assertExists($sfa_pg_SFAListView.btn_processNav);
+
+	$sfa_pg_SFAListView.selectRandomPicklistitem("strSVMXGroupProfileId");
+	
+	
+
+//_click($sfa_pg_SFAListView.titleAuNAME);
+
+	var $autName =$sfa_pg_SFAListView.randomNumber();
+	var $map = $sfa_pg_SFAListView.titlenameAut;
+	var $titleName =$map.concat("Automation_");
+	var $titleName =$titleName.concat($autName);
+	var $sfaProcessName = $bo_act_common.generateRandomName("SFAPro_");
+		$bo_act_navigation.navigateToServiceFlowAutomation();
+		_wait(30000, _isVisible($bo_pg_serviceFlowAutomation.btn_newAutomation));
+		_click($bo_pg_serviceFlowAutomation.btn_newAutomation);
+
+	    $sfa_pg_SFAListView.selectRandomPicklistitem("strSVMXGroupProfileId");
+
+		_setValue($bo_pg_serviceFlowAutomation.txt_automationName, $sfaProcessName);
+		_setValue($bo_pg_serviceFlowAutomation.txt_automationDescription, $sfaProcessName);
+		_click($bo_pg_serviceFlowAutomation.btn_enableAutomation);
+		_click($bo_pg_serviceFlowAutomation.btn_nextTabOnAutomation);
+		_click($sfa_pg_SFAListView.radio1);
+
+		$sfa_pg_SFAListView.selectRandomPicklistitem("objSFDCEventJson__SFDC_Data_Event_Type");
+		_click($bo_pg_serviceFlowAutomation.btn_nextTabOnAutomation);
+
+
+		$sfa_pg_SFAListView.selectRandomPicklistitem("objSFDCEventJson__Object_API_Name");
+
+		$sfa_pg_SFAListView.selectRandomPicklistitem("strExpressionId");
+
+		if(_assertExists(_textbox("objSFDCEventJson__Event_Trigger_Fields")))
+		{
+			$sfa_pg_SFAListView.selectRandomPicklistitem("objSFDCEventJson__Event_Trigger_Fields");
+		}
+		_click($sfa_pg_SFAListView.buttonNext);
+		_wait(500);
+		_click(_span("slds-radio--faux[2]"));
+		_click($sfa_pg_SFAListView.buttonNext);
+		_click(_div("(Enter a custom number)"));
+		_click(_span("United States of America (the)"));
+		_setValue(_telephonebox("* Phone"), "4083685235");
+		_click(_span("+ Add another recipient"));
+		_click(_link("AccountAccount[1]"));
+		_click(_span("Billing Country"));
+		_click(_span("Account Phone"));
+		_click(_div("expando-unique-id"));
+		//_click(_link("Contact[1]"));
+		//_click(_span("Menu__item-content slds-truncate[11]"));
+		//_click(_link("Mobile Phone"));
+		_click(_textarea("objSMSActionJson.Message_Body"));
+		_setValue(_textarea("objSMSActionJson.Message_Body"), "test");
+		_click(_button("Finish"));
+
+
+
+
+
+
+
+
+
+
+
+
+
+

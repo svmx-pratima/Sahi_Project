@@ -1,72 +1,69 @@
-/**
- * Author	: Pratima
- * Reviewer	: 
- * Pre-req	: Nothing
- * Testcase	: Creates a New Automation with all required fields.
- * 
- 				1)  Should be able to Create a Automation of type Record Create.
- * Expt Res	:
- */
+	/**
+	* Author	: Pratima
+	* Reviewer	: 
+	* Pre-req	: Nothing
+	* Testcase	: Creates a New Automation with all required fields.
+	* 
+					1)  Should be able to Create a Automation of type Record Created, Record Updated,Record Created or Updated, record Field Updated.
+	* Expt Res	:
+	*/
 
-var $SFA_CreateAutomation= _testcase("SFA_CreateAutomation.sah","Create a Automation");
-$SFA_CreateAutomation.start();
-_setSpeed($g_stepSpeed);
-
-/**
- * Login to the Sandbox Org and launching Automation list view**/
+	var $SFA_CreateAutomation= _testcase("SFA_CreateAutomation.sah","Create a Automation");
+	$SFA_CreateAutomation.start();
+	_setSpeed($g_stepSpeed);
 
 	/**
-	 * Global Variable declaration
-	 */
-//
-	var $url="https://svmxdev-dev-ed.lightning.force.com";
-	var $un="pratima.svmxdev@servicemax.com";
-	var $pwd="Testing123";
-	var $viewName="automations";
-//	
-//	/**
-//	 * Login to the Sandbox Org and launching AUTOMATION list view
-//	 */
-//	
-	$bo_act_login.login($url, $un, $pwd);
+	* Login to the Sandbox Org and launching Automation list view**/
+
+		/**
+		* Global Variable declaration
+		*/
+	//
+		var $url="https://svmxdev-dev-ed.lightning.force.com";
+		var $un="pratima.svmxdev@servicemax.com";
+		var $pwd="Testing123";
+		var $viewName="automations";
+		var $eventType = "Record Field Updated";
+		var $object = "Work Order";
+	//	/**
+	//	 * Login to the Sandbox Org and launching AUTOMATION list view
+	//	 */
+		$bo_act_login.login($url, $un, $pwd);
+
+			var $sfaProcessName = $bo_act_serviceFlowAutomation.createServiceFlowAutomationProcess_SalesforceEvent($eventType,$object);
+			_log($sfaProcessName);
+	/**
+	*Verify the SFA Process is created 
+	*/
+			var $actMsg = _getText(_heading2("slds-text-heading--small"));
+			var $expMsg = "Automation created successfully";
 
 
 
-var $sfaProcessName = $bo_act_serviceFlowAutomation.createServiceFlowAutomationProcess_SalesforceEvent();
-_log($sfaProcessName);
-/**
- *Verify the SFA Process is created 
-*/
-var $actMsg = _getText(_heading2("slds-text-heading--small"));
-var $expMsg = "Automation created successfully";
+			_assertEqual($expMsg,$actMsg,"Actual and expected SFA Success message are not same");
+			_wait(30000, _isVisible($bo_pg_serviceFlowAutomation.btn_newAutomation));
+			_assertExists(_link($sfaProcessName));
+			$bo_act_serviceFlowAutomation.editSFAProcess($sfaProcessName);
+	// Delete the created SFA process
+			$bo_act_serviceFlowAutomation.deleteSFAProcess($sfaProcessName);
 
-_assertEqual($expMsg,$actMsg,"Actual and expected SFA Success message are not same");
-_wait(30000, _isVisible($bo_pg_serviceFlowAutomation.btn_newAutomation));
-_assertExists(_link($sfaProcessName));
-$bo_act_serviceFlowAutomation.editSFAProcess($sfaProcessName);
+	/**
+	Verify the SFA Process is deleted 
+	*/
+			var $actdltMsg = _getText(_heading2("slds-text-heading--small"));
+			var $expdltMsg = "Automation deleted successfully.";
+			_assertEqual($expdltMsg,$actdltMsg,"Actual and expected SFA Success message same");
 
-
-// Delete the created SFA process
-$bo_act_serviceFlowAutomation.deleteSFAProcess($sfaProcessName);
-
-/**
- Verify the SFA Process is deleted 
-*/
-var $actdltMsg = _getText(_heading2("slds-text-heading--small"));
-var $expdltMsg = "Automation deleted successfully.";
-//_assertEqual($expdltMsg,$actdltMsg,"Actual and expected SFA Success message same");
-
-
-
-
-$bo_act_login.logOut();
-
-
-
-
-
-
-
-
-
-
+			var $sfaProcessName = $bo_act_serviceFlowAutomation.createServiceFlowAutomationProcess_SalesforceEvent("Record Created","Work Order");
+			var $sfaProcessName = $bo_act_serviceFlowAutomation.createServiceFlowAutomationProcess_SalesforceEvent("Record Created Or Updated","Work Order");
+			var $sfaProcessName = $bo_act_serviceFlowAutomation.createServiceFlowAutomationProcess_SalesforceEvent("Record Updated","Event");
+			var $sfaProcessName = $bo_act_serviceFlowAutomation.createServiceFlowAutomationProcess_SalesforceEvent("Record Created","Event");
+			var $sfaProcessName = $bo_act_serviceFlowAutomation.createServiceFlowAutomationProcess_SalesforceEvent("Record Created Or Updated","Event");
+			var $sfaProcessName = $bo_act_serviceFlowAutomation.createServiceFlowAutomationProcess_SalesforceEvent("Record Field Updated","ServiceMax Event");
+			var $sfaProcessName = $bo_act_serviceFlowAutomation.createServiceFlowAutomationProcess_SalesforceEvent("Record Updated","ServiceMax Event");
+			var $sfaProcessName = $bo_act_serviceFlowAutomation.createServiceFlowAutomationProcess_SalesforceEvent("Record Created Or Updated","ServiceMax Event");
+			var $sfaProcessName = $bo_act_serviceFlowAutomation.createServiceFlowAutomationProcess_SalesforceEvent("Record Created","ServiceMax Event");
+			var $sfaProcessName = $bo_act_serviceFlowAutomation.createServiceFlowAutomationProcess_GeolocationEvent("On Entry");
+			var $sfaProcessName = $bo_act_serviceFlowAutomation.createServiceFlowAutomationProcess_GeolocationEvent("On Exit");
+			var $sfaProcessName = $bo_act_serviceFlowAutomation.createServiceFlowAutomationProcess_GeolocationEvent("On Entry or Exit");
+			$bo_act_login.logOut();
