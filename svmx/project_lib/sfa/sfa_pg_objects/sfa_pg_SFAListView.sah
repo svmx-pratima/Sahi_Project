@@ -1,6 +1,12 @@
-/**
- * Automation list view page object repository
- */
+
+ /**
+ * Author	: Pratima
+ * Reviewer	: 
+ * Pre-req	: Nothing
+ *  * Automation list view page object repository
+
+*/
+
 
 
 
@@ -40,56 +46,15 @@ var $sfa_pg_SFAListView=new function sfa_pg_SFAListView(){
 	this.textbox_GeoSortBy_Dropdown=_textbox("objGeofenceEventJson__Sort_Records_By");
 	this.btn_actionMenu=_button("/slds-button Button--type-icon-border/");
 	this.btn_radiusDropdown=_textbox("objGeofenceEventJson__Fence_Radius");
+	this.textbox_ConfigButtons_Dropdown=_textbox("Input Picklist__input slds-input slds-combobox__input[3]");
 
 	this.btn_autNameAscSort=_div("/sort-asc/");
+	
 
-	
-	//Confirmation message items on delete window 
-	this.heading_confirmationAlert=_heading2("Are you sure you want to delete this Transactions?");
-	this.heading_usedTrnMessage=_div("Below are the different areas where this transaction is being used:");
-
-	
-	//Confirmation message items on transaction window 
-	this.btn_trnDeleteSucessMsg=_heading2("SFM TODO_TAG");
-	this.btn_closeTrnDeleteSucessMsg=_button("Close",_near(this.$btn_trnDeleteSucessMsg));
-	
-	//Clone Window items
-	this.heading_cloneTrn=_heading2("/Clone: /");
-	this.label_trnType=_label("Type");
-	this.label_trnDescription=_label("Description");
-	this.label_trnTags=_span("Tags");
-	this.txt_trnType=_textbox("entitySubType");
-	this.txt_trnDescription=_textarea("entityDescription");
-	this.txt_searchTag=_textbox("entitySearch");
-	this.btn_trnCloneCancel=_button("Cancel");
-	this.btn_trnCloneSave=_button("Save");
-	
-	//Recent Item div
-	this.btn_recentSearchDiv=_div("Recent Items");
-	//this.lbl_recentItem=_listItem("Recent Items"); //commented this as its invalid ajay 6/14/2019
-	
-	//Type Picklist items
-	this.btn_heading_defaultView=_span("DEFAULT VIEWS");
-	this.btn_pickListMenu=_div("/Menu Picklist__menu/");
-	this.link_showAll=_link("Show All");
-	this.link_recent=_link("Recents (Edited in Last 7 days)");
-	this.link_stdTransaction=_link("Standard SFM Transactions");
-	this.link_otherTrn=_link("Other Transaction");
-	this.link_createSourceToTarget=_link("To create Source to Target records");
-	this.link_createMapChildLine=_link("To create and map child lines only");
-	this.link_createManageChildLine=_span("To create and manage child lines");
-	
-	//Where Used window Items
-	this.btn_heading_whereUsedDivHeading=_heading2("/Where Used:.*/");
-	this.btn_heading_SFMUsed=_div("Below are the different areas where this transaction is being used:");
-	this.btn_heading_SFMSteps=_div("Service Flow Wizard Step");
-	this.btn_closeWindow=_button("Button ModalHeader__close slds-modal__close slds-button Button--type-icon-inverse slds-button--icon-inverse slds-button_icon-inverse");
-	
 	this.textbox_SFATitle = _textbox("strSFAProcessName");
 
 /** Function to return Timestamp
 	 * Function Name : timestamp
-	 * Author - Ajay Kumar 28-Feb-2019
 	 * Description : This function will return the current time stamp in below format
 	 *     YYYYMMDDHHMMSS
 	 * Ex; 20190227144201
@@ -185,6 +150,25 @@ else if($DOMObject == "objSFDCEventJson__Event_Trigger_Fields")
 			else if($DOMObject == "strSFMProcessId")
 			{		
 			 _click(_textbox("strSFMProcessId"));
+				 _wait(1000);
+				 $links = _collect("_link","/.*/",_in(_list("Menu__list slds-dropdown__list[1]")));
+				 $linkslen=$links.length;
+				 _log("TOTAL LINKS IN DROPDOWN ARE"+$linkslen);				 
+				 
+				 if($counter >= $linkslen)
+				 {
+					 $counter = $linkslen-1;
+				  }
+		
+			 //To select pick list item based on the random index generated
+				_log("Index is"+$counter);
+				_log($links[$counter]);
+
+				_click($links[$counter]);
+			}	
+			else if($DOMObject == "Input Picklist__input slds-input slds-combobox__input[2]")
+			{		
+			 _click(_textbox("Input Picklist__input slds-input slds-combobox__input[2]"));
 				 _wait(1000);
 				 $links = _collect("_link","/.*/",_in(_list("Menu__list slds-dropdown__list[2]")));
 				 $linkslen=$links.length;
@@ -399,20 +383,96 @@ else if($DOMObject == "objSFDCEventJson__Event_Trigger_Fields")
 				_log($links[$counter]);
 
 				_click($links[$counter]);
+			}
+			else if($DOMObject == "Input Picklist__input slds-input slds-combobox__input[3]")
+			{		
+			 _click(_textbox("Input Picklist__input slds-input slds-combobox__input[3]"));
+				 _wait(1000);
+				 $links = _collect("_link","/.*/",_in(_list("Menu__list slds-dropdown__list[3]")));
+				 $linkslen=$links.length;
+				 _log("TOTAL LINKS IN DROPDOWN ARE"+$linkslen);				 
+				 
+				 if($counter >= $linkslen)
+				 {
+					 $counter = $linkslen-1;
+				  }
+		
+			 //To select pick list item based on the random index generated
+				_log("Index is"+$counter);
+				_log($links[$counter]);
+
+				_click($links[$counter]);
 			}	
+			else if($DOMObject == "Input Picklist__input slds-input slds-combobox__input[4]")
+			{		
+			 _click(_textbox("Input Picklist__input slds-input slds-combobox__input[4]"));
+				 _wait(1000);
+				 $links = _collect("_link","/.*/",_in(_list("Menu__list slds-dropdown__list[4]")));
+				 $linkslen=$links.length;
+				 _log("TOTAL LINKS IN DROPDOWN ARE"+$linkslen);				 
+				 
+				 if($counter >= $linkslen)
+				 {
+					 $counter = $linkslen-1;
+				  }
+		
+			 //To select pick list item based on the random index generated
+				_log("Index is"+$counter);
+				_log($links[$counter]);
+
+				_click($links[$counter]);
+			}	
+			else if($DOMObject == "Input Picklist__input slds-input slds-combobox__input[5]")
+			{		
+			 _click(_textbox("Input Picklist__input slds-input slds-combobox__input[5]"));
+				 _wait(1000);
+				 $links = _collect("_link","/.*/",_in(_list("Menu__list slds-dropdown__list[5]")));
+				 $linkslen=$links.length;
+				 _log("TOTAL LINKS IN DROPDOWN ARE"+$linkslen);				 
+				 
+				 if($counter >= $linkslen)
+				 {
+					 $counter = $linkslen-1;
+				  }
+		
+			 //To select pick list item based on the random index generated
+				_log("Index is"+$counter);
+				_log($links[$counter]);
+
+				_click($links[$counter]);
+			}	
+			else if($DOMObject == "Input Picklist__input slds-input slds-combobox__input[6]")
+			{		
+			 _click(_textbox("Input Picklist__input slds-input slds-combobox__input[6]"));
+				 _wait(1000);
+				 $links = _collect("_link","/.*/",_in(_list("Menu__list slds-dropdown__list6]")));
+				 $linkslen=$links.length;
+				 _log("TOTAL LINKS IN DROPDOWN ARE"+$linkslen);				 
+				 
+				 if($counter >= $linkslen)
+				 {
+					 $counter = $linkslen-1;
+				  }
+		
+			 //To select pick list item based on the random index generated
+				_log("Index is"+$counter);
+				_log($links[$counter]);
+
+				_click($links[$counter]);
+			}	
+			
 	  };
-	  
-	 /**
+	
+		 /**
 		 * Function to sort list view Items
-		 * Modified by - Ajay Kumar 5-Mar-2019
-		 * $colName - Column name to sort Ex:"TRANSACTION NAME","DATA VALIDATION RULES NAME"
+		 * $colName - Column name to sort Ex:"Automation Name","Last Edited Date"
 		 * $order - Order to sort Ex:ascending or descending.
 		 **/
-	 /* Sorting on list View */
+	 /* Sorting on Automation list View */
 	  
 	this.colSort=function($colName,$order){
 		//Collection All element under mentioned column
-		var $list=null;// commented below for Tag name Ajay 6/17/2019
+		var $list=null;
 		if ($colName=="Automation Name") {
 				_log("Under if loop1: ");
 				$list =_collect("_div","/DataGrid__cell/",_under(_parentNode(_div($colName),"DIV",1)));
@@ -438,7 +498,7 @@ else if($DOMObject == "objSFDCEventJson__Event_Trigger_Fields")
 		for(var $i=0;$i<$listName.length;$i++){
 			
 			$orgList[$i]=$listName[$i];
-			_log("Orginal Item ="+$orgList[$i]+ "Array Item=" +$listName[$i]);
+		//	_log("Orginal Item ="+$orgList[$i]+ "Array Item=" +$listName[$i]);
 		}
 		
 		//Sorting based on Ascending or descending
@@ -455,23 +515,20 @@ else if($DOMObject == "objSFDCEventJson__Event_Trigger_Fields")
 		var $retVal=false;
 		for(var $i=0;$i<$linkListSorted.length;$i++){	
 		//	_log("Sorted Links len"+$linkListSorted.length);
+	
 			if($orgList[$i]==$linkListSorted[$i]){;
 				$retVal=true;
-				//_log("Status of list values"+$retVal);
+				_log("Status of list values"+$retVal);
 			}else{
-				_log("Actual object is: "+$orgList[$i]);
-				_log("Expected object is: "+$linkListSorted[$i]);
+				
 				$retVal=false;
 				break;
 			}	
-		}
+
 		//_assertTrue($retVal, "Links on "+$colName+" column are not sorted in order");
 		return $retVal;
+		_log($retVal)
 	};
 
 	  };
-	  
-	  
-		
-
-	
+};

@@ -27,7 +27,8 @@ var $bo_pg_serviceFlowAutomation = new function bo_pg_serviceFlowAutomation(){
 	 * Selects Entitlement Settings radio button
 	 */
 	this.sel_SFAProcess = function($sfaProcessName){
-		_click(_button(0,_near(_link($sfaProcessName))));
+		//_click(_button(0,_near(_link($sfaProcessName))));
+		
 	};
 	
 };

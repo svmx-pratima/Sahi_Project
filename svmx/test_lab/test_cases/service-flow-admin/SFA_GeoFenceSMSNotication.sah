@@ -70,35 +70,21 @@ _click($sfa_pg_SFAListView.buttonNext);
 _wait(500);
 _click(_span("slds-radio--faux[2]"));
 _click($sfa_pg_SFAListView.buttonNext);
-_click(_link("Contact[1]"));
-_click(_span("Menu__item-content slds-truncate[11]"));
-_click(_link("Mobile Phone"));
+_click(_div("(Enter a custom number)"));
+_click(_span("United States of America (the)"));
+_setValue(_telephonebox("* Phone"), "4083685235");
 _click(_span("+ Add another recipient"));
-_click(_link("Additional Number[1]"));
-_click(_div("+1"));
+_click(_link("AccountAccount[1]"));
+_click(_span("Billing Country"));
+_click(_span("Account Phone"));
+_click(_div("expando-unique-id"));
+//$sfa_pg_SFAListView.selectRandomPicklistitem($sfa_pg_SFAListView.btn_radiusDropdown_Recipients);
+//_click(_link("Contact[1]"));
+//_click(_span("Menu__item-content slds-truncate[11]"));
+//_click(_link("Mobile Phone"));
 _click(_textarea("objSMSActionJson.Message_Body"));
 _setValue(_textarea("objSMSActionJson.Message_Body"), "test");
-_button("Finish")
-
-//$sfa_pg_SFAListView.selectRandomPicklistitem($sfa_pg_SFAListView.btn_radiusDropdown_Recipients);
-
-/**
-$sfa_pg_SFAListView.selectRandomPicklistitem("objGeofenceActionJson__Message_Body.)
-$sfa_pg_SFAListView.selectRandomPicklistitem("objGeofenceEventJson__Trigger_Type");
-_click($sfa_pg_SFAListView.buttonNext);
-$sfa_pg_SFAListView.selectRandomPicklistitem("objGeofenceEventJson__Sort_Records_By");
-//$sfa_pg_SFAListView.selectRandomPicklistitem("objGeofenceEventJson__Location_Field");
-_click(_link("Site"));
-$sfa_pg_SFAListView.selectRandomPicklistitem("objGeofenceEventJson__Fence_Radius");
-_click($sfa_pg_SFAListView.buttonNext);
-_wait(500);
-_click($sfa_pg_SFAListView.buttonNext);
-_setValue(_textbox("objGeofenceActionJson__Message_Title"),$titleName);
-_setValue(_textarea("objGeofenceActionJson__Message_Body"),$titleName);
-$sfa_pg_SFAListView.selectRandomPicklistitem("strSFMProcessId");
-
-
-*/
+_click(_button("Finish"));
 
 
 
